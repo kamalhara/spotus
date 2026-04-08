@@ -1,8 +1,10 @@
+import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Oauth from "../../components/Oauth";
 import { auth, db } from "../../config/firebase.config";
 
 export default function SignUp() {
@@ -11,11 +13,19 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  const router = useRouter();
+
   const handleSignup = async () => {
     try {
+      if (!name || !email || !password || !confirmPassword) {
+        const error = new Error("Please fill all the fields");
+        error.code = "ERR_MISSING_FIELDS";
+        throw error;
+      }
       if (password !== confirmPassword) {
-        alert("Passwords do not match");
-        return;
+        const error = new Error("Passwords do not match");
+        error.code = "ERR_PASSWORDS_MISMATCH";
+        throw error;
       }
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -83,6 +93,7 @@ export default function SignUp() {
             placeholder="********"
             value={password}
             onChangeText={setPassword}
+            secureTextEntry
           />
         </View>
 
@@ -95,7 +106,11 @@ export default function SignUp() {
             placeholder="********"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
+            secureTextEntry
           />
+          {password !== confirmPassword && (
+            <Text className="text-red-700">Passwords do not match</Text>
+          )}
         </View>
       </View>
 
@@ -107,6 +122,21 @@ export default function SignUp() {
           <Text className="text-white text-center font-bold text-lg">
             Sign Up
           </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View className="flex flex-row items-center justify-center gap-2 my-4">
+        <View className="w-1/2 h-0.5 bg-gray-300"></View>
+        <Text className="text-gray-500">Or continue with</Text>
+        <View className="w-1/2 h-0.5 bg-gray-300"></View>
+      </View>
+
+      <Oauth />
+
+      <View className="flex flex-row items-center justify-center gap-2">
+        <Text>Already have an account?</Text>
+        <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+          <Text className="text-primary font-bold">Login</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
