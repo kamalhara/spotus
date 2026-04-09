@@ -18,8 +18,15 @@
               "com.googleusercontent.apps.704434880673-objjnb36t9ctc3vpj8s3fi7vtucdui1b",
               "spotus"
             ]
+          },
+          {
+            "CFBundleURLSchemes": [
+              "com.googleusercontent.apps.704434880673-objjnb36t9ctc3vpj8s3fi7vtucdui1b",
+              "spotus"
+            ]
           }
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -50,11 +57,12 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,
-      "reactCompiler": true
+      "reactCompiler": false
     },
     "extra": {
       "router": {},

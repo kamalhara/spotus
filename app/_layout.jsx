@@ -1,18 +1,33 @@
-import { ClerkProvider } from "@clerk/expo";
-import { tokenCache } from "@clerk/expo/token-cache";
+import { ClerkLoaded, ClerkProvider } from "@clerk/expo";
 import { Stack } from "expo-router";
+import { tokenCache } from "../utils/cache";
 import "../global.css";
 
+const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+
+if (!publishableKey) {
+  console.error(
+    "Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env",
+  );
+}
+
 export default function RootLayout() {
+  console.log("Clerk Publishable Key:", publishableKey ? "EXISTS" : "MISSING");
+
   return (
     <ClerkProvider
-      publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      publishableKey={publishableKey}
       tokenCache={tokenCache}
+      navigation={(to) => {
+        console.log("Clerk navigating to:", to);
+      }}
     >
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-      </Stack>
+      <ClerkLoaded>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        </Stack>
+      </ClerkLoaded>
     </ClerkProvider>
   );
 }

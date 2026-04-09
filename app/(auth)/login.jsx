@@ -1,21 +1,40 @@
-import { useSignIn } from "@clerk/expo";
+import { useAuth, useClerk } from "@clerk/expo";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Oauth from "../../components/Oauth";
 
 export default function Login() {
-  const { signIn, setActive, isLoaded } = useSignIn();
+  const { isLoaded } = useAuth();
+  const { client, setActive } = useClerk();
+  const signIn = client?.signIn;
   const router = useRouter();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
+  console.log("Clerk loaded?", isLoaded);
   const onSignInPress = async () => {
-    if (!isLoaded) return;
+    if (!isLoaded) return console.log("Clerk is not loaded");
+
+    setLoading(true);
+    setError("");
 
     try {
+      if (!signIn) {
+        throw new Error("SignIn resource not available on the client");
+      }
+
       const signInAttempt = await signIn.create({
         identifier: emailAddress,
         password,
@@ -23,16 +42,38 @@ export default function Login() {
 
       if (signInAttempt.status === "complete") {
         await setActive({ session: signInAttempt.createdSessionId });
-        router.push("/");
+        router.replace("/");
       } else {
-        console.error("Login incomplete: ", signInAttempt);
+        console.warn("Sign in status not complete:", signInAttempt.status);
+        setError(`Sign in failed: ${signInAttempt.status}. Please check your credentials.`);
       }
     } catch (err) {
-      console.error("Login error:", JSON.stringify(err, null, 2));
-      alert(err.errors?.[0]?.message || err.message);
+      console.error("Sign in error caught:", err);
+      let errorMessage = "An error occurred during sign in.";
+      if (err.errors) {
+        err.errors.forEach((e, i) => {
+          console.error(`Error ${i}: ${e.longMessage || e.message}`);
+          if (e.code === "strategy_for_user_invalid") {
+            errorMessage = "This login method is not enabled in your Clerk Dashboard. Ensure 'Email & Password' is enabled.";
+          } else {
+            errorMessage = e.longMessage || e.message;
+          }
+        });
+      }
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
+  if (!isLoaded) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#000" />
+        <Text>Loading authentication...</Text>
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView className="bg-bg h-screen px-7">
       <View className=" justify-center mt-10 mb-10">
@@ -71,17 +112,23 @@ export default function Login() {
             secureTextEntry
           />
         </View>
+        {error ? <Text className="text-red-500">{error}</Text> : null}
       </View>
 
       <View>
-        <TouchableOpacity
-          className="bg-primary px-10 py-4 rounded-2xl w-full"
+        <Pressable
+          disabled={loading}
           onPress={onSignInPress}
+          className={`bg-primary px-10 py-4 rounded-2xl w-full flex-row justify-center items-center ${loading ? "opacity-70" : "active:opacity-80"}`}
         >
-          <Text className="text-white text-center font-bold text-lg">
-            Login
-          </Text>
-        </TouchableOpacity>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text className="text-white text-center font-bold text-lg">
+              Login
+            </Text>
+          )}
+        </Pressable>
       </View>
 
       <View className="flex flex-row items-center justify-center gap-2 my-6">
