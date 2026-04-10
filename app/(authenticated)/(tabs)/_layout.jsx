@@ -1,8 +1,15 @@
-import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
+import {
+  Badge,
+  Icon,
+  Label,
+  NativeTabs,
+} from "expo-router/unstable-native-tabs";
+import { Platform } from "react-native";
 
 export default function TabsLayout() {
-  return (
+  return Platform.OS === "android" ? (
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: "#4F46E5", // primary color
@@ -68,5 +75,37 @@ export default function TabsLayout() {
         }}
       />
     </Tabs>
+  ) : (
+    <NativeTabs>
+      <NativeTabs.Trigger name="home">
+        <Label>Home</Label>
+        <Icon
+          selectedColor="#4F46E5"
+          sf={{ default: "house", selected: "house.fill" }}
+        />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="rooms">
+        <Label>Rooms</Label>
+        <Icon
+          selectedColor="#4F46E5"
+          sf={{ default: "person.2", selected: "person.2.fill" }}
+        />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="chat">
+        <Label>Chat</Label>
+        <Icon
+          selectedColor="#4F46E5"
+          sf={{ default: "message", selected: "message.fill" }}
+        />
+        <Badge>3</Badge>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="profile">
+        <Label>Profile</Label>
+        <Icon
+          selectedColor="#4F46E5"
+          sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }}
+        />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

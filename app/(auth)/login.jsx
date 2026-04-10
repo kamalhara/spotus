@@ -45,7 +45,9 @@ export default function Login() {
         router.replace("/");
       } else {
         console.warn("Sign in status not complete:", signInAttempt.status);
-        setError(`Sign in failed: ${signInAttempt.status}. Please check your credentials.`);
+        setError(
+          `Sign in failed: ${signInAttempt.status}. Please check your credentials.`,
+        );
       }
     } catch (err) {
       console.error("Sign in error caught:", err);
@@ -54,7 +56,8 @@ export default function Login() {
         err.errors.forEach((e, i) => {
           console.error(`Error ${i}: ${e.longMessage || e.message}`);
           if (e.code === "strategy_for_user_invalid") {
-            errorMessage = "This login method is not enabled in your Clerk Dashboard. Ensure 'Email & Password' is enabled.";
+            errorMessage =
+              "This login method is not enabled in your Clerk Dashboard. Ensure 'Email & Password' is enabled.";
           } else {
             errorMessage = e.longMessage || e.message;
           }
