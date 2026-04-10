@@ -8,6 +8,8 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Oauth from "../../components/Oauth";
@@ -78,7 +80,8 @@ export default function Login() {
     );
   }
   return (
-    <SafeAreaView className="bg-bg h-screen px-7">
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView className="bg-bg h-screen px-7">
       <View className=" justify-center mt-10 mb-10">
         <Text className="text-primary text-2xl font-bold">Spot Us</Text>
       </View>
@@ -149,5 +152,6 @@ export default function Login() {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }

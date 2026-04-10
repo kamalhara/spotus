@@ -9,6 +9,7 @@ export default function CustomInput({
   secureTextEntry,
   icon,
   error,
+  className = "",
   ...props
 }) {
   const [isFocused, setIsFocused] = useState(false);
@@ -16,13 +17,19 @@ export default function CustomInput({
   return (
     <View className="flex flex-col w-full">
       {label && (
-        <Text className="uppercase text-sm tracking-widest text-gray-500 font-semibold mb-1">
+        <Text
+          className={`uppercase text-sm tracking-widest text-gray-500 font-semibold mb-1 ${className}`}
+        >
           {label}
         </Text>
       )}
       <View
         className={`flex-row items-center bg-gray-200 rounded-lg px-3 py-4 border-2 ${
-          error ? "border-red-500" : isFocused ? "border-primary" : "border-transparent"
+          error
+            ? "border-red-500"
+            : isFocused
+              ? "border-primary"
+              : "border-transparent"
         }`}
       >
         {icon && <View className="mr-2">{icon}</View>}

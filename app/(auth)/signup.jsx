@@ -2,7 +2,7 @@ import { useAuth, useClerk } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View, TouchableWithoutFeedback, Keyboard } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../components/CustomButton";
 import CustomInput from "../../components/CustomInput";
@@ -77,7 +77,8 @@ export default function SignUp() {
   }
 
   return (
-    <SafeAreaView className="bg-bg flex-1 px-8">
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <SafeAreaView className="bg-bg flex-1 px-8">
       <View className="mb-10 mt-10">
         <Text className="text-secondary text-4xl font-bold">
           {pendingVerification ? "Verify Email" : "Create Account"}
@@ -163,5 +164,6 @@ export default function SignUp() {
         </TouchableOpacity>
       </View>
     </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 }
