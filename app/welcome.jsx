@@ -8,7 +8,7 @@ export default function Welcome() {
   const { isSignedIn, isLoaded } = useAuth();
 
   if (isLoaded && isSignedIn) {
-    return <Redirect href="/(home)" />;
+    return <Redirect href="/(authenticated)/(tabs)/home" />;
   }
 
   return (

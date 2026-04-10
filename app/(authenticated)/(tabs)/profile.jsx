@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import useFirestoreUser from "../../hook/useFireStoreUser";
+import useFirestoreUser from "../../../hook/useFireStoreUser";
 
 export default function Home() {
   const { signOut } = useAuth();
