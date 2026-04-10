@@ -1,9 +1,15 @@
-import { useRouter } from "expo-router";
+import { Redirect, useRouter } from "expo-router";
 import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuth } from "@clerk/expo";
 
 export default function Welcome() {
   const router = useRouter();
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (isLoaded && isSignedIn) {
+    return <Redirect href="/(home)" />;
+  }
 
   return (
     <SafeAreaView className="bg-bg flex-1 px-8 justify-between pb-10">
