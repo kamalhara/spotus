@@ -1,13 +1,28 @@
 import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
-import { useRouter } from "expo-router";
-import { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { useRouter, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
+import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import RoomCard from "../../../components/RoomCard";
+import { getRooms } from "../../../lib/getRoom";
 
 export default function Home() {
   const [distance, setDistance] = useState(5);
   const router = useRouter();
+
+  const [rooms, setRooms] = useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadRooms = async () => {
+        const data = await getRooms();
+        setRooms(data);
+      };
+
+      loadRooms();
+    }, [])
+  );
 
   return (
     <SafeAreaView className="bg-bg h-screen px-4">
@@ -65,6 +80,16 @@ export default function Home() {
         <Ionicons name="add-circle" size={24} color="white" />
         <Text className="text-white font-bold text-lg ml-2">Create a Room</Text>
       </TouchableOpacity>
+
+      <View className="mt-8">
+        <Text className="text-primary text-lg font-semibold">Rooms</Text>
+        <Text className="text-secondary text-2xl font-bold">Nearby Rooms</Text>
+      </View>
+      <FlatList
+        data={rooms}
+        renderItem={({ item }) => <RoomCard room={item} />}
+        keyExtractor={(item) => item.id}
+      />
     </SafeAreaView>
   );
 }

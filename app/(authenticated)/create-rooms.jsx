@@ -134,6 +134,7 @@ export default function CreateRooms() {
                   <Switch
                     trackColor={{ false: "#767577", true: "#4F46E5" }}
                     onValueChange={toggleSwitch}
+                    ios_backgroundColor="#767577"
                     value={isEnabled}
                   />
                 </View>
