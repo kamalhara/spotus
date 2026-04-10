@@ -19,6 +19,7 @@ export default function TabsLayout() {
           borderTopWidth: 1,
           borderTopColor: "#E5E5E5",
           paddingTop: 5,
+          height: 80,
         },
       }}
     >
@@ -103,7 +104,10 @@ export default function TabsLayout() {
         <Label>Profile</Label>
         <Icon
           selectedColor="#4F46E5"
-          sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }}
+          sf={{
+            default: "person.crop.circle",
+            selected: "person.crop.circle.fill",
+          }}
         />
       </NativeTabs.Trigger>
     </NativeTabs>

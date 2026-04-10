@@ -2,14 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import { useRouter, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, TouchableOpacity, View, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/RoomCard";
+import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 
 export default function Home() {
   const [distance, setDistance] = useState(5);
   const router = useRouter();
+  const { firestoreUser } = useFirestoreUser();
 
   const [rooms, setRooms] = useState([]);
 
@@ -25,14 +27,17 @@ export default function Home() {
   );
 
   return (
-    <SafeAreaView className="bg-bg h-screen px-4">
-      <View className="flex flex-row justify-between items-center">
-        <TouchableOpacity>
-          <Ionicons name="search" size={24} color="black" />
+    <SafeAreaView className="bg-[#FAFAFA] h-screen px-6">
+      <View className="flex flex-row justify-between items-center my-2">
+        <TouchableOpacity onPress={() => router.push("/profile")}>
+          <Image 
+            source={{ uri: firestoreUser?.profilePic || "https://picsum.photos/200" }} 
+            className="w-11 h-11 rounded-full border border-gray-200" 
+          />
         </TouchableOpacity>
-        <Text className="text-primary text-2xl font-bold">Spot Us</Text>
-        <TouchableOpacity>
-          <Ionicons name="settings-outline" size={24} color="black" />
+        <Text className="text-secondary tracking-tighter text-2xl font-black">Spot Us</Text>
+        <TouchableOpacity className="w-11 h-11 bg-white rounded-full items-center justify-center border border-gray-100 shadow-sm shadow-slate-100">
+          <Ionicons name="notifications-outline" size={20} color="black" />
         </TouchableOpacity>
       </View>
 
@@ -52,8 +57,8 @@ export default function Home() {
         </View>
       </View>
 
-      <View className="mt-4 bg-gray-100 rounded-lg px-2 py-4 border border-gray-200">
-        <Text className="text-gray-500 text-sm font-semibold ">
+      <View className="mt-6 bg-white shadow-sm shadow-slate-200 rounded-3xl px-5 py-5 border border-slate-100">
+        <Text className="text-gray-500 text-sm font-semibold mb-2 ml-1">
           Search Radius
         </Text>
         <Slider
@@ -75,7 +80,7 @@ export default function Home() {
 
       <TouchableOpacity
         onPress={() => router.push("/create-rooms")}
-        className="mt-8 bg-primary py-4 px-6 rounded-2xl flex-row justify-center items-center shadow-md active:opacity-90"
+        className="mt-10 bg-primary py-4 px-6 rounded-[20px] flex-row justify-center items-center shadow-lg shadow-indigo-200 active:opacity-90"
       >
         <Ionicons name="add-circle" size={24} color="white" />
         <Text className="text-white font-bold text-lg ml-2">Create a Room</Text>

@@ -12,11 +12,11 @@ export default function CustomButton({
   const getButtonStyles = () => {
     switch (type) {
       case "outline":
-        return "bg-transparent border border-primary";
+        return "bg-transparent border border-gray-200";
       case "ghost":
         return "bg-transparent";
       default:
-        return "bg-primary";
+        return "bg-primary shadow-md shadow-indigo-200";
     }
   };
 
@@ -34,7 +34,7 @@ export default function CustomButton({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled || loading}
-      className={`px-10 py-4 rounded-xl w-full flex-row justify-center items-center ${getButtonStyles()} ${
+      className={`px-10 py-4 rounded-2xl w-full flex-row justify-center items-center ${getButtonStyles()} ${
         disabled || loading ? "opacity-70" : "active:opacity-80"
       } ${className}`}
     >

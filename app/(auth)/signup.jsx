@@ -78,15 +78,24 @@ export default function SignUp() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="bg-bg flex-1 px-8">
-      <View className="mb-10 mt-10">
-        <Text className="text-secondary text-4xl font-bold">
-          {pendingVerification ? "Verify Email" : "Create Account"}
+      <SafeAreaView className="bg-white flex-1 px-8">
+      <View className="flex-row items-center mt-4">
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
+        >
+          <Ionicons name="arrow-back" size={20} color="black" />
+        </TouchableOpacity>
+      </View>
+
+      <View className="mb-10 mt-8">
+        <Text className="text-secondary text-4xl font-black tracking-tight mb-2">
+          {pendingVerification ? "Verify Email" : "Create\nAccount"}
         </Text>
-        <Text className="text-gray-500 text-lg mt-2">
+        <Text className="text-gray-500 text-lg leading-6 mt-1">
           {pendingVerification
             ? `Enter the code sent to ${emailAddress}`
-            : "Join the local discovery circle"}
+            : "Join the local discovery circle and connect with people nearby."}
         </Text>
       </View>
 

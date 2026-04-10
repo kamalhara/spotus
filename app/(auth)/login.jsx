@@ -3,15 +3,16 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   ActivityIndicator,
-  Pressable,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import CustomInput from "../../components/CustomInput";
+import CustomButton from "../../components/CustomButton";
 import Oauth from "../../components/Oauth";
 
 export default function Login() {
@@ -81,60 +82,49 @@ export default function Login() {
   }
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="bg-bg h-screen px-7">
-      <View className=" justify-center mt-10 mb-10">
-        <Text className="text-primary text-2xl font-bold">Spot Us</Text>
+      <SafeAreaView className="bg-white flex-1 px-8">
+      <View className="flex-row items-center mt-4">
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
+        >
+          <Ionicons name="arrow-back" size={20} color="black" />
+        </TouchableOpacity>
       </View>
 
-      <View className="mb-10">
-        <Text className="text-2xl font-bold mb-2">Welcome Back!</Text>
-        <Text className="text-gray-500">Sign in to your account</Text>
+      <View className="mt-8 mb-10">
+        <Text className="text-secondary text-4xl font-black mb-2 tracking-tight">Welcome{"\n"}Back</Text>
+        <Text className="text-gray-500 text-lg leading-6 mt-1">Sign in to your account and continue your journey.</Text>
       </View>
 
-      <View className="mb-10 flex flex-col gap-5">
-        <View className="flex flex-col gap-1">
-          <Text className="uppercase text-sm tracking-wider text-gray-600">
-            Email
-          </Text>
-          <TextInput
-            className="bg-gray-200 rounded-lg py-4 px-3"
-            placeholder="example@gmail.com"
-            value={emailAddress}
-            onChangeText={setEmailAddress}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-        </View>
+      <View className="mb-10 flex flex-col gap-6">
+        <CustomInput
+          label="Email Address"
+          placeholder="example@gmail.com"
+          value={emailAddress}
+          onChangeText={setEmailAddress}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
+        />
 
-        <View className="flex flex-col gap-1">
-          <Text className="uppercase text-sm tracking-wider text-gray-600">
-            Password
-          </Text>
-          <TextInput
-            className="bg-gray-200 rounded-lg py-4 px-3"
-            placeholder="********"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-        </View>
-        {error ? <Text className="text-red-500">{error}</Text> : null}
+        <CustomInput
+          label="Password"
+          placeholder="********"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          icon={<Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />}
+        />
+        {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
       </View>
 
       <View>
-        <Pressable
-          disabled={loading}
-          onPress={onSignInPress}
-          className={`bg-primary px-10 py-4 rounded-2xl w-full flex-row justify-center items-center ${loading ? "opacity-70" : "active:opacity-80"}`}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text className="text-white text-center font-bold text-lg">
-              Login
-            </Text>
-          )}
-        </Pressable>
+        <CustomButton
+           title="Login"
+           onPress={onSignInPress}
+           loading={loading}
+        />
       </View>
 
       <View className="flex flex-row items-center justify-center gap-2 my-6">
