@@ -45,10 +45,9 @@ export default function CreateRooms() {
     if (!user) return alert("User not loaded");
     try {
       await createRoom(title, selectedCategory, isEnabled, user.id);
-      console.log("Room created successfully");
       router.back();
     } catch (err) {
-      console.log(err);
+      console.error("Error creating room:", err);
     }
   };
 

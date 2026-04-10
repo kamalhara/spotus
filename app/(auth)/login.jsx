@@ -26,9 +26,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  console.log("Clerk loaded?", isLoaded);
   const onSignInPress = async () => {
-    if (!isLoaded) return console.log("Clerk is not loaded");
+    if (!isLoaded) return;
 
     setLoading(true);
     setError("");

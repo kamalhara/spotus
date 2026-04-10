@@ -1,6 +1,8 @@
 import { ClerkLoaded, ClerkProvider, useUser } from "@clerk/expo";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../global.css";
 import syncUserToFirebase from "../lib/syncUser";
 import { tokenCache } from "../utils/cache";
@@ -24,22 +26,24 @@ function UserSync() {
 }
 
 export default function RootLayout() {
-  console.log("Clerk Publishable Key:", publishableKey ? "EXISTS" : "MISSING");
-
   return (
-    <ClerkProvider
-      publishableKey={publishableKey}
-      tokenCache={tokenCache}
-    >
-      <ClerkLoaded>
-        <Stack>
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="welcome" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
-        </Stack>
-        <UserSync />
-      </ClerkLoaded>
-    </ClerkProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ClerkProvider
+        publishableKey={publishableKey}
+        tokenCache={tokenCache}
+      >
+        <ClerkLoaded>
+          <BottomSheetModalProvider>
+            <Stack>
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              <Stack.Screen name="welcome" options={{ headerShown: false }} />
+              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+              <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
+            </Stack>
+            <UserSync />
+          </BottomSheetModalProvider>
+        </ClerkLoaded>
+      </ClerkProvider>
+    </GestureHandlerRootView>
   );
 }

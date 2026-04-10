@@ -1,4 +1,5 @@
 import { Stack } from "expo-router";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export default function _layout() {
   return (

@@ -34,7 +34,7 @@ export default function CustomButton({
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled || loading}
-      className={`px-10 py-4 rounded-2xl w-full flex-row justify-center items-center ${getButtonStyles()} ${
+      className={`px-4 py-4 rounded-2xl w-full flex-row justify-center items-center ${getButtonStyles()} ${
         disabled || loading ? "opacity-70" : "active:opacity-80"
       } ${className}`}
     >

@@ -20,7 +20,7 @@ export default function useFirestoreUser() {
           setFirestoreUser({ id: snap.id, ...snap.data() });
         }
       } catch (err) {
-        console.log("Firestore user fetch error:", err);
+        console.error("Firestore user fetch error:", err);
       } finally {
         setLoading(false);
       }
