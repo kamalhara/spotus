@@ -83,65 +83,65 @@ export default function Login() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView className="bg-white flex-1 px-8">
-      <View className="flex-row items-center mt-4">
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
-        >
-          <Ionicons name="arrow-back" size={20} color="black" />
-        </TouchableOpacity>
-      </View>
+        <View className="flex-row items-center mt-4">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
+          >
+            <Ionicons name="arrow-back" size={20} color="black" />
+          </TouchableOpacity>
+        </View>
 
-      <View className="mt-8 mb-10">
-        <Text className="text-secondary text-4xl font-black mb-2 tracking-tight">Welcome{"\n"}Back</Text>
-        <Text className="text-gray-500 text-lg leading-6 mt-1">Sign in to your account and continue your journey.</Text>
-      </View>
+        <View className="mt-8 mb-10">
+          <Text className="text-secondary text-4xl font-black mb-2 tracking-tight">Welcome{"\n"}Back</Text>
+          <Text className="text-gray-500 text-lg leading-6 mt-1">Sign in to your account and continue your journey.</Text>
+        </View>
 
-      <View className="mb-10 flex flex-col gap-6">
-        <CustomInput
-          label="Email Address"
-          placeholder="example@gmail.com"
-          value={emailAddress}
-          onChangeText={setEmailAddress}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
-        />
+        <View className="mb-10 flex flex-col gap-6">
+          <CustomInput
+            label="Email Address"
+            placeholder="example@gmail.com"
+            value={emailAddress}
+            onChangeText={setEmailAddress}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
+          />
 
-        <CustomInput
-          label="Password"
-          placeholder="********"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          icon={<Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />}
-        />
-        {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
-      </View>
+          <CustomInput
+            label="Password"
+            placeholder="********"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            icon={<Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />}
+          />
+          {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
+        </View>
 
-      <View>
-        <CustomButton
-           title="Login"
-           onPress={onSignInPress}
-           loading={loading}
-        />
-      </View>
+        <View>
+          <CustomButton
+             title="Login"
+             onPress={onSignInPress}
+             loading={loading}
+          />
+        </View>
 
-      <View className="flex flex-row items-center justify-center gap-2 my-6">
-        <View className="w-1/3 h-0.5 bg-gray-300"></View>
-        <Text className="text-gray-500">Or continue with</Text>
-        <View className="w-1/3 h-0.5 bg-gray-300"></View>
-      </View>
+        <View className="flex flex-row items-center justify-center gap-2 my-6">
+          <View className="w-1/3 h-0.5 bg-gray-300"></View>
+          <Text className="text-gray-500">Or continue with</Text>
+          <View className="w-1/3 h-0.5 bg-gray-300"></View>
+        </View>
 
-      <Oauth />
+        <Oauth />
 
-      <View className="flex flex-row items-center justify-center gap-1 mt-6">
-        <Text className="text-gray-600">Don&apos;t have an account?</Text>
-        <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
-          <Text className="text-primary font-bold">Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+        <View className="flex flex-row items-center justify-center gap-1 mt-6">
+          <Text className="text-gray-600">Don&apos;t have an account?</Text>
+          <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
+            <Text className="text-primary font-bold">Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 }

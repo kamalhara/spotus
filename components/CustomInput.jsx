@@ -24,7 +24,8 @@ export default function CustomInput({
         </Text>
       )}
       <View
-        className={`flex-row items-center bg-white rounded-2xl px-4 py-4 border ${error ? "border-red-500 shadow-sm shadow-red-100" : isFocused ? "border-primary shadow-sm shadow-indigo-100" : "border-gray-200"}`}
+        className="flex-row items-center bg-white rounded-2xl px-4 py-4 border"
+        style={{ borderColor: error ? "#ef4444" : isFocused ? "#4F46E5" : "#e5e7eb" }}
       >
         {icon && <View className="mr-2">{icon}</View>}
         <TextInput

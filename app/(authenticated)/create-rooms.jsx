@@ -30,23 +30,21 @@ export default function CreateRooms() {
     "Food",
     "Fashion",
     "Sports",
-    "Other",
+    "Local Events",
   ];
   const { firestoreUser: user } = useFirestoreUser();
 
   const [title, setTitle] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [customCategory, setCustomCategory] = useState("");
   const [isEnabled, setIsEnabled] = useState(false);
 
   const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
   const handleCreateRoom = async () => {
-    const finalCategory = selectedCategory === "Other" ? customCategory.trim() : selectedCategory;
-    if (!title || !finalCategory) return alert("Please fill all the fields");
+    if (!title || !selectedCategory) return alert("Please fill all the fields");
     if (!user) return alert("User not loaded");
     try {
-      await createRoom(title, finalCategory, isEnabled, user.id);
+      await createRoom(title, selectedCategory, isEnabled, user.id);
       console.log("Room created successfully");
       router.back();
     } catch (err) {
@@ -119,19 +117,6 @@ export default function CreateRooms() {
                   </TouchableOpacity>
                 ))}
               </View>
-
-              {selectedCategory === "Other" && (
-                <View className="mt-6">
-                  <CustomInput
-                    label="Custom Category"
-                    placeholder="e.g. Hiking (max 15 chars)"
-                    value={customCategory}
-                    onChangeText={setCustomCategory}
-                    maxLength={15}
-                    icon={<Ionicons name="pricetag-outline" size={20} color="#9CA3AF" />}
-                  />
-                </View>
-              )}
 
               <View className="mt-10">
                 <View className="flex flex-row items-center gap-4 bg-white p-4 rounded-xl  shadow-sm shadow-slate-200">

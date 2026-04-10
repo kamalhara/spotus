@@ -79,100 +79,100 @@ export default function SignUp() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView className="bg-white flex-1 px-8">
-      <View className="flex-row items-center mt-4">
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
-        >
-          <Ionicons name="arrow-back" size={20} color="black" />
-        </TouchableOpacity>
-      </View>
+        <View className="flex-row items-center mt-4">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
+          >
+            <Ionicons name="arrow-back" size={20} color="black" />
+          </TouchableOpacity>
+        </View>
 
-      <View className="mb-10 mt-8">
-        <Text className="text-secondary text-4xl font-black tracking-tight mb-2">
-          {pendingVerification ? "Verify Email" : "Create\nAccount"}
-        </Text>
-        <Text className="text-gray-500 text-lg leading-6 mt-1">
-          {pendingVerification
-            ? `Enter the code sent to ${emailAddress}`
-            : "Join the local discovery circle and connect with people nearby."}
-        </Text>
-      </View>
+        <View className="mb-10 mt-8">
+          <Text className="text-secondary text-4xl font-black tracking-tight mb-2">
+            {pendingVerification ? "Verify Email" : "Create\nAccount"}
+          </Text>
+          <Text className="text-gray-500 text-lg leading-6 mt-1">
+            {pendingVerification
+              ? `Enter the code sent to ${emailAddress}`
+              : "Join the local discovery circle and connect with people nearby."}
+          </Text>
+        </View>
 
-      {!pendingVerification ? (
-        <View className="gap-6">
-          <CustomInput
-            label="Full Name"
-            placeholder="e.g. Alexandria"
-            value={name}
-            onChangeText={setName}
-            autoCapitalize="words"
-            icon={<Ionicons name="person-outline" size={20} color="#9CA3AF" />}
-          />
+        {!pendingVerification ? (
+          <View className="gap-6">
+            <CustomInput
+              label="Full Name"
+              placeholder="e.g. Alexandria"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+              icon={<Ionicons name="person-outline" size={20} color="#9CA3AF" />}
+            />
 
-          <CustomInput
-            label="Email Address"
-            placeholder="example@gmail.com"
-            value={emailAddress}
-            onChangeText={setEmailAddress}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
-          />
+            <CustomInput
+              label="Email Address"
+              placeholder="example@gmail.com"
+              value={emailAddress}
+              onChangeText={setEmailAddress}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
+            />
 
-          <CustomInput
-            label="Password"
-            placeholder="Create a password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            icon={
-              <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />
-            }
-          />
+            <CustomInput
+              label="Password"
+              placeholder="Create a password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              icon={
+                <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />
+              }
+            />
 
-          {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
+            {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
 
-          <View className="mt-4">
+            <View className="mt-4">
+              <CustomButton
+                title="Sign Up"
+                onPress={onSignUpPress}
+                loading={loading}
+              />
+            </View>
+          </View>
+        ) : (
+          <View className="gap-6">
+            <CustomInput
+              label="Verification Code"
+              placeholder="123456"
+              value={code}
+              onChangeText={setCode}
+              keyboardType="number-pad"
+              icon={<Ionicons name="keypad-outline" size={20} color="#9CA3AF" />}
+            />
+            {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
             <CustomButton
-              title="Sign Up"
-              onPress={onSignUpPress}
+              title="Verify & Join"
+              onPress={onPressVerify}
               loading={loading}
             />
+
+            <CustomButton
+              title="Cancel"
+              type="ghost"
+              onPress={() => setPendingVerification(false)}
+            />
           </View>
-        </View>
-      ) : (
-        <View className="gap-6">
-          <CustomInput
-            label="Verification Code"
-            placeholder="123456"
-            value={code}
-            onChangeText={setCode}
-            keyboardType="number-pad"
-            icon={<Ionicons name="keypad-outline" size={20} color="#9CA3AF" />}
-          />
-          {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
-          <CustomButton
-            title="Verify & Join"
-            onPress={onPressVerify}
-            loading={loading}
-          />
+        )}
 
-          <CustomButton
-            title="Cancel"
-            type="ghost"
-            onPress={() => setPendingVerification(false)}
-          />
+        <View className="flex flex-row items-center justify-center gap-1 mt-8">
+          <Text className="text-gray-600">Already have an account?</Text>
+          <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+            <Text className="text-primary font-bold">Log In</Text>
+          </TouchableOpacity>
         </View>
-      )}
-
-      <View className="flex flex-row items-center justify-center gap-1 mt-8">
-        <Text className="text-gray-600">Already have an account?</Text>
-        <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-          <Text className="text-primary font-bold">Log In</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 }

@@ -3,10 +3,7 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 export default function RoomCard({ room }) {
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      className="bg-white rounded-2xl p-5 border border-gray-100 mt-4 shadow-sm shadow-slate-200"
-    >
+    <View className="bg-white rounded-2xl p-5 border border-gray-100 mt-4 shadow-sm shadow-slate-200">
       <View className="flex flex-row justify-between items-center mb-3">
         <View className="bg-gray-100 px-3 py-1.5 rounded-full">
           <Text className="text-gray-600 font-bold tracking-wider uppercase text-[10px]">
@@ -34,11 +31,11 @@ export default function RoomCard({ room }) {
             {room.participants?.length || 1} members
           </Text>
         </View>
-        <View className="bg-primary px-5 py-2 rounded-full flex-row items-center gap-1">
+        <TouchableOpacity className="bg-primary px-5 py-2 rounded-full flex-row items-center gap-1">
           <Text className="text-white font-bold text-xs">Enter</Text>
           <Ionicons name="arrow-forward" size={12} color="white" />
-        </View>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
