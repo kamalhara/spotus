@@ -1,7 +1,7 @@
+import { useAuth } from "@clerk/expo";
 import { Redirect, useRouter } from "expo-router";
 import { Image, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useAuth } from "@clerk/expo";
 
 export default function Welcome() {
   const router = useRouter();

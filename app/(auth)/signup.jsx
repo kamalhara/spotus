@@ -1,17 +1,11 @@
 import { useAuth, useClerk } from "@clerk/expo";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  Modal,
-  Pressable,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Oauth from "../../components/Oauth";
+import CustomButton from "../../components/CustomButton";
+import CustomInput from "../../components/CustomInput";
 
 export default function SignUp() {
   const { isLoaded } = useAuth();
@@ -19,39 +13,24 @@ export default function SignUp() {
   const signUp = client?.signUp;
   const router = useRouter();
 
-  const [name, setName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const [code, setCode] = useState("");
+  const [name, setName] = useState("");
   const [pendingVerification, setPendingVerification] = useState(false);
+  const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [verifyError, setVerifyError] = useState("");
-  const [verifyLoading, setVerifyLoading] = useState(false);
 
   const onSignUpPress = async () => {
-    if (!isLoaded) {
-      // Just log and prevent action, don’t return JSX
-      console.log("Clerk is not loaded");
-      return; // stop signup until loaded
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
+    if (!isLoaded) return;
+    setLoading(true);
+    setError("");
 
     const nameParts = name.trim().split(" ");
     const firstName = nameParts[0];
     const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
 
     try {
-      if (!signUp) {
-        throw new Error("SignUp resource not available on the client");
-      }
-
       await signUp.create({
         emailAddress,
         password,
@@ -59,47 +38,10 @@ export default function SignUp() {
         lastName,
       });
 
-      console.log("SignUp created. Status:", signUp.status);
-      console.log("Unverified fields:", signUp.unverifiedFields);
-
-      if (signUp.status === "missing_requirements") {
-        if (signUp.unverifiedFields.includes("email_address")) {
-          console.log("Attempting to prepare email verification...");
-          // In some Core 3 builds, prototype methods like prepareVerification 
-          // are on the prototype, so Object.keys(signUp) might not show them.
-          // But accessing them directly usually works if we have the real resource.
-          console.log("Has prepareVerification?", typeof signUp.prepareVerification);
-          
-          // Use the more generic prepareVerification which is required in some Core 3 versions
-          await signUp.prepareVerification({
-            strategy: "email_code",
-          });
-          setPendingVerification(true);
-        } else {
-          console.warn("SignUp is missing requirements:", signUp.missingFields);
-          setError("Please fill in all required fields.");
-        }
-      } else if (signUp.status === "complete") {
-        await setActive({ session: signUp.createdSessionId });
-        router.replace("/");
-      }
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      setPendingVerification(true);
     } catch (err) {
-      console.error("Sign up error caught:", err);
-
-      let errorMessage = "An error occurred during sign up.";
-
-      if (err.errors) {
-        err.errors.forEach((e, i) => {
-          console.error(`Error ${i}: ${e.longMessage || e.message}`);
-          if (e.code === "strategy_for_user_invalid") {
-            errorMessage =
-              "Email verification code is not enabled in your Clerk Dashboard. Please enable it in 'User & Auth > Sign-up'.";
-          } else {
-            errorMessage = e.longMessage || e.message;
-          }
-        });
-      }
-      setError(errorMessage);
+      setError(err.errors?.[0]?.longMessage || "Sign up failed");
     } finally {
       setLoading(false);
     }
@@ -107,199 +49,119 @@ export default function SignUp() {
 
   const onPressVerify = async () => {
     if (!isLoaded) return;
-
-    setVerifyLoading(true);
-    setVerifyError("");
+    setLoading(true);
+    setError("");
 
     try {
-      const completeSignUp = await signUp.attemptVerification({
-        strategy: "email_code",
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
         code,
       });
 
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
-        router.replace("/");
-        setPendingVerification(false);
-      } else {
-        console.error("Verification not complete. Status:", completeSignUp.status);
-        setVerifyError("Verification failed. Please try again.");
+        router.replace("/(authenticated)/(tabs)/home");
       }
     } catch (err) {
-      console.error("Verification error caught:", err);
-      // Log details if it exists
-      if (err.errors) {
-        err.errors.forEach((e) => console.error(e.longMessage || e.message));
-      }
-      setVerifyError(
-        err.errors?.[0]?.longMessage ||
-          err.errors?.[0]?.message ||
-          "Verification failed. Please check the code.",
-      );
+      setError(err.errors?.[0]?.longMessage || "Verification failed");
     } finally {
-      setVerifyLoading(false);
+      setLoading(false);
     }
   };
 
+  if (!isLoaded) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" color="#4F46E5" />
+      </SafeAreaView>
+    );
+  }
+
   return (
-    <SafeAreaView className="bg-bg h-screen px-7">
-      <View className=" justify-center mb-10">
-        <Text className="text-primary text-2xl font-bold">Spot Us</Text>
+    <SafeAreaView className="bg-bg flex-1 px-8">
+      <View className="mb-10 mt-10">
+        <Text className="text-secondary text-4xl font-bold">
+          {pendingVerification ? "Verify Email" : "Create Account"}
+        </Text>
+        <Text className="text-gray-500 text-lg mt-2">
+          {pendingVerification
+            ? `Enter the code sent to ${emailAddress}`
+            : "Join the local discovery circle"}
+        </Text>
       </View>
 
-      <View className="mb-10">
-        <Text className="text-2xl font-bold mb-2">Create Account</Text>
-        <Text className="text-gray-500">Enter your details to sign up</Text>
-      </View>
-
-      <View className="mb-10 flex flex-col gap-5">
-        <View className="flex flex-col gap-1">
-          <Text className="uppercase text-sm tracking-wider text-gray-600">
-            Full Name
-          </Text>
-          <TextInput
-            className="bg-gray-200 rounded-lg py-4 px-3"
-            placeholder="Alexandria"
+      {!pendingVerification ? (
+        <View className="gap-6">
+          <CustomInput
+            label="Full Name"
+            placeholder="e.g. Alexandria"
             value={name}
             onChangeText={setName}
+            autoCapitalize="words"
+            icon={<Ionicons name="person-outline" size={20} color="#9CA3AF" />}
           />
-        </View>
 
-        <View className="flex flex-col gap-1">
-          <Text className="uppercase text-sm tracking-wider text-gray-600">
-            Email
-          </Text>
-          <TextInput
-            className="bg-gray-200 rounded-lg py-4 px-3"
-            placeholder="examplw@gmail.com"
+          <CustomInput
+            label="Email Address"
+            placeholder="example@gmail.com"
             value={emailAddress}
             onChangeText={setEmailAddress}
-            autoCapitalize="none"
             keyboardType="email-address"
+            autoCapitalize="none"
+            icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
           />
-        </View>
 
-        <View className="flex flex-col gap-1">
-          <Text className="uppercase text-sm tracking-wider text-gray-600">
-            Password
-          </Text>
-          <TextInput
-            className="bg-gray-200 rounded-lg py-4 px-3"
-            placeholder="********"
+          <CustomInput
+            label="Password"
+            placeholder="Create a password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            icon={
+              <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />
+            }
           />
-        </View>
 
-        <View className="flex flex-col gap-1">
-          <Text className="uppercase text-sm tracking-wider text-gray-600">
-            Confirm Password
-          </Text>
-          <TextInput
-            className="bg-gray-200 rounded-lg py-4 px-3"
-            placeholder="********"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
-        </View>
-        {error ? <Text className="text-red-500">{error}</Text> : null}
-      </View>
+          {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
 
-      <View>
-        <Pressable
-          disabled={loading}
-          onPress={onSignUpPress}
-          className={`bg-primary max-w-2xl px-10 py-4 rounded-2xl flex-row justify-center items-center ${loading ? "opacity-70" : "active:opacity-80"}`}
-        >
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text className="text-white text-center font-bold text-lg">
-              Sign Up
-            </Text>
-          )}
-        </Pressable>
-      </View>
-
-      <View className="flex flex-row items-center justify-center gap-2 my-4">
-        <View className="w-1/2 h-0.5 bg-gray-300"></View>
-        <Text className="text-gray-500">Or continue with</Text>
-        <View className="w-1/2 h-0.5 bg-gray-300"></View>
-      </View>
-
-      <Oauth />
-
-      <View className="flex flex-row items-center justify-center gap-2">
-        <Text>Already have an account?</Text>
-        <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-          <Text className="text-primary font-bold">Login</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* OTP Verification Modal */}
-      <Modal
-        visible={pendingVerification}
-        animationType="slide"
-        transparent={true}
-      >
-        <View className="flex-1 justify-center items-center bg-black/50 px-5">
-          <View className="bg-white w-full rounded-2xl p-6 shadow-lg">
-            <Text className="text-2xl font-bold mb-2 text-center text-primary">
-              Verify Email
-            </Text>
-            <Text className="text-gray-500 text-center mb-6">
-              Enter the 6-digit code sent to {emailAddress || "your email"}
-            </Text>
-
-            <View className="flex flex-col gap-1 mb-6">
-              <Text className="uppercase text-sm tracking-wider text-gray-600">
-                Verification Code
-              </Text>
-              <TextInput
-                className="bg-gray-200 rounded-lg py-4 px-3 text-center text-xl tracking-widest"
-                placeholder="123456"
-                value={code}
-                onChangeText={setCode}
-                keyboardType="number-pad"
-                maxLength={6}
-              />
-            </View>
-
-            {verifyError ? (
-              <Text className="text-red-500 text-center mb-4">
-                {verifyError}
-              </Text>
-            ) : null}
-
-            <View className="flex-col gap-3">
-              <Pressable
-                disabled={verifyLoading}
-                onPress={onPressVerify}
-                className={`bg-primary px-10 py-4 rounded-xl flex-row justify-center items-center ${verifyLoading ? "opacity-70" : "active:opacity-80"}`}
-              >
-                {verifyLoading ? (
-                  <ActivityIndicator color="white" />
-                ) : (
-                  <Text className="text-white text-center font-bold text-lg">
-                    Verify
-                  </Text>
-                )}
-              </Pressable>
-
-              <TouchableOpacity
-                onPress={() => setPendingVerification(false)}
-                className="py-2"
-              >
-                <Text className="text-gray-500 text-center font-semibold text-base mt-2">
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-            </View>
+          <View className="mt-4">
+            <CustomButton
+              title="Sign Up"
+              onPress={onSignUpPress}
+              loading={loading}
+            />
           </View>
         </View>
-      </Modal>
+      ) : (
+        <View className="gap-6">
+          <CustomInput
+            label="Verification Code"
+            placeholder="123456"
+            value={code}
+            onChangeText={setCode}
+            keyboardType="number-pad"
+            icon={<Ionicons name="keypad-outline" size={20} color="#9CA3AF" />}
+          />
+          {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
+          <CustomButton
+            title="Verify & Join"
+            onPress={onPressVerify}
+            loading={loading}
+          />
+
+          <CustomButton
+            title="Cancel"
+            type="ghost"
+            onPress={() => setPendingVerification(false)}
+          />
+        </View>
+      )}
+
+      <View className="flex flex-row items-center justify-center gap-1 mt-8">
+        <Text className="text-gray-600">Already have an account?</Text>
+        <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+          <Text className="text-primary font-bold">Log In</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
