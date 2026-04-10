@@ -1,7 +1,7 @@
 import { ClerkLoaded, ClerkProvider } from "@clerk/expo";
 import { Stack } from "expo-router";
-import { tokenCache } from "../utils/cache";
 import "../global.css";
+import { tokenCache } from "../utils/cache";
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
@@ -25,6 +25,7 @@ export default function RootLayout() {
       <ClerkLoaded>
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="welcome" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         </Stack>
       </ClerkLoaded>
