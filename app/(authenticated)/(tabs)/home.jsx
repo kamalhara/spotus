@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
-import { useRouter, useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useRef, useState } from "react";
-import { FlatList, Text, TouchableOpacity, View, Image } from "react-native";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/RoomCard";
 import RoomJoinSheet from "../../../components/RoomJoinSheet";
@@ -16,7 +16,7 @@ export default function Home() {
 
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  
+
   // Sheet Ref
   const bottomSheetModalRef = useRef(null);
 
@@ -26,7 +26,10 @@ export default function Home() {
   }, []);
 
   const handleConfirmJoin = useCallback((room) => {
-    router.push(`/room-chat`);
+    router.push({
+      pathname: "/room-chat",
+      params: { room: JSON.stringify(room) },
+    });
   }, []);
 
   useFocusEffect(
@@ -37,7 +40,7 @@ export default function Home() {
       };
 
       loadRooms();
-    }, [])
+    }, []),
   );
 
   return (
@@ -45,12 +48,16 @@ export default function Home() {
       <SafeAreaView className="bg-[#FAFAFA] h-screen px-6">
         <View className="flex flex-row justify-between items-center my-2">
           <TouchableOpacity onPress={() => router.push("/profile")}>
-            <Image 
-              source={{ uri: firestoreUser?.profilePic || "https://picsum.photos/200" }} 
-              className="w-11 h-11 rounded-full border border-gray-200" 
+            <Image
+              source={{
+                uri: firestoreUser?.profilePic || "https://picsum.photos/200",
+              }}
+              className="w-11 h-11 rounded-full border border-gray-200"
             />
           </TouchableOpacity>
-          <Text className="text-secondary tracking-tighter text-2xl font-black">Spot Us</Text>
+          <Text className="text-secondary tracking-tighter text-2xl font-black">
+            Spot Us
+          </Text>
           <TouchableOpacity className="w-11 h-11 bg-white rounded-full items-center justify-center border border-gray-100 shadow-sm shadow-slate-100">
             <Ionicons name="notifications-outline" size={20} color="black" />
           </TouchableOpacity>
@@ -58,7 +65,9 @@ export default function Home() {
 
         <View className="flex flex-row justify-between mt-5">
           <View className="flex flex-col">
-            <Text className="text-primary text-lg font-semibold">Discovery</Text>
+            <Text className="text-primary text-lg font-semibold">
+              Discovery
+            </Text>
             <Text className="text-secondary text-2xl font-bold">
               Nearby Rooms
             </Text>
@@ -89,7 +98,9 @@ export default function Home() {
           />
           <View className="flex flex-row justify-between">
             <Text className="text-gray-500 text-sm font-semibold ">1 mile</Text>
-            <Text className="text-gray-500 text-sm font-semibold ">25 miles</Text>
+            <Text className="text-gray-500 text-sm font-semibold ">
+              25 miles
+            </Text>
           </View>
         </View>
 
@@ -98,20 +109,30 @@ export default function Home() {
           className="mt-10 bg-primary py-4 px-6 rounded-[20px] flex-row justify-center items-center shadow-lg shadow-indigo-200 active:opacity-90"
         >
           <Ionicons name="add-circle" size={24} color="white" />
-          <Text className="text-white font-bold text-lg ml-2">Create a Room</Text>
+          <Text className="text-white font-bold text-lg ml-2">
+            Create a Room
+          </Text>
         </TouchableOpacity>
 
         <View className="mt-8">
-          <Text className="text-primary text-lg font-semibold">Rooms</Text>
-          <Text className="text-secondary text-2xl font-bold">Nearby Rooms</Text>
+          <View className="flex flex-row justify-between items-center ">
+            <View>
+              <Text className="text-primary text-lg font-semibold">Rooms</Text>
+              <Text className="text-secondary text-2xl font-bold">
+                Nearby Rooms
+              </Text>
+            </View>
+            <View>
+              <Text className="text-gray-500 text-sm font-semibold  ">
+                {rooms?.length} Rooms
+              </Text>
+            </View>
+          </View>
         </View>
         <FlatList
           data={rooms}
           renderItem={({ item }) => (
-            <RoomCard 
-              room={item} 
-              onPress={handlePresentModalPress} 
-            />
+            <RoomCard room={item} onPress={handlePresentModalPress} />
           )}
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 100 }}
