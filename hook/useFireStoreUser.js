@@ -17,7 +17,10 @@ export default function useFirestoreUser() {
         const snap = await getDoc(ref);
 
         if (snap.exists()) {
-          setFirestoreUser({ id: snap.id, ...snap.data() });
+          setFirestoreUser({
+            id: snap.id,
+            ...snap.data(),
+          });
         }
       } catch (err) {
         console.error("Firestore user fetch error:", err);

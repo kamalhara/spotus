@@ -9,6 +9,7 @@ export default function _layout() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="rooms/[roomId]" options={{ headerShown: false }} />
+      <Stack.Screen name="users/[userId]" options={{ headerShown: false }} />
     </Stack>
   );
 }

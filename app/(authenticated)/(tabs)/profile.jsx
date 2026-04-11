@@ -2,93 +2,151 @@ import { useAuth } from "@clerk/expo";
 import { Redirect, useRouter } from "expo-router";
 import {
   ActivityIndicator,
-  Image,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import * as Haptics from "expo-haptics";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 
-export default function Home() {
+const MenuItem = ({ icon, label, onPress, color = "#4F46E5", isLast = false }) => (
+  <TouchableOpacity
+    onPress={() => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onPress?.();
+    }}
+    activeOpacity={0.6}
+    className={`bg-white px-5 py-4 flex-row items-center justify-between ${!isLast ? 'border-b border-gray-50' : ''}`}
+  >
+    <View className="flex-row items-center">
+      <View className="w-10 h-10 rounded-2xl items-center justify-center mr-4" style={{ backgroundColor: `${color}15` }}>
+        <Ionicons name={icon} size={20} color={color} />
+      </View>
+      <Text className="text-secondary font-bold text-[15px]">{label}</Text>
+    </View>
+    <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
+  </TouchableOpacity>
+);
+
+const SectionHeader = ({ title }) => (
+  <Text className="text-gray-400 font-bold text-[11px] uppercase tracking-[1.5px] px-6 mt-2 mb-2">
+    {title}
+  </Text>
+);
+
+export default function Profile() {
   const { signOut } = useAuth();
   const { firestoreUser, loading } = useFirestoreUser();
   const router = useRouter();
+
   if (loading) {
-    return <ActivityIndicator size="large" color="#000" />;
+    return (
+      <View className="flex-1 items-center justify-center bg-bg">
+        <ActivityIndicator size="large" color="#4F46E5" />
+      </View>
+    );
   }
+
   if (!firestoreUser) {
     return <Redirect href="/welcome" />;
   }
 
   const handleSignOut = async () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     await signOut();
     router.replace("/login");
   };
 
   return (
-    <SafeAreaView className="bg-[#FAFAFA] flex-1 px-6">
-      {/* Header Profile Section */}
-      <View className="items-center mt-6 mb-8">
-        <View className="relative">
-          <Image
-            source={{ uri: firestoreUser?.profilePic || "https://picsum.photos/200" }}
-            className="w-28 h-28 rounded-full border-4 border-white shadow-lg shadow-gray-200"
-          />
-          <View className="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-[3px] border-white"></View>
-        </View>
-        <Text className="text-secondary text-3xl font-black mt-4 tracking-tight">
-          {firestoreUser?.userName || "Spot Us User"}
-        </Text>
-        <Text className="text-gray-500 text-base mt-1 font-medium">
-          {firestoreUser?.email || "No email linked"}
-        </Text>
-      </View>
-
-      {/* Stats and Action Blocks */}
-      <View className="flex-1">
-        <View className="bg-white rounded-3xl p-5 border border-gray-100 shadow-sm shadow-slate-100 mb-6 flex-row justify-around">
-          <View className="items-center">
-            <Text className="text-2xl font-black text-primary">0</Text>
-            <Text className="text-gray-500 text-xs font-semibold mt-1 uppercase tracking-wider">Rooms Created</Text>
+    <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 40 }}>
+        {/* Profile Header */}
+        <View className="items-center px-6 mt-8 mb-6">
+          <View className="relative">
+            <View className="w-32 h-32 rounded-[40px] border-4 border-white shadow-xl shadow-slate-200 overflow-hidden bg-gray-100">
+              <Image
+                source={firestoreUser?.profilePic || "https://picsum.photos/200"}
+                contentFit="cover"
+                transition={500}
+                style={{ width: '100%', height: '100%' }}
+              />
+            </View>
+            <TouchableOpacity 
+              activeOpacity={0.8}
+              className="absolute bottom-0 right-0 bg-primary w-10 h-10 rounded-2xl border-4 border-bg items-center justify-center"
+            >
+              <Ionicons name="camera" size={18} color="white" />
+            </TouchableOpacity>
           </View>
-          <View className="w-[1px] bg-gray-100 h-full"></View>
-          <View className="items-center">
-            <Text className="text-2xl font-black text-primary">12</Text>
-            <Text className="text-gray-500 text-xs font-semibold mt-1 uppercase tracking-wider">Rooms Joined</Text>
-          </View>
+          
+          <Text className="text-secondary text-3xl font-black mt-5 tracking-tight">
+            {firestoreUser?.userName || "User"}
+          </Text>
+          <Text className="text-gray-400 text-base font-semibold">
+            {firestoreUser?.email}
+          </Text>
         </View>
 
-        <TouchableOpacity className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm shadow-slate-50 flex-row items-center justify-between mb-3 active:opacity-70">
-          <View className="flex-row items-center">
-             <View className="bg-indigo-50 w-11 h-11 rounded-full items-center justify-center mr-4">
-               <Ionicons name="settings-outline" size={20} color="#4F46E5" />
-             </View>
-             <Text className="text-secondary font-bold text-base">Account Settings</Text>
+        {/* Stats Section */}
+        <View className="px-6 mb-8">
+          <View className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm shadow-slate-100 flex-row items-center justify-between">
+            <View className="items-center flex-1">
+              <Text className="text-2xl font-black text-primary">
+                {firestoreUser?.roomsCreated ?? 0}
+              </Text>
+              <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-1">Created</Text>
+            </View>
+            <View className="w-[1px] bg-gray-50 h-8" />
+            <View className="items-center flex-1">
+              <Text className="text-2xl font-black text-secondary">
+                {firestoreUser?.roomsJoined ?? 0}
+              </Text>
+              <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-1">Joined</Text>
+            </View>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
+        </View>
+
+        {/* Menu Sections */}
+        <View className="bg-white mx-6 rounded-3xl border border-gray-100 overflow-hidden shadow-sm shadow-slate-50">
+          <SectionHeader title="General" />
+          <MenuItem icon="person-outline" label="Account Settings" />
+          <MenuItem icon="create-outline" label="Edit Profile" />
+          <MenuItem icon="shield-checkmark-outline" label="Security" isLast />
+        </View>
+
+        <View className="bg-white mx-6 mt-6 rounded-3xl border border-gray-100 overflow-hidden shadow-sm shadow-slate-50">
+          <SectionHeader title="App Settings" />
+          <MenuItem icon="notifications-outline" label="Notifications" color="#6366F1" />
+          <MenuItem icon="eye-outline" label="Privacy & Data" color="#6366F1" />
+          <MenuItem icon="language-outline" label="Language" color="#6366F1" isLast />
+        </View>
+
+        <View className="bg-white mx-6 mt-6 rounded-3xl border border-gray-100 overflow-hidden shadow-sm shadow-slate-50">
+          <SectionHeader title="Support & Legal" />
+          <MenuItem icon="help-circle-outline" label="Help Center" color="#94A3B8" />
+          <MenuItem icon="information-circle-outline" label="About SpotUs" color="#94A3B8" isLast />
+        </View>
+
+        {/* Sign Out Button */}
+        <TouchableOpacity
+          onPress={handleSignOut}
+          activeOpacity={0.7}
+          className="mx-6 mt-8 bg-red-50 py-5 rounded-[28px] border border-red-100 flex-row items-center justify-center gap-2"
+        >
+          <Ionicons name="log-out-outline" size={20} color="#EF4444" />
+          <Text className="text-red-500 font-bold text-base tracking-wide">
+            Sign Out
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm shadow-slate-50 flex-row items-center justify-between active:opacity-70">
-          <View className="flex-row items-center">
-             <View className="bg-indigo-50 w-11 h-11 rounded-full items-center justify-center mr-4">
-               <Ionicons name="notifications-outline" size={20} color="#4F46E5" />
-             </View>
-             <Text className="text-secondary font-bold text-base">Notifications</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#D1D5DB" />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        onPress={handleSignOut}
-        className="bg-red-50 py-4 rounded-[20px] mb-8 border border-red-100 shadow-sm shadow-red-100 active:opacity-80"
-      >
-        <Text className="text-red-500 text-center font-bold text-lg tracking-wide">
-          Sign Out
+        <Text className="text-center text-gray-300 text-[10px] font-bold mt-8 uppercase tracking-[2px]">
+          SpotUs v1.0.4
         </Text>
-      </TouchableOpacity>
+      </ScrollView>
     </SafeAreaView>
   );
 }

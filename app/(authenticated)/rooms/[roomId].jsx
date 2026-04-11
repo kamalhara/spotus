@@ -28,6 +28,7 @@ import MessageSender from "../../../components/MessageSender";
 import RoomDetailsSheet from "../../../components/RoomDetailsSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { updateTrustOnMessage } from "../../../lib/trust";
 
 export default function RoomChat() {
   const router = useRouter();
@@ -130,22 +131,21 @@ export default function RoomChat() {
 
   const handleSend = async (text) => {
     if (!text.trim()) return;
-    await addDoc(collection(db, "rooms", roomId, "messages"), {
-      text,
-      senderId: currentUserId || "unknown-id",
-      user: user?.userName || "Unknown",
-      createdAt: serverTimestamp(),
-    });
+    const trimmedText = text.trim();
 
-    const trustRef = doc(db, "rooms", roomId, "trust", currentUserId);
-    await setDoc(
-      trustRef,
-      {
-        messagesCount: increment(1),
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true },
-    );
+    try {
+      await addDoc(collection(db, "rooms", roomId, "messages"), {
+        text: trimmedText,
+        senderId: currentUserId || "unknown-id",
+        user: user?.userName || "Unknown",
+        createdAt: serverTimestamp(),
+      });
+
+      // Update both room and global trust
+      await updateTrustOnMessage(db, roomId, currentUserId, trimmedText);
+    } catch (err) {
+      console.error("Error sending message:", err);
+    }
   };
   return (
     <KeyboardAvoidingView
