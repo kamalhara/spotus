@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
 
 export default function RoomCard({ room, onPress }) {
@@ -50,7 +49,7 @@ export default function RoomCard({ room, onPress }) {
           onPress={() => onPress?.(room)}
           className="bg-primary px-5 py-2 rounded-full flex-row items-center gap-1"
         >
-          <Text className="text-white font-bold text-xs">Enter</Text>
+          <Text className="text-white font-bold text-xs">Join</Text>
           <Ionicons name="arrow-forward" size={12} color="white" />
         </TouchableOpacity>
       </View>

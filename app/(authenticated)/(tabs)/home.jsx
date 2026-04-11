@@ -1,11 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import { useFocusEffect, useRouter } from "expo-router";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useRef, useState } from "react";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/RoomCard";
 import RoomJoinSheet from "../../../components/RoomJoinSheet";
+import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 
@@ -25,9 +27,14 @@ export default function Home() {
     bottomSheetModalRef.current?.present();
   }, []);
 
-  const handleConfirmJoin = useCallback((room) => {
-    router.push(`/rooms/${room.id}`);
-  }, []);
+  const handleJoinRoom = async () => {
+    const roomRef = doc(db, "rooms", selectedRoom.id);
+    await updateDoc(roomRef, {
+      participants: arrayUnion(firestoreUser?.id),
+    });
+    bottomSheetModalRef.current?.dismiss();
+    router.push(`/rooms/${selectedRoom.id}`);
+  };
 
   useFocusEffect(
     useCallback(() => {
@@ -128,9 +135,14 @@ export default function Home() {
         </View>
         <FlatList
           data={rooms}
-          renderItem={({ item }) => (
-            <RoomCard room={item} onPress={handlePresentModalPress} />
-          )}
+          renderItem={({ item }) =>
+            !item.participants?.includes(firestoreUser?.id) && (
+              <RoomCard
+                room={item}
+                onPress={() => handlePresentModalPress(item)}
+              />
+            )
+          }
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 100 }}
         />
@@ -139,7 +151,7 @@ export default function Home() {
       <RoomJoinSheet
         ref={bottomSheetModalRef}
         room={selectedRoom}
-        onConfirm={handleConfirmJoin}
+        onConfirm={handleJoinRoom}
       />
     </>
   );

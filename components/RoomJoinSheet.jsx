@@ -4,6 +4,7 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
+import { useRouter } from "expo-router";
 import {
   forwardRef,
   useCallback,
@@ -16,7 +17,7 @@ import CustomButton from "./CustomButton";
 
 const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
   const bottomSheetModalRef = useRef(null);
-
+  const router = useRouter();
   // Expose the dismiss and present methods to the parent
   useImperativeHandle(ref, () => ({
     dismiss: () => bottomSheetModalRef.current?.dismiss(),
