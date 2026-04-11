@@ -5,6 +5,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   increment,
   onSnapshot,
   orderBy,
@@ -12,7 +13,7 @@ import {
   serverTimestamp,
   setDoc,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -24,6 +25,7 @@ import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatMessages from "../../../components/ChatMessages";
 import MessageSender from "../../../components/MessageSender";
+import RoomDetailsSheet from "../../../components/RoomDetailsSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 
@@ -33,13 +35,16 @@ export default function RoomChat() {
   const [room, setRoom] = useState(null);
   const [messages, setMessages] = useState([]);
   const [trust, setTrust] = useState(0);
+  const [members, setMembers] = useState([]);
 
   const { firestoreUser: user } = useFirestoreUser();
 
   const currentUserId = user?.id;
 
+  // Sheet Refs
+  const detailsSheetRef = useRef(null);
+
   const { roomId } = useLocalSearchParams();
-  console.log(roomId);
   useEffect(() => {
     if (!roomId) return;
 
@@ -85,6 +90,44 @@ export default function RoomChat() {
     return unsub;
   }, [roomId, currentUserId]);
 
+  useEffect(() => {
+    const fetchMemberData = async () => {
+      if (!room?.participants?.length) return;
+
+      try {
+        // Fetch User Profiles
+        const profiles = [];
+        for (const userId of room.participants) {
+          const userDoc = await getDoc(doc(db, "users", userId));
+          if (userDoc.exists()) {
+            profiles.push({ id: userDoc.id, ...userDoc.data() });
+          }
+        }
+
+        // Fetch Trust Scores for everyone in this room
+        const trustSnap = await getDocs(
+          collection(db, "rooms", roomId, "trust"),
+        );
+        const trustMap = {};
+        trustSnap.forEach((d) => {
+          trustMap[d.id] = d.data().messagesCount || 0;
+        });
+
+        // Combine data
+        const membersWithTrust = profiles.map((p) => ({
+          ...p,
+          trustScore: trustMap[p.id] || 0,
+        }));
+
+        setMembers(membersWithTrust);
+      } catch (error) {
+        console.error("Error fetching member data:", error);
+      }
+    };
+
+    fetchMemberData();
+  }, [room?.participants, roomId]);
+
   const handleSend = async (text) => {
     if (!text.trim()) return;
     await addDoc(collection(db, "rooms", roomId, "messages"), {
@@ -121,7 +164,11 @@ export default function RoomChat() {
                 <Ionicons name="chevron-back" size={20} color="#1F2937" />
               </TouchableOpacity>
 
-              <View className="flex-1">
+              <TouchableOpacity
+                className="flex-1"
+                onPress={() => detailsSheetRef.current?.present()}
+                activeOpacity={0.7}
+              >
                 <Text
                   className="text-secondary text-xl font-black tracking-tight leading-7"
                   numberOfLines={1}
@@ -129,13 +176,13 @@ export default function RoomChat() {
                   {room?.title || "Loading..."}
                 </Text>
                 <View className="flex flex-row items-center mt-0.5">
-                  <View className="bg-green-500 w-2 h-2 rounded-full mr-2 shadow-sm shadow-green-200" />
-                  <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">
-                    {room?.category || ""} • {room?.participants?.length || 0}{" "}
-                    ACTIVE
+                  <View className="bg-green-500 w-1.5 h-1.5 rounded-full mr-1.5 shadow-sm shadow-green-200" />
+                  <Text className="text-gray-400 text-[9px] font-black uppercase tracking-widest">
+                    {room?.category || "SPOT"} •{" "}
+                    {room?.participants?.length || 0} ACTIVE
                   </Text>
                 </View>
-              </View>
+              </TouchableOpacity>
             </View>
 
             <TouchableOpacity className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100 active:bg-gray-100">
@@ -192,6 +239,13 @@ export default function RoomChat() {
       <View className="px-6 py-4 bg-white/0 flex items-center">
         <MessageSender handleSend={handleSend} />
       </View>
+
+      <RoomDetailsSheet
+        ref={detailsSheetRef}
+        room={room}
+        members={members}
+        currentUserId={currentUserId}
+      />
     </KeyboardAvoidingView>
   );
 }

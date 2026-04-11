@@ -1,0 +1,31 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // USERS
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+
+    // ROOMS
+    match /rooms/{roomId} {
+      allow read, write: if true;
+
+      // MESSAGES SUBCOLLECTION
+      match /messages/{messageId} {
+        allow read, write: if true;
+      }
+
+      // TRUST SUBCOLLECTION
+      match /trust/{userId} {
+        allow read, write: if true;
+      }
+    }
+
+    // fallback
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
