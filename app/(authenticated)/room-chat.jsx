@@ -1,8 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
+import ChatMessages from "../../components/ChatMessages";
 
 export default function RoomChat() {
   const router = useRouter();
@@ -21,6 +23,37 @@ export default function RoomChat() {
       console.error("Failed to parse room param", e);
     }
   }
+
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      user: "John Doe",
+      message: "Hello, how are you?",
+      time: "10:00 AM",
+      sentByMe: false,
+    },
+    {
+      id: 2,
+      user: "Jane Doe",
+      message: "I'm fine, thank you!",
+      time: "10:01 AM",
+      sentByMe: true,
+    },
+    {
+      id: 3,
+      user: "John Doe",
+      message: "Hello, how are you?",
+      time: "10:00 AM",
+      sentByMe: false,
+    },
+    {
+      id: 4,
+      user: "Jane Doe",
+      message: "I'm fine, thank you!",
+      time: "10:01 AM",
+      sentByMe: true,
+    },
+  ]);
 
   return (
     <View className="flex-1 bg-[#F9FAFB] ">
@@ -70,7 +103,7 @@ export default function RoomChat() {
               </Text>
             </View>
             <View className="bg-indigo-50 px-2 py-0.5 rounded-md">
-              <Text className="text-primary text-[11px] font-black">35%</Text>
+              <Text className="text-primary text-[11px] font-black">50%</Text>
             </View>
           </View>
 
@@ -94,6 +127,8 @@ export default function RoomChat() {
           </Text>
         </View>
       </View>
+
+      <ChatMessages messages={messages} />
     </View>
   );
 }
