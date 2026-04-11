@@ -5,10 +5,12 @@ import {
   collection,
   doc,
   getDoc,
+  increment,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
@@ -27,7 +29,11 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 
 export default function RoomChat() {
   const router = useRouter();
+
   const [room, setRoom] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [trust, setTrust] = useState(0);
+
   const { firestoreUser: user } = useFirestoreUser();
 
   const currentUserId = user?.id;
@@ -68,36 +74,16 @@ export default function RoomChat() {
     loadRoom();
   }, [roomId]);
 
-  const [messages, setMessages] = useState([
-    {
-      id: "1",
-      text: "Hello, how are you?",
-      senderId: "user_456",
-      user: "Alice",
-      createdAt: new Date(),
-    },
-    {
-      id: "2",
-      text: "I'm fine, thank you!",
-      senderId: "user_123",
-      user: "Me",
-      createdAt: new Date(),
-    },
-    {
-      id: "3",
-      text: "What are you up to?",
-      senderId: "user_456",
-      user: "Alice",
-      createdAt: new Date(),
-    },
-    {
-      id: "4",
-      text: "Just working on this app!",
-      senderId: "user_123",
-      user: "Me",
-      createdAt: new Date(),
-    },
-  ]);
+  useEffect(() => {
+    if (!roomId || !currentUserId) return;
+    const trustRef = doc(db, "rooms", roomId, "trust", currentUserId);
+    const unsub = onSnapshot(trustRef, (snap) => {
+      if (snap.exists()) {
+        setTrust(snap.data().messagesCount || 0);
+      }
+    });
+    return unsub;
+  }, [roomId, currentUserId]);
 
   const handleSend = async (text) => {
     if (!text.trim()) return;
@@ -107,6 +93,16 @@ export default function RoomChat() {
       user: user?.userName || "Unknown",
       createdAt: serverTimestamp(),
     });
+
+    const trustRef = doc(db, "rooms", roomId, "trust", currentUserId);
+    await setDoc(
+      trustRef,
+      {
+        messagesCount: increment(1),
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true },
+    );
   };
   return (
     <KeyboardAvoidingView
@@ -150,40 +146,44 @@ export default function RoomChat() {
       </View>
 
       {/* Medium Trust Meter Card */}
-      <View className="px-6 mt-4">
-        <View className="bg-white px-4 py-3.5 rounded-2xl border border-gray-100 shadow-sm shadow-slate-50">
-          <View className="flex flex-row items-center justify-between mb-3">
-            <View className="flex flex-row items-center gap-2">
-              <Ionicons name="shield-checkmark" size={16} color="#4F46E5" />
-              <Text className="text-secondary text-[11px] font-bold uppercase tracking-wider">
-                Trust Meter
-              </Text>
+      {trust < 10 && (
+        <View className="px-6 mt-4">
+          <View className="bg-white px-4 py-3.5 rounded-2xl border border-gray-100 shadow-sm shadow-slate-50">
+            <View className="flex flex-row items-center justify-between mb-3">
+              <View className="flex flex-row items-center gap-2">
+                <Ionicons name="shield-checkmark" size={16} color="#4F46E5" />
+                <Text className="text-secondary text-[11px] font-bold uppercase tracking-wider">
+                  Trust Meter
+                </Text>
+              </View>
+              <View className="bg-indigo-50 px-2 py-0.5 rounded-md">
+                <Text className="text-primary text-[11px] font-black">
+                  {trust * 10}%
+                </Text>
+              </View>
             </View>
-            <View className="bg-indigo-50 px-2 py-0.5 rounded-md">
-              <Text className="text-primary text-[11px] font-black">50%</Text>
-            </View>
-          </View>
 
-          <View className="flex flex-row items-center gap-3">
-            <View className="flex-1">
-              <Progress.Bar
-                progress={0.5}
-                width={null}
-                color="#4F46E5"
-                unfilledColor="#F3F4F6"
-                borderWidth={0}
-                height={7}
-                borderRadius={4}
-                animated={true}
-              />
+            <View className="flex flex-row items-center gap-3">
+              <View className="flex-1">
+                <Progress.Bar
+                  progress={trust / 10}
+                  width={null}
+                  color="#4F46E5"
+                  unfilledColor="#F3F4F6"
+                  borderWidth={0}
+                  height={7}
+                  borderRadius={4}
+                  animated={true}
+                />
+              </View>
             </View>
-          </View>
 
-          <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-2.5 ml-0.5">
-            7 more messages to unlock direct messaging
-          </Text>
+            <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-2.5 ml-0.5">
+              {10 - trust} more messages to unlock direct messaging
+            </Text>
+          </View>
         </View>
-      </View>
+      )}
 
       <View className="flex-1">
         <ChatMessages messages={messages} currentUserId={currentUserId} />

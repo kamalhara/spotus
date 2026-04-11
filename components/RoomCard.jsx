@@ -1,12 +1,26 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
 
-export default function RoomCard({ room, onPress }) {
+export default function RoomCard({
+  room,
+  onPress,
+  variant = "discovery",
+  currentUserId,
+}) {
+  const isOwner = room.createdBy === currentUserId;
+  const isDiscovery = variant === "discovery";
+
   return (
     <TouchableOpacity
       onPress={() => onPress?.(room)}
-      activeOpacity={0.8}
-      className="bg-white rounded-2xl p-5 border border-gray-100 mt-4 shadow-sm shadow-slate-200"
+      activeOpacity={0.9}
+      className={`rounded-3xl p-5 mb-4 shadow-sm ${
+        isDiscovery
+          ? "bg-white border border-gray-100 shadow-slate-200"
+          : isOwner
+            ? "bg-indigo-50/50 border border-indigo-100 shadow-indigo-100"
+            : "bg-white border border-gray-100 shadow-slate-100"
+      }`}
     >
       <View className="flex flex-row justify-between items-center mb-3">
         <View className="bg-gray-100 px-3 py-1.5 rounded-full">

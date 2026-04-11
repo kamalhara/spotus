@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { FlatList, Text, View } from "react-native";
 
 export default function ChatMessages({ messages, currentUserId }) {
@@ -24,8 +25,10 @@ export default function ChatMessages({ messages, currentUserId }) {
 
     // Group messages by user if consecutive
     const showAvatarAndName =
-      !isSentByMe && (index === 0 || messages[index - 1].senderId !== item.senderId);
-    const addTopMargin = index === 0 || messages[index - 1].senderId !== item.senderId;
+      !isSentByMe &&
+      (index === 0 || messages[index - 1].senderId !== item.senderId);
+    const addTopMargin =
+      index === 0 || messages[index - 1].senderId !== item.senderId;
 
     return (
       <View
@@ -80,13 +83,25 @@ export default function ChatMessages({ messages, currentUserId }) {
     );
   };
 
+  const flatListRef = useRef(null);
+  useEffect(() => {
+    if (!messages?.length) return;
+
+    requestAnimationFrame(() => {
+      flatListRef.current?.scrollToEnd({ animated: true });
+    });
+  }, [messages]);
   return (
     <FlatList
+      ref={flatListRef}
       data={messages}
-      keyExtractor={(item, index) => item.id?.toString() || index.toString()}
       renderItem={renderMessage}
-      contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 8 }}
+      keyExtractor={(item, index) => item.id?.toString() || index.toString()}
       showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 8 }}
+      onContentSizeChange={() =>
+        flatListRef.current?.scrollToEnd({ animated: true })
+      }
     />
   );
 }

@@ -126,11 +126,7 @@ export default function Home() {
                 Nearby Rooms
               </Text>
             </View>
-            <View>
-              <Text className="text-gray-500 text-sm font-semibold  ">
-                {rooms?.length} Rooms
-              </Text>
-            </View>
+            <View></View>
           </View>
         </View>
         <FlatList
