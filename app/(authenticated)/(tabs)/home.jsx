@@ -26,10 +26,7 @@ export default function Home() {
   }, []);
 
   const handleConfirmJoin = useCallback((room) => {
-    router.push({
-      pathname: "/room-chat",
-      params: { room: JSON.stringify(room) },
-    });
+    router.push(`/rooms/${room.id}`);
   }, []);
 
   useFocusEffect(
@@ -105,7 +102,7 @@ export default function Home() {
         </View>
 
         <TouchableOpacity
-          onPress={() => router.push("/create-rooms")}
+          onPress={() => router.push("/rooms/create-rooms")}
           className="mt-10 bg-primary py-4 px-6 rounded-[20px] flex-row justify-center items-center shadow-lg shadow-indigo-200 active:opacity-90"
         >
           <Ionicons name="add-circle" size={24} color="white" />

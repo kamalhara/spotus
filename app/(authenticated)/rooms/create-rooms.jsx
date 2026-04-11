@@ -13,10 +13,10 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CustomButton from "../../components/CustomButton";
-import CustomInput from "../../components/CustomInput";
-import useFirestoreUser from "../../hook/useFireStoreUser";
-import { createRoom } from "../../lib/createRoom";
+import CustomButton from "../../../components/CustomButton";
+import CustomInput from "../../../components/CustomInput";
+import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { createRoom } from "../../../lib/createRoom";
 
 export default function CreateRooms() {
   const router = useRouter();

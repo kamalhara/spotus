@@ -1,62 +1,118 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ChatMessages from "../../components/ChatMessages";
+import ChatMessages from "../../../components/ChatMessages";
+import MessageSender from "../../../components/MessageSender";
+import { db } from "../../../config/firebase.config";
+import useFirestoreUser from "../../../hook/useFireStoreUser";
 
 export default function RoomChat() {
   const router = useRouter();
-  const params = useLocalSearchParams();
+  const [room, setRoom] = useState(null);
+  const { firestoreUser: user } = useFirestoreUser();
 
-  // Parse room data if passed as a string, otherwise use placeholder
-  let room = {
-    title: "IPL Discussion",
-    category: "Sports",
-    participants: new Array(12),
-  };
-  if (params.room) {
-    try {
-      room = JSON.parse(params.room);
-    } catch (e) {
-      console.error("Failed to parse room param", e);
-    }
-  }
+  const currentUserId = user?.id;
+
+  const { roomId } = useLocalSearchParams();
+  console.log(roomId);
+  useEffect(() => {
+    if (!roomId) return;
+
+    const q = query(
+      collection(db, "rooms", roomId, "messages"),
+      orderBy("createdAt", "asc"),
+    );
+
+    const unsub = onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setMessages(msgs);
+    });
+
+    return unsub;
+  }, [roomId]);
+
+  useEffect(() => {
+    if (!roomId) return;
+
+    const loadRoom = async () => {
+      const roomRef = doc(db, "rooms", roomId);
+      const snap = await getDoc(roomRef);
+      if (snap.exists()) {
+        setRoom({ id: snap.id, ...snap.data() });
+      }
+    };
+
+    loadRoom();
+  }, [roomId]);
 
   const [messages, setMessages] = useState([
     {
-      id: 1,
-      user: "John Doe",
-      message: "Hello, how are you?",
-      time: "10:00 AM",
-      sentByMe: false,
+      id: "1",
+      text: "Hello, how are you?",
+      senderId: "user_456",
+      user: "Alice",
+      createdAt: new Date(),
     },
     {
-      id: 2,
-      user: "Jane Doe",
-      message: "I'm fine, thank you!",
-      time: "10:01 AM",
-      sentByMe: true,
+      id: "2",
+      text: "I'm fine, thank you!",
+      senderId: "user_123",
+      user: "Me",
+      createdAt: new Date(),
     },
     {
-      id: 3,
-      user: "John Doe",
-      message: "Hello, how are you?",
-      time: "10:00 AM",
-      sentByMe: false,
+      id: "3",
+      text: "What are you up to?",
+      senderId: "user_456",
+      user: "Alice",
+      createdAt: new Date(),
     },
     {
-      id: 4,
-      user: "Jane Doe",
-      message: "I'm fine, thank you!",
-      time: "10:01 AM",
-      sentByMe: true,
+      id: "4",
+      text: "Just working on this app!",
+      senderId: "user_123",
+      user: "Me",
+      createdAt: new Date(),
     },
   ]);
 
+  const handleSend = async (text) => {
+    if (!text.trim()) return;
+    await addDoc(collection(db, "rooms", roomId, "messages"), {
+      text,
+      senderId: currentUserId || "unknown-id",
+      user: user?.userName || "Unknown",
+      createdAt: serverTimestamp(),
+    });
+  };
   return (
-    <View className="flex-1 bg-[#F9FAFB] ">
+    <KeyboardAvoidingView
+      className="flex-1 bg-[#F9FAFB]"
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       {/* Premium Header */}
       <View className="bg-white shadow-sm shadow-slate-200 z-10">
         <SafeAreaView edges={["top"]}>
@@ -74,12 +130,13 @@ export default function RoomChat() {
                   className="text-secondary text-xl font-black tracking-tight leading-7"
                   numberOfLines={1}
                 >
-                  {room.title}
+                  {room?.title || "Loading..."}
                 </Text>
                 <View className="flex flex-row items-center mt-0.5">
                   <View className="bg-green-500 w-2 h-2 rounded-full mr-2 shadow-sm shadow-green-200" />
                   <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">
-                    {room.category} • {room.participants?.length || 0} ACTIVE
+                    {room?.category || ""} • {room?.participants?.length || 0}{" "}
+                    ACTIVE
                   </Text>
                 </View>
               </View>
@@ -128,7 +185,13 @@ export default function RoomChat() {
         </View>
       </View>
 
-      <ChatMessages messages={messages} />
-    </View>
+      <View className="flex-1">
+        <ChatMessages messages={messages} currentUserId={currentUserId} />
+      </View>
+
+      <View className="px-6 py-4 bg-white/0 flex items-center">
+        <MessageSender handleSend={handleSend} />
+      </View>
+    </KeyboardAvoidingView>
   );
 }
