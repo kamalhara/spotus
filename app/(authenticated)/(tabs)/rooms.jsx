@@ -18,27 +18,29 @@ export default function RoomsScreen() {
         setRooms(data);
       };
       loadRooms();
-    }, [])
+    }, []),
   );
 
   const myCreatedRooms = rooms.filter((r) => r.createdBy === firestoreUser?.id);
   const myJoinedRooms = rooms.filter(
-    (r) => r.participants?.includes(firestoreUser?.id) && r.createdBy !== firestoreUser?.id
+    (r) =>
+      r.participants?.includes(firestoreUser?.id) &&
+      r.createdBy !== firestoreUser?.id,
   );
 
   const sections = [
-    { 
-      title: "Created by me", 
-      data: myCreatedRooms, 
-      isEmpty: myCreatedRooms.length === 0, 
-      emptyText: "You haven't created any rooms yet." 
+    {
+      title: "Created by me",
+      data: myCreatedRooms,
+      isEmpty: myCreatedRooms.length === 0,
+      emptyText: "You haven't created any rooms yet.",
     },
-    { 
-      title: "Joined", 
-      data: myJoinedRooms, 
-      isEmpty: myJoinedRooms.length === 0, 
-      emptyText: "You haven't joined any other rooms yet." 
-    }
+    {
+      title: "Joined",
+      data: myJoinedRooms,
+      isEmpty: myJoinedRooms.length === 0,
+      emptyText: "You haven't joined any other rooms yet.",
+    },
   ];
 
   return (
@@ -56,7 +58,9 @@ export default function RoomsScreen() {
           <View className="bg-[#FAFAFA]">
             <View className="flex flex-row justify-between mt-5 mb-5">
               <View className="flex flex-col">
-                <Text className="text-secondary text-2xl font-bold">{section.title}</Text>
+                <Text className="text-secondary text-2xl font-bold">
+                  {section.title}
+                </Text>
               </View>
             </View>
             {section.isEmpty && (
