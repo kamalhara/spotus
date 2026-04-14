@@ -26,7 +26,14 @@ const CATEGORY_COLORS = {
   "Local Events": "#14B8A6",
 };
 
-const AVATAR_COLORS = ["#6366F1", "#EC4899", "#10B981", "#F59E0B", "#3B82F6", "#8B5CF6"];
+const AVATAR_COLORS = [
+  "#6366F1",
+  "#EC4899",
+  "#10B981",
+  "#F59E0B",
+  "#3B82F6",
+  "#8B5CF6",
+];
 
 export default function RoomCard({
   room,
@@ -77,8 +84,16 @@ export default function RoomCard({
             className="flex-row items-center px-3 py-1.5 rounded-lg"
             style={{ backgroundColor: `${categoryColor}10` }}
           >
-            <Ionicons name={categoryIcon} size={11} color={categoryColor} style={{ marginRight: 5 }} />
-            <Text className="font-semibold text-[11px]" style={{ color: categoryColor }}>
+            <Ionicons
+              name={categoryIcon}
+              size={11}
+              color={categoryColor}
+              style={{ marginRight: 5 }}
+            />
+            <Text
+              className="font-semibold text-[11px]"
+              style={{ color: categoryColor }}
+            >
               {room.category}
             </Text>
           </View>

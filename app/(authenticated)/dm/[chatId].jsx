@@ -80,10 +80,14 @@ export default function ChatId() {
         user: firestoreUser?.userName || "Unknown",
         createdAt: serverTimestamp(),
       });
-      // Update the chat's last activity
+      // Update the chat's last activity and message preview
       await setDoc(
         doc(db, "chats", chatDocId),
-        { updatedAt: serverTimestamp() },
+        {
+          updatedAt: serverTimestamp(),
+          lastMessage: text.trim(),
+          lastMessageAt: serverTimestamp(),
+        },
         { merge: true },
       );
     } catch (err) {

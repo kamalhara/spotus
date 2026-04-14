@@ -1,4 +1,7 @@
 import { useAuth } from "@clerk/expo";
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import { Redirect, useRouter } from "expo-router";
 import {
   ActivityIndicator,
@@ -8,9 +11,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
-import * as Haptics from "expo-haptics";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 
 const MenuItem = ({
@@ -37,7 +37,9 @@ const MenuItem = ({
         <Ionicons name={icon} size={18} color={color} />
       </View>
       <View className="flex-1">
-        <Text className="text-secondary font-semibold text-[15px]">{label}</Text>
+        <Text className="text-secondary font-semibold text-[15px]">
+          {label}
+        </Text>
         {subtitle && (
           <Text className="text-gray-400 text-xs mt-0.5" numberOfLines={1}>
             {subtitle}
@@ -83,7 +85,9 @@ export default function Profile() {
           <View className="relative">
             <View className="w-[110px] h-[110px] rounded-full border-4 border-white shadow-lg shadow-gray-200 overflow-hidden bg-gray-100">
               <Image
-                source={firestoreUser?.profilePic || "https://picsum.photos/200"}
+                source={
+                  firestoreUser?.profilePic || "https://picsum.photos/200"
+                }
                 contentFit="cover"
                 transition={500}
                 style={{ width: "100%", height: "100%" }}
@@ -152,11 +156,7 @@ export default function Profile() {
             label="Notifications"
             color="#8B5CF6"
           />
-          <MenuItem
-            icon="eye-outline"
-            label="Privacy & Data"
-            color="#8B5CF6"
-          />
+          <MenuItem icon="eye-outline" label="Privacy & Data" color="#8B5CF6" />
           <MenuItem
             icon="language-outline"
             label="Language"
@@ -187,7 +187,7 @@ export default function Profile() {
         <TouchableOpacity
           onPress={handleSignOut}
           activeOpacity={0.7}
-          className="mx-6 mt-7 bg-red-50 py-4.5 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
+          className="mx-6 mt-7 bg-red-50 py-4 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
         >
           <Ionicons name="log-out-outline" size={18} color="#EF4444" />
           <Text className="text-red-500 font-semibold text-[15px]">
