@@ -18,7 +18,7 @@ import CustomInput from "../../../components/CustomInput";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { createRoom } from "../../../lib/createRoom";
 
-const CATEGORY_DATA = [
+const CATEGORIES = [
   { label: "Music", icon: "musical-notes" },
   { label: "Coffee", icon: "cafe" },
   { label: "Art", icon: "color-palette" },
@@ -30,18 +30,15 @@ const CATEGORY_DATA = [
   { label: "Local Events", icon: "calendar" },
 ];
 
-const MAX_TITLE_LENGTH = 60;
+const MAX_TITLE = 60;
 
 export default function CreateRooms() {
   const router = useRouter();
-
   const { firestoreUser: user } = useFirestoreUser();
 
   const [title, setTitle] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isEnabled, setIsEnabled] = useState(false);
-
-  const toggleSwitch = () => setIsEnabled((previousState) => !previousState);
 
   const handleCreateRoom = async () => {
     if (!title || !selectedCategory) return alert("Please fill all the fields");
@@ -66,112 +63,107 @@ export default function CreateRooms() {
             contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
           >
             {/* Header */}
-            <View className="flex flex-row items-center py-4">
+            <View className="flex-row items-center py-4">
               <TouchableOpacity
                 onPress={() => router.back()}
-                className="w-11 h-11 bg-white rounded-2xl items-center justify-center border border-border-light mr-3"
+                className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100 mr-3"
               >
                 <Ionicons name="arrow-back" size={20} color="#18181B" />
               </TouchableOpacity>
-              <Text className="text-secondary text-lg font-bold">Back</Text>
+              <Text className="text-secondary text-lg font-semibold">Back</Text>
             </View>
 
-            {/* Title Section */}
-            <View className="flex flex-col gap-2 mt-6">
-              <Text className="text-secondary text-[30px] font-black tracking-tight leading-[36px]">
+            {/* Title */}
+            <View className="mt-6 mb-8">
+              <Text className="text-secondary text-[28px] font-bold tracking-tight leading-[34px]">
                 Create a Room
               </Text>
-              <Text className="text-muted text-[15px] leading-[22px] font-medium">
-                Define the vibe and invite others to join your curated discovery
-                circle.
+              <Text className="text-gray-400 text-sm leading-5 mt-2">
+                Define the vibe and invite others to join your discovery circle.
               </Text>
             </View>
 
             {/* Room Title Input */}
-            <View className="flex flex-col gap-1.5 mt-8">
+            <View className="mb-1">
               <CustomInput
                 label="Room Title"
                 placeholder="e.g. Saturday coffee and vinyl"
                 value={title}
                 onChangeText={(text) => {
-                  if (text.length <= MAX_TITLE_LENGTH) setTitle(text);
+                  if (text.length <= MAX_TITLE) setTitle(text);
                 }}
               />
-              <Text className="text-muted text-xs font-semibold self-end mr-1 mt-1">
-                {title.length}/{MAX_TITLE_LENGTH}
+              <Text className="text-gray-300 text-xs self-end mt-1.5 mr-1">
+                {title.length}/{MAX_TITLE}
               </Text>
             </View>
 
-            {/* Category Selection */}
-            <View className="flex-1 mt-6">
-              <Text className="text-muted text-[10px] tracking-[2px] font-bold uppercase ml-1 mb-4">
-                Focus Category
+            {/* Categories */}
+            <View className="mt-5">
+              <Text className="text-gray-500 text-sm font-medium mb-3 ml-1">
+                Category
               </Text>
 
-              <View className="flex flex-row flex-wrap gap-3">
-                {CATEGORY_DATA.map(({ label, icon }) => (
-                  <TouchableOpacity
-                    key={label}
-                    onPress={() => setSelectedCategory(label)}
-                    className={`px-4 py-2.5 rounded-xl border flex-row items-center gap-2 ${
-                      selectedCategory === label
-                        ? "bg-primary border-primary"
-                        : "bg-white border-border"
-                    }`}
-                  >
-                    {selectedCategory === label && (
-                      <Ionicons name="checkmark-circle" size={14} color="white" />
-                    )}
-                    <Ionicons
-                      name={icon}
-                      size={14}
-                      color={selectedCategory === label ? "white" : "#94A3B8"}
-                    />
-                    <Text
-                      className={`font-bold text-sm ${
-                        selectedCategory === label
-                          ? "text-white"
-                          : "text-secondary"
+              <View className="flex-row flex-wrap gap-2.5">
+                {CATEGORIES.map(({ label, icon }) => {
+                  const selected = selectedCategory === label;
+                  return (
+                    <TouchableOpacity
+                      key={label}
+                      onPress={() => setSelectedCategory(label)}
+                      className={`px-3.5 py-2.5 rounded-xl flex-row items-center gap-2 border ${
+                        selected
+                          ? "bg-primary border-primary"
+                          : "bg-white border-gray-100"
                       }`}
                     >
-                      {label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <Ionicons
+                        name={selected ? "checkmark" : icon}
+                        size={14}
+                        color={selected ? "white" : "#9CA3AF"}
+                      />
+                      <Text
+                        className={`text-sm font-medium ${
+                          selected ? "text-white" : "text-secondary"
+                        }`}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
+            </View>
 
-              {/* Age Similarity Card */}
-              <View className="mt-10">
-                <View className="flex flex-row items-center gap-4 bg-white p-5 rounded-2xl border border-border-light">
-                  <View className="bg-primary/10 p-3.5 rounded-2xl">
-                    <Ionicons name="people-sharp" size={22} color="#4F46E5" />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-secondary text-[16px] font-bold">
-                      Age Similarity
-                    </Text>
-                    <Text className="text-muted text-xs font-medium mt-0.5">
-                      Show only to users of my age bracket
-                    </Text>
-                  </View>
-                  <Switch
-                    trackColor={{ false: "#E2E8F0", true: "#4F46E5" }}
-                    onValueChange={toggleSwitch}
-                    ios_backgroundColor="#E2E8F0"
-                    value={isEnabled}
-                  />
+            {/* Age Similarity */}
+            <View className="mt-8">
+              <View className="flex-row items-center bg-white p-4 rounded-2xl border border-gray-100">
+                <View className="bg-indigo-50 p-3 rounded-xl mr-3.5">
+                  <Ionicons name="people-sharp" size={20} color="#4F46E5" />
                 </View>
-              </View>
-
-              {/* Create Button */}
-              <View className="flex-1 justify-end mt-12">
-                <CustomButton
-                  title="Create Room"
-                  size="lg"
-                  onPress={handleCreateRoom}
-                  icon={<Ionicons name="rocket" size={20} color="white" />}
+                <View className="flex-1">
+                  <Text className="text-secondary text-[15px] font-semibold">
+                    Age Similarity
+                  </Text>
+                  <Text className="text-gray-400 text-xs mt-0.5">
+                    Show only to my age bracket
+                  </Text>
+                </View>
+                <Switch
+                  trackColor={{ false: "#E5E7EB", true: "#4F46E5" }}
+                  onValueChange={() => setIsEnabled((p) => !p)}
+                  ios_backgroundColor="#E5E7EB"
+                  value={isEnabled}
                 />
               </View>
+            </View>
+
+            {/* Create Button */}
+            <View className="flex-1 justify-end mt-10">
+              <CustomButton
+                title="Create Room"
+                onPress={handleCreateRoom}
+              />
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

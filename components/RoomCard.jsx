@@ -14,20 +14,7 @@ const CATEGORY_ICONS = {
   "Local Events": "calendar",
 };
 
-const AVATAR_COLORS = [
-  "#4F46E5",
-  "#6366F1",
-  "#8B5CF6",
-  "#EC4899",
-  "#10B981",
-  "#F59E0B",
-  "#3B82F6",
-  "#14B8A6",
-];
-
-function getAvatarColor(index) {
-  return AVATAR_COLORS[index % AVATAR_COLORS.length];
-}
+const AVATAR_COLORS = ["#6366F1", "#EC4899", "#10B981", "#F59E0B", "#3B82F6", "#8B5CF6"];
 
 export default function RoomCard({
   room,
@@ -42,10 +29,9 @@ export default function RoomCard({
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
-      toValue: 0.975,
+      toValue: 0.98,
       useNativeDriver: true,
       speed: 50,
-      bounciness: 4,
     }).start();
   };
 
@@ -54,7 +40,6 @@ export default function RoomCard({
       toValue: 1,
       useNativeDriver: true,
       speed: 50,
-      bounciness: 4,
     }).start();
   };
 
@@ -65,73 +50,58 @@ export default function RoomCard({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.95}
-        className={`rounded-3xl p-5 mb-4 ${
+        className={`rounded-2xl p-5 mb-3 border ${
           isDiscovery
-            ? "bg-white border border-border-light shadow-sm shadow-slate-100"
+            ? "bg-white border-gray-100"
             : isOwner
-              ? "bg-indigo-50/40 border border-indigo-100/60"
-              : "bg-white border border-border-light shadow-sm shadow-slate-50"
+              ? "bg-indigo-50/30 border-indigo-100"
+              : "bg-white border-gray-100"
         }`}
       >
-        {/* Category + Menu Row */}
-        <View className="flex flex-row justify-between items-center mb-4">
-          <View className="flex-row items-center bg-surface-alt px-3.5 py-2 rounded-xl">
-            <Ionicons
-              name={categoryIcon}
-              size={12}
-              color="#64748B"
-              style={{ marginRight: 6 }}
-            />
-            <Text className="text-slate-500 font-bold tracking-widest uppercase text-[10px]">
+        {/* Category */}
+        <View className="flex-row justify-between items-center mb-3">
+          <View className="flex-row items-center bg-gray-50 px-3 py-1.5 rounded-lg">
+            <Ionicons name={categoryIcon} size={11} color="#6B7280" style={{ marginRight: 5 }} />
+            <Text className="text-gray-500 font-medium text-[11px]">
               {room.category}
             </Text>
           </View>
-          <TouchableOpacity className="w-8 h-8 items-center justify-center rounded-lg">
-            <Ionicons name="ellipsis-horizontal" size={18} color="#CBD5E1" />
-          </TouchableOpacity>
         </View>
 
-        {/* Title + Status */}
-        <View className="mb-5">
-          <Text className="text-secondary text-xl font-black tracking-tight mb-1.5">
-            {room.title}
-          </Text>
-          <View className="flex-row items-center">
-            <View className="w-2 h-2 rounded-full bg-success mr-2" />
-            <Text className="text-muted text-xs font-semibold">
-              Active now in your area
-            </Text>
-          </View>
+        {/* Title */}
+        <Text className="text-secondary text-lg font-bold tracking-tight mb-1">
+          {room.title}
+        </Text>
+        <View className="flex-row items-center mb-4">
+          <View className="w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5" />
+          <Text className="text-gray-400 text-xs">Active now</Text>
         </View>
 
-        {/* Footer: Avatars + Join Button */}
-        <View className="flex-row justify-between items-center pt-4 border-t border-border-light">
+        {/* Footer */}
+        <View className="flex-row justify-between items-center pt-3 border-t border-gray-50">
           <View className="flex-row items-center">
-            <View className="flex-row -space-x-2.5 mr-3">
+            <View className="flex-row -space-x-2 mr-2">
               {[0, 1, 2].map((i) => (
                 <View
                   key={i}
-                  className="w-7 h-7 rounded-full border-[2.5px] border-white items-center justify-center"
-                  style={{ backgroundColor: getAvatarColor(i) }}
+                  className="w-6 h-6 rounded-full border-2 border-white items-center justify-center"
+                  style={{ backgroundColor: AVATAR_COLORS[i] }}
                 >
-                  <Text className="text-white text-[9px] font-black">
+                  <Text className="text-white text-[8px] font-bold">
                     {String.fromCharCode(65 + i)}
                   </Text>
                 </View>
               ))}
             </View>
-            <Text className="text-muted font-bold text-[11px] uppercase tracking-wider">
+            <Text className="text-gray-400 text-xs">
               {room.participants?.length || 1} members
             </Text>
           </View>
           <TouchableOpacity
             onPress={() => onPress?.(room)}
-            className="bg-primary px-5 py-2.5 rounded-xl flex-row items-center gap-1.5"
+            className="bg-primary px-4 py-2 rounded-xl"
           >
-            <Text className="text-white font-bold text-xs tracking-wide">
-              Join
-            </Text>
-            <Ionicons name="arrow-forward" size={12} color="white" />
+            <Text className="text-white font-semibold text-xs">Join</Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>

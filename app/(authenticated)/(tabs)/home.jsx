@@ -3,7 +3,7 @@ import Slider from "@react-native-community/slider";
 import { useFocusEffect, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useRef, useState } from "react";
-import { Animated, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/RoomCard";
 import RoomJoinSheet from "../../../components/RoomJoinSheet";
@@ -159,7 +159,11 @@ export default function Home() {
               Start your own discovery circle
             </Text>
           </View>
-          <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.6)" />
+          <Ionicons
+            name="chevron-forward"
+            size={20}
+            color="rgba(255,255,255,0.6)"
+          />
         </TouchableOpacity>
 
         {/* Nearby Rooms Section */}

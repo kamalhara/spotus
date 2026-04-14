@@ -14,19 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../components/CustomButton";
 import CustomInput from "../../components/CustomInput";
 
-function StepIndicator({ currentStep }) {
-  return (
-    <View className="flex-row items-center justify-center gap-2.5 mb-8">
-      <View
-        className={`h-1.5 rounded-full ${currentStep >= 1 ? "bg-primary w-8" : "bg-border w-5"}`}
-      />
-      <View
-        className={`h-1.5 rounded-full ${currentStep >= 2 ? "bg-primary w-8" : "bg-border w-5"}`}
-      />
-    </View>
-  );
-}
-
 export default function SignUp() {
   const { isLoaded } = useAuth();
   const { client, setActive } = useClerk();
@@ -51,13 +38,7 @@ export default function SignUp() {
     const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
 
     try {
-      await signUp.create({
-        emailAddress,
-        password,
-        firstName,
-        lastName,
-      });
-
+      await signUp.create({ emailAddress, password, firstName, lastName });
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       setPendingVerification(true);
     } catch (err) {
@@ -73,10 +54,7 @@ export default function SignUp() {
     setError("");
 
     try {
-      const completeSignUp = await signUp.attemptEmailAddressVerification({
-        code,
-      });
-
+      const completeSignUp = await signUp.attemptEmailAddressVerification({ code });
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
         router.replace("/(authenticated)/(tabs)/home");
@@ -102,25 +80,27 @@ export default function SignUp() {
         <View className="flex-row items-center mt-4">
           <TouchableOpacity
             onPress={() =>
-              pendingVerification
-                ? setPendingVerification(false)
-                : router.back()
+              pendingVerification ? setPendingVerification(false) : router.back()
             }
-            className="w-11 h-11 bg-surface-alt rounded-2xl items-center justify-center"
+            className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center"
           >
-            <Ionicons name="arrow-back" size={20} color="#18181B" />
+            <Ionicons name="arrow-back" size={20} color="black" />
           </TouchableOpacity>
         </View>
 
-        <View className="mb-8 mt-10">
-          <StepIndicator currentStep={pendingVerification ? 2 : 1} />
+        <View className="mb-8 mt-8">
+          {/* Step dots — subtle, not flashy */}
+          <View className="flex-row gap-2 mb-6">
+            <View className={`h-1 rounded-full ${pendingVerification ? "bg-gray-200 w-5" : "bg-primary w-7"}`} />
+            <View className={`h-1 rounded-full ${pendingVerification ? "bg-primary w-7" : "bg-gray-200 w-5"}`} />
+          </View>
 
-          <Text className="text-secondary text-[36px] font-black tracking-tight mb-2 leading-[42px]">
+          <Text className="text-secondary text-[32px] font-bold tracking-tight mb-1">
             {pendingVerification ? "Verify Email" : "Create\nAccount"}
           </Text>
-          <Text className="text-muted text-[16px] leading-6 mt-2 font-medium">
+          <Text className="text-gray-400 text-base leading-6 mt-2">
             {pendingVerification
-              ? `Enter the 6-digit code sent to ${emailAddress}`
+              ? `Enter the code sent to ${emailAddress}`
               : "Join the local discovery circle and connect with people nearby."}
           </Text>
         </View>
@@ -133,9 +113,8 @@ export default function SignUp() {
               value={name}
               onChangeText={setName}
               autoCapitalize="words"
-              icon={<Ionicons name="person-outline" size={20} color="#94A3B8" />}
+              icon={<Ionicons name="person-outline" size={20} color="#9CA3AF" />}
             />
-
             <CustomInput
               label="Email Address"
               placeholder="example@gmail.com"
@@ -143,41 +122,21 @@ export default function SignUp() {
               onChangeText={setEmailAddress}
               keyboardType="email-address"
               autoCapitalize="none"
-              icon={<Ionicons name="mail-outline" size={20} color="#94A3B8" />}
+              icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
             />
-
             <CustomInput
               label="Password"
               placeholder="Create a password"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              icon={
-                <Ionicons
-                  name="lock-closed-outline"
-                  size={20}
-                  color="#94A3B8"
-                />
-              }
+              icon={<Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />}
             />
 
-            {error ? (
-              <View className="bg-danger/8 border border-danger/20 px-4 py-3.5 rounded-2xl flex-row items-center">
-                <View className="w-8 h-8 bg-danger/15 rounded-xl items-center justify-center mr-3">
-                  <Ionicons name="alert-circle" size={16} color="#EF4444" />
-                </View>
-                <Text className="text-danger text-sm font-medium flex-1">
-                  {error}
-                </Text>
-              </View>
-            ) : null}
+            {error ? <Text className="text-red-500 text-sm ml-1">{error}</Text> : null}
 
-            <View className="mt-3">
-              <CustomButton
-                title="Sign Up"
-                onPress={onSignUpPress}
-                loading={loading}
-              />
+            <View className="mt-2">
+              <CustomButton title="Sign Up" onPress={onSignUpPress} loading={loading} />
             </View>
           </View>
         ) : (
@@ -188,40 +147,18 @@ export default function SignUp() {
               value={code}
               onChangeText={setCode}
               keyboardType="number-pad"
-              icon={
-                <Ionicons name="keypad-outline" size={20} color="#94A3B8" />
-              }
+              icon={<Ionicons name="keypad-outline" size={20} color="#9CA3AF" />}
             />
-            {error ? (
-              <View className="bg-danger/8 border border-danger/20 px-4 py-3.5 rounded-2xl flex-row items-center">
-                <View className="w-8 h-8 bg-danger/15 rounded-xl items-center justify-center mr-3">
-                  <Ionicons name="alert-circle" size={16} color="#EF4444" />
-                </View>
-                <Text className="text-danger text-sm font-medium flex-1">
-                  {error}
-                </Text>
-              </View>
-            ) : null}
-            <CustomButton
-              title="Verify & Join"
-              onPress={onPressVerify}
-              loading={loading}
-            />
-
-            <CustomButton
-              title="Cancel"
-              type="ghost"
-              onPress={() => setPendingVerification(false)}
-            />
+            {error ? <Text className="text-red-500 text-sm ml-1">{error}</Text> : null}
+            <CustomButton title="Verify & Join" onPress={onPressVerify} loading={loading} />
+            <CustomButton title="Cancel" type="ghost" onPress={() => setPendingVerification(false)} />
           </View>
         )}
 
-        <View className="flex flex-row items-center justify-center gap-1.5 mt-8">
-          <Text className="text-muted font-medium text-[15px]">
-            Already have an account?
-          </Text>
+        <View className="flex-row items-center justify-center gap-1.5 mt-8">
+          <Text className="text-gray-400 text-[15px]">Already have an account?</Text>
           <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-            <Text className="text-primary font-black text-[15px]">Log In</Text>
+            <Text className="text-primary font-semibold text-[15px]">Log In</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

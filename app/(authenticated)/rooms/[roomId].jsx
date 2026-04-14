@@ -49,100 +49,66 @@ export default function RoomChat() {
   const [members, setMembers] = useState([]);
 
   const { firestoreUser: user } = useFirestoreUser();
-
   const currentUserId = user?.id;
-
-  // Sheet Refs
   const detailsSheetRef = useRef(null);
 
   const { roomId } = useLocalSearchParams();
+
   useEffect(() => {
     if (!roomId) return;
-
     const q = query(
       collection(db, "rooms", roomId, "messages"),
       orderBy("createdAt", "asc"),
     );
-
     const unsub = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setMessages(msgs);
+      setMessages(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
-
     return unsub;
   }, [roomId]);
 
   useEffect(() => {
     if (!roomId) return;
-
     const loadRoom = async () => {
-      const roomRef = doc(db, "rooms", roomId);
-      const snap = await getDoc(roomRef);
-      if (snap.exists()) {
-        setRoom({ id: snap.id, ...snap.data() });
-      }
+      const snap = await getDoc(doc(db, "rooms", roomId));
+      if (snap.exists()) setRoom({ id: snap.id, ...snap.data() });
     };
-
     loadRoom();
   }, [roomId]);
 
   useEffect(() => {
     if (!roomId || !currentUserId) return;
-    const trustRef = doc(db, "rooms", roomId, "trust", currentUserId);
-    const unsub = onSnapshot(trustRef, (snap) => {
-      if (snap.exists()) {
-        setTrust(snap.data().messagesCount || 0);
-      }
-    });
+    const unsub = onSnapshot(
+      doc(db, "rooms", roomId, "trust", currentUserId),
+      (snap) => {
+        if (snap.exists()) setTrust(snap.data().messagesCount || 0);
+      },
+    );
     return unsub;
   }, [roomId, currentUserId]);
 
   useEffect(() => {
     const fetchMemberData = async () => {
       if (!room?.participants?.length) return;
-
       try {
-        // Fetch User Profiles
         const profiles = [];
-        for (const userId of room.participants) {
-          const userDoc = await getDoc(doc(db, "users", userId));
-          if (userDoc.exists()) {
-            profiles.push({ id: userDoc.id, ...userDoc.data() });
-          }
+        for (const uid of room.participants) {
+          const userDoc = await getDoc(doc(db, "users", uid));
+          if (userDoc.exists()) profiles.push({ id: userDoc.id, ...userDoc.data() });
         }
-
-        // Fetch Trust Scores for everyone in this room
-        const trustSnap = await getDocs(
-          collection(db, "rooms", roomId, "trust"),
-        );
+        const trustSnap = await getDocs(collection(db, "rooms", roomId, "trust"));
         const trustMap = {};
-        trustSnap.forEach((d) => {
-          trustMap[d.id] = d.data().messagesCount || 0;
-        });
-
-        // Combine data
-        const membersWithTrust = profiles.map((p) => ({
-          ...p,
-          trustScore: trustMap[p.id] || 0,
-        }));
-
-        setMembers(membersWithTrust);
+        trustSnap.forEach((d) => { trustMap[d.id] = d.data().messagesCount || 0; });
+        setMembers(profiles.map((p) => ({ ...p, trustScore: trustMap[p.id] || 0 })));
       } catch (error) {
         console.error("Error fetching member data:", error);
       }
     };
-
     fetchMemberData();
   }, [room?.participants, roomId]);
 
   const handleSend = async (text) => {
     if (!text.trim()) return;
     const trimmedText = text.trim();
-
     try {
       await addDoc(collection(db, "rooms", roomId, "messages"), {
         text: trimmedText,
@@ -150,17 +116,14 @@ export default function RoomChat() {
         user: user?.userName || "Unknown",
         createdAt: serverTimestamp(),
       });
-
-      // Update both room and global trust
       await updateTrustOnMessage(db, roomId, currentUserId, trimmedText);
     } catch (err) {
       console.error("Error sending message:", err);
     }
   };
 
-  const trustPercentage = Math.min(trust * 10, 100);
   const trustColor =
-    trustPercentage < 30 ? "#EF4444" : trustPercentage < 70 ? "#F59E0B" : "#10B981";
+    trust < 3 ? "#EF4444" : trust < 7 ? "#F59E0B" : "#10B981";
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
 
   return (
@@ -168,14 +131,14 @@ export default function RoomChat() {
       className="flex-1 bg-bg"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      {/* Premium Header */}
-      <View className="bg-white z-10 border-b border-border-light">
+      {/* Header */}
+      <View className="bg-white z-10 border-b border-gray-100">
         <SafeAreaView edges={["top"]}>
-          <View className="flex flex-row items-center justify-between px-5 py-3.5">
-            <View className="flex flex-row items-center flex-1">
+          <View className="flex-row items-center justify-between px-5 py-3">
+            <View className="flex-row items-center flex-1">
               <TouchableOpacity
                 onPress={() => router.back()}
-                className="w-10 h-10 bg-surface-alt rounded-2xl items-center justify-center mr-3.5"
+                className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center mr-3"
               >
                 <Ionicons name="chevron-back" size={20} color="#18181B" />
               </TouchableOpacity>
@@ -185,77 +148,53 @@ export default function RoomChat() {
                 onPress={() => detailsSheetRef.current?.present()}
                 activeOpacity={0.7}
               >
-                <View className="flex-row items-center gap-2">
-                  <View className="w-8 h-8 bg-primary/10 rounded-xl items-center justify-center">
-                    <Ionicons name={categoryIcon} size={14} color="#4F46E5" />
-                  </View>
-                  <View>
-                    <Text
-                      className="text-secondary text-[17px] font-black tracking-tight"
-                      numberOfLines={1}
-                    >
-                      {room?.title || "Loading..."}
-                    </Text>
-                    <View className="flex flex-row items-center mt-0.5">
-                      <View className="bg-success w-1.5 h-1.5 rounded-full mr-1.5" />
-                      <Text className="text-muted text-[9px] font-bold uppercase tracking-[1.5px]">
-                        {room?.participants?.length || 0} active
-                      </Text>
-                    </View>
-                  </View>
+                <Text
+                  className="text-secondary text-base font-bold"
+                  numberOfLines={1}
+                >
+                  {room?.title || "Loading..."}
+                </Text>
+                <View className="flex-row items-center mt-0.5">
+                  <Ionicons name={categoryIcon} size={10} color="#9CA3AF" style={{ marginRight: 4 }} />
+                  <Text className="text-gray-400 text-xs">
+                    {room?.participants?.length || 0} members
+                  </Text>
                 </View>
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity className="w-10 h-10 bg-surface-alt rounded-2xl items-center justify-center">
-              <Ionicons name="ellipsis-horizontal" size={18} color="#94A3B8" />
+            <TouchableOpacity className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center">
+              <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
             </TouchableOpacity>
           </View>
         </SafeAreaView>
       </View>
 
-      {/* Trust Meter Card */}
+      {/* Trust Meter — compact */}
       {trust < 10 && (
-        <View className="px-5 mt-4">
-          <View className="bg-white px-5 py-4 rounded-2xl border border-border-light">
-            <View className="flex flex-row items-center justify-between mb-3">
-              <View className="flex flex-row items-center gap-2">
-                <Ionicons name="shield-checkmark" size={16} color={trustColor} />
-                <Text className="text-secondary text-[11px] font-bold uppercase tracking-[1.5px]">
-                  Trust Meter
+        <View className="px-5 pt-3 pb-1">
+          <View className="bg-white px-4 py-3 rounded-xl border border-gray-100">
+            <View className="flex-row items-center justify-between mb-2">
+              <View className="flex-row items-center">
+                <Ionicons name="shield-checkmark-outline" size={14} color={trustColor} />
+                <Text className="text-gray-500 text-xs font-medium ml-1.5">
+                  Trust
                 </Text>
               </View>
-              <View
-                className="px-2.5 py-1 rounded-lg"
-                style={{ backgroundColor: `${trustColor}15` }}
-              >
-                <Text
-                  className="text-[12px] font-black"
-                  style={{ color: trustColor }}
-                >
-                  {trustPercentage}%
-                </Text>
-              </View>
+              <Text className="text-xs font-semibold" style={{ color: trustColor }}>
+                {trust}/10
+              </Text>
             </View>
-
-            <View className="flex flex-row items-center gap-3">
-              <View className="flex-1">
-                <Progress.Bar
-                  progress={trust / 10}
-                  width={null}
-                  color={trustColor}
-                  unfilledColor="#F1F5F9"
-                  borderWidth={0}
-                  height={6}
-                  borderRadius={3}
-                  animated={true}
-                />
-              </View>
-            </View>
-
-            <Text className="text-muted text-[10px] font-bold uppercase tracking-[1.5px] mt-2.5 ml-0.5">
-              {10 - trust} more messages to unlock DMs
-            </Text>
+            <Progress.Bar
+              progress={trust / 10}
+              width={null}
+              color={trustColor}
+              unfilledColor="#F3F4F6"
+              borderWidth={0}
+              height={4}
+              borderRadius={2}
+              animated={true}
+            />
           </View>
         </View>
       )}
@@ -264,7 +203,7 @@ export default function RoomChat() {
         <ChatMessages messages={messages} currentUserId={currentUserId} />
       </View>
 
-      <View className="px-5 py-3.5 bg-transparent flex items-center pb-6">
+      <View className="px-5 py-3 flex items-center pb-6">
         <MessageSender handleSend={handleSend} />
       </View>
 

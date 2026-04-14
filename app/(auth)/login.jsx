@@ -75,31 +75,27 @@ export default function Login() {
     return (
       <SafeAreaView className="flex-1 justify-center items-center bg-white">
         <ActivityIndicator size="large" color="#4F46E5" />
-        <Text className="text-muted mt-3 font-medium">
-          Loading authentication...
-        </Text>
       </SafeAreaView>
     );
   }
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView className="bg-white flex-1 px-8">
         <View className="flex-row items-center mt-4">
           <TouchableOpacity
             onPress={() => router.back()}
-            className="w-11 h-11 bg-surface-alt rounded-2xl items-center justify-center"
+            className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center"
           >
-            <Ionicons name="arrow-back" size={20} color="#18181B" />
+            <Ionicons name="arrow-back" size={20} color="black" />
           </TouchableOpacity>
         </View>
 
-        <View className="mt-10 mb-10">
-          <View className="flex-row items-center mb-2">
-            <Text className="text-secondary text-[36px] font-black tracking-tight leading-[42px]">
-              Welcome{"\n"}Back
-            </Text>
-          </View>
-          <Text className="text-muted text-[16px] leading-6 mt-2 font-medium">
+        <View className="mt-8 mb-10">
+          <Text className="text-secondary text-[32px] font-bold tracking-tight mb-1">
+            Welcome{"\n"}Back
+          </Text>
+          <Text className="text-gray-400 text-base leading-6 mt-2">
             Sign in to your account and continue your journey.
           </Text>
         </View>
@@ -112,7 +108,7 @@ export default function Login() {
             onChangeText={setEmailAddress}
             autoCapitalize="none"
             keyboardType="email-address"
-            icon={<Ionicons name="mail-outline" size={20} color="#94A3B8" />}
+            icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
           />
 
           <CustomInput
@@ -122,53 +118,41 @@ export default function Login() {
             onChangeText={setPassword}
             secureTextEntry
             icon={
-              <Ionicons name="lock-closed-outline" size={20} color="#94A3B8" />
+              <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />
             }
           />
 
-          {/* Forgot Password Link */}
           <TouchableOpacity className="self-end -mt-2">
-            <Text className="text-primary font-bold text-sm">
+            <Text className="text-primary font-medium text-sm">
               Forgot Password?
             </Text>
           </TouchableOpacity>
 
           {error ? (
-            <View className="bg-danger/8 border border-danger/20 px-4 py-3.5 rounded-2xl flex-row items-center">
-              <View className="w-8 h-8 bg-danger/15 rounded-xl items-center justify-center mr-3">
-                <Ionicons name="alert-circle" size={16} color="#EF4444" />
-              </View>
-              <Text className="text-danger text-sm font-medium flex-1">
-                {error}
-              </Text>
-            </View>
+            <Text className="text-red-500 text-sm ml-1">{error}</Text>
           ) : null}
         </View>
 
-        <View>
-          <CustomButton
-            title="Login"
-            onPress={onSignInPress}
-            loading={loading}
-          />
-        </View>
+        <CustomButton
+          title="Login"
+          onPress={onSignInPress}
+          loading={loading}
+        />
 
-        <View className="flex flex-row items-center justify-center gap-3 my-7">
-          <View className="flex-1 h-[1px] bg-border" />
-          <Text className="text-muted text-sm font-semibold">
-            Or continue with
-          </Text>
-          <View className="flex-1 h-[1px] bg-border" />
+        <View className="flex-row items-center justify-center gap-3 my-7">
+          <View className="flex-1 h-px bg-gray-200" />
+          <Text className="text-gray-400 text-sm">Or</Text>
+          <View className="flex-1 h-px bg-gray-200" />
         </View>
 
         <Oauth />
 
-        <View className="flex flex-row items-center justify-center gap-1.5 mt-4">
-          <Text className="text-muted font-medium text-[15px]">
+        <View className="flex-row items-center justify-center gap-1.5 mt-4">
+          <Text className="text-gray-400 text-[15px]">
             Don&apos;t have an account?
           </Text>
           <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
-            <Text className="text-primary font-black text-[15px]">
+            <Text className="text-primary font-semibold text-[15px]">
               Sign Up
             </Text>
           </TouchableOpacity>
