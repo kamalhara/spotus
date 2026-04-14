@@ -19,15 +19,15 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { createRoom } from "../../../lib/createRoom";
 
 const CATEGORIES = [
-  { label: "Music", icon: "musical-notes" },
-  { label: "Coffee", icon: "cafe" },
-  { label: "Art", icon: "color-palette" },
-  { label: "Books", icon: "book" },
-  { label: "Tech", icon: "code-slash" },
-  { label: "Food", icon: "restaurant" },
-  { label: "Fashion", icon: "shirt" },
-  { label: "Sports", icon: "football" },
-  { label: "Local Events", icon: "calendar" },
+  { label: "Music", icon: "musical-notes", color: "#8B5CF6" },
+  { label: "Coffee", icon: "cafe", color: "#D97706" },
+  { label: "Art", icon: "color-palette", color: "#EC4899" },
+  { label: "Books", icon: "book", color: "#6366F1" },
+  { label: "Tech", icon: "code-slash", color: "#3B82F6" },
+  { label: "Food", icon: "restaurant", color: "#EF4444" },
+  { label: "Fashion", icon: "shirt", color: "#F59E0B" },
+  { label: "Sports", icon: "football", color: "#10B981" },
+  { label: "Local Events", icon: "calendar", color: "#14B8A6" },
 ];
 
 const MAX_TITLE = 60;
@@ -70,16 +70,15 @@ export default function CreateRooms() {
               >
                 <Ionicons name="arrow-back" size={20} color="#18181B" />
               </TouchableOpacity>
-              <Text className="text-secondary text-lg font-semibold">Back</Text>
             </View>
 
             {/* Title */}
-            <View className="mt-6 mb-8">
-              <Text className="text-secondary text-[28px] font-bold tracking-tight leading-[34px]">
+            <View className="mt-4 mb-8">
+              <Text className="text-secondary text-[28px] font-extrabold tracking-tight leading-[34px]">
                 Create a Room
               </Text>
               <Text className="text-gray-400 text-sm leading-5 mt-2">
-                Define the vibe and invite others to join your discovery circle.
+                Define the vibe and invite others to your circle.
               </Text>
             </View>
 
@@ -98,14 +97,14 @@ export default function CreateRooms() {
               </Text>
             </View>
 
-            {/* Categories */}
+            {/* Categories — each with its own color */}
             <View className="mt-5">
               <Text className="text-gray-500 text-sm font-medium mb-3 ml-1">
                 Category
               </Text>
 
               <View className="flex-row flex-wrap gap-2.5">
-                {CATEGORIES.map(({ label, icon }) => {
+                {CATEGORIES.map(({ label, icon, color }) => {
                   const selected = selectedCategory === label;
                   return (
                     <TouchableOpacity
@@ -113,19 +112,19 @@ export default function CreateRooms() {
                       onPress={() => setSelectedCategory(label)}
                       className={`px-3.5 py-2.5 rounded-xl flex-row items-center gap-2 border ${
                         selected
-                          ? "bg-primary border-primary"
+                          ? "border-transparent"
                           : "bg-white border-gray-100"
                       }`}
+                      style={selected ? { backgroundColor: `${color}15`, borderColor: `${color}30` } : {}}
                     >
                       <Ionicons
                         name={selected ? "checkmark" : icon}
                         size={14}
-                        color={selected ? "white" : "#9CA3AF"}
+                        color={selected ? color : "#9CA3AF"}
                       />
                       <Text
-                        className={`text-sm font-medium ${
-                          selected ? "text-white" : "text-secondary"
-                        }`}
+                        className={`text-sm font-medium ${!selected ? "text-secondary" : ""}`}
+                        style={selected ? { color } : {}}
                       >
                         {label}
                       </Text>
@@ -160,10 +159,7 @@ export default function CreateRooms() {
 
             {/* Create Button */}
             <View className="flex-1 justify-end mt-10">
-              <CustomButton
-                title="Create Room"
-                onPress={handleCreateRoom}
-              />
+              <CustomButton title="Create Room" onPress={handleCreateRoom} />
             </View>
           </ScrollView>
         </KeyboardAvoidingView>

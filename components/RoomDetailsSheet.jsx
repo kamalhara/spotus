@@ -199,7 +199,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                   <Ionicons name="people-outline" size={24} color="#CBD5E1" />
                 </View>
                 <Text className="text-muted font-bold text-sm">
-                  Loading circle members...
+                  Loading members...
                 </Text>
               </View>
             )}

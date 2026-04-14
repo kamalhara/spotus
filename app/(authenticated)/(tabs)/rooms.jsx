@@ -35,6 +35,7 @@ export default function RoomsScreen() {
       count: myCreatedRooms.length,
       data: myCreatedRooms,
       isEmpty: myCreatedRooms.length === 0,
+      emptyIcon: "add-circle-outline",
       emptyText: "You haven't created any rooms yet.",
     },
     {
@@ -42,6 +43,7 @@ export default function RoomsScreen() {
       count: myJoinedRooms.length,
       data: myJoinedRooms,
       isEmpty: myJoinedRooms.length === 0,
+      emptyIcon: "compass-outline",
       emptyText: "You haven't joined any rooms.",
     },
   ];
@@ -50,7 +52,9 @@ export default function RoomsScreen() {
     <SafeAreaView className="flex-1 bg-bg px-6">
       {/* Header */}
       <View className="flex-row items-center justify-between my-3">
-        <Text className="text-secondary text-2xl font-bold">My Rooms</Text>
+        <Text className="text-secondary text-2xl font-extrabold tracking-tight">
+          My Rooms
+        </Text>
         <TouchableOpacity
           onPress={() => router.push("/rooms/create-rooms")}
           className="w-10 h-10 bg-primary rounded-full items-center justify-center"
@@ -71,15 +75,22 @@ export default function RoomsScreen() {
         renderSectionHeader={({ section }) => (
           <View className="bg-bg pt-5 pb-3">
             <View className="flex-row items-center gap-2">
-              <Text className="text-secondary text-lg font-semibold">
+              <Text className="text-secondary text-lg font-bold">
                 {section.title}
               </Text>
-              <Text className="text-gray-300 text-sm">{section.count}</Text>
+              <View className="bg-gray-100 px-2 py-0.5 rounded-md">
+                <Text className="text-gray-400 text-xs font-semibold">
+                  {section.count}
+                </Text>
+              </View>
             </View>
             {section.isEmpty && (
-              <Text className="text-gray-400 text-sm mt-4 mb-2 text-center">
-                {section.emptyText}
-              </Text>
+              <View className="items-center py-10">
+                <Ionicons name={section.emptyIcon} size={32} color="#D1D5DB" />
+                <Text className="text-gray-400 text-sm mt-2.5">
+                  {section.emptyText}
+                </Text>
+              </View>
             )}
           </View>
         )}

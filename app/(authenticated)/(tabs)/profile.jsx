@@ -32,7 +32,7 @@ const MenuItem = ({
     <View className="flex-row items-center flex-1">
       <View
         className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
-        style={{ backgroundColor: `${color}10` }}
+        style={{ backgroundColor: `${color}12` }}
       >
         <Ionicons name={icon} size={18} color={color} />
       </View>
@@ -81,7 +81,7 @@ export default function Profile() {
         {/* Profile Header */}
         <View className="items-center px-6 mt-8 mb-7">
           <View className="relative">
-            <View className="w-28 h-28 rounded-full border-4 border-white shadow-lg shadow-gray-200 overflow-hidden bg-gray-100">
+            <View className="w-[110px] h-[110px] rounded-full border-4 border-white shadow-lg shadow-gray-200 overflow-hidden bg-gray-100">
               <Image
                 source={firestoreUser?.profilePic || "https://picsum.photos/200"}
                 contentFit="cover"
@@ -91,13 +91,13 @@ export default function Profile() {
             </View>
             <TouchableOpacity
               activeOpacity={0.8}
-              className="absolute bottom-0 right-0 bg-primary w-9 h-9 rounded-full border-[4px] border-bg items-center justify-center"
+              className="absolute -bottom-1 -right-1 bg-primary w-10 h-10 rounded-full border-4 border-bg items-center justify-center"
             >
-              <Ionicons name="camera" size={15} color="white" />
+              <Ionicons name="camera" size={16} color="white" />
             </TouchableOpacity>
           </View>
 
-          <Text className="text-secondary text-2xl font-bold mt-4 tracking-tight">
+          <Text className="text-secondary text-[24px] font-extrabold mt-4 tracking-tight">
             {firestoreUser?.userName || "User"}
           </Text>
           <Text className="text-gray-400 text-sm mt-1">
@@ -105,24 +105,24 @@ export default function Profile() {
           </Text>
         </View>
 
-        {/* Stats */}
+        {/* Stats — with a touch of color */}
         <View className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-7">
           <View className="items-center flex-1">
-            <Text className="text-xl font-bold text-primary">
+            <Text className="text-[22px] font-extrabold text-primary">
               {firestoreUser?.roomsCreated ?? 0}
             </Text>
             <Text className="text-gray-400 text-xs mt-1">Created</Text>
           </View>
           <View className="w-px bg-gray-100" />
           <View className="items-center flex-1">
-            <Text className="text-xl font-bold text-secondary">
+            <Text className="text-[22px] font-extrabold text-secondary">
               {firestoreUser?.roomsJoined ?? 0}
             </Text>
             <Text className="text-gray-400 text-xs mt-1">Joined</Text>
           </View>
           <View className="w-px bg-gray-100" />
           <View className="items-center flex-1">
-            <Text className="text-xl font-bold text-green-500">
+            <Text className="text-[22px] font-extrabold text-green-500">
               {firestoreUser?.globalReputation ?? 0}
             </Text>
             <Text className="text-gray-400 text-xs mt-1">Reputation</Text>
@@ -150,18 +150,18 @@ export default function Profile() {
           <MenuItem
             icon="notifications-outline"
             label="Notifications"
-            color="#6366F1"
+            color="#8B5CF6"
           />
           <MenuItem
             icon="eye-outline"
             label="Privacy & Data"
-            color="#6366F1"
+            color="#8B5CF6"
           />
           <MenuItem
             icon="language-outline"
             label="Language"
             subtitle="English"
-            color="#6366F1"
+            color="#8B5CF6"
             isLast
           />
         </View>
@@ -173,12 +173,12 @@ export default function Profile() {
           <MenuItem
             icon="help-circle-outline"
             label="Help Center"
-            color="#94A3B8"
+            color="#64748B"
           />
           <MenuItem
             icon="information-circle-outline"
             label="About SpotUs"
-            color="#94A3B8"
+            color="#64748B"
             isLast
           />
         </View>
@@ -187,10 +187,12 @@ export default function Profile() {
         <TouchableOpacity
           onPress={handleSignOut}
           activeOpacity={0.7}
-          className="mx-6 mt-7 bg-red-50 py-4 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
+          className="mx-6 mt-7 bg-red-50 py-4.5 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
         >
           <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-          <Text className="text-red-500 font-semibold text-sm">Sign Out</Text>
+          <Text className="text-red-500 font-semibold text-[15px]">
+            Sign Out
+          </Text>
         </TouchableOpacity>
 
         <Text className="text-center text-gray-300 text-[10px] mt-6 tracking-wider">

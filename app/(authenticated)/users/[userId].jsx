@@ -4,13 +4,7 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import {
-  Alert,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../../config/firebase.config";
@@ -54,8 +48,26 @@ export default function UserProfile() {
   const hasDMAccess = canSendDM(viewerRoomTrust);
   const trustProgress = Math.min(viewerRoomTrust / 10, 1);
   const trustColor =
-    viewerRoomTrust < 3 ? "#EF4444" : viewerRoomTrust < 7 ? "#F59E0B" : "#10B981";
+    viewerRoomTrust < 3
+      ? "#EF4444"
+      : viewerRoomTrust < 7
+        ? "#F59E0B"
+        : "#10B981";
 
+  const handleMessage = () => {
+    if (!hasDMAccess) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      Alert.alert(
+        "DMs locked",
+        `Send ${10 - viewerRoomTrust} more messages in the room to unlock.`,
+      );
+      return;
+    }
+    router.push({
+      pathname: `/dm/${user.id}`,
+      params: { userName: user?.userName, profilePic: user?.profilePic },
+    });
+  };
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-bg">
@@ -118,7 +130,7 @@ export default function UserProfile() {
         {/* Avatar + Name */}
         <View className="items-center mt-6 mb-6 px-6">
           <View className="relative">
-            <View className="w-28 h-28 rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-lg shadow-gray-200">
+            <View className="w-[110px] h-[110px] rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-lg shadow-gray-200">
               <Image
                 source={user?.profilePic || "https://picsum.photos/200"}
                 contentFit="cover"
@@ -129,7 +141,7 @@ export default function UserProfile() {
             <View className="absolute bottom-0 right-0 w-7 h-7 bg-green-400 rounded-full border-[4px] border-bg" />
           </View>
 
-          <Text className="text-secondary text-[26px] font-bold mt-4 tracking-tight">
+          <Text className="text-secondary text-[24px] font-extrabold mt-4 tracking-tight">
             {user?.userName || "User"}
           </Text>
           {user?.bio ? (
@@ -139,29 +151,21 @@ export default function UserProfile() {
           ) : null}
 
           {(user?.globalReputation ?? 0) > 0 && (
-            <View className="mt-3 flex-row items-center bg-green-50 px-3 py-1.5 rounded-full">
+            <View className="mt-3 flex-row items-center bg-green-50 px-3.5 py-1.5 rounded-full">
               <Ionicons name="star" size={12} color="#10B981" />
-              <Text className="text-green-600 text-xs font-semibold ml-1">
+              <Text className="text-green-600 text-xs font-semibold ml-1.5">
                 {user.globalReputation} rep
               </Text>
             </View>
           )}
         </View>
 
-        {/* Action Buttons */}
-        <View className="flex-row px-6 gap-3 mb-6">
+        {/* Action Buttons — varied sizes give visual interest */}
+        <View className="flex-row px-6 gap-2.5 mb-6">
           <TouchableOpacity
-            onPress={() => {
-              if (!hasDMAccess) {
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-                Alert.alert(
-                  "DMs locked",
-                  `Send ${10 - viewerRoomTrust} more messages in the room to unlock.`,
-                );
-              }
-            }}
+            onPress={handleMessage}
             activeOpacity={0.8}
-            className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${
+            className={`flex-[2] py-3.5 rounded-2xl flex-row items-center justify-center ${
               hasDMAccess ? "bg-primary" : "bg-gray-100"
             }`}
           >
@@ -181,10 +185,10 @@ export default function UserProfile() {
 
           <TouchableOpacity
             activeOpacity={0.8}
-            className="flex-1 py-3.5 rounded-2xl flex-row items-center justify-center bg-gray-50 border border-gray-100"
+            className="flex-1 py-3.5 rounded-2xl flex-row items-center justify-center bg-pink-50 border border-pink-100"
           >
             <Ionicons name="heart-outline" size={16} color="#EC4899" />
-            <Text className="text-secondary font-semibold text-sm ml-2">
+            <Text className="text-pink-500 font-semibold text-sm ml-1.5">
               Vouch
             </Text>
           </TouchableOpacity>
@@ -197,7 +201,7 @@ export default function UserProfile() {
           </TouchableOpacity>
         </View>
 
-        {/* Trust progress — when locked */}
+        {/* Trust progress */}
         {!hasDMAccess && (
           <View className="px-6 mb-6">
             <View className="bg-white rounded-2xl px-4 py-4 border border-gray-100">
@@ -232,28 +236,28 @@ export default function UserProfile() {
         {/* Stats */}
         <View className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-6">
           <View className="flex-1 items-center">
-            <Text className="text-xl font-bold text-primary">
+            <Text className="text-[22px] font-extrabold text-primary">
               {user?.roomsCreated ?? 0}
             </Text>
             <Text className="text-gray-400 text-xs mt-1">Hosted</Text>
           </View>
           <View className="w-px bg-gray-100" />
           <View className="flex-1 items-center">
-            <Text className="text-xl font-bold text-secondary">
+            <Text className="text-[22px] font-extrabold text-secondary">
               {user?.roomsJoined ?? 0}
             </Text>
             <Text className="text-gray-400 text-xs mt-1">Joined</Text>
           </View>
           <View className="w-px bg-gray-100" />
           <View className="flex-1 items-center">
-            <Text className="text-xl font-bold text-green-500">
+            <Text className="text-[22px] font-extrabold text-green-500">
               {user?.globalReputation ?? 0}
             </Text>
             <Text className="text-gray-400 text-xs mt-1">Rep</Text>
           </View>
         </View>
 
-        {/* About — using a different visual approach, no card */}
+        {/* About — mixed visual approach */}
         <View className="px-6 mb-4">
           <Text className="text-secondary text-lg font-bold mb-4">About</Text>
 
@@ -266,7 +270,8 @@ export default function UserProfile() {
                 Activity
               </Text>
               <Text className="text-gray-400 text-sm leading-5 mt-0.5">
-                Active in Music and Tech rooms. Recently hosted &quot;Late Night coding&quot;.
+                Active in Music and Tech rooms. Recently hosted &quot;Late Night
+                coding&quot;.
               </Text>
             </View>
           </View>
@@ -287,7 +292,7 @@ export default function UserProfile() {
 
           <View className="flex-row">
             <View className="w-8 h-8 rounded-xl bg-green-50 items-center justify-center mr-3 mt-0.5">
-              <Ionicons name="time-outline" size={14} color="#10B981" />
+              <Ionicons name="heart" size={14} color="#10B981" />
             </View>
             <View className="flex-1">
               <Text className="text-secondary text-sm font-semibold">
@@ -295,8 +300,13 @@ export default function UserProfile() {
               </Text>
               <View className="flex-row flex-wrap gap-1.5 mt-1.5">
                 {["Music", "Tech", "Coffee"].map((tag) => (
-                  <View key={tag} className="bg-gray-50 px-2.5 py-1 rounded-lg">
-                    <Text className="text-gray-500 text-xs">{tag}</Text>
+                  <View
+                    key={tag}
+                    className="bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-100"
+                  >
+                    <Text className="text-gray-500 text-xs font-medium">
+                      {tag}
+                    </Text>
                   </View>
                 ))}
               </View>

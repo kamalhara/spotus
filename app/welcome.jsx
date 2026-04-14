@@ -17,7 +17,7 @@ export default function Welcome() {
       <SafeAreaView className="flex-1 justify-between">
         {/* Brand */}
         <View className="mt-6 px-8">
-          <Text className="text-secondary text-2xl font-bold tracking-tight">
+          <Text className="text-secondary text-2xl font-extrabold tracking-tight">
             Spot Us
           </Text>
         </View>
@@ -35,7 +35,7 @@ export default function Welcome() {
 
         {/* Bottom */}
         <View className="bg-gray-50 px-8 pt-10 pb-14 rounded-t-[36px]">
-          <Text className="text-secondary text-[34px] font-bold leading-[40px] tracking-tight">
+          <Text className="text-secondary text-[36px] font-extrabold leading-[42px] tracking-tight">
             Find People {"\n"}
             <Text className="text-primary">Nearby</Text>
           </Text>
@@ -58,7 +58,7 @@ export default function Welcome() {
                 <Text className="text-gray-400 text-[15px]">
                   Already have an account?
                 </Text>
-                <Text className="text-primary font-semibold text-[15px]">
+                <Text className="text-primary font-bold text-[15px]">
                   Log In
                 </Text>
               </View>

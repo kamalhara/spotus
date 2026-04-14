@@ -10,18 +10,21 @@ export default function Chat() {
       </View>
 
       <View className="flex-1 items-center justify-center -mt-10">
-        <Ionicons name="chatbubble-outline" size={44} color="#D1D5DB" />
-        <Text className="text-secondary text-base font-semibold mt-4">
+        <View className="w-16 h-16 bg-indigo-50 rounded-2xl items-center justify-center mb-4">
+          <Ionicons name="chatbubble-outline" size={28} color="#6366F1" />
+        </View>
+        <Text className="text-secondary text-base font-bold mt-2">
           No messages yet
         </Text>
-        <Text className="text-gray-400 text-sm mt-1 text-center px-10 leading-5">
+        <Text className="text-gray-400 text-sm mt-1.5 text-center px-10 leading-5">
           Build trust in rooms to unlock direct messages with other members.
         </Text>
 
-        {/* Small trust hint */}
         <View className="mt-6 bg-white rounded-2xl px-4 py-3.5 flex-row items-center border border-gray-100">
-          <Ionicons name="shield-checkmark-outline" size={16} color="#4F46E5" />
-          <Text className="text-gray-500 text-xs ml-2.5 flex-1">
+          <View className="w-7 h-7 bg-primary/10 rounded-lg items-center justify-center mr-2.5">
+            <Ionicons name="shield-checkmark-outline" size={14} color="#4F46E5" />
+          </View>
+          <Text className="text-gray-500 text-xs flex-1">
             10 room messages = DM access
           </Text>
         </View>

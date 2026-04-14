@@ -14,6 +14,18 @@ const CATEGORY_ICONS = {
   "Local Events": "calendar",
 };
 
+const CATEGORY_COLORS = {
+  Music: "#8B5CF6",
+  Coffee: "#D97706",
+  Art: "#EC4899",
+  Books: "#6366F1",
+  Tech: "#3B82F6",
+  Food: "#EF4444",
+  Fashion: "#F59E0B",
+  Sports: "#10B981",
+  "Local Events": "#14B8A6",
+};
+
 const AVATAR_COLORS = ["#6366F1", "#EC4899", "#10B981", "#F59E0B", "#3B82F6", "#8B5CF6"];
 
 export default function RoomCard({
@@ -26,6 +38,7 @@ export default function RoomCard({
   const isOwner = room.createdBy === currentUserId;
   const isDiscovery = variant === "discovery";
   const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
+  const categoryColor = CATEGORY_COLORS[room.category] || "#6B7280";
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -58,18 +71,21 @@ export default function RoomCard({
               : "bg-white border-gray-100"
         }`}
       >
-        {/* Category */}
+        {/* Category — colored per type */}
         <View className="flex-row justify-between items-center mb-3">
-          <View className="flex-row items-center bg-gray-50 px-3 py-1.5 rounded-lg">
-            <Ionicons name={categoryIcon} size={11} color="#6B7280" style={{ marginRight: 5 }} />
-            <Text className="text-gray-500 font-medium text-[11px]">
+          <View
+            className="flex-row items-center px-3 py-1.5 rounded-lg"
+            style={{ backgroundColor: `${categoryColor}10` }}
+          >
+            <Ionicons name={categoryIcon} size={11} color={categoryColor} style={{ marginRight: 5 }} />
+            <Text className="font-semibold text-[11px]" style={{ color: categoryColor }}>
               {room.category}
             </Text>
           </View>
         </View>
 
         {/* Title */}
-        <Text className="text-secondary text-lg font-bold tracking-tight mb-1">
+        <Text className="text-secondary text-[18px] font-bold tracking-tight mb-1">
           {room.title}
         </Text>
         <View className="flex-row items-center mb-4">
@@ -78,9 +94,9 @@ export default function RoomCard({
         </View>
 
         {/* Footer */}
-        <View className="flex-row justify-between items-center pt-3 border-t border-gray-50">
+        <View className="flex-row justify-between items-center pt-3.5 border-t border-gray-50">
           <View className="flex-row items-center">
-            <View className="flex-row -space-x-2 mr-2">
+            <View className="flex-row -space-x-2 mr-2.5">
               {[0, 1, 2].map((i) => (
                 <View
                   key={i}
@@ -99,9 +115,9 @@ export default function RoomCard({
           </View>
           <TouchableOpacity
             onPress={() => onPress?.(room)}
-            className="bg-primary px-4 py-2 rounded-xl"
+            className="bg-primary px-5 py-2 rounded-xl"
           >
-            <Text className="text-white font-semibold text-xs">Join</Text>
+            <Text className="text-white font-bold text-xs">Join</Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
