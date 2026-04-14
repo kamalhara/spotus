@@ -1,3 +1,4 @@
+import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import {
   ActivityIndicator,
@@ -18,6 +19,17 @@ export default function CustomButton({
   icon,
 }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePress = () => {
+    if (!disabled && !loading) {
+      if (type === "primary") {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } else {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }
+      onPress?.();
+    }
+  };
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -102,7 +114,7 @@ export default function CustomButton({
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
-        onPress={onPress}
+        onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         disabled={disabled || loading}

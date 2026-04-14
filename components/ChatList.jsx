@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
@@ -56,7 +55,9 @@ export default function ChatRow({ chat, onPress }) {
       >
         <View className="relative">
           <Image
-            source={{ uri: otherUser?.profilePic || "https://picsum.photos/200" }}
+            source={{
+              uri: otherUser?.profilePic || "https://picsum.photos/200",
+            }}
             className="rounded-[22px] bg-gray-100 border border-gray-50"
             style={{ width: 60, height: 60 }}
           />
@@ -70,18 +71,10 @@ export default function ChatRow({ chat, onPress }) {
             </Text>
             <Text className="text-gray-400 text-xs font-semibold">{time}</Text>
           </View>
-          
+
           <View className="flex-row items-center">
-            {lastMsg && (
-              <Ionicons 
-                name="checkmark-done" 
-                size={14} 
-                color="#6366F1" 
-                style={{ marginRight: 4 }} 
-              />
-            )}
-            <Text 
-              className="text-gray-500 text-[13px] leading-5 flex-1" 
+            <Text
+              className="text-gray-500 text-[13px] leading-5 flex-1"
               numberOfLines={1}
             >
               {lastMsg || "Click to start the conversation..."}

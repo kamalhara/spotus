@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
+import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useRef, useState } from "react";
@@ -14,7 +15,7 @@ import { getRooms } from "../../../lib/getRoom";
 function getGreeting() {
   const h = new Date().getHours();
   if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
+  if (h >= 12 && h < 17) return "Good afternoon";
   return "Good evening";
 }
 
@@ -76,13 +77,27 @@ export default function Home() {
 
   const firstName = firestoreUser?.userName?.split(" ")[0] || "there";
 
+  const handleCreateRoom = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push("/rooms/create-rooms");
+  };
+
+  const handleProfilePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push("/profile");
+  };
+
+  const handleNotificationPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
+
   return (
     <>
       <SafeAreaView className="bg-bg h-screen px-6">
         {/* Header */}
         <View className="flex flex-row justify-between items-center my-3">
           <TouchableOpacity
-            onPress={() => router.push("/profile")}
+            onPress={handleProfilePress}
             className="flex-row items-center"
           >
             <Image
@@ -98,7 +113,10 @@ export default function Home() {
             </Text>
             <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
           </View>
-          <TouchableOpacity className="w-12 h-12 bg-white rounded-2xl items-center justify-center border border-border-light">
+          <TouchableOpacity
+            onPress={handleNotificationPress}
+            className="w-12 h-12 bg-white rounded-2xl items-center justify-center border border-border-light"
+          >
             <Ionicons name="notifications-outline" size={20} color="#18181B" />
           </TouchableOpacity>
         </View>
@@ -144,7 +162,7 @@ export default function Home() {
 
         {/* Create Room CTA */}
         <TouchableOpacity
-          onPress={() => router.push("/rooms/create-rooms")}
+          onPress={handleCreateRoom}
           activeOpacity={0.9}
           className="mt-7 bg-primary py-5 px-6 rounded-3xl flex-row items-center shadow-lg shadow-indigo-200"
         >

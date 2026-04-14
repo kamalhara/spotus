@@ -63,11 +63,49 @@ export default function UserProfile() {
       );
       return;
     }
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push({
       pathname: `/dm/${user.id}`,
       params: { userName: user?.userName, profilePic: user?.profilePic },
     });
   };
+
+  const handleBack = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.back();
+  };
+
+  const handleOptions = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Alert.alert("", "", [
+      { text: "Report", style: "destructive" },
+      { text: "Block", style: "destructive" },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
+
+  const handleVouch = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // Vouch logic would go here
+  };
+
+  const handleShare = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Share logic would go here
+  };
+
+  const handleBlock = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    Alert.alert(
+      `Block ${user?.userName}?`,
+      "You won't see each other anymore.",
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Block", style: "destructive" },
+      ],
+    );
+  };
+
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-bg">
@@ -80,7 +118,7 @@ export default function UserProfile() {
     return (
       <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={handleBack}
           className="mx-6 mt-4 w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100"
         >
           <Ionicons name="chevron-back" size={20} color="#18181B" />
@@ -103,20 +141,14 @@ export default function UserProfile() {
       {/* Header */}
       <View className="flex-row items-center justify-between px-6 py-2">
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={handleBack}
           className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100"
         >
           <Ionicons name="chevron-back" size={20} color="#18181B" />
         </TouchableOpacity>
         <Text className="text-secondary font-semibold text-base">Profile</Text>
         <TouchableOpacity
-          onPress={() =>
-            Alert.alert("", "", [
-              { text: "Report", style: "destructive" },
-              { text: "Block", style: "destructive" },
-              { text: "Cancel", style: "cancel" },
-            ])
-          }
+          onPress={handleOptions}
           className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100"
         >
           <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
@@ -184,6 +216,7 @@ export default function UserProfile() {
           </TouchableOpacity>
 
           <TouchableOpacity
+            onPress={handleVouch}
             activeOpacity={0.8}
             className="flex-1 py-3.5 rounded-2xl flex-row items-center justify-center bg-pink-50 border border-pink-100"
           >
@@ -194,6 +227,7 @@ export default function UserProfile() {
           </TouchableOpacity>
 
           <TouchableOpacity
+            onPress={handleShare}
             activeOpacity={0.8}
             className="py-3.5 px-4 rounded-2xl bg-gray-50 border border-gray-100 items-center justify-center"
           >
@@ -317,16 +351,7 @@ export default function UserProfile() {
         {/* Block */}
         <TouchableOpacity
           className="mt-6 py-4 items-center"
-          onPress={() =>
-            Alert.alert(
-              `Block ${user?.userName}?`,
-              "You won't see each other anymore.",
-              [
-                { text: "Cancel", style: "cancel" },
-                { text: "Block", style: "destructive" },
-              ],
-            )
-          }
+          onPress={handleBlock}
         >
           <Text className="text-gray-300 text-sm">Block this user</Text>
         </TouchableOpacity>
