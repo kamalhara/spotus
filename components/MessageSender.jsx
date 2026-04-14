@@ -1,55 +1,79 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
-import { TextInput, TouchableOpacity, View } from "react-native";
+import * as Haptics from "expo-haptics";
+import { useRef, useState } from "react";
+import { Animated, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function MessageSender({ handleSend }) {
   const [message, setMessage] = useState("");
+  const sendScaleAnim = useRef(new Animated.Value(1)).current;
 
   const isActive = message.trim().length > 0;
 
+  const animateSend = () => {
+    Animated.sequence([
+      Animated.spring(sendScaleAnim, {
+        toValue: 0.7,
+        useNativeDriver: true,
+        speed: 80,
+      }),
+      Animated.spring(sendScaleAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+        speed: 40,
+        bounciness: 12,
+      }),
+    ]).start();
+  };
+
+  const onSend = () => {
+    if (!isActive || !handleSend) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    animateSend();
+    handleSend(message);
+    setMessage("");
+  };
+
   return (
-    <View className="flex-row items-center w-full bg-white rounded-full p-1.5 border border-slate-200 shadow-sm shadow-slate-100">
+    <View className="flex-row items-center w-full bg-white rounded-full p-1.5 border border-border shadow-sm shadow-slate-100">
       <TouchableOpacity
-        className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-50 border border-gray-100 ml-0.5"
+        className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-alt ml-0.5"
         onPress={() => {}}
       >
-        <Ionicons name="add" size={22} color="#6B7280" />
+        <Ionicons name="add" size={22} color="#94A3B8" />
       </TouchableOpacity>
 
       <TextInput
         value={message}
         onChangeText={setMessage}
         placeholder="Type a message..."
-        placeholderTextColor="#9CA3AF"
-        className="flex-1 px-3 text-[15px] text-secondary tracking-wide h-10"
+        placeholderTextColor="#CBD5E1"
+        className="flex-1 px-3.5 text-[15px] text-secondary font-medium tracking-wide h-11"
         returnKeyType="send"
+        onSubmitEditing={onSend}
       />
 
-      <TouchableOpacity
-        disabled={!isActive}
-        onPress={() => {
-          if (handleSend) {
-            handleSend(message);
-            setMessage(""); // Clear input on send
-          }
-        }}
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 20,
-          alignItems: "center",
-          justifyContent: "center",
-          marginRight: 2,
-          backgroundColor: isActive ? "#4F46E5" : "#F3F4F6",
-        }}
-      >
-        <Ionicons
-          name="send"
-          size={16}
-          color={isActive ? "white" : "#9CA3AF"}
-          style={{ marginLeft: isActive ? 2 : 0 }}
-        />
-      </TouchableOpacity>
+      <Animated.View style={{ transform: [{ scale: sendScaleAnim }] }}>
+        <TouchableOpacity
+          disabled={!isActive}
+          onPress={onSend}
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: 21,
+            alignItems: "center",
+            justifyContent: "center",
+            marginRight: 2,
+            backgroundColor: isActive ? "#4F46E5" : "#F1F5F9",
+          }}
+        >
+          <Ionicons
+            name="send"
+            size={17}
+            color={isActive ? "white" : "#CBD5E1"}
+            style={{ marginLeft: isActive ? 2 : 0 }}
+          />
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../../components/CustomButton";
 import { db } from "../../../config/firebase.config";
@@ -56,12 +57,14 @@ export default function UserProfile() {
   }, [userId, roomId, viewer?.id]);
 
   const hasDMAccess = canSendDM(viewerRoomTrust);
+  const trustProgress = Math.min(viewerRoomTrust / 10, 1);
+  const trustPercentage = Math.min(viewerRoomTrust * 10, 100);
 
   if (loading) {
-    // ...
     return (
       <View className="flex-1 items-center justify-center bg-bg">
         <ActivityIndicator size="large" color="#4F46E5" />
+        <Text className="text-muted mt-3 font-medium">Loading profile...</Text>
       </View>
     );
   }
@@ -69,13 +72,18 @@ export default function UserProfile() {
   if (!user) {
     return (
       <View className="flex-1 items-center justify-center bg-bg p-6">
-        <Ionicons name="person-remove-outline" size={64} color="#D1D5DB" />
-        <Text className="text-secondary text-xl font-bold mt-4">
+        <View className="w-20 h-20 bg-surface-alt rounded-3xl items-center justify-center mb-5">
+          <Ionicons name="person-remove-outline" size={36} color="#CBD5E1" />
+        </View>
+        <Text className="text-secondary text-xl font-black mt-2">
           User not found
+        </Text>
+        <Text className="text-muted text-sm font-medium mt-2 text-center">
+          This profile may have been removed or doesn't exist.
         </Text>
         <TouchableOpacity
           onPress={() => router.back()}
-          className="mt-6 bg-primary px-8 py-3 rounded-full"
+          className="mt-8 bg-primary px-8 py-3.5 rounded-2xl"
         >
           <Text className="text-white font-bold">Go Back</Text>
         </TouchableOpacity>
@@ -89,13 +97,13 @@ export default function UserProfile() {
       <View className="flex-row items-center justify-between px-6 py-2">
         <TouchableOpacity
           onPress={() => router.back()}
-          className="w-10 h-10 rounded-full bg-white border border-gray-100 items-center justify-center shadow-sm shadow-slate-100"
+          className="w-11 h-11 rounded-2xl bg-white border border-border-light items-center justify-center"
         >
           <Ionicons name="chevron-back" size={20} color="#18181B" />
         </TouchableOpacity>
         <Text className="text-secondary font-bold text-lg">Profile</Text>
-        <TouchableOpacity className="w-10 h-10 items-center justify-center">
-          <Ionicons name="ellipsis-horizontal" size={20} color="#9CA3AF" />
+        <TouchableOpacity className="w-11 h-11 items-center justify-center">
+          <Ionicons name="ellipsis-horizontal" size={20} color="#94A3B8" />
         </TouchableOpacity>
       </View>
 
@@ -106,7 +114,7 @@ export default function UserProfile() {
         {/* Profile Header */}
         <View className="items-center px-6 mt-6 mb-6">
           <View className="relative">
-            <View className="w-32 h-32 rounded-full border-4 border-white shadow-xl shadow-slate-200 overflow-hidden bg-gray-100">
+            <View className="w-[120px] h-[120px] rounded-full border-4 border-white shadow-xl shadow-slate-200 overflow-hidden bg-surface-alt">
               <Image
                 source={user?.profilePic || "https://picsum.photos/200"}
                 contentFit="cover"
@@ -114,68 +122,94 @@ export default function UserProfile() {
                 style={{ width: "100%", height: "100%" }}
               />
             </View>
-            <View className="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-[4px] border-bg" />
+            <View className="absolute bottom-1 right-1 bg-success w-7 h-7 rounded-full border-[4px] border-bg" />
           </View>
 
-          <Text className="text-secondary text-3xl font-black mt-5 tracking-tight">
+          <Text className="text-secondary text-[28px] font-black mt-5 tracking-tight">
             {user?.userName || "User"}
           </Text>
-          <Text className="text-gray-400 text-base font-semibold text-center mt-1 px-4">
+          <Text className="text-muted text-sm font-medium text-center mt-1.5 px-6 leading-5">
             {user?.bio || "No bio yet."}
           </Text>
         </View>
 
-        <View>
-          <View className="px-16 mb-8 flex flex-row">
-            <CustomButton
-              title={
-                <View className="flex-row justify-center gap-2 items-center">
-                  <Ionicons
-                    name={hasDMAccess ? "send" : "lock-closed"}
-                    size={20}
-                    color="white"
-                  />
-                  <Text className="text-white font-bold text-lg ml-2">
-                    {hasDMAccess ? "Send DM" : "Unlock DM"}
+        {/* DM Button */}
+        <View className="px-8 mb-4">
+          <CustomButton
+            title={
+              <View className="flex-row justify-center gap-2.5 items-center">
+                <Ionicons
+                  name={hasDMAccess ? "send" : "lock-closed"}
+                  size={18}
+                  color="white"
+                />
+                <Text className="text-white font-bold text-[16px]">
+                  {hasDMAccess ? "Send Message" : "Unlock DM"}
+                </Text>
+              </View>
+            }
+            onPress={() => {
+              if (!hasDMAccess) {
+                alert(
+                  "You need 10 messages in this circle to unlock DMs. Keep interacting to build trust!",
+                );
+              } else {
+                // Navigate to DM screen or open chat
+              }
+            }}
+            variant={hasDMAccess ? "secondary" : "primary"}
+          />
+        </View>
+
+        {/* Trust Progress for DM */}
+        {!hasDMAccess && (
+          <View className="px-8 mb-8">
+            <View className="bg-white border border-border-light px-5 py-4 rounded-2xl">
+              <View className="flex-row items-center justify-between mb-3">
+                <View className="flex-row items-center gap-2">
+                  <Ionicons name="shield-checkmark" size={14} color="#F59E0B" />
+                  <Text className="text-secondary text-[11px] font-bold uppercase tracking-[1.5px]">
+                    DM Access
                   </Text>
                 </View>
-              }
-              onPress={() => {
-                if (!hasDMAccess) {
-                  alert(
-                    "You need 10 messages in this circle to unlock DMs. Keep interacting to build trust!",
-                  );
-                } else {
-                  // Navigate to DM screen or open chat
-                }
-              }}
-              variant={hasDMAccess ? "secondary" : "primary"}
-            />
+                <Text className="text-warning text-[11px] font-black">
+                  {trustPercentage}%
+                </Text>
+              </View>
+              <Progress.Bar
+                progress={trustProgress}
+                width={null}
+                color="#F59E0B"
+                unfilledColor="#F1F5F9"
+                borderWidth={0}
+                height={6}
+                borderRadius={3}
+                animated={true}
+              />
+              <Text className="text-muted text-[10px] font-bold uppercase tracking-[1.5px] mt-2.5">
+                {10 - viewerRoomTrust} more interactions needed
+              </Text>
+            </View>
           </View>
-          {!hasDMAccess && (
-            <Text className="text-center text-gray-400 text-xs px-10 -mt-4 mb-8 font-medium">
-              Maintain {10 - viewerRoomTrust} more room interaction to unlock.
-            </Text>
-          )}
-        </View>
+        )}
 
         {/* Stats Section */}
         <View className="px-6 mb-8">
-          <View className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm shadow-slate-100 flex-row items-center justify-between">
+          <View className="bg-white rounded-3xl p-5 border border-border-light flex-row items-center justify-between">
             <View className="items-center flex-1">
-              <Text className="text-2xl font-black text-primary">
+              <Text className="text-[26px] font-black text-primary">
                 {user?.roomsCreated ?? 0}
               </Text>
-              <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-1">
+              <Text className="text-muted text-[9px] font-bold uppercase tracking-[1.5px] mt-1">
                 Hosted
               </Text>
             </View>
-            <View className="w-[1px] bg-gray-50 h-8" />
+            <View className="w-[1px] bg-border-light h-10" />
             <View className="items-center flex-1">
-              <Text className="text-2xl font-black text-secondary">
+              <Text className="text-[26px] font-black text-secondary">
                 {user?.roomsJoined ?? 0}
               </Text>
-              <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-1">
+              <Text className="text-muted text-[9px] font-bold uppercase tracking-[1.5px] mt-1">
                 Joined
               </Text>
             </View>
@@ -184,40 +218,40 @@ export default function UserProfile() {
 
         {/* Info Cards */}
         <View className="px-6 gap-4">
-          <View className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm shadow-slate-50">
+          <View className="bg-white p-5 rounded-3xl border border-border-light">
             <View className="flex-row items-center mb-3">
-              <View className="w-8 h-8 rounded-xl bg-orange-50 items-center justify-center mr-3">
-                <Ionicons name="flash" size={16} color="#F97316" />
+              <View className="w-9 h-9 rounded-xl bg-warning/10 items-center justify-center mr-3">
+                <Ionicons name="flash" size={16} color="#F59E0B" />
               </View>
-              <Text className="text-secondary font-bold text-base">
+              <Text className="text-secondary font-bold text-[15px]">
                 Activity
               </Text>
             </View>
-            <Text className="text-gray-500 leading-5">
+            <Text className="text-muted leading-[22px] text-[14px] font-medium">
               This user is very active in &quot;Music&quot; and &quot;Tech&quot;
               rooms. Recently hosted a room called &quot;Late Night
               coding&quot;.
             </Text>
           </View>
 
-          <View className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm shadow-slate-50">
+          <View className="bg-white p-5 rounded-3xl border border-border-light">
             <View className="flex-row items-center mb-3">
-              <View className="w-8 h-8 rounded-xl bg-blue-50 items-center justify-center mr-3">
-                <Ionicons name="shield-checkmark" size={16} color="#3B82F6" />
+              <View className="w-9 h-9 rounded-xl bg-primary/10 items-center justify-center mr-3">
+                <Ionicons name="shield-checkmark" size={16} color="#4F46E5" />
               </View>
-              <Text className="text-secondary font-bold text-base">
+              <Text className="text-secondary font-bold text-[15px]">
                 Verified Host
               </Text>
             </View>
-            <Text className="text-gray-500 leading-5">
+            <Text className="text-muted leading-[22px] text-[14px] font-medium">
               Member since June 2023. Has successfully hosted over 10 rooms with
               positive feedback.
             </Text>
           </View>
         </View>
 
-        <TouchableOpacity className="mt-8 mx-6 items-center justify-center py-4">
-          <Text className="text-gray-400 font-bold text-sm tracking-wide">
+        <TouchableOpacity className="mt-10 mx-6 items-center justify-center py-4">
+          <Text className="text-danger/60 font-bold text-sm tracking-wide">
             Block User
           </Text>
         </TouchableOpacity>

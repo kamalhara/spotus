@@ -2,10 +2,30 @@ import { useAuth, useClerk } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View, TouchableWithoutFeedback, Keyboard } from "react-native";
+import {
+  ActivityIndicator,
+  Text,
+  TouchableOpacity,
+  View,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../components/CustomButton";
 import CustomInput from "../../components/CustomInput";
+
+function StepIndicator({ currentStep }) {
+  return (
+    <View className="flex-row items-center justify-center gap-2.5 mb-8">
+      <View
+        className={`h-1.5 rounded-full ${currentStep >= 1 ? "bg-primary w-8" : "bg-border w-5"}`}
+      />
+      <View
+        className={`h-1.5 rounded-full ${currentStep >= 2 ? "bg-primary w-8" : "bg-border w-5"}`}
+      />
+    </View>
+  );
+}
 
 export default function SignUp() {
   const { isLoaded } = useAuth();
@@ -70,7 +90,7 @@ export default function SignUp() {
 
   if (!isLoaded) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center">
+      <SafeAreaView className="flex-1 justify-center items-center bg-white">
         <ActivityIndicator size="large" color="#4F46E5" />
       </SafeAreaView>
     );
@@ -81,20 +101,26 @@ export default function SignUp() {
       <SafeAreaView className="bg-white flex-1 px-8">
         <View className="flex-row items-center mt-4">
           <TouchableOpacity
-            onPress={() => router.back()}
-            className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
+            onPress={() =>
+              pendingVerification
+                ? setPendingVerification(false)
+                : router.back()
+            }
+            className="w-11 h-11 bg-surface-alt rounded-2xl items-center justify-center"
           >
-            <Ionicons name="arrow-back" size={20} color="black" />
+            <Ionicons name="arrow-back" size={20} color="#18181B" />
           </TouchableOpacity>
         </View>
 
-        <View className="mb-10 mt-8">
-          <Text className="text-secondary text-4xl font-black tracking-tight mb-2">
+        <View className="mb-8 mt-10">
+          <StepIndicator currentStep={pendingVerification ? 2 : 1} />
+
+          <Text className="text-secondary text-[36px] font-black tracking-tight mb-2 leading-[42px]">
             {pendingVerification ? "Verify Email" : "Create\nAccount"}
           </Text>
-          <Text className="text-gray-500 text-lg leading-6 mt-1">
+          <Text className="text-muted text-[16px] leading-6 mt-2 font-medium">
             {pendingVerification
-              ? `Enter the code sent to ${emailAddress}`
+              ? `Enter the 6-digit code sent to ${emailAddress}`
               : "Join the local discovery circle and connect with people nearby."}
           </Text>
         </View>
@@ -107,7 +133,7 @@ export default function SignUp() {
               value={name}
               onChangeText={setName}
               autoCapitalize="words"
-              icon={<Ionicons name="person-outline" size={20} color="#9CA3AF" />}
+              icon={<Ionicons name="person-outline" size={20} color="#94A3B8" />}
             />
 
             <CustomInput
@@ -117,7 +143,7 @@ export default function SignUp() {
               onChangeText={setEmailAddress}
               keyboardType="email-address"
               autoCapitalize="none"
-              icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
+              icon={<Ionicons name="mail-outline" size={20} color="#94A3B8" />}
             />
 
             <CustomInput
@@ -127,13 +153,26 @@ export default function SignUp() {
               onChangeText={setPassword}
               secureTextEntry
               icon={
-                <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={20}
+                  color="#94A3B8"
+                />
               }
             />
 
-            {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
+            {error ? (
+              <View className="bg-danger/8 border border-danger/20 px-4 py-3.5 rounded-2xl flex-row items-center">
+                <View className="w-8 h-8 bg-danger/15 rounded-xl items-center justify-center mr-3">
+                  <Ionicons name="alert-circle" size={16} color="#EF4444" />
+                </View>
+                <Text className="text-danger text-sm font-medium flex-1">
+                  {error}
+                </Text>
+              </View>
+            ) : null}
 
-            <View className="mt-4">
+            <View className="mt-3">
               <CustomButton
                 title="Sign Up"
                 onPress={onSignUpPress}
@@ -149,9 +188,20 @@ export default function SignUp() {
               value={code}
               onChangeText={setCode}
               keyboardType="number-pad"
-              icon={<Ionicons name="keypad-outline" size={20} color="#9CA3AF" />}
+              icon={
+                <Ionicons name="keypad-outline" size={20} color="#94A3B8" />
+              }
             />
-            {error ? <Text className="text-red-500 ml-1">{error}</Text> : null}
+            {error ? (
+              <View className="bg-danger/8 border border-danger/20 px-4 py-3.5 rounded-2xl flex-row items-center">
+                <View className="w-8 h-8 bg-danger/15 rounded-xl items-center justify-center mr-3">
+                  <Ionicons name="alert-circle" size={16} color="#EF4444" />
+                </View>
+                <Text className="text-danger text-sm font-medium flex-1">
+                  {error}
+                </Text>
+              </View>
+            ) : null}
             <CustomButton
               title="Verify & Join"
               onPress={onPressVerify}
@@ -166,10 +216,12 @@ export default function SignUp() {
           </View>
         )}
 
-        <View className="flex flex-row items-center justify-center gap-1 mt-8">
-          <Text className="text-gray-600">Already have an account?</Text>
+        <View className="flex flex-row items-center justify-center gap-1.5 mt-8">
+          <Text className="text-muted font-medium text-[15px]">
+            Already have an account?
+          </Text>
           <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-            <Text className="text-primary font-bold">Log In</Text>
+            <Text className="text-primary font-black text-[15px]">Log In</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

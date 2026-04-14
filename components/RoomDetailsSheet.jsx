@@ -14,6 +14,18 @@ import {
 } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
+const CATEGORY_ICONS = {
+  Music: "musical-notes",
+  Coffee: "cafe",
+  Art: "color-palette",
+  Books: "book",
+  Tech: "code-slash",
+  Food: "restaurant",
+  Fashion: "shirt",
+  Sports: "football",
+  "Local Events": "calendar",
+};
+
 const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
   const bottomSheetModalRef = useRef(null);
   const router = useRouter();
@@ -30,7 +42,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
         {...props}
         disappearsOnIndex={-1}
         appearsOnIndex={0}
-        opacity={0.5}
+        opacity={0.4}
       />
     ),
     [],
@@ -53,28 +65,41 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
     bottomSheetModalRef.current?.dismiss();
   };
 
+  const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
+
   return (
     <BottomSheetModal
       ref={bottomSheetModalRef}
       index={0}
       snapPoints={snapPoints}
       backdropComponent={renderBackdrop}
-      handleIndicatorStyle={{ backgroundColor: "#E5E7EB", width: 40 }}
-      backgroundStyle={{ borderRadius: 40, backgroundColor: "#FFFFFF" }}
+      handleIndicatorStyle={{
+        backgroundColor: "#E2E8F0",
+        width: 40,
+        height: 4,
+        borderRadius: 2,
+      }}
+      backgroundStyle={{ borderRadius: 32, backgroundColor: "#FFFFFF" }}
       enableDynamicSizing={false}
     >
       <BottomSheetScrollView
         contentContainerStyle={{
           paddingHorizontal: 24,
-          paddingTop: 24,
+          paddingTop: 20,
           paddingBottom: 40,
         }}
       >
         {/* Header section */}
         <View className="flex-row justify-between items-start mb-6">
           <View className="flex-1 mr-4">
-            <View className="bg-primary/10 self-start px-3 py-1.5 rounded-xl mb-3">
-              <Text className="text-primary font-black text-[10px] uppercase tracking-[2px]">
+            <View className="bg-surface-alt self-start px-3.5 py-2 rounded-xl mb-4 flex-row items-center">
+              <Ionicons
+                name={categoryIcon}
+                size={12}
+                color="#4F46E5"
+                style={{ marginRight: 6 }}
+              />
+              <Text className="text-primary font-black text-[10px] uppercase tracking-[1.5px]">
                 {room?.category || "Discovery Circle"}
               </Text>
             </View>
@@ -84,18 +109,18 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
           </View>
           <TouchableOpacity
             onPress={handleDismiss}
-            className="w-10 h-10 bg-gray-50 rounded-2xl items-center justify-center border border-gray-100"
+            className="w-10 h-10 bg-surface-alt rounded-2xl items-center justify-center"
           >
-            <Ionicons name="close" size={20} color="#18181B" />
+            <Ionicons name="close" size={18} color="#94A3B8" />
           </TouchableOpacity>
         </View>
 
         {/* Room Description */}
-        <View className="mb-8">
-          <Text className="text-gray-400 text-[13px] font-bold uppercase tracking-widest mb-2">
+        <View className="mb-8 pb-8 border-b border-border-light">
+          <Text className="text-muted text-[10px] font-bold uppercase tracking-[2px] mb-2.5">
             Description
           </Text>
-          <Text className="text-gray-500 leading-5 font-medium">
+          <Text className="text-slate-500 leading-[22px] font-medium text-[14px]">
             This discovery circle is dedicated to exploring{" "}
             {room?.category || "new experiences"} and sharing local vibes with
             fellow members in your area.
@@ -104,54 +129,54 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
 
         {/* Members Section */}
         <View>
-          <View className="flex-row justify-between items-center mb-4">
+          <View className="flex-row justify-between items-center mb-5">
             <Text className="text-secondary text-xl font-black tracking-tight">
               Members
             </Text>
-            <View className="bg-gray-50 px-3 py-1 rounded-lg">
-              <Text className="text-gray-400 font-black text-[11px] uppercase tracking-widest">
+            <View className="bg-surface-alt px-3.5 py-1.5 rounded-xl">
+              <Text className="text-muted font-black text-[10px] uppercase tracking-[1.5px]">
                 {room?.participants?.length || 0} Total
               </Text>
             </View>
           </View>
 
-          <View className="flex flex-col gap-4">
+          <View className="flex flex-col gap-3">
             {members && members.length > 0 ? (
               members.map((member) => (
                 <TouchableOpacity
-                  activeOpacity={0.8}
+                  activeOpacity={0.7}
                   onPress={() => handleProfilePress(member.id)}
                   key={member.id}
-                  className="flex-row items-center justify-between bg-gray-50/50 p-3 rounded-2xl border border-gray-50"
+                  className="flex-row items-center justify-between bg-surface-alt p-3.5 rounded-2xl"
                 >
                   <View className="flex-row items-center flex-1">
                     <Image
                       source={{
                         uri: member.profilePic || "https://picsum.photos/200",
                       }}
-                      className="w-10 h-10 rounded-xl mr-3 border border-white"
+                      className="w-11 h-11 rounded-xl mr-3.5 border-2 border-white"
                     />
                     <View>
                       <Text className="text-secondary font-black text-sm tracking-tight">
                         {member.userName || "Unknown Member"}
                       </Text>
-                      <View className="flex-row items-center mt-1.5 gap-2">
+                      <View className="flex-row items-center mt-2 gap-2">
                         {member.trustScore > 0 && (
-                          <View className="bg-green-50 px-2 py-0.5 rounded-md flex-row items-center border border-green-100">
+                          <View className="bg-success/10 px-2.5 py-1 rounded-lg flex-row items-center">
                             <Ionicons
                               name="checkmark-circle"
                               size={10}
                               color="#10B981"
                             />
-                            <Text className="text-[#059669] font-black text-[8px] uppercase tracking-widest ml-1">
+                            <Text className="text-success font-black text-[8px] uppercase tracking-widest ml-1">
                               Trust {Math.min(member.trustScore * 10, 100)}%
                             </Text>
                           </View>
                         )}
                         {member.id === room.createdBy && (
-                          <View className="bg-amber-50 px-2 py-0.5 rounded-md flex-row items-center border border-amber-100">
-                            <Ionicons name="star" size={10} color="#D97706" />
-                            <Text className="text-[#D97706] font-black text-[8px] uppercase tracking-widest ml-1">
+                          <View className="bg-warning/10 px-2.5 py-1 rounded-lg flex-row items-center">
+                            <Ionicons name="star" size={10} color="#F59E0B" />
+                            <Text className="text-warning font-black text-[8px] uppercase tracking-widest ml-1">
                               Creator
                             </Text>
                           </View>
@@ -160,7 +185,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                     </View>
                   </View>
                   {member.id === currentUserId && (
-                    <View className="bg-indigo-100 px-2 py-1 rounded-md">
+                    <View className="bg-primary/10 px-2.5 py-1.5 rounded-xl">
                       <Text className="text-primary font-black text-[9px] uppercase tracking-widest">
                         You
                       </Text>
@@ -169,8 +194,11 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                 </TouchableOpacity>
               ))
             ) : (
-              <View className="py-4 items-center">
-                <Text className="text-gray-400 font-bold italic">
+              <View className="py-8 items-center">
+                <View className="w-14 h-14 bg-surface-alt rounded-2xl items-center justify-center mb-3">
+                  <Ionicons name="people-outline" size={24} color="#CBD5E1" />
+                </View>
+                <Text className="text-muted font-bold text-sm">
                   Loading circle members...
                 </Text>
               </View>

@@ -6,12 +6,10 @@ import {
   doc,
   getDoc,
   getDocs,
-  increment,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
-  setDoc,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -29,6 +27,18 @@ import RoomDetailsSheet from "../../../components/RoomDetailsSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { updateTrustOnMessage } from "../../../lib/trust";
+
+const CATEGORY_ICONS = {
+  Music: "musical-notes",
+  Coffee: "cafe",
+  Art: "color-palette",
+  Books: "book",
+  Tech: "code-slash",
+  Food: "restaurant",
+  Fashion: "shirt",
+  Sports: "football",
+  "Local Events": "calendar",
+};
 
 export default function RoomChat() {
   const router = useRouter();
@@ -147,21 +157,27 @@ export default function RoomChat() {
       console.error("Error sending message:", err);
     }
   };
+
+  const trustPercentage = Math.min(trust * 10, 100);
+  const trustColor =
+    trustPercentage < 30 ? "#EF4444" : trustPercentage < 70 ? "#F59E0B" : "#10B981";
+  const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
+
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-[#F9FAFB]"
+      className="flex-1 bg-bg"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       {/* Premium Header */}
-      <View className="bg-white shadow-sm shadow-slate-200 z-10">
+      <View className="bg-white z-10 border-b border-border-light">
         <SafeAreaView edges={["top"]}>
-          <View className="flex flex-row items-center justify-between px-6 py-4 border-b border-gray-50">
+          <View className="flex flex-row items-center justify-between px-5 py-3.5">
             <View className="flex flex-row items-center flex-1">
               <TouchableOpacity
                 onPress={() => router.back()}
-                className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center mr-4 border border-gray-100 active:bg-gray-100"
+                className="w-10 h-10 bg-surface-alt rounded-2xl items-center justify-center mr-3.5"
               >
-                <Ionicons name="chevron-back" size={20} color="#1F2937" />
+                <Ionicons name="chevron-back" size={20} color="#18181B" />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -169,43 +185,55 @@ export default function RoomChat() {
                 onPress={() => detailsSheetRef.current?.present()}
                 activeOpacity={0.7}
               >
-                <Text
-                  className="text-secondary text-xl font-black tracking-tight leading-7"
-                  numberOfLines={1}
-                >
-                  {room?.title || "Loading..."}
-                </Text>
-                <View className="flex flex-row items-center mt-0.5">
-                  <View className="bg-green-500 w-1.5 h-1.5 rounded-full mr-1.5 shadow-sm shadow-green-200" />
-                  <Text className="text-gray-400 text-[9px] font-black uppercase tracking-widest">
-                    {room?.category || "SPOT"} •{" "}
-                    {room?.participants?.length || 0} ACTIVE
-                  </Text>
+                <View className="flex-row items-center gap-2">
+                  <View className="w-8 h-8 bg-primary/10 rounded-xl items-center justify-center">
+                    <Ionicons name={categoryIcon} size={14} color="#4F46E5" />
+                  </View>
+                  <View>
+                    <Text
+                      className="text-secondary text-[17px] font-black tracking-tight"
+                      numberOfLines={1}
+                    >
+                      {room?.title || "Loading..."}
+                    </Text>
+                    <View className="flex flex-row items-center mt-0.5">
+                      <View className="bg-success w-1.5 h-1.5 rounded-full mr-1.5" />
+                      <Text className="text-muted text-[9px] font-bold uppercase tracking-[1.5px]">
+                        {room?.participants?.length || 0} active
+                      </Text>
+                    </View>
+                  </View>
                 </View>
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100 active:bg-gray-100">
-              <Ionicons name="ellipsis-horizontal" size={20} color="#6B7280" />
+            <TouchableOpacity className="w-10 h-10 bg-surface-alt rounded-2xl items-center justify-center">
+              <Ionicons name="ellipsis-horizontal" size={18} color="#94A3B8" />
             </TouchableOpacity>
           </View>
         </SafeAreaView>
       </View>
 
-      {/* Medium Trust Meter Card */}
+      {/* Trust Meter Card */}
       {trust < 10 && (
-        <View className="px-6 mt-4">
-          <View className="bg-white px-4 py-3.5 rounded-2xl border border-gray-100 shadow-sm shadow-slate-50">
+        <View className="px-5 mt-4">
+          <View className="bg-white px-5 py-4 rounded-2xl border border-border-light">
             <View className="flex flex-row items-center justify-between mb-3">
               <View className="flex flex-row items-center gap-2">
-                <Ionicons name="shield-checkmark" size={16} color="#4F46E5" />
-                <Text className="text-secondary text-[11px] font-bold uppercase tracking-wider">
+                <Ionicons name="shield-checkmark" size={16} color={trustColor} />
+                <Text className="text-secondary text-[11px] font-bold uppercase tracking-[1.5px]">
                   Trust Meter
                 </Text>
               </View>
-              <View className="bg-indigo-50 px-2 py-0.5 rounded-md">
-                <Text className="text-primary text-[11px] font-black">
-                  {trust * 10}%
+              <View
+                className="px-2.5 py-1 rounded-lg"
+                style={{ backgroundColor: `${trustColor}15` }}
+              >
+                <Text
+                  className="text-[12px] font-black"
+                  style={{ color: trustColor }}
+                >
+                  {trustPercentage}%
                 </Text>
               </View>
             </View>
@@ -215,18 +243,18 @@ export default function RoomChat() {
                 <Progress.Bar
                   progress={trust / 10}
                   width={null}
-                  color="#4F46E5"
-                  unfilledColor="#F3F4F6"
+                  color={trustColor}
+                  unfilledColor="#F1F5F9"
                   borderWidth={0}
-                  height={7}
-                  borderRadius={4}
+                  height={6}
+                  borderRadius={3}
                   animated={true}
                 />
               </View>
             </View>
 
-            <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-2.5 ml-0.5">
-              {10 - trust} more messages to unlock direct messaging
+            <Text className="text-muted text-[10px] font-bold uppercase tracking-[1.5px] mt-2.5 ml-0.5">
+              {10 - trust} more messages to unlock DMs
             </Text>
           </View>
         </View>
@@ -236,7 +264,7 @@ export default function RoomChat() {
         <ChatMessages messages={messages} currentUserId={currentUserId} />
       </View>
 
-      <View className="px-6 py-4 bg-white/0 flex items-center">
+      <View className="px-5 py-3.5 bg-transparent flex items-center pb-6">
         <MessageSender handleSend={handleSend} />
       </View>
 

@@ -1,17 +1,39 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
-import { FlatList, Text, View } from "react-native";
+import { Animated, FlatList, Text, View } from "react-native";
 
-export default function ChatMessages({ messages, currentUserId }) {
-  // Generate a consistent color based on username for avatar
+function MessageBubble({ item, index, messages, currentUserId }) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(12)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  const isSentByMe = item.senderId === currentUserId;
+
   const getUserColor = (username) => {
-    if (!username) return "bg-gray-500";
+    if (!username) return "#94A3B8";
     const colors = [
-      "bg-blue-500",
-      "bg-green-500",
-      "bg-amber-500",
-      "bg-pink-500",
-      "bg-purple-500",
-      "bg-teal-500",
+      "#4F46E5",
+      "#6366F1",
+      "#EC4899",
+      "#8B5CF6",
+      "#10B981",
+      "#F59E0B",
+      "#3B82F6",
+      "#14B8A6",
     ];
     let hash = 0;
     for (let i = 0; i < username.length; i++) {
@@ -20,85 +42,144 @@ export default function ChatMessages({ messages, currentUserId }) {
     return colors[Math.abs(hash) % colors.length];
   };
 
-  const renderMessage = ({ item, index }) => {
-    const isSentByMe = item.senderId === currentUserId;
+  // Group messages by user if consecutive
+  const showAvatarAndName =
+    !isSentByMe &&
+    (index === 0 || messages[index - 1].senderId !== item.senderId);
+  const addTopMargin =
+    index === 0 || messages[index - 1].senderId !== item.senderId;
 
-    // Group messages by user if consecutive
-    const showAvatarAndName =
-      !isSentByMe &&
-      (index === 0 || messages[index - 1].senderId !== item.senderId);
-    const addTopMargin =
-      index === 0 || messages[index - 1].senderId !== item.senderId;
+  // Format timestamp
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMin = Math.floor(diffMs / 60000);
 
-    return (
+    if (diffMin < 1) return "now";
+    if (diffMin < 60) return `${diffMin}m`;
+    const diffHr = Math.floor(diffMin / 60);
+    if (diffHr < 24) return `${diffHr}h`;
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  };
+
+  return (
+    <Animated.View
+      style={{
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }],
+      }}
+      className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-5" : "mt-1"} px-3`}
+    >
+      {!isSentByMe && (
+        <View className="w-8 mr-2.5 flex justify-end pb-5">
+          {showAvatarAndName ? (
+            <View
+              className="w-8 h-8 rounded-full items-center justify-center"
+              style={{ backgroundColor: getUserColor(item.user) }}
+            >
+              <Text className="text-white text-[12px] font-black">
+                {item.user ? item.user.charAt(0).toUpperCase() : "?"}
+              </Text>
+            </View>
+          ) : (
+            <View className="w-8 h-8" />
+          )}
+        </View>
+      )}
+
       <View
-        className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-4" : "mt-1.5"} px-2`}
+        className={`max-w-[75%] flex-col ${isSentByMe ? "items-end" : "items-start"}`}
       >
-        {!isSentByMe && (
-          <View className="w-8 mr-2 flex justify-end pb-4">
-            {showAvatarAndName ? (
-              <View
-                className={`w-8 h-8 rounded-full items-center justify-center ${getUserColor(item.user)} shadow-sm`}
-              >
-                <Text className="text-white text-[13px] font-black">
-                  {item.user ? item.user.charAt(0).toUpperCase() : "?"}
-                </Text>
-              </View>
-            ) : (
-              <View className="w-8 h-8" />
-            )}
-          </View>
+        {showAvatarAndName && (
+          <Text className="text-muted text-[10px] font-bold tracking-[1.5px] mb-1.5 ml-1 uppercase">
+            {item.user || "Unknown"}
+          </Text>
         )}
 
         <View
-          className={`max-w-[77%] flex-col ${isSentByMe ? "items-end" : "items-start"}`}
+          className={`px-4 py-3 ${
+            isSentByMe
+              ? "bg-primary rounded-2xl rounded-br-md"
+              : "bg-white border border-border-light rounded-2xl rounded-bl-md"
+          }`}
         >
-          {showAvatarAndName && (
-            <Text className="text-gray-500 text-[11px] font-bold tracking-wide mb-1.5 ml-1 opacity-90 uppercase">
-              {item.user || "Unknown"}
-            </Text>
-          )}
-
-          <View
-            className={`px-4 py-3 shadow-sm ${
-              isSentByMe
-                ? "bg-primary rounded-2xl rounded-tr-sm shadow-indigo-100"
-                : "bg-white border border-gray-100/80 rounded-2xl rounded-tl-sm shadow-slate-100"
-            }`}
-          >
-            <Text
-              className={`text-[15px] leading-5 ${isSentByMe ? "text-white" : "text-gray-800"}`}
-            >
-              {item.text}
-            </Text>
-          </View>
-
           <Text
-            className={`text-gray-400 text-[10px] mt-1.5 font-bold uppercase tracking-wider ${isSentByMe ? "mr-1" : "ml-1"}`}
+            className={`text-[15px] leading-[22px] font-medium ${isSentByMe ? "text-white" : "text-secondary"}`}
           >
-            {item.time}
+            {item.text}
           </Text>
         </View>
-      </View>
-    );
-  };
 
+        <Text
+          className={`text-muted/60 text-[9px] mt-1.5 font-bold uppercase tracking-widest ${isSentByMe ? "mr-1" : "ml-1"}`}
+        >
+          {formatTime(item.createdAt)}
+        </Text>
+      </View>
+    </Animated.View>
+  );
+}
+
+function EmptyChat() {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 600,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  return (
+    <Animated.View
+      className="flex-1 items-center justify-center px-10"
+      style={{ opacity: fadeAnim }}
+    >
+      <View className="w-20 h-20 bg-surface-alt rounded-3xl items-center justify-center mb-6">
+        <Ionicons name="chatbubbles-outline" size={36} color="#CBD5E1" />
+      </View>
+      <Text className="text-secondary text-xl font-black tracking-tight text-center mb-2">
+        Start the conversation
+      </Text>
+      <Text className="text-muted text-sm font-medium text-center leading-5">
+        Be the first to say something in this circle. Break the ice!
+      </Text>
+    </Animated.View>
+  );
+}
+
+export default function ChatMessages({ messages, currentUserId }) {
   const flatListRef = useRef(null);
+
   useEffect(() => {
     if (!messages?.length) return;
-
     requestAnimationFrame(() => {
       flatListRef.current?.scrollToEnd({ animated: true });
     });
   }, [messages]);
+
+  if (!messages || messages.length === 0) {
+    return <EmptyChat />;
+  }
+
   return (
     <FlatList
       ref={flatListRef}
       data={messages}
-      renderItem={renderMessage}
+      renderItem={({ item, index }) => (
+        <MessageBubble
+          item={item}
+          index={index}
+          messages={messages}
+          currentUserId={currentUserId}
+        />
+      )}
       keyExtractor={(item, index) => item.id?.toString() || index.toString()}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 8 }}
+      contentContainerStyle={{ paddingVertical: 20, paddingHorizontal: 4 }}
       onContentSizeChange={() =>
         flatListRef.current?.scrollToEnd({ animated: true })
       }

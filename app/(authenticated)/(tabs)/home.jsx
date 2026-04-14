@@ -3,13 +3,36 @@ import Slider from "@react-native-community/slider";
 import { useFocusEffect, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useRef, useState } from "react";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import { Animated, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/RoomCard";
 import RoomJoinSheet from "../../../components/RoomJoinSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 17) return "Good afternoon";
+  return "Good evening";
+}
+
+function EmptyRooms() {
+  return (
+    <View className="items-center justify-center py-16 px-6">
+      <View className="w-20 h-20 bg-surface-alt rounded-3xl items-center justify-center mb-5">
+        <Ionicons name="compass-outline" size={36} color="#CBD5E1" />
+      </View>
+      <Text className="text-secondary text-lg font-black tracking-tight text-center mb-2">
+        No rooms nearby
+      </Text>
+      <Text className="text-muted text-sm font-medium text-center leading-5">
+        Try expanding your search radius or create the first room in your area.
+      </Text>
+    </View>
+  );
+}
 
 export default function Home() {
   const [distance, setDistance] = useState(5);
@@ -47,48 +70,61 @@ export default function Home() {
     }, []),
   );
 
+  const nearbyRooms = rooms.filter(
+    (r) => !r.participants?.includes(firestoreUser?.id),
+  );
+
+  const firstName = firestoreUser?.userName?.split(" ")[0] || "there";
+
   return (
     <>
-      <SafeAreaView className="bg-[#FAFAFA] h-screen px-6">
-        <View className="flex flex-row justify-between items-center my-2">
-          <TouchableOpacity onPress={() => router.push("/profile")}>
+      <SafeAreaView className="bg-bg h-screen px-6">
+        {/* Header */}
+        <View className="flex flex-row justify-between items-center my-3">
+          <TouchableOpacity
+            onPress={() => router.push("/profile")}
+            className="flex-row items-center"
+          >
             <Image
               source={{
                 uri: firestoreUser?.profilePic || "https://picsum.photos/200",
               }}
-              className="w-11 h-11 rounded-full border border-gray-200"
+              className="w-12 h-12 rounded-2xl border-2 border-white shadow-sm shadow-slate-200"
             />
           </TouchableOpacity>
-          <Text className="text-secondary tracking-tighter text-2xl font-black">
-            Spot Us
-          </Text>
-          <TouchableOpacity className="w-11 h-11 bg-white rounded-full items-center justify-center border border-gray-100 shadow-sm shadow-slate-100">
-            <Ionicons name="notifications-outline" size={20} color="black" />
+          <View className="flex-row items-center">
+            <Text className="text-secondary tracking-tighter text-[22px] font-black">
+              Spot Us
+            </Text>
+            <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
+          </View>
+          <TouchableOpacity className="w-12 h-12 bg-white rounded-2xl items-center justify-center border border-border-light">
+            <Ionicons name="notifications-outline" size={20} color="#18181B" />
           </TouchableOpacity>
         </View>
 
-        <View className="flex flex-row justify-between mt-5">
-          <View className="flex flex-col">
-            <Text className="text-primary text-lg font-semibold">
-              Discovery
+        {/* Greeting + Distance */}
+        <View className="mt-5 mb-1">
+          <Text className="text-muted text-sm font-bold uppercase tracking-[1.5px]">
+            {getGreeting()}
+          </Text>
+          <Text className="text-secondary text-[28px] font-black tracking-tight mt-1">
+            {firstName} 👋
+          </Text>
+        </View>
+
+        {/* Slider Card */}
+        <View className="mt-6 bg-white rounded-3xl px-5 py-5 border border-border-light">
+          <View className="flex-row items-center justify-between mb-3">
+            <Text className="text-secondary text-sm font-bold ml-1">
+              Search Radius
             </Text>
-            <Text className="text-secondary text-2xl font-bold">
-              Nearby Rooms
-            </Text>
-          </View>
-          <View className="flex flex-col justify-end">
-            <View>
-              <Text className="text-gray-500 text-sm font-semibold ">
-                Within {distance.toFixed(1)} miles
+            <View className="bg-primary/10 px-3 py-1.5 rounded-xl">
+              <Text className="text-primary text-sm font-black">
+                {distance} mi
               </Text>
             </View>
           </View>
-        </View>
-
-        <View className="mt-6 bg-white shadow-sm shadow-slate-200 rounded-3xl px-5 py-5 border border-slate-100">
-          <Text className="text-gray-500 text-sm font-semibold mb-2 ml-1">
-            Search Radius
-          </Text>
           <Slider
             style={{ width: "100%", height: 40 }}
             minimumValue={1}
@@ -97,50 +133,65 @@ export default function Home() {
             value={distance}
             onValueChange={setDistance}
             minimumTrackTintColor="#4F46E5"
-            maximumTrackTintColor="#E5E5E5"
+            maximumTrackTintColor="#E2E8F0"
             thumbTintColor="#4F46E5"
           />
-          <View className="flex flex-row justify-between">
-            <Text className="text-gray-500 text-sm font-semibold ">1 mile</Text>
-            <Text className="text-gray-500 text-sm font-semibold ">
-              25 miles
-            </Text>
+          <View className="flex flex-row justify-between mt-1">
+            <Text className="text-muted text-xs font-semibold">1 mile</Text>
+            <Text className="text-muted text-xs font-semibold">25 miles</Text>
           </View>
         </View>
 
+        {/* Create Room CTA */}
         <TouchableOpacity
           onPress={() => router.push("/rooms/create-rooms")}
-          className="mt-10 bg-primary py-4 px-6 rounded-[20px] flex-row justify-center items-center shadow-lg shadow-indigo-200 active:opacity-90"
+          activeOpacity={0.9}
+          className="mt-7 bg-primary py-5 px-6 rounded-3xl flex-row items-center shadow-lg shadow-indigo-200"
         >
-          <Ionicons name="add-circle" size={24} color="white" />
-          <Text className="text-white font-bold text-lg ml-2">
-            Create a Room
-          </Text>
+          <View className="w-12 h-12 bg-white/20 rounded-2xl items-center justify-center mr-4">
+            <Ionicons name="add" size={24} color="white" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-white font-black text-lg tracking-tight">
+              Create a Room
+            </Text>
+            <Text className="text-white/70 text-xs font-semibold mt-0.5">
+              Start your own discovery circle
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.6)" />
         </TouchableOpacity>
 
-        <View className="mt-8">
-          <View className="flex flex-row justify-between items-center ">
-            <View>
-              <Text className="text-primary text-lg font-semibold">Rooms</Text>
-              <Text className="text-secondary text-2xl font-bold">
+        {/* Nearby Rooms Section */}
+        <View className="mt-8 mb-2">
+          <View className="flex flex-row justify-between items-center">
+            <View className="flex-row items-center gap-2.5">
+              <Text className="text-secondary text-xl font-black tracking-tight">
                 Nearby Rooms
               </Text>
+              {nearbyRooms.length > 0 && (
+                <View className="bg-primary/10 px-2.5 py-1 rounded-lg">
+                  <Text className="text-primary text-[11px] font-black">
+                    {nearbyRooms.length}
+                  </Text>
+                </View>
+              )}
             </View>
-            <View></View>
           </View>
         </View>
+
         <FlatList
-          data={rooms}
-          renderItem={({ item }) =>
-            !item.participants?.includes(firestoreUser?.id) && (
-              <RoomCard
-                room={item}
-                onPress={() => handlePresentModalPress(item)}
-              />
-            )
-          }
+          data={nearbyRooms}
+          renderItem={({ item }) => (
+            <RoomCard
+              room={item}
+              onPress={() => handlePresentModalPress(item)}
+            />
+          )}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 100 }}
+          contentContainerStyle={{ paddingBottom: 100, paddingTop: 8 }}
+          showsVerticalScrollIndicator={false}
+          ListEmptyComponent={<EmptyRooms />}
         />
       </SafeAreaView>
 
