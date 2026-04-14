@@ -1,51 +1,63 @@
-# Welcome to your Expo app 👋
+# SpotUs
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+SpotUs is a location-based social discovery and real-time chat application built with React Native and Expo. It allows users to discover active rooms within a specific radius, join dynamic conversations based on interests, and organically build trust with other users to unlock direct messaging capabilities.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Location-Based Discovery**: Find nearby chat rooms using a dynamic radius slider.
+- **Interest-Based Rooms**: Create and join rooms categorized by topics like Music, Tech, Coffee, Local Events, and more.
+- **Dual Trust System**: A unique reputation mechanism where users must build "Room Trust" (by participating in public rooms) to unlock Direct Messaging, preventing spam and fostering organic connections.
+- **Real-Time Chat**: Fast, reliable messaging powered by Firebase Firestore with read receipts, typing indicators, and immediate synchronization.
+- **Premium Human UI**: A heavily polished, tactile user interface utilizing NativeWind. Features squircle avatars, fluid spring animations, and comprehensive haptic feedback.
+- **Secure Authentication**: Passwordless OTP, Google OAuth, and Apple Sign-In powered by Clerk.
 
+## Tech Stack
+
+- **Framework**: React Native with Expo (Expo Router)
+- **Styling**: NativeWind (Tailwind CSS)
+- **Backend & Database**: Firebase Firestore
+- **Authentication**: Clerk (Core 2/3)
+- **Key Libraries**: `@gorhom/bottom-sheet`, `expo-haptics`, `react-native-reanimated`
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18+)
+- EAS CLI (`npm install -g eas-cli`)
+- A Clerk Account
+- A Firebase Project
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone git@github.com:your-private-org/spotus.git
+   cd spotus
+   ```
+
+2. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Start the app
-
-   ```bash
-   npx expo start
+3. Set up environment variables:
+   Create a `.env` or `.env.local` file in the root directory and add your keys (contact the repository admin if you do not have these):
+   ```env
+   EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_key
+   EXPO_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+   EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+   EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
+   EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+   EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_sender_id
+   EXPO_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
    ```
 
-In the output, you'll find options to open the app in a
+4. Start the development server:
+   ```bash
+   npm start
+   ```
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## License & Copyright
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# spotus
+This is a **private repository**. All rights reserved. No part of this codebase may be reproduced, distributed, or transmitted in any form or by any means without the prior written permission of the copyright owner. See the [LICENSE](LICENSE) file for details.
