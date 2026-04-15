@@ -1,6 +1,8 @@
 import * as Haptics from "expo-haptics";
 import { useRef } from "react";
-import { Animated, Text, TouchableOpacity, View } from "react-native";
+import { Animated, FlatList, Text, TouchableOpacity, View } from "react-native";
+import useFirestoreUser from "../hook/useFireStoreUser";
+import { isRoomUnseen } from "../lib/chatSeen";
 
 const CATEGORY_COLORS = {
   Music: "#8B5CF6",
@@ -14,9 +16,15 @@ const CATEGORY_COLORS = {
   "Local Events": "#14B8A6",
 };
 
-export default function RoomHorizontalItem({ room, onPress }) {
+/**
+ * Individual room item for the horizontal scroll list.
+ * Features a category-colored icon, dynamic scale animation, and an unread badge.
+ */
+export function RoomHorizontalItem({ room, onPress }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const categoryColor = CATEGORY_COLORS[room?.category] || "#6B7280";
+  const { firestoreUser } = useFirestoreUser();
+  const currentUserId = firestoreUser?.id;
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -39,8 +47,14 @@ export default function RoomHorizontalItem({ room, onPress }) {
     onPress?.();
   };
 
+  // Correctly pass the room document object to check for unread state
+  const roomUnseen = isRoomUnseen(room, currentUserId);
+
   return (
-    <Animated.View style={{ transform: [{ scale: scaleAnim }] }} className="mr-4">
+    <Animated.View
+      style={{ transform: [{ scale: scaleAnim }] }}
+      className="mr-5"
+    >
       <TouchableOpacity
         onPress={handlePress}
         onPressIn={handlePressIn}
@@ -49,26 +63,65 @@ export default function RoomHorizontalItem({ room, onPress }) {
         className="items-center"
       >
         <View
-          className="w-20 h-20 rounded-3xl items-center justify-center border border-white shadow-sm shadow-gray-200"
+          className="w-[74px] h-[74px] rounded-[26px] items-center justify-center border border-white shadow-sm shadow-gray-200"
           style={{ backgroundColor: `${categoryColor}15` }}
         >
           <View
-            className="w-16 h-16 rounded-[22px] items-center justify-center shadow-sm"
-            style={{ backgroundColor: categoryColor, shadowColor: categoryColor }}
+            className="w-[60px] h-[60px] rounded-[21px] items-center justify-center shadow-lg"
+            style={{
+              backgroundColor: categoryColor,
+              shadowColor: categoryColor,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.25,
+              shadowRadius: 8,
+              elevation: 6,
+            }}
           >
             <Text className="text-white text-xl font-extrabold">
               {room?.title?.charAt(0).toUpperCase()}
             </Text>
           </View>
-          <View className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-400 rounded-full border-4 border-white items-center justify-center shadow-sm shadow-green-200" />
+
+          {roomUnseen && (
+            <View
+              className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full border-2 border-white items-center justify-center shadow-md shadow-primary/30"
+            />
+          )}
         </View>
+
         <Text
-          className="text-secondary text-xs font-bold mt-2.5 text-center w-20 tracking-tight"
+          className={`text-[11px] font-bold mt-2.5 text-center w-20 tracking-tight ${
+            roomUnseen ? "text-primary" : "text-secondary/60"
+          }`}
           numberOfLines={1}
         >
           {room?.title}
         </Text>
       </TouchableOpacity>
     </Animated.View>
+  );
+}
+
+/**
+ * Reusable horizontal list for active rooms.
+ * Handles scrolling logic and empty state gracefully.
+ */
+export default function RoomHorizontalList({ rooms, onRoomPress }) {
+  if (!rooms || rooms.length === 0) return null;
+
+  return (
+    <FlatList
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      data={rooms}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <RoomHorizontalItem
+          room={item}
+          onPress={() => onRoomPress?.(item)}
+        />
+      )}
+      contentContainerClassName="px-1 py-1"
+    />
   );
 }

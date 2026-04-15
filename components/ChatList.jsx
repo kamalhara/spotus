@@ -81,19 +81,19 @@ export default function ChatRow({ chat, onPress }) {
             </Text>
             <View className="flex-row items-center">
               <Text
-                className={`${isUnread ? "text-indigo-600 font-bold" : "text-gray-400 font-semibold"} text-xs`}
+                className={`${isUnread ? "text-primary font-bold" : "text-gray-400 font-semibold"} text-xs`}
               >
                 {time}
               </Text>
               {isUnread && (
-                <View className="w-2.5 h-2.5 bg-indigo-600 rounded-full ml-2" />
+                <View className="w-2.5 h-2.5 bg-primary rounded-full ml-2" />
               )}
             </View>
           </View>
 
           <View className="flex-row items-center">
             {isTyping ? (
-              <Text className="text-[#4F46E5] text-[13px] font-semibold leading-5 flex-1">
+              <Text className="text-primary text-[13px] font-semibold leading-5 flex-1">
                 Typing...
               </Text>
             ) : (

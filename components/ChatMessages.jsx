@@ -73,13 +73,13 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
 
     return (
       <View
-        className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-4" : "mt-1"} px-3`}
+        className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-0.5"} px-3`}
       >
         {!isSentByMe && (
-          <View className="w-8 mr-2 flex justify-end pb-5">
+          <View className="w-8 mr-2 flex justify-end pb-1">
             {showAvatarAndName ? (
               <View
-                className="w-7 h-7 rounded-full items-center justify-center"
+                className="w-7 h-7 rounded-full items-center justify-center shadow-sm"
                 style={{ backgroundColor: getUserColor(item.user) }}
               >
                 <Text className="text-white text-[11px] font-bold">
@@ -92,45 +92,45 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
           </View>
         )}
         <View
-          className={`max-w-[75%] flex-col ${isSentByMe ? "items-end" : "items-start"}`}
+          className={`max-w-[78%] flex-col ${isSentByMe ? "items-end" : "items-start"}`}
         >
           {showAvatarAndName && (
-            <Text className="text-gray-400 text-[11px] font-medium mb-1 ml-1">
+            <Text className="text-muted text-[10px] font-semibold mb-1 ml-1 uppercase tracking-wide">
               {item.user || "Unknown"}
             </Text>
           )}
 
           <View
-            className={`px-4 py-2.5 ${
+            className={`px-3.5 py-2 min-w-[72px] shadow-sm ${
               isSentByMe
-                ? "bg-primary rounded-2xl rounded-br-md"
-                : "bg-white border border-gray-100 rounded-2xl rounded-bl-md"
+                ? "bg-primary rounded-2xl rounded-br-sm shadow-primary/20"
+                : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm shadow-gray-200"
             }`}
           >
-            <View>
-              <Text
-                className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"}`}
-              >
-                {item.text}
-              </Text>
-            </View>
-          </View>
-
-          <View className="flex-row items-center mt-1 px-1">
-            <Text className="text-gray-400 text-[10px]">
-              {formatTime(item.createdAt)}
+            <Text
+              className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"} pb-3.5`}
+            >
+              {item.text}
             </Text>
-            {isSentByMe && (
-              <View className="ml-1.5 flex-row items-center">
-                <Ionicons
-                  name={
-                    item.seenBy?.length > 1 ? "checkmark-done" : "checkmark"
-                  }
-                  size={15}
-                  color={item.seenBy?.length > 1 ? "#4F46E5" : "#D1D5DB"}
-                />
-              </View>
-            )}
+
+            <View className="absolute bottom-1.5 right-2.5 flex-row items-center">
+              <Text
+                className={`text-[9px] font-medium ${isSentByMe ? "text-white/60" : "text-gray-400"}`}
+              >
+                {formatTime(item.createdAt)}
+              </Text>
+              {isSentByMe && (
+                <View className="ml-1">
+                  <Ionicons
+                    name={
+                      item.seenBy?.length > 1 ? "checkmark-done" : "checkmark"
+                    }
+                    size={13}
+                    color={item.seenBy?.length > 1 ? "#93C5FD" : "rgba(255,255,255,0.55)"}
+                  />
+                </View>
+              )}
+            </View>
           </View>
         </View>
       </View>
@@ -144,7 +144,7 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
       renderItem={renderMessage}
       keyExtractor={(item, index) => item.id?.toString() || index.toString()}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 4 }}
+      contentContainerClassName="py-4 px-1"
       onContentSizeChange={() => {
         setTimeout(
           () => flatListRef.current?.scrollToEnd({ animated: true }),

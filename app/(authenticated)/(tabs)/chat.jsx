@@ -19,7 +19,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatRow from "../../../components/ChatList";
-import RoomHorizontalItem from "../../../components/RoomHorizontalList";
+import RoomHorizontalList from "../../../components/RoomHorizontalList";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 
@@ -112,22 +112,15 @@ export default function Chat() {
       </View>
 
       {/* Rooms horizontal scroll */}
-      {rooms.length > 0 && (
-        <View className="mb-6">
-          <Text className="text-secondary text-base font-bold mb-4">
-            Active Rooms
-          </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {rooms.map((room) => (
-              <RoomHorizontalItem
-                key={room.id}
-                room={room}
-                onPress={() => router.push(`/rooms/${room.id}`)}
-              />
-            ))}
-          </ScrollView>
-        </View>
-      )}
+      <View className="mb-6">
+        <Text className="text-secondary text-base font-bold mb-4">
+          Active Rooms
+        </Text>
+        <RoomHorizontalList
+          rooms={rooms}
+          onRoomPress={(room) => router.push(`/rooms/${room.id}`)}
+        />
+      </View>
 
       {/* Chat list */}
       <View className="flex-1 mt-2">

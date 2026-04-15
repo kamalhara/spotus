@@ -10,6 +10,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -27,6 +28,7 @@ import RoomDetailsSheet from "../../../components/RoomDetailsSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { updateTrustOnMessage } from "../../../lib/trust";
+import { RoomSeen } from "../../../lib/chatSeen";
 
 const CATEGORY_ICONS = {
   Music: "musical-notes",
@@ -66,6 +68,12 @@ export default function RoomChat() {
     });
     return unsub;
   }, [roomId]);
+
+  // Mark room messages as seen when entering
+  useEffect(() => {
+    if (!roomId || !currentUserId) return;
+    RoomSeen(roomId, currentUserId);
+  }, [roomId, currentUserId]);
 
   // Load the static room details like title and category
   useEffect(() => {
@@ -119,7 +127,17 @@ export default function RoomChat() {
         senderId: currentUserId || "unknown-id",
         user: user?.userName || "Unknown",
         createdAt: serverTimestamp(),
+        seenBy: [currentUserId],
       });
+
+      // Sync the parent room document with last message metadata
+      await updateDoc(doc(db, "rooms", roomId), {
+        lastMessage: trimmedText,
+        lastMessageAt: serverTimestamp(),
+        lastMessageSenderId: currentUserId,
+        lastMessageSeenBy: [currentUserId],
+      });
+
       await updateTrustOnMessage(db, roomId, currentUserId, trimmedText);
     } catch (err) {
       console.error("Error sending message:", err);
