@@ -7,8 +7,12 @@ import {
   NativeTabs,
 } from "expo-router/unstable-native-tabs";
 import { Platform } from "react-native";
+import useFirestoreUser from "../../../hook/useFireStoreUser";
+import useUnreadCount from "../../../hook/useUnreadCount";
 
 export default function TabsLayout() {
+  const { firestoreUser } = useFirestoreUser();
+  const unreadCount = useUnreadCount(firestoreUser?.id);
   return Platform.OS === "android" ? (
     <Tabs
       screenOptions={{
@@ -98,7 +102,7 @@ export default function TabsLayout() {
           selectedColor="#4F46E5"
           sf={{ default: "message", selected: "message.fill" }}
         />
-        <Badge>3</Badge>
+        {unreadCount > 0 && <Badge>{unreadCount}</Badge>}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profile">
         <Label>Profile</Label>
