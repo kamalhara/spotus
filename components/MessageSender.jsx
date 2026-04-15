@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { useRef, useState } from "react";
 import {
+  Alert,
   Pressable,
   Text,
   TextInput,
@@ -51,6 +52,8 @@ export default function MessageSender({ handleSend, chatId, currentUserId }) {
   const typingTimeout = useRef(null);
   const isTypingLocal = useRef(false);
 
+  const [image, setImage] = useState(null);
+
   const toggleMediaMenu = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShowMediaMenu((prev) => !prev);
@@ -92,19 +95,27 @@ export default function MessageSender({ handleSend, chatId, currentUserId }) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     const pickImage = async () => {
-      try {
-        const permission =
-          await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (!permission.granted) {
-          alert("Sorry, we need camera roll permissions to make this work!");
-          return;
-        }
-        // Proceed with picker logic
-      } catch (err) {
-        console.error("ImagePicker not available:", err);
-        alert(
-          "Image picker requires a fresh native rebuild of the Dev Client.",
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permission.granted) {
+        Alert.alert(
+          "Permission Required",
+          "Please grant permission to access the media library.",
         );
+        return;
+      }
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      console.log(result);
+
+      if (!result.canceled) {
+        setImage(result.assets[0].uri);
       }
     };
 
@@ -112,7 +123,7 @@ export default function MessageSender({ handleSend, chatId, currentUserId }) {
       // Handle camera functionality
     }
     if (key === "photo") {
-      // Handle photo functionality
+      pickImage();
     }
     if (key === "file") {
       // Handle file functionality
