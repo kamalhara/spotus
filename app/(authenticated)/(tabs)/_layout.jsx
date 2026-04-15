@@ -41,7 +41,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="rooms"
+        name="rooms_tab"
         options={{
           title: "Rooms",
           tabBarIcon: ({ color, focused }) => (
@@ -54,7 +54,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="chat"
+        name="chat_tab"
         options={{
           title: "Chat",
           tabBarIcon: ({ color, focused }) => (
@@ -89,14 +89,14 @@ export default function TabsLayout() {
           sf={{ default: "house", selected: "house.fill" }}
         />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="rooms">
+      <NativeTabs.Trigger name="rooms_tab">
         <Label>Rooms</Label>
         <Icon
           selectedColor="#4F46E5"
           sf={{ default: "person.2", selected: "person.2.fill" }}
         />
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="chat">
+      <NativeTabs.Trigger name="chat_tab">
         <Label>Chat</Label>
         <Icon
           selectedColor="#4F46E5"

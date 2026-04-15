@@ -11,7 +11,6 @@ import {
 import { useEffect, useState } from "react";
 import {
   FlatList,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -125,10 +124,15 @@ export default function Chat() {
       {/* Chat list */}
       <View className="flex-1 mt-2">
         <Text className="text-secondary text-base font-bold mb-3">Recent</Text>
-        
+
         {chats.length > 0 ? (
           <FlatList
-            data={chats.filter(c => c.otherUser?.userName?.toLowerCase().includes(search.toLowerCase()) || search === "")}
+            data={chats.filter(
+              (c) =>
+                c.otherUser?.userName
+                  ?.toLowerCase()
+                  .includes(search.toLowerCase()) || search === "",
+            )}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <ChatRow
@@ -158,14 +162,10 @@ export default function Chat() {
             <Text className="text-gray-400 text-sm mt-1.5 text-center px-10 leading-5">
               Build trust in rooms to unlock direct messages with other members.
             </Text>
-            
+
             <View className="mt-6 bg-white rounded-2xl px-4 py-3.5 flex-row items-center border border-gray-100 shadow-sm shadow-gray-100">
               <View className="w-7 h-7 bg-indigo-50 rounded-lg items-center justify-center mr-3">
-                <Ionicons
-                  name="shield-checkmark"
-                  size={14}
-                  color="#4F46E5"
-                />
+                <Ionicons name="shield-checkmark" size={14} color="#4F46E5" />
               </View>
               <Text className="text-gray-500 text-[13px] font-medium flex-1">
                 10 room messages = DM access

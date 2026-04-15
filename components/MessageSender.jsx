@@ -1,7 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import * as ImagePicker from "expo-image-picker";
 import { useRef, useState } from "react";
-import { Pressable, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Pressable,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { setTyping } from "../lib/chatTyping";
 
 const MEDIA_OPTIONS = [
@@ -83,7 +90,36 @@ export default function MessageSender({ handleSend, chatId, currentUserId }) {
 
   const handleMediaOption = (key) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setShowMediaMenu(false);
+
+    const pickImage = async () => {
+      try {
+        const permission =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permission.granted) {
+          alert("Sorry, we need camera roll permissions to make this work!");
+          return;
+        }
+        // Proceed with picker logic
+      } catch (err) {
+        console.error("ImagePicker not available:", err);
+        alert(
+          "Image picker requires a fresh native rebuild of the Dev Client.",
+        );
+      }
+    };
+
+    if (key === "camera") {
+      // Handle camera functionality
+    }
+    if (key === "photo") {
+      // Handle photo functionality
+    }
+    if (key === "file") {
+      // Handle file functionality
+    }
+    if (key === "location") {
+      // Handle location functionality
+    }
     // Placeholder — each key can route to actual functionality later
   };
 
