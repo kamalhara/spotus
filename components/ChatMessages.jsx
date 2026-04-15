@@ -1,8 +1,18 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 import { FlatList, Text, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import useTypingIndicator from "../hook/useTypingIndicator";
+import TypingIndicator from "./TypingIndicator";
 
-const COLORS = ["#4F46E5", "#EC4899", "#10B981", "#F59E0B", "#3B82F6", "#8B5CF6", "#14B8A6"];
+const COLORS = [
+  "#4F46E5",
+  "#EC4899",
+  "#10B981",
+  "#F59E0B",
+  "#3B82F6",
+  "#8B5CF6",
+  "#14B8A6",
+];
 
 function getUserColor(username) {
   if (!username) return "#94A3B8";
@@ -25,15 +35,18 @@ function formatTime(timestamp) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export default function ChatMessages({ messages, currentUserId }) {
+export default function ChatMessages({ messages, currentUserId, chatDocId }) {
   const flatListRef = useRef(null);
+
+  const isTyping = useTypingIndicator(chatDocId, currentUserId);
 
   useEffect(() => {
     if (!messages?.length) return;
-    requestAnimationFrame(() => {
+    const timer = setTimeout(() => {
       flatListRef.current?.scrollToEnd({ animated: true });
-    });
-  }, [messages]);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [messages?.length, isTyping]);
 
   if (!messages || messages.length === 0) {
     return (
@@ -77,7 +90,6 @@ export default function ChatMessages({ messages, currentUserId }) {
             )}
           </View>
         )}
-
         <View
           className={`max-w-[75%] flex-col ${isSentByMe ? "items-end" : "items-start"}`}
         >
@@ -117,8 +129,20 @@ export default function ChatMessages({ messages, currentUserId }) {
       keyExtractor={(item, index) => item.id?.toString() || index.toString()}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingVertical: 16, paddingHorizontal: 4 }}
-      onContentSizeChange={() =>
-        flatListRef.current?.scrollToEnd({ animated: true })
+      onContentSizeChange={() => {
+        setTimeout(
+          () => flatListRef.current?.scrollToEnd({ animated: true }),
+          100,
+        );
+      }}
+      onLayout={() => {
+        setTimeout(
+          () => flatListRef.current?.scrollToEnd({ animated: true }),
+          100,
+        );
+      }}
+      ListFooterComponent={
+        isTyping ? <TypingIndicator /> : <View className="h-2" />
       }
     />
   );

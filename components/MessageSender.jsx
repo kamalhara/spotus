@@ -2,12 +2,16 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRef, useState } from "react";
 import { Animated, TextInput, TouchableOpacity, View } from "react-native";
+import { setTyping } from "../lib/chatTyping";
 
-export default function MessageSender({ handleSend }) {
+export default function MessageSender({ handleSend, chatId, currentUserId }) {
   const [message, setMessage] = useState("");
   const sendScaleAnim = useRef(new Animated.Value(1)).current;
 
   const isActive = message.trim().length > 0;
+
+  const typingTimeout = useRef(null);
+  const isTypingLocal = useRef(false);
 
   const animateSend = () => {
     Animated.sequence([
@@ -25,8 +29,33 @@ export default function MessageSender({ handleSend }) {
     ]).start();
   };
 
+  const handleTyping = () => {
+    if (!chatId || !currentUserId) return;
+
+    if (!isTypingLocal.current) {
+      isTypingLocal.current = true;
+      setTyping(chatId, currentUserId, true);
+    }
+
+    if (typingTimeout.current) {
+      clearTimeout(typingTimeout.current);
+    }
+
+    typingTimeout.current = setTimeout(() => {
+      isTypingLocal.current = false;
+      setTyping(chatId, currentUserId, false);
+    }, 1500);
+  };
+
   const onSend = () => {
     if (!isActive || !handleSend) return;
+
+    if (typingTimeout.current) {
+      clearTimeout(typingTimeout.current);
+    }
+    isTypingLocal.current = false;
+    setTyping(chatId, currentUserId, false);
+    
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     animateSend();
     handleSend(message);
@@ -44,7 +73,10 @@ export default function MessageSender({ handleSend }) {
 
       <TextInput
         value={message}
-        onChangeText={setMessage}
+        onChangeText={(text) => {
+          setMessage(text);
+          handleTyping();
+        }}
         placeholder="Type a message..."
         placeholderTextColor="#CBD5E1"
         className="flex-1 px-3.5 text-[15px] text-secondary font-medium tracking-wide h-11"

@@ -1,6 +1,8 @@
 import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
+import useFirestoreUser from "../hook/useFireStoreUser";
+import useTypingIndicator from "../hook/useTypingIndicator";
 
 function formatTime(timestamp) {
   if (!timestamp) return "";
@@ -43,7 +45,9 @@ export default function ChatRow({ chat, onPress }) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress?.();
   };
-
+  const { firestoreUser } = useFirestoreUser();
+  const currentUserId = firestoreUser?.id;
+  const isTyping = useTypingIndicator(chat.id, currentUserId);
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
@@ -73,12 +77,18 @@ export default function ChatRow({ chat, onPress }) {
           </View>
 
           <View className="flex-row items-center">
-            <Text
-              className="text-gray-500 text-[13px] leading-5 flex-1"
-              numberOfLines={1}
-            >
-              {lastMsg || "Click to start the conversation..."}
-            </Text>
+            {isTyping ? (
+              <Text className="text-[#4F46E5] text-[13px] font-semibold leading-5 flex-1">
+                Typing...
+              </Text>
+            ) : (
+              <Text
+                className="text-gray-500 text-[13px] leading-5 flex-1"
+                numberOfLines={1}
+              >
+                {lastMsg || "Click to start the conversation..."}
+              </Text>
+            )}
           </View>
         </View>
       </TouchableOpacity>

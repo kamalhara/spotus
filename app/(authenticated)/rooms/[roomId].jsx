@@ -200,11 +200,11 @@ export default function RoomChat() {
       )}
 
       <View className="flex-1">
-        <ChatMessages messages={messages} currentUserId={currentUserId} />
+        <ChatMessages messages={messages} currentUserId={currentUserId} chatDocId={roomId} />
       </View>
 
       <View className="px-5 py-3 flex items-center pb-6">
-        <MessageSender handleSend={handleSend} />
+        <MessageSender handleSend={handleSend} chatId={roomId} currentUserId={currentUserId} />
       </View>
 
       <RoomDetailsSheet

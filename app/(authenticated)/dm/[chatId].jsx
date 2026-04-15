@@ -24,6 +24,7 @@ import ChatMessages from "../../../components/ChatMessages";
 import MessageSender from "../../../components/MessageSender";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import useTypingIndicator from "../../../hook/useTypingIndicator";
 
 export default function ChatId() {
   const { chatId, userName, profilePic } = useLocalSearchParams();
@@ -37,6 +38,8 @@ export default function ChatId() {
     if (!currentUserId || !chatId) return null;
     return [currentUserId, chatId].sort().join("_");
   }, [currentUserId, chatId]);
+
+  const isTyping = useTypingIndicator(chatDocId, currentUserId);
 
   // Create or merge the chat document
   useEffect(() => {
@@ -63,9 +66,7 @@ export default function ChatId() {
       orderBy("createdAt", "asc"),
     );
     const unsub = onSnapshot(q, (snapshot) => {
-      setMessages(
-        snapshot.docs.map((d) => ({ id: d.id, ...d.data() })),
-      );
+      setMessages(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
     return unsub;
   }, [chatDocId]);
@@ -118,9 +119,26 @@ export default function ChatId() {
               <Text className="text-secondary font-bold text-base">
                 {userName}
               </Text>
-              <View className="flex-row items-center mt-0.5">
-                <View className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1" />
-                <Text className="text-gray-400 text-xs">Active now</Text>
+              <View
+                className="flex-row items-center mt-0.5"
+                style={{ minHeight: 16 }}
+              >
+                {isTyping ? (
+                  <Text
+                    style={{
+                      color: "#4F46E5",
+                      fontSize: 12,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Typing...
+                  </Text>
+                ) : (
+                  <>
+                    <View className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1" />
+                    <Text className="text-gray-400 text-xs">Active now</Text>
+                  </>
+                )}
               </View>
             </View>
           </View>
@@ -131,12 +149,20 @@ export default function ChatId() {
 
         {/* Messages */}
         <View className="flex-1">
-          <ChatMessages messages={messages} currentUserId={currentUserId} />
+          <ChatMessages
+            messages={messages}
+            currentUserId={currentUserId}
+            chatDocId={chatDocId}
+          />
         </View>
 
         {/* Input */}
         <View className="px-5 py-3 pb-5">
-          <MessageSender handleSend={handleSend} />
+          <MessageSender
+            handleSend={handleSend}
+            chatId={chatDocId}
+            currentUserId={currentUserId}
+          />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
