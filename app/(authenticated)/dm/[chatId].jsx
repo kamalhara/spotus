@@ -4,6 +4,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
   onSnapshot,
   orderBy,
   query,
@@ -25,6 +26,7 @@ import MessageSender from "../../../components/MessageSender";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import useTypingIndicator from "../../../hook/useTypingIndicator";
+import { ChatSeen } from "../../../lib/chatSeen";
 
 export default function ChatId() {
   const { chatId, userName, profilePic } = useLocalSearchParams();
@@ -43,18 +45,33 @@ export default function ChatId() {
 
   // Create or merge the chat document
   useEffect(() => {
-    if (!chatDocId || !currentUserId) return;
+    if (!chatDocId || !currentUserId || !chatId) return;
+
     const createChat = async () => {
-      await setDoc(
-        doc(db, "chats", chatDocId),
-        {
+      const ref = doc(db, "chats", chatDocId);
+      const snap = await getDoc(ref);
+
+      // ✅ only first time create
+      if (!snap.exists()) {
+        await setDoc(ref, {
           participants: [currentUserId, chatId],
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
-        },
-        { merge: true },
-      );
+          lastMessage: "",
+          lastMessageAt: null,
+        });
+      } else {
+        // 🔄 only update activity
+        await setDoc(
+          ref,
+          {
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true },
+        );
+      }
     };
+
     createChat();
   }, [chatDocId, currentUserId, chatId]);
 
@@ -70,6 +87,10 @@ export default function ChatId() {
     });
     return unsub;
   }, [chatDocId]);
+  useEffect(() => {
+    if (!chatDocId || !currentUserId) return;
+    ChatSeen(chatDocId, currentUserId);
+  }, [chatDocId, currentUserId]);
 
   // Send a message
   const handleSend = async (text) => {
@@ -80,6 +101,7 @@ export default function ChatId() {
         senderId: currentUserId,
         user: firestoreUser?.userName || "Unknown",
         createdAt: serverTimestamp(),
+        seenBy: [currentUserId],
       });
       // Update the chat's last activity and message preview
       await setDoc(
@@ -88,6 +110,8 @@ export default function ChatId() {
           updatedAt: serverTimestamp(),
           lastMessage: text.trim(),
           lastMessageAt: serverTimestamp(),
+          lastMessageSenderId: currentUserId,
+          lastMessageSeenBy: [currentUserId],
         },
         { merge: true },
       );

@@ -19,6 +19,7 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [viewerRoomTrust, setViewerRoomTrust] = useState(0);
 
+  // Fetch the viewed user's profile and check trust context for DM access
   useEffect(() => {
     if (!userId) return;
 

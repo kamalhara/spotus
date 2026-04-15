@@ -17,6 +17,7 @@ if (!publishableKey) {
 
 function UserSync() {
   const { user, isLoaded } = useUser();
+  // Global sync of user data from Clerk to Firestore
   useEffect(() => {
     if (!isLoaded || !user) return;
     syncUserToFirebase(user);

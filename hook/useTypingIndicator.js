@@ -5,6 +5,7 @@ import { db } from "../config/firebase.config";
 export default function useTypingIndicator(chatId, currentUserId) {
   const [isTyping, setIsTyping] = useState(false);
 
+  // Listen to real-time typing status of other participants in the chat
   useEffect(() => {
     if (!chatId || !currentUserId) {
       setIsTyping(false);

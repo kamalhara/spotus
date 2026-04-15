@@ -5,6 +5,7 @@ import syncUserToFirebase from "../lib/syncUser";
 export default function useSyncUser() {
   const { user, isLoaded } = useUser();
 
+  // Automatically sync Clerk user profile to Firestore on login or update
   useEffect(() => {
     if (!isLoaded || !user) return;
 

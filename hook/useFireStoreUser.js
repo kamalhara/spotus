@@ -8,6 +8,7 @@ export default function useFirestoreUser() {
   const [firestoreUser, setFirestoreUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Fetch current user's profile data from Firestore when Clerk session is ready
   useEffect(() => {
     const fetchUser = async () => {
       if (!isLoaded || !user) return;

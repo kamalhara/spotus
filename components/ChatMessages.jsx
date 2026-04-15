@@ -40,6 +40,7 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
 
   const isTyping = useTypingIndicator(chatDocId, currentUserId);
 
+  // Auto-scroll to the bottom of the list when new messages or typing indicators appear
   useEffect(() => {
     if (!messages?.length) return;
     const timer = setTimeout(() => {
@@ -106,16 +107,31 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
                 : "bg-white border border-gray-100 rounded-2xl rounded-bl-md"
             }`}
           >
-            <Text
-              className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"}`}
-            >
-              {item.text}
-            </Text>
+            <View>
+              <Text
+                className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"}`}
+              >
+                {item.text}
+              </Text>
+            </View>
           </View>
 
-          <Text className="text-gray-300 text-[10px] mt-1 px-1">
-            {formatTime(item.createdAt)}
-          </Text>
+          <View className="flex-row items-center mt-1 px-1">
+            <Text className="text-gray-400 text-[10px]">
+              {formatTime(item.createdAt)}
+            </Text>
+            {isSentByMe && (
+              <View className="ml-1.5 flex-row items-center">
+                <Ionicons
+                  name={
+                    item.seenBy?.length > 1 ? "checkmark-done" : "checkmark"
+                  }
+                  size={15}
+                  color={item.seenBy?.length > 1 ? "#4F46E5" : "#D1D5DB"}
+                />
+              </View>
+            )}
+          </View>
         </View>
       </View>
     );

@@ -54,6 +54,7 @@ export default function RoomChat() {
 
   const { roomId } = useLocalSearchParams();
 
+  // Subscribe to real-time message updates for this room
   useEffect(() => {
     if (!roomId) return;
     const q = query(
@@ -66,6 +67,7 @@ export default function RoomChat() {
     return unsub;
   }, [roomId]);
 
+  // Load the static room details like title and category
   useEffect(() => {
     if (!roomId) return;
     const loadRoom = async () => {
@@ -75,6 +77,7 @@ export default function RoomChat() {
     loadRoom();
   }, [roomId]);
 
+  // Listen to the viewer's specific trust level/message count in this room
   useEffect(() => {
     if (!roomId || !currentUserId) return;
     const unsub = onSnapshot(
@@ -86,6 +89,7 @@ export default function RoomChat() {
     return unsub;
   }, [roomId, currentUserId]);
 
+  // Fetch profiles and trust scores for all members in the room
   useEffect(() => {
     const fetchMemberData = async () => {
       if (!room?.participants?.length) return;

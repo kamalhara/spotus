@@ -33,6 +33,7 @@ export default function Chat() {
   const [search, setSearch] = useState("");
 
   // Fetch rooms user is in
+  // Fetch all rooms where the current user is a participant
   useEffect(() => {
     if (!currentUserId) return;
     const q = query(
@@ -46,6 +47,7 @@ export default function Chat() {
   }, [currentUserId]);
 
   // Fetch DM chats & resolve other user's profile
+  // Fetch direct message threads and enrich them with participant profile data
   useEffect(() => {
     if (!currentUserId) return;
 

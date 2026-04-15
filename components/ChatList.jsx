@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
 import useFirestoreUser from "../hook/useFireStoreUser";
 import useTypingIndicator from "../hook/useTypingIndicator";
+import { isChatUnseen } from "../lib/chatSeen";
 
 function formatTime(timestamp) {
   if (!timestamp) return "";
@@ -48,6 +49,9 @@ export default function ChatRow({ chat, onPress }) {
   const { firestoreUser } = useFirestoreUser();
   const currentUserId = firestoreUser?.id;
   const isTyping = useTypingIndicator(chat.id, currentUserId);
+
+  const isUnread = isChatUnseen(chat, currentUserId);
+
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
@@ -55,7 +59,7 @@ export default function ChatRow({ chat, onPress }) {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.9}
-        className="flex-row items-center p-4 border border-gray-100 bg-white rounded-3xl shadow-sm shadow-gray-200 mb-3"
+        className={`flex-row items-center p-4 border ${isUnread ? "border-indigo-100 bg-indigo-50/30" : "border-gray-100 bg-white"} rounded-3xl shadow-sm shadow-gray-200 mb-3`}
       >
         <View className="relative">
           <Image
@@ -70,10 +74,21 @@ export default function ChatRow({ chat, onPress }) {
 
         <View className="flex-1 ml-4 justify-center">
           <View className="flex-row justify-between items-center mb-1">
-            <Text className="text-secondary font-extrabold text-[17px] tracking-tight">
+            <Text
+              className={`text-secondary ${isUnread ? "font-black" : "font-extrabold"} text-[17px] tracking-tight`}
+            >
               {otherUser?.userName || "User"}
             </Text>
-            <Text className="text-gray-400 text-xs font-semibold">{time}</Text>
+            <View className="flex-row items-center">
+              <Text
+                className={`${isUnread ? "text-indigo-600 font-bold" : "text-gray-400 font-semibold"} text-xs`}
+              >
+                {time}
+              </Text>
+              {isUnread && (
+                <View className="w-2.5 h-2.5 bg-indigo-600 rounded-full ml-2" />
+              )}
+            </View>
           </View>
 
           <View className="flex-row items-center">
@@ -83,7 +98,7 @@ export default function ChatRow({ chat, onPress }) {
               </Text>
             ) : (
               <Text
-                className="text-gray-500 text-[13px] leading-5 flex-1"
+                className={`${isUnread ? "text-secondary font-bold" : "text-gray-500"} text-[13px] leading-5 flex-1`}
                 numberOfLines={1}
               >
                 {lastMsg || "Click to start the conversation..."}

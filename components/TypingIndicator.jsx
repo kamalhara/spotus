@@ -6,6 +6,7 @@ export default function TypingIndicator() {
   const dot2 = useRef(new Animated.Value(0)).current;
   const dot3 = useRef(new Animated.Value(0)).current;
 
+  // Initialize and loop the dots animation for the typing indicator
   useEffect(() => {
     const createAnimation = (anim) => {
       return Animated.sequence([

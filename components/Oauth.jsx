@@ -10,6 +10,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 // Clerk recommendation for faster OAuth loading
 const useWarmUpBrowser = () => {
+  // Optimization: Warm up the web browser for faster OAuth redirect handling
   useEffect(() => {
     void WebBrowser.warmUpAsync();
     return () => {
