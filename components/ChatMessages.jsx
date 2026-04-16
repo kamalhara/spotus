@@ -77,6 +77,7 @@ export default function ChatMessages({
   currentUserId,
   chatDocId,
   uploadingImageUri,
+  collectionName = "chats",
 }) {
   const flatListRef = useRef(null);
   const [reactionPicker, setReactionPicker] = useState(null);
@@ -340,6 +341,7 @@ export default function ChatMessages({
               const newEmoji = currentReaction === emoji ? "" : emoji;
 
               toggleReaction(
+                collectionName,
                 chatDocId,
                 reactionPicker.messageId,
                 currentUserId,

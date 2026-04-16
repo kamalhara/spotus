@@ -280,6 +280,7 @@ export default function RoomChat() {
           currentUserId={currentUserId}
           chatDocId={roomId}
           uploadingImageUri={uploadingImageUri}
+          collectionName="rooms"
         />
       </View>
 

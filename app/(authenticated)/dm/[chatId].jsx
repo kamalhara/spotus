@@ -104,7 +104,7 @@ export default function ChatId() {
         user: firestoreUser?.userName || "Unknown",
         createdAt: serverTimestamp(),
         seenBy: [currentUserId],
-        reactions: [],
+        reactions: {},
       });
       // Update the chat's last activity and message preview
       await setDoc(
@@ -217,6 +217,7 @@ export default function ChatId() {
             currentUserId={currentUserId}
             chatDocId={chatDocId}
             uploadingImageUri={uploadingImageUri}
+            collectionName="chats"
           />
         </View>
 
