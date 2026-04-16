@@ -2,8 +2,10 @@ import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
 import useFirestoreUser from "../hook/useFireStoreUser";
+import usePresenceStatus from "../hook/usePresenceStatus";
 import useTypingIndicator from "../hook/useTypingIndicator";
 import { isChatUnseen } from "../lib/chatSeen";
+import { getStatus } from "../lib/getStatus";
 
 function formatTime(timestamp) {
   if (!timestamp) return "";
@@ -49,6 +51,7 @@ export default function ChatRow({ chat, onPress }) {
   const { firestoreUser } = useFirestoreUser();
   const currentUserId = firestoreUser?.id;
   const isTyping = useTypingIndicator(chat.id, currentUserId);
+  const userStatus = usePresenceStatus(otherUser?.lastSeen);
 
   const isUnread = isChatUnseen(chat, currentUserId);
 
@@ -69,7 +72,13 @@ export default function ChatRow({ chat, onPress }) {
             className="rounded-[22px] bg-gray-100 border border-gray-50"
             style={{ width: 60, height: 60 }}
           />
-          <View className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-[3px] border-white z-10 shadow-sm shadow-green-100" />
+          <View
+            className={`absolute -bottom-1 -right-1 w-5 h-5 ${
+              userStatus === "Active now"
+                ? "bg-green-400"
+                : "bg-gray-400"
+            } rounded-full border-[3px] border-white z-10 shadow-sm shadow-green-100`}
+          />
         </View>
 
         <View className="flex-1 ml-4 justify-center">

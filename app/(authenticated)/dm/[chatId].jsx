@@ -25,8 +25,10 @@ import ChatMessages from "../../../components/ChatMessages";
 import MessageSender from "../../../components/MessageSender";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import usePresenceStatus from "../../../hook/usePresenceStatus";
 import useTypingIndicator from "../../../hook/useTypingIndicator";
 import { ChatSeen } from "../../../lib/chatSeen";
+import { getStatus } from "../../../lib/getStatus";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
 export default function ChatId() {
@@ -35,6 +37,7 @@ export default function ChatId() {
   const { firestoreUser } = useFirestoreUser();
   const currentUserId = firestoreUser?.id;
   const [messages, setMessages] = useState([]);
+  const [otherUser, setOtherUser] = useState(null);
   const [uploadingImageUri, setUploadingImageUri] = useState(null);
 
   // Deterministic chat doc ID so both users share the same conversation
@@ -44,6 +47,7 @@ export default function ChatId() {
   }, [currentUserId, chatId]);
 
   const isTyping = useTypingIndicator(chatDocId, currentUserId);
+  const userStatus = usePresenceStatus(otherUser?.lastSeen);
 
   // Create or merge the chat document
   useEffect(() => {
@@ -76,6 +80,16 @@ export default function ChatId() {
 
     createChat();
   }, [chatDocId, currentUserId, chatId]);
+
+  useEffect(() => {
+    if (!chatId) return;
+
+    const unsub = onSnapshot(doc(db, "users", chatId), (snap) => {
+      setOtherUser(snap.data());
+    });
+
+    return unsub;
+  }, [chatId, currentUserId]);
 
   // Listen to messages
   useEffect(() => {
@@ -198,8 +212,16 @@ export default function ChatId() {
                   </Text>
                 ) : (
                   <>
-                    <View className="w-1.5 h-1.5 bg-green-400 rounded-full mr-1" />
-                    <Text className="text-gray-400 text-xs">Active now</Text>
+                    <View
+                      className={`w-1.5 h-1.5 ${
+                        userStatus === "Active now"
+                          ? "bg-green-400"
+                          : "bg-gray-400"
+                      } rounded-full mr-1`}
+                    />
+                    <Text className="text-gray-400 text-xs">
+                      {userStatus}
+                    </Text>
                   </>
                 )}
               </View>
