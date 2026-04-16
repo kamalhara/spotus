@@ -43,7 +43,12 @@ const MEDIA_OPTIONS = [
   },
 ];
 
-export default function MessageSender({ handleSend, chatId, currentUserId }) {
+export default function MessageSender({
+  handleSend,
+  chatId,
+  currentUserId,
+  handleSendImage,
+}) {
   const [message, setMessage] = useState("");
   const [showMediaMenu, setShowMediaMenu] = useState(false);
 
@@ -107,15 +112,14 @@ export default function MessageSender({ handleSend, chatId, currentUserId }) {
       }
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ["images"],
-        allowsEditing: true,
-        aspect: [4, 3],
+
         quality: 1,
       });
 
-      console.log(result);
-
       if (!result.canceled) {
-        setImage(result.assets[0].uri);
+        const uri = result.assets[0].uri;
+        setShowMediaMenu(false);
+        handleSendImage(uri);
       }
     };
 

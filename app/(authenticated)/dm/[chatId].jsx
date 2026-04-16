@@ -27,6 +27,7 @@ import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import useTypingIndicator from "../../../hook/useTypingIndicator";
 import { ChatSeen } from "../../../lib/chatSeen";
+import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
 export default function ChatId() {
   const { chatId, userName, profilePic } = useLocalSearchParams();
@@ -119,6 +120,36 @@ export default function ChatId() {
       console.error("Error sending DM:", err);
     }
   };
+  const handleSendImage = async (uri) => {
+    if (!uri) return;
+
+    try {
+      const imageUrl = await uploadToCloudinary(uri);
+      if (!imageUrl) return;
+
+      await addDoc(collection(db, "chats", chatDocId, "messages"), {
+        type: "image",
+        imageUrl,
+        senderId: currentUserId,
+        user: firestoreUser?.userName || "Unknown",
+        createdAt: serverTimestamp(),
+        seenBy: [currentUserId],
+      });
+      await setDoc(
+        doc(db, "chats", chatDocId),
+        {
+          updatedAt: serverTimestamp(),
+          lastMessage: "📷 Photo",
+          lastMessageAt: serverTimestamp(),
+          lastMessageSenderId: currentUserId,
+          lastMessageSeenBy: [currentUserId],
+        },
+        { merge: true },
+      );
+    } catch (err) {
+      console.error("Error sending Image", err);
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
@@ -186,6 +217,7 @@ export default function ChatId() {
             handleSend={handleSend}
             chatId={chatDocId}
             currentUserId={currentUserId}
+            handleSendImage={handleSendImage}
           />
         </View>
       </KeyboardAvoidingView>

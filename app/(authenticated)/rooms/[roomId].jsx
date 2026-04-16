@@ -27,8 +27,9 @@ import MessageSender from "../../../components/MessageSender";
 import RoomDetailsSheet from "../../../components/RoomDetailsSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
-import { updateTrustOnMessage } from "../../../lib/trust";
 import { RoomSeen } from "../../../lib/chatSeen";
+import { updateTrustOnMessage } from "../../../lib/trust";
+import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
 const CATEGORY_ICONS = {
   Music: "musical-notes",
@@ -105,12 +106,19 @@ export default function RoomChat() {
         const profiles = [];
         for (const uid of room.participants) {
           const userDoc = await getDoc(doc(db, "users", uid));
-          if (userDoc.exists()) profiles.push({ id: userDoc.id, ...userDoc.data() });
+          if (userDoc.exists())
+            profiles.push({ id: userDoc.id, ...userDoc.data() });
         }
-        const trustSnap = await getDocs(collection(db, "rooms", roomId, "trust"));
+        const trustSnap = await getDocs(
+          collection(db, "rooms", roomId, "trust"),
+        );
         const trustMap = {};
-        trustSnap.forEach((d) => { trustMap[d.id] = d.data().messagesCount || 0; });
-        setMembers(profiles.map((p) => ({ ...p, trustScore: trustMap[p.id] || 0 })));
+        trustSnap.forEach((d) => {
+          trustMap[d.id] = d.data().messagesCount || 0;
+        });
+        setMembers(
+          profiles.map((p) => ({ ...p, trustScore: trustMap[p.id] || 0 })),
+        );
       } catch (error) {
         console.error("Error fetching member data:", error);
       }
@@ -144,8 +152,32 @@ export default function RoomChat() {
     }
   };
 
-  const trustColor =
-    trust < 3 ? "#EF4444" : trust < 7 ? "#F59E0B" : "#10B981";
+  const handleSendImage = async (uri) => {
+    if (!uri || !roomId) return;
+
+    try {
+      const imageUrl = await uploadToCloudinary(uri);
+
+      await addDoc(collection(db, "rooms", roomId, "messages"), {
+        type: "image",
+        imageUrl,
+        senderId: currentUserId,
+        user: user?.userName || "Unknown",
+        createdAt: serverTimestamp(),
+        seenBy: [currentUserId],
+      });
+
+      await updateDoc(doc(db, "rooms", roomId), {
+        lastMessage: "📷 Photo",
+        lastMessageAt: serverTimestamp(),
+        lastMessageSenderId: currentUserId,
+        lastMessageSeenBy: [currentUserId],
+      });
+    } catch (err) {
+      console.error("Room image send error:", err);
+    }
+  };
+  const trustColor = trust < 3 ? "#EF4444" : trust < 7 ? "#F59E0B" : "#10B981";
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
 
   return (
@@ -177,7 +209,12 @@ export default function RoomChat() {
                   {room?.title || "Loading..."}
                 </Text>
                 <View className="flex-row items-center mt-0.5">
-                  <Ionicons name={categoryIcon} size={10} color="#9CA3AF" style={{ marginRight: 4 }} />
+                  <Ionicons
+                    name={categoryIcon}
+                    size={10}
+                    color="#9CA3AF"
+                    style={{ marginRight: 4 }}
+                  />
                   <Text className="text-gray-400 text-xs">
                     {room?.participants?.length || 0} members
                   </Text>
@@ -198,12 +235,19 @@ export default function RoomChat() {
           <View className="bg-white px-4 py-3 rounded-xl border border-gray-100">
             <View className="flex-row items-center justify-between mb-2">
               <View className="flex-row items-center">
-                <Ionicons name="shield-checkmark-outline" size={14} color={trustColor} />
+                <Ionicons
+                  name="shield-checkmark-outline"
+                  size={14}
+                  color={trustColor}
+                />
                 <Text className="text-gray-500 text-xs font-medium ml-1.5">
                   Trust
                 </Text>
               </View>
-              <Text className="text-xs font-semibold" style={{ color: trustColor }}>
+              <Text
+                className="text-xs font-semibold"
+                style={{ color: trustColor }}
+              >
                 {trust}/10
               </Text>
             </View>
@@ -222,11 +266,20 @@ export default function RoomChat() {
       )}
 
       <View className="flex-1">
-        <ChatMessages messages={messages} currentUserId={currentUserId} chatDocId={roomId} />
+        <ChatMessages
+          messages={messages}
+          currentUserId={currentUserId}
+          chatDocId={roomId}
+        />
       </View>
 
       <View className="px-5 py-3 flex items-center pb-6">
-        <MessageSender handleSend={handleSend} chatId={roomId} currentUserId={currentUserId} />
+        <MessageSender
+          handleSend={handleSend}
+          chatId={roomId}
+          currentUserId={currentUserId}
+          handleSendImage={handleSendImage}
+        />
       </View>
 
       <RoomDetailsSheet

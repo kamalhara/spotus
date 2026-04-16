@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Image, Text, View } from "react-native";
 import useTypingIndicator from "../hook/useTypingIndicator";
 import TypingIndicator from "./TypingIndicator";
 
@@ -107,11 +107,18 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
                 : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm shadow-gray-200"
             }`}
           >
-            <Text
-              className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"} pb-3.5`}
-            >
-              {item.text}
-            </Text>
+            {item.imageUrl ? (
+              <Image
+                source={{ uri: item.imageUrl }}
+                className="w-48 h-48 rounded-lg"
+              />
+            ) : (
+              <Text
+                className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"} pb-3.5`}
+              >
+                {item.text}
+              </Text>
+            )}
 
             <View className="absolute bottom-1.5 right-2.5 flex-row items-center">
               <Text
@@ -126,7 +133,11 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
                       item.seenBy?.length > 1 ? "checkmark-done" : "checkmark"
                     }
                     size={13}
-                    color={item.seenBy?.length > 1 ? "#93C5FD" : "rgba(255,255,255,0.55)"}
+                    color={
+                      item.seenBy?.length > 1
+                        ? "#93C5FD"
+                        : "rgba(255,255,255,0.55)"
+                    }
                   />
                 </View>
               )}
