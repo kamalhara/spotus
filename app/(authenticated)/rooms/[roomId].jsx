@@ -137,6 +137,7 @@ export default function RoomChat() {
         user: user?.userName || "Unknown",
         createdAt: serverTimestamp(),
         seenBy: [currentUserId],
+        reactions: {},
       });
 
       // Sync the parent room document with last message metadata

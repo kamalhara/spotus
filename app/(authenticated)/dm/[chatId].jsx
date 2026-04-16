@@ -104,6 +104,7 @@ export default function ChatId() {
         user: firestoreUser?.userName || "Unknown",
         createdAt: serverTimestamp(),
         seenBy: [currentUserId],
+        reactions: [],
       });
       // Update the chat's last activity and message preview
       await setDoc(

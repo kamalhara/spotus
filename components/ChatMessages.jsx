@@ -1,7 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useRef } from "react";
-import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import useTypingIndicator from "../hook/useTypingIndicator";
+import { toggleReaction } from "../lib/reactions";
+import ReactionPicker from "./ReactionPicker";
 import TypingIndicator from "./TypingIndicator";
 
 const COLORS = [
@@ -70,6 +79,7 @@ export default function ChatMessages({
   uploadingImageUri,
 }) {
   const flatListRef = useRef(null);
+  const [reactionPicker, setReactionPicker] = useState(null);
 
   const isTyping = useTypingIndicator(chatDocId, currentUserId);
 
@@ -96,6 +106,37 @@ export default function ChatMessages({
     );
   }
 
+  const ReactionDisplay = ({ reactions, isSentByMe }) => {
+    if (!reactions || Object.keys(reactions).length === 0) return null;
+
+    const emojiCounts = {};
+    Object.values(reactions).forEach((emoji) => {
+      if (emoji) {
+        emojiCounts[emoji] = (emojiCounts[emoji] || 0) + 1;
+      }
+    });
+
+    const uniqueEmojis = Object.keys(emojiCounts);
+    const totalCount = Object.values(emojiCounts).reduce((a, b) => a + b, 0);
+
+    return (
+      <View
+        className={`absolute -bottom-5 ${isSentByMe ? "right-1" : "left-0"} flex-row items-center bg-gray-200 border border-gray-100 rounded-full px-2 py-0.5 h-7`}
+        style={{ elevation: 4, zIndex: 20 }}
+      >
+        <Text className="text-[13px] leading-tight">
+          {uniqueEmojis.slice(0, 3).join("")}
+          {totalCount > 1 ? (
+            <Text className="text-[10px] text-gray-500 font-bold ml-1">
+              {" "}
+              {totalCount}
+            </Text>
+          ) : null}
+        </Text>
+      </View>
+    );
+  };
+
   const renderMessage = ({ item, index }) => {
     const isSentByMe = item.senderId === currentUserId;
     const prevItem = index > 0 ? messages[index - 1] : null;
@@ -109,6 +150,10 @@ export default function ChatMessages({
 
     const addTopMargin =
       !prevItem || prevItem.senderId !== item.senderId || showDateSeparator;
+
+    const hasReactions =
+      item.reactions &&
+      Object.values(item.reactions).filter((r) => !!r).length > 0;
 
     return (
       <View className="w-full">
@@ -124,7 +169,7 @@ export default function ChatMessages({
           </View>
         )}
         <View
-          className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-0.5"} px-3`}
+          className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-0.5"} ${hasReactions ? "mb-5" : ""} px-3`}
         >
           {!isSentByMe && (
             <View className="w-8 mr-2 flex justify-end pb-1">
@@ -151,8 +196,19 @@ export default function ChatMessages({
               </Text>
             )}
 
-            <View
-              className={`min-w-[72px] shadow-sm overflow-hidden ${
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onLongPress={(event) => {
+                const { pageX, pageY } = event.nativeEvent;
+                const currentReaction = item.reactions?.[currentUserId] || null;
+                setReactionPicker({
+                  messageId: item.id,
+                  x: pageX,
+                  y: pageY,
+                  currentReaction,
+                });
+              }}
+              className={`min-w-[72px] shadow-sm ${
                 item.imageUrl ? "" : "px-3.5 py-2"
               } ${
                 isSentByMe
@@ -213,7 +269,11 @@ export default function ChatMessages({
                   </View>
                 )}
               </View>
-            </View>
+              <ReactionDisplay
+                reactions={item.reactions}
+                isSentByMe={isSentByMe}
+              />
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -267,6 +327,29 @@ export default function ChatMessages({
           )}
           {isTyping ? <TypingIndicator /> : <View className="h-2" />}
         </View>
+      }
+      ListHeaderComponent={
+        <ReactionPicker
+          isVisible={!!reactionPicker}
+          onClose={() => setReactionPicker(null)}
+          onSelect={(emoji) => {
+            if (reactionPicker?.messageId) {
+              const currentReaction = reactionPicker.currentReaction;
+
+              // Toggle: if same emoji, remove it
+              const newEmoji = currentReaction === emoji ? "" : emoji;
+
+              toggleReaction(
+                chatDocId,
+                reactionPicker.messageId,
+                currentUserId,
+                newEmoji,
+              );
+            }
+          }}
+          position={{ x: reactionPicker?.x, y: reactionPicker?.y }}
+          currentReaction={reactionPicker?.currentReaction}
+        />
       }
     />
   );
