@@ -23,6 +23,34 @@ function getUserColor(username) {
   return COLORS[Math.abs(hash) % COLORS.length];
 }
 
+function isSameDay(t1, t2) {
+  if (!t1 || !t2) return false;
+  const d1 = t1.toDate ? t1.toDate() : new Date(t1);
+  const d2 = t2.toDate ? t2.toDate() : new Date(t2);
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
+}
+
+function formatSeparatorDate(timestamp) {
+  if (!timestamp) return "";
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  const now = new Date();
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+
+  if (isSameDay(date, now)) return "Today";
+  if (isSameDay(date, yesterday)) return "Yesterday";
+
+  return date.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 function formatTime(timestamp) {
   if (!timestamp) return "";
   const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -70,102 +98,121 @@ export default function ChatMessages({
 
   const renderMessage = ({ item, index }) => {
     const isSentByMe = item.senderId === currentUserId;
+    const prevItem = index > 0 ? messages[index - 1] : null;
+
+    const showDateSeparator =
+      !prevItem || !isSameDay(prevItem.createdAt, item.createdAt);
+
     const showAvatarAndName =
       !isSentByMe &&
-      (index === 0 || messages[index - 1].senderId !== item.senderId);
+      (!prevItem || prevItem.senderId !== item.senderId || showDateSeparator);
+
     const addTopMargin =
-      index === 0 || messages[index - 1].senderId !== item.senderId;
+      !prevItem || prevItem.senderId !== item.senderId || showDateSeparator;
 
     return (
-      <View
-        className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-0.5"} px-3`}
-      >
-        {!isSentByMe && (
-          <View className="w-8 mr-2 flex justify-end pb-1">
-            {showAvatarAndName ? (
-              <View
-                className="w-7 h-7 rounded-full items-center justify-center shadow-sm"
-                style={{ backgroundColor: getUserColor(item.user) }}
-              >
-                <Text className="text-white text-[11px] font-bold">
-                  {item.user ? item.user.charAt(0).toUpperCase() : "?"}
-                </Text>
-              </View>
-            ) : (
-              <View className="w-7 h-7" />
-            )}
+      <View className="w-full">
+        {showDateSeparator && (
+          <View className="items-center my-6 flex-row justify-center px-10">
+            <View className="h-[1px] bg-gray-100 flex-1" />
+            <View className="bg-white border border-gray-300 px-4 py-1.5 rounded-full mx-4">
+              <Text className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                {formatSeparatorDate(item.createdAt)}
+              </Text>
+            </View>
+            <View className="h-[1px] bg-gray-100 flex-1" />
           </View>
         )}
         <View
-          className={`max-w-[78%] flex-col ${isSentByMe ? "items-end" : "items-start"}`}
+          className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-0.5"} px-3`}
         >
-          {showAvatarAndName && (
-            <Text className="text-muted text-[10px] font-semibold mb-1 ml-1 uppercase tracking-wide">
-              {item.user || "Unknown"}
-            </Text>
+          {!isSentByMe && (
+            <View className="w-8 mr-2 flex justify-end pb-1">
+              {showAvatarAndName ? (
+                <View
+                  className="w-7 h-7 rounded-full items-center justify-center shadow-sm"
+                  style={{ backgroundColor: getUserColor(item.user) }}
+                >
+                  <Text className="text-white text-[11px] font-bold">
+                    {item.user ? item.user.charAt(0).toUpperCase() : "?"}
+                  </Text>
+                </View>
+              ) : (
+                <View className="w-7 h-7" />
+              )}
+            </View>
           )}
-
           <View
-            className={`min-w-[72px] shadow-sm overflow-hidden ${
-              item.imageUrl ? "" : "px-3.5 py-2"
-            } ${
-              isSentByMe
-                ? "bg-primary rounded-2xl rounded-br-sm shadow-primary/20"
-                : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm shadow-gray-200"
-            }`}
+            className={`max-w-[78%] flex-col ${isSentByMe ? "items-end" : "items-start"}`}
           >
-            {item.imageUrl ? (
-              <Image
-                source={{ uri: item.imageUrl }}
-                className={`w-56 h-56 ${
-                  isSentByMe
-                    ? "rounded-2xl rounded-br-sm"
-                    : "rounded-2xl rounded-bl-sm"
-                }`}
-              />
-            ) : (
-              <Text
-                className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"} pb-3.5`}
-              >
-                {item.text}
+            {showAvatarAndName && (
+              <Text className="text-muted text-[10px] font-semibold mb-1 ml-1 uppercase tracking-wide">
+                {item.user || "Unknown"}
               </Text>
             )}
 
             <View
-              className={`${
-                item.imageUrl
-                  ? "absolute bottom-2 right-2 bg-black/30 px-2 py-0.5 rounded-full border border-white/10"
-                  : "absolute bottom-1.5 right-2.5"
-              } flex-row items-center`}
+              className={`min-w-[72px] shadow-sm overflow-hidden ${
+                item.imageUrl ? "" : "px-3.5 py-2"
+              } ${
+                isSentByMe
+                  ? "bg-primary rounded-2xl rounded-br-sm shadow-primary/20"
+                  : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm shadow-gray-200"
+              }`}
             >
-              <Text
-                className={`text-[9px] font-medium ${
-                  item.imageUrl
-                    ? "text-white"
-                    : isSentByMe
-                      ? "text-white/60"
-                      : "text-gray-400"
-                }`}
-              >
-                {formatTime(item.createdAt)}
-              </Text>
-              {isSentByMe && (
-                <View className="ml-1">
-                  <Ionicons
-                    name={
-                      item.seenBy?.length > 1 ? "checkmark-done" : "checkmark"
-                    }
-                    size={13}
-                    color={
-                      item.seenBy?.length > 1
-                        ? "#93C5FD"
-                        : item.imageUrl
-                          ? "rgba(255,255,255,0.8)"
-                          : "rgba(255,255,255,0.55)"
-                    }
-                  />
-                </View>
+              {item.imageUrl ? (
+                <Image
+                  source={{ uri: item.imageUrl }}
+                  className={`w-56 h-56 ${
+                    isSentByMe
+                      ? "rounded-2xl rounded-br-sm"
+                      : "rounded-2xl rounded-bl-sm"
+                  }`}
+                />
+              ) : (
+                <Text
+                  className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"} pb-3.5`}
+                >
+                  {item.text}
+                </Text>
               )}
+
+              <View
+                className={`${
+                  item.imageUrl
+                    ? "absolute bottom-2 right-2 bg-black/30 px-2 py-0.5 rounded-full border border-white/10"
+                    : "absolute bottom-1.5 right-2.5"
+                } flex-row items-center`}
+              >
+                <Text
+                  className={`text-[9px] font-medium ${
+                    item.imageUrl
+                      ? "text-white"
+                      : isSentByMe
+                        ? "text-white/60"
+                        : "text-gray-400"
+                  }`}
+                >
+                  {formatTime(item.createdAt)}
+                </Text>
+                {isSentByMe && (
+                  <View className="ml-1">
+                    <Ionicons
+                      name={
+                        item.seenBy?.length > 1 ? "checkmark-done" : "checkmark"
+                      }
+                      size={13}
+                      color={
+                        item.seenBy?.length > 1
+                          ? "#93C5FD"
+                          : item.imageUrl
+                            ? "rgba(255,255,255,0.8)"
+                            : "rgba(255,255,255,0.55)"
+                      }
+                    />
+                  </View>
+                )}
+              </View>
             </View>
           </View>
         </View>
@@ -180,6 +227,7 @@ export default function ChatMessages({
       renderItem={renderMessage}
       keyExtractor={(item, index) => item.id?.toString() || index.toString()}
       showsVerticalScrollIndicator={false}
+      initialNumToRender={10}
       contentContainerClassName="py-4 px-1"
       onContentSizeChange={() => {
         setTimeout(
