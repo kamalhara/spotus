@@ -57,8 +57,6 @@ export default function MessageSender({
   const typingTimeout = useRef(null);
   const isTypingLocal = useRef(false);
 
-  const [image, setImage] = useState(null);
-
   const toggleMediaMenu = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setShowMediaMenu((prev) => !prev);
