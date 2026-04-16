@@ -35,6 +35,7 @@ export default function ChatId() {
   const { firestoreUser } = useFirestoreUser();
   const currentUserId = firestoreUser?.id;
   const [messages, setMessages] = useState([]);
+  const [uploadingImageUri, setUploadingImageUri] = useState(null);
 
   // Deterministic chat doc ID so both users share the same conversation
   const chatDocId = useMemo(() => {
@@ -122,10 +123,14 @@ export default function ChatId() {
   };
   const handleSendImage = async (uri) => {
     if (!uri) return;
+    setUploadingImageUri(uri);
 
     try {
       const imageUrl = await uploadToCloudinary(uri);
-      if (!imageUrl) return;
+      if (!imageUrl) {
+        setUploadingImageUri(null);
+        return;
+      }
 
       await addDoc(collection(db, "chats", chatDocId, "messages"), {
         type: "image",
@@ -148,6 +153,8 @@ export default function ChatId() {
       );
     } catch (err) {
       console.error("Error sending Image", err);
+    } finally {
+      setUploadingImageUri(null);
     }
   };
 
@@ -208,6 +215,7 @@ export default function ChatId() {
             messages={messages}
             currentUserId={currentUserId}
             chatDocId={chatDocId}
+            uploadingImageUri={uploadingImageUri}
           />
         </View>
 

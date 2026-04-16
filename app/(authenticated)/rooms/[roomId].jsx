@@ -50,6 +50,7 @@ export default function RoomChat() {
   const [messages, setMessages] = useState([]);
   const [trust, setTrust] = useState(0);
   const [members, setMembers] = useState([]);
+  const [uploadingImageUri, setUploadingImageUri] = useState(null);
 
   const { firestoreUser: user } = useFirestoreUser();
   const currentUserId = user?.id;
@@ -154,9 +155,14 @@ export default function RoomChat() {
 
   const handleSendImage = async (uri) => {
     if (!uri || !roomId) return;
+    setUploadingImageUri(uri);
 
     try {
       const imageUrl = await uploadToCloudinary(uri);
+      if (!imageUrl) {
+        setUploadingImageUri(null);
+        return;
+      }
 
       await addDoc(collection(db, "rooms", roomId, "messages"), {
         type: "image",
@@ -175,6 +181,8 @@ export default function RoomChat() {
       });
     } catch (err) {
       console.error("Room image send error:", err);
+    } finally {
+      setUploadingImageUri(null);
     }
   };
   const trustColor = trust < 3 ? "#EF4444" : trust < 7 ? "#F59E0B" : "#10B981";
@@ -270,6 +278,7 @@ export default function RoomChat() {
           messages={messages}
           currentUserId={currentUserId}
           chatDocId={roomId}
+          uploadingImageUri={uploadingImageUri}
         />
       </View>
 

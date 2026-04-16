@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
-import { FlatList, Image, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, Text, View } from "react-native";
 import useTypingIndicator from "../hook/useTypingIndicator";
 import TypingIndicator from "./TypingIndicator";
 
@@ -35,7 +35,12 @@ function formatTime(timestamp) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export default function ChatMessages({ messages, currentUserId, chatDocId }) {
+export default function ChatMessages({
+  messages,
+  currentUserId,
+  chatDocId,
+  uploadingImageUri,
+}) {
   const flatListRef = useRef(null);
 
   const isTyping = useTypingIndicator(chatDocId, currentUserId);
@@ -101,7 +106,9 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
           )}
 
           <View
-            className={`px-3.5 py-2 min-w-[72px] shadow-sm ${
+            className={`min-w-[72px] shadow-sm overflow-hidden ${
+              item.imageUrl ? "" : "px-3.5 py-2"
+            } ${
               isSentByMe
                 ? "bg-primary rounded-2xl rounded-br-sm shadow-primary/20"
                 : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm shadow-gray-200"
@@ -110,7 +117,11 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
             {item.imageUrl ? (
               <Image
                 source={{ uri: item.imageUrl }}
-                className="w-48 h-48 rounded-lg"
+                className={`w-56 h-56 ${
+                  isSentByMe
+                    ? "rounded-2xl rounded-br-sm"
+                    : "rounded-2xl rounded-bl-sm"
+                }`}
               />
             ) : (
               <Text
@@ -120,9 +131,21 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
               </Text>
             )}
 
-            <View className="absolute bottom-1.5 right-2.5 flex-row items-center">
+            <View
+              className={`${
+                item.imageUrl
+                  ? "absolute bottom-2 right-2 bg-black/30 px-2 py-0.5 rounded-full border border-white/10"
+                  : "absolute bottom-1.5 right-2.5"
+              } flex-row items-center`}
+            >
               <Text
-                className={`text-[9px] font-medium ${isSentByMe ? "text-white/60" : "text-gray-400"}`}
+                className={`text-[9px] font-medium ${
+                  item.imageUrl
+                    ? "text-white"
+                    : isSentByMe
+                      ? "text-white/60"
+                      : "text-gray-400"
+                }`}
               >
                 {formatTime(item.createdAt)}
               </Text>
@@ -136,7 +159,9 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
                     color={
                       item.seenBy?.length > 1
                         ? "#93C5FD"
-                        : "rgba(255,255,255,0.55)"
+                        : item.imageUrl
+                          ? "rgba(255,255,255,0.8)"
+                          : "rgba(255,255,255,0.55)"
                     }
                   />
                 </View>
@@ -169,7 +194,31 @@ export default function ChatMessages({ messages, currentUserId, chatDocId }) {
         );
       }}
       ListFooterComponent={
-        isTyping ? <TypingIndicator /> : <View className="h-2" />
+        <View>
+          {uploadingImageUri && (
+            <View className="w-full flex-row justify-end mt-2 px-3 mb-2">
+              <View className="max-w-[78%] items-end">
+                <View className="bg-primary/20 rounded-2xl rounded-br-sm overflow-hidden border border-primary/20 shadow-sm">
+                  <View className="relative">
+                    <Image
+                      source={{ uri: uploadingImageUri }}
+                      className="w-56 h-56 opacity-50"
+                    />
+                    <View className="absolute inset-0 items-center justify-center bg-black/10">
+                      <View className="bg-white/90 p-3 rounded-2xl items-center shadow-xl">
+                        <ActivityIndicator color="#4F46E5" size="small" />
+                        <Text className="text-[10px] font-bold text-primary mt-2 tracking-widest">
+                          SENDING...
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          )}
+          {isTyping ? <TypingIndicator /> : <View className="h-2" />}
+        </View>
       }
     />
   );
