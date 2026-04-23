@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -96,11 +97,13 @@ export default function ChatMessages({
   if (!messages || messages.length === 0) {
     return (
       <View className="flex-1 items-center justify-center px-10">
-        <Ionicons name="chatbubble-outline" size={32} color="#D1D5DB" />
-        <Text className="text-secondary text-base font-semibold mt-3">
+        <View className="w-16 h-16 bg-primary/5 rounded-3xl items-center justify-center mb-4">
+          <Ionicons name="chatbubble-outline" size={28} color="#818CF8" />
+        </View>
+        <Text className="text-secondary text-base font-semibold mt-1">
           Start the conversation
         </Text>
-        <Text className="text-gray-400 text-sm text-center mt-1">
+        <Text className="text-gray-400 text-sm text-center mt-1.5 leading-5">
           Be the first to say something.
         </Text>
       </View>
@@ -122,8 +125,15 @@ export default function ChatMessages({
 
     return (
       <View
-        className={`absolute -bottom-5 ${isSentByMe ? "right-1" : "left-0"} flex-row items-center bg-gray-200 border border-gray-100 rounded-full px-2 py-0.5 h-7`}
-        style={{ elevation: 4, zIndex: 20 }}
+        className={`absolute -bottom-5 ${isSentByMe ? "right-1" : "left-0"} flex-row items-center bg-white border border-gray-100 rounded-full px-2 py-0.5 h-7`}
+        style={{
+          elevation: 4,
+          zIndex: 20,
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.08,
+          shadowRadius: 4,
+        }}
       >
         <Text className="text-[13px] leading-tight">
           {uniqueEmojis.slice(0, 3).join("")}
@@ -161,7 +171,7 @@ export default function ChatMessages({
         {showDateSeparator && (
           <View className="items-center my-6 flex-row justify-center px-10">
             <View className="h-[1px] bg-gray-100 flex-1" />
-            <View className="bg-white border border-gray-300 px-4 py-1.5 rounded-full mx-4">
+            <View className="bg-white border border-gray-200 px-4 py-1.5 rounded-full mx-4 shadow-sm shadow-gray-100">
               <Text className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
                 {formatSeparatorDate(item.createdAt)}
               </Text>
@@ -176,8 +186,14 @@ export default function ChatMessages({
             <View className="w-8 mr-2 flex justify-end pb-1">
               {showAvatarAndName ? (
                 <View
-                  className="w-7 h-7 rounded-full items-center justify-center shadow-sm"
-                  style={{ backgroundColor: getUserColor(item.user) }}
+                  className="w-7 h-7 rounded-full items-center justify-center"
+                  style={{
+                    backgroundColor: getUserColor(item.user),
+                    shadowColor: getUserColor(item.user),
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 4,
+                  }}
                 >
                   <Text className="text-white text-[11px] font-bold">
                     {item.user ? item.user.charAt(0).toUpperCase() : "?"}
@@ -209,14 +225,49 @@ export default function ChatMessages({
                   currentReaction,
                 });
               }}
-              className={`min-w-[72px] shadow-sm ${
+              className={`min-w-[72px] ${
                 item.imageUrl ? "" : "px-3.5 py-2"
               } ${
                 isSentByMe
-                  ? "bg-primary rounded-2xl rounded-br-sm shadow-primary/20"
-                  : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm shadow-gray-200"
+                  ? "rounded-2xl rounded-br-sm overflow-hidden"
+                  : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm"
               }`}
+              style={
+                !isSentByMe
+                  ? {
+                      shadowColor: "#94A3B8",
+                      shadowOffset: { width: 0, height: 1 },
+                      shadowOpacity: 0.06,
+                      shadowRadius: 4,
+                      elevation: 1,
+                    }
+                  : isSentByMe && !item.imageUrl
+                    ? {
+                        shadowColor: "#4F46E5",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.15,
+                        shadowRadius: 6,
+                        elevation: 3,
+                      }
+                    : {}
+              }
             >
+              {/* Solid background for sent messages */}
+              {isSentByMe && (
+                <View
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: "#4F46E5",
+                    borderRadius: 16,
+                    borderBottomRightRadius: 4,
+                  }}
+                />
+              )}
+
               {item.imageUrl ? (
                 <Image
                   source={{ uri: item.imageUrl }}
@@ -307,21 +358,21 @@ export default function ChatMessages({
           {uploadingImageUri && (
             <View className="w-full flex-row justify-end mt-2 px-3 mb-2">
               <View className="max-w-[78%] items-end">
-                <View className="bg-primary/20 rounded-2xl rounded-br-sm overflow-hidden border border-primary/20 shadow-sm">
-                  <View className="relative">
-                    <Image
-                      source={{ uri: uploadingImageUri }}
-                      className="w-56 h-56 opacity-50"
-                    />
-                    <View className="absolute inset-0 items-center justify-center bg-black/10">
-                      <View className="bg-white/90 p-3 rounded-2xl items-center shadow-xl">
-                        <ActivityIndicator color="#4F46E5" size="small" />
-                        <Text className="text-[10px] font-bold text-primary mt-2 tracking-widest">
-                          SENDING...
-                        </Text>
+                <View className="rounded-2xl rounded-br-sm overflow-hidden border border-primary/20 shadow-sm bg-primary/10">
+                    <View className="relative">
+                      <Image
+                        source={{ uri: uploadingImageUri }}
+                        className="w-56 h-56 opacity-50"
+                      />
+                      <View className="absolute inset-0 items-center justify-center bg-black/10">
+                        <View className="bg-white/90 p-3 rounded-2xl items-center shadow-xl">
+                          <ActivityIndicator color="#4F46E5" size="small" />
+                          <Text className="text-[10px] font-bold text-primary mt-2 tracking-widest">
+                            SENDING...
+                          </Text>
+                        </View>
                       </View>
                     </View>
-                  </View>
                 </View>
               </View>
             </View>

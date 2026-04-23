@@ -147,14 +147,15 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                   activeOpacity={0.7}
                   onPress={() => handleProfilePress(member.id)}
                   key={member.id}
-                  className="flex-row items-center justify-between bg-surface-alt p-3.5 rounded-2xl"
+                  className="flex-row items-center justify-between bg-white p-3.5 rounded-2xl border border-gray-50"
+                  style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}
                 >
                   <View className="flex-row items-center flex-1">
                     <Image
                       source={{
                         uri: member.profilePic || "https://picsum.photos/200",
                       }}
-                      className="w-11 h-11 rounded-xl mr-3.5 border-2 border-white"
+                      className="w-11 h-11 rounded-xl mr-3.5 border-2 border-gray-50"
                     />
                     <View>
                       <Text className="text-secondary font-black text-sm tracking-tight">

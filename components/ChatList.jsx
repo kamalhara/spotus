@@ -1,5 +1,5 @@
 import * as Haptics from "expo-haptics";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
 import useFirestoreUser from "../hook/useFireStoreUser";
 import usePresenceStatus from "../hook/usePresenceStatus";
@@ -28,6 +28,9 @@ export default function ChatRow({ chat, onPress }) {
   const lastMsg = chat?.lastMessage;
   const time = chat?.lastMessageAt ? formatTime(chat.lastMessageAt) : "";
 
+  // Pulsing animation for online status dot
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
       toValue: 0.97,
@@ -54,6 +57,29 @@ export default function ChatRow({ chat, onPress }) {
   const userStatus = usePresenceStatus(otherUser?.lastSeen);
 
   const isUnread = isChatUnseen(chat, currentUserId);
+  const isOnline = userStatus === "Active now";
+
+  // Pulse animation for active users
+  useEffect(() => {
+    if (isOnline) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.3,
+            duration: 1200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 1200,
+            useNativeDriver: true,
+          }),
+        ]),
+      ).start();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [isOnline]);
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
@@ -62,7 +88,28 @@ export default function ChatRow({ chat, onPress }) {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.9}
-        className={`flex-row items-center p-4 border ${isUnread ? "border-indigo-100 bg-indigo-50/30" : "border-gray-100 bg-white"} rounded-3xl shadow-sm shadow-gray-200 mb-3`}
+        className={`flex-row items-center p-4 border rounded-3xl mb-3 ${
+          isUnread
+            ? "border-indigo-100 bg-indigo-50/30"
+            : "border-gray-100 bg-white"
+        }`}
+        style={
+          isUnread
+            ? {
+                shadowColor: "#4F46E5",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 8,
+                elevation: 2,
+              }
+            : {
+                shadowColor: "#94A3B8",
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.04,
+                shadowRadius: 4,
+                elevation: 1,
+              }
+        }
       >
         <View className="relative">
           <Image
@@ -72,12 +119,25 @@ export default function ChatRow({ chat, onPress }) {
             className="rounded-[22px] bg-gray-100 border border-gray-50"
             style={{ width: 60, height: 60 }}
           />
+          {/* Pulse ring behind status dot */}
+          {isOnline && (
+            <Animated.View
+              style={{
+                position: "absolute",
+                bottom: -1,
+                right: -1,
+                width: 20,
+                height: 20,
+                borderRadius: 10,
+                backgroundColor: "rgba(74, 222, 128, 0.3)",
+                transform: [{ scale: pulseAnim }],
+              }}
+            />
+          )}
           <View
             className={`absolute -bottom-1 -right-1 w-5 h-5 ${
-              userStatus === "Active now"
-                ? "bg-green-400"
-                : "bg-gray-400"
-            } rounded-full border-[3px] border-white z-10 shadow-sm shadow-green-100`}
+              isOnline ? "bg-green-400" : "bg-gray-300"
+            } rounded-full border-[3px] border-white z-10`}
           />
         </View>
 

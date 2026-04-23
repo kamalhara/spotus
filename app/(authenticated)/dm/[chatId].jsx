@@ -28,7 +28,7 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 import usePresenceStatus from "../../../hook/usePresenceStatus";
 import useTypingIndicator from "../../../hook/useTypingIndicator";
 import { ChatSeen } from "../../../lib/chatSeen";
-import { getStatus } from "../../../lib/getStatus";
+
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
 export default function ChatId() {
@@ -180,11 +180,14 @@ export default function ChatId() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         {/* Header */}
-        <View className="flex-row items-center justify-between border-b border-gray-100 px-5 pb-3.5 pt-1">
+        <View
+          className="flex-row items-center justify-between border-b border-gray-100 px-5 pb-3.5 pt-1"
+          style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4 }}
+        >
           <View className="flex-row items-center gap-3">
             <TouchableOpacity
               onPress={() => router.back()}
-              className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center"
+              className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center border border-gray-100"
             >
               <Ionicons name="chevron-back" size={20} color="#18181B" />
             </TouchableOpacity>
@@ -227,7 +230,7 @@ export default function ChatId() {
               </View>
             </View>
           </View>
-          <TouchableOpacity className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center">
+          <TouchableOpacity className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center border border-gray-100">
             <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
           </TouchableOpacity>
         </View>
@@ -244,7 +247,7 @@ export default function ChatId() {
         </View>
 
         {/* Input */}
-        <View className="px-5 py-3 pb-5">
+        <View className="px-5 py-3 pb-5 border-t border-gray-50">
           <MessageSender
             handleSend={handleSend}
             chatId={chatDocId}

@@ -2,6 +2,7 @@ import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
+
 import { Redirect, useRouter } from "expo-router";
 import {
   ActivityIndicator,
@@ -81,9 +82,21 @@ export default function Profile() {
         contentContainerStyle={{ paddingBottom: 40 }}
       >
         {/* Profile Header */}
-        <View className="items-center px-6 mt-8 mb-7">
-          <View className="relative">
-            <View className="w-[110px] h-[110px] rounded-full border-4 border-white shadow-lg shadow-gray-200 overflow-hidden bg-gray-100">
+        <View className="items-center px-6 mt-2 mb-7">
+          {/* Background accent */}
+          <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px] bg-indigo-50/50" />
+
+          <View className="relative mt-6">
+            <View
+              className="w-[110px] h-[110px] rounded-full border-4 border-white overflow-hidden bg-gray-100"
+              style={{
+                shadowColor: "#4F46E5",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.15,
+                shadowRadius: 16,
+                elevation: 8,
+              }}
+            >
               <Image
                 source={
                   firestoreUser?.profilePic || "https://picsum.photos/200"
@@ -109,8 +122,8 @@ export default function Profile() {
           </Text>
         </View>
 
-        {/* Stats — with a touch of color */}
-        <View className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-7">
+        {/* Stats — with gradient accent on primary stat */}
+        <View className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-7 shadow-sm shadow-gray-100">
           <View className="items-center flex-1">
             <Text className="text-[22px] font-extrabold text-primary">
               {firestoreUser?.roomsCreated ?? 0}
@@ -134,7 +147,7 @@ export default function Profile() {
         </View>
 
         {/* Menu Groups */}
-        <View className="bg-white mx-6 rounded-2xl border border-gray-100 overflow-hidden">
+        <View className="bg-white mx-6 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
           <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             General
           </Text>
@@ -147,7 +160,7 @@ export default function Profile() {
           <MenuItem icon="shield-checkmark-outline" label="Security" isLast />
         </View>
 
-        <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden">
+        <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
           <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             App
           </Text>
@@ -166,7 +179,7 @@ export default function Profile() {
           />
         </View>
 
-        <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden">
+        <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
           <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             Support
           </Text>

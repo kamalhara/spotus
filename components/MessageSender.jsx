@@ -149,7 +149,16 @@ export default function MessageSender({
       {/* Media Menu Popup */}
       {showMediaMenu && (
         <View className="absolute bottom-[60px] left-0 right-0 z-10">
-          <View className="bg-white rounded-3xl py-5 px-4 mx-1 shadow-lg shadow-black/10 border border-border-light">
+          <View
+            className="bg-white rounded-3xl py-5 px-4 mx-1 border border-gray-100"
+            style={{
+              shadowColor: '#18181B',
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.12,
+              shadowRadius: 24,
+              elevation: 12,
+            }}
+          >
             <View className="flex-row justify-around items-center">
               {MEDIA_OPTIONS.map((option) => (
                 <TouchableOpacity
@@ -208,6 +217,17 @@ export default function MessageSender({
           disabled={!isActive}
           onPress={onSend}
           className={`w-[42px] h-[42px] rounded-full items-center justify-center mr-0.5 ${isActive ? "bg-primary" : "bg-surface-alt"}`}
+          style={
+            isActive
+              ? {
+                  shadowColor: '#4F46E5',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 6,
+                  elevation: 4,
+                }
+              : {}
+          }
         >
           <Ionicons
             name="send"

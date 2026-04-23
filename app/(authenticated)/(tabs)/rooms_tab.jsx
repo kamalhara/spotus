@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { SectionList, Text, TouchableOpacity, View } from "react-native";
@@ -78,16 +79,22 @@ export default function RoomsScreen() {
               <Text className="text-secondary text-lg font-bold">
                 {section.title}
               </Text>
-              <View className="bg-gray-100 px-2 py-0.5 rounded-md">
-                <Text className="text-gray-400 text-xs font-semibold">
+              <View
+                className={`px-2 py-0.5 rounded-md ${section.count > 0 ? "bg-primary" : "bg-gray-100"}`}
+              >
+                <Text
+                  className={`text-xs font-semibold ${section.count > 0 ? "text-white" : "text-gray-400"}`}
+                >
                   {section.count}
                 </Text>
               </View>
             </View>
             {section.isEmpty && (
               <View className="items-center py-10">
-                <Ionicons name={section.emptyIcon} size={32} color="#D1D5DB" />
-                <Text className="text-gray-400 text-sm mt-2.5">
+                <View className="w-14 h-14 bg-white rounded-2xl items-center justify-center mb-3 border border-gray-100 shadow-sm shadow-gray-100">
+                  <Ionicons name={section.emptyIcon} size={28} color="#D1D5DB" />
+                </View>
+                <Text className="text-gray-400 text-sm mt-1">
                   {section.emptyText}
                 </Text>
               </View>

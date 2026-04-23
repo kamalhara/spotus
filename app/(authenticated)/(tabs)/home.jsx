@@ -3,8 +3,8 @@ import Slider from "@react-native-community/slider";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
-import { useCallback, useRef, useState } from "react";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Animated, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/RoomCard";
 import RoomJoinSheet from "../../../components/RoomJoinSheet";
@@ -42,6 +42,33 @@ export default function Home() {
 
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
+
+  // Entrance animations
+  const fadeInHeader = useRef(new Animated.Value(0)).current;
+  const fadeInContent = useRef(new Animated.Value(0)).current;
+  const slideUpContent = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.sequence([
+      Animated.timing(fadeInHeader, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.parallel([
+        Animated.timing(fadeInContent, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideUpContent, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  }, []);
 
   // Sheet Ref
   const bottomSheetModalRef = useRef(null);
@@ -95,7 +122,10 @@ export default function Home() {
     <>
       <SafeAreaView className="bg-bg h-screen px-6">
         {/* Header */}
-        <View className="flex flex-row justify-between items-center my-3">
+        <Animated.View
+          className="flex flex-row justify-between items-center my-3"
+          style={{ opacity: fadeInHeader }}
+        >
           <TouchableOpacity
             onPress={handleProfilePress}
             className="flex-row items-center"
@@ -115,74 +145,110 @@ export default function Home() {
           </View>
           <TouchableOpacity
             onPress={handleNotificationPress}
-            className="w-12 h-12 bg-white rounded-2xl items-center justify-center border border-border-light"
+            className="w-12 h-12 bg-white rounded-2xl items-center justify-center border border-border-light shadow-sm shadow-gray-100"
           >
             <Ionicons name="notifications-outline" size={20} color="#18181B" />
           </TouchableOpacity>
-        </View>
+        </Animated.View>
 
         {/* Greeting + Distance */}
-        <View className="mt-5 mb-1">
+        <Animated.View
+          className="mt-5 mb-1"
+          style={{
+            opacity: fadeInContent,
+            transform: [{ translateY: slideUpContent }],
+          }}
+        >
           <Text className="text-muted text-sm font-bold uppercase tracking-[1.5px]">
             {getGreeting()}
           </Text>
           <Text className="text-secondary text-[28px] font-black tracking-tight mt-1">
             {firstName} 👋
           </Text>
-        </View>
+        </Animated.View>
 
-        {/* Slider Card */}
-        <View className="mt-6 bg-white rounded-3xl px-5 py-5 border border-border-light">
-          <View className="flex-row items-center justify-between mb-3">
-            <Text className="text-secondary text-sm font-bold ml-1">
-              Search Radius
-            </Text>
-            <View className="bg-primary/10 px-3 py-1.5 rounded-xl">
-              <Text className="text-primary text-sm font-black">
-                {distance} mi
-              </Text>
+        {/* Slider Card — elevated */}
+        <Animated.View
+          className="mt-6"
+          style={{
+            opacity: fadeInContent,
+            transform: [{ translateY: slideUpContent }],
+          }}
+        >
+          <View className="bg-white rounded-3xl px-5 py-5 border border-border-light shadow-sm shadow-gray-100">
+            <View className="flex-row items-center justify-between mb-3">
+              <View className="flex-row items-center">
+                <View className="w-7 h-7 bg-primary/10 rounded-lg items-center justify-center mr-2.5">
+                  <Ionicons name="locate" size={14} color="#4F46E5" />
+                </View>
+                <Text className="text-secondary text-sm font-bold">
+                  Search Radius
+                </Text>
+              </View>
+              <View className="bg-primary px-3 py-1.5 rounded-xl">
+                <Text className="text-white text-sm font-black">
+                  {distance} mi
+                </Text>
+              </View>
+            </View>
+            <Slider
+              style={{ width: "100%", height: 40 }}
+              minimumValue={1}
+              maximumValue={25}
+              step={1}
+              value={distance}
+              onValueChange={setDistance}
+              minimumTrackTintColor="#4F46E5"
+              maximumTrackTintColor="#E2E8F0"
+              thumbTintColor="#4F46E5"
+            />
+            <View className="flex flex-row justify-between mt-1">
+              <Text className="text-muted text-xs font-semibold">1 mile</Text>
+              <Text className="text-muted text-xs font-semibold">25 miles</Text>
             </View>
           </View>
-          <Slider
-            style={{ width: "100%", height: 40 }}
-            minimumValue={1}
-            maximumValue={25}
-            step={1}
-            value={distance}
-            onValueChange={setDistance}
-            minimumTrackTintColor="#4F46E5"
-            maximumTrackTintColor="#E2E8F0"
-            thumbTintColor="#4F46E5"
-          />
-          <View className="flex flex-row justify-between mt-1">
-            <Text className="text-muted text-xs font-semibold">1 mile</Text>
-            <Text className="text-muted text-xs font-semibold">25 miles</Text>
-          </View>
-        </View>
+        </Animated.View>
 
         {/* Create Room CTA */}
-        <TouchableOpacity
-          onPress={handleCreateRoom}
-          activeOpacity={0.9}
-          className="mt-7 bg-primary py-5 px-6 rounded-3xl flex-row items-center shadow-lg shadow-indigo-200"
+        <Animated.View
+          className="mt-7"
+          style={{
+            opacity: fadeInContent,
+            transform: [{ translateY: slideUpContent }],
+          }}
         >
-          <View className="w-12 h-12 bg-white/20 rounded-2xl items-center justify-center mr-4">
-            <Ionicons name="add" size={24} color="white" />
-          </View>
-          <View className="flex-1">
-            <Text className="text-white font-black text-lg tracking-tight">
-              Create a Room
-            </Text>
-            <Text className="text-white/70 text-xs font-semibold mt-0.5">
-              Start your own discovery circle
-            </Text>
-          </View>
-          <Ionicons
-            name="chevron-forward"
-            size={20}
-            color="rgba(255,255,255,0.6)"
-          />
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleCreateRoom}
+            activeOpacity={0.9}
+            className="bg-primary py-5 px-6 rounded-3xl flex-row items-center"
+            style={{
+              shadowColor: "#4F46E5",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.2,
+              shadowRadius: 12,
+              elevation: 6,
+            }}
+          >
+            <View className="w-12 h-12 bg-white/20 rounded-2xl items-center justify-center mr-4">
+              <Ionicons name="add" size={24} color="white" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-white font-black text-lg tracking-tight">
+                Create a Room
+              </Text>
+              <Text className="text-white/70 text-xs font-semibold mt-0.5">
+                Start your own discovery circle
+              </Text>
+            </View>
+            <View className="w-8 h-8 bg-white/15 rounded-xl items-center justify-center">
+              <Ionicons
+                name="chevron-forward"
+                size={16}
+                color="rgba(255,255,255,0.8)"
+              />
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
 
         {/* Nearby Rooms Section */}
         <View className="mt-8 mb-2">
@@ -192,8 +258,8 @@ export default function Home() {
                 Nearby Rooms
               </Text>
               {nearbyRooms.length > 0 && (
-                <View className="bg-primary/10 px-2.5 py-1 rounded-lg">
-                  <Text className="text-primary text-[11px] font-black">
+                <View className="bg-primary px-2.5 py-1 rounded-lg">
+                  <Text className="text-white text-[11px] font-black">
                     {nearbyRooms.length}
                   </Text>
                 </View>

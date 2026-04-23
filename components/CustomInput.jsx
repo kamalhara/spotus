@@ -19,7 +19,7 @@ export default function CustomInput({
     Animated.parallel([
       Animated.timing(borderAnim, {
         toValue: 1,
-        duration: 200,
+        duration: 250,
         useNativeDriver: false,
       }),
       Animated.spring(scaleAnim, {
@@ -54,7 +54,7 @@ export default function CustomInput({
 
   const animatedBgColor = borderAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#FFFFFF", "#F8F7FF"],
+    outputRange: ["#FFFFFF", "#FAFAFF"],
   });
 
   return (
@@ -77,7 +77,9 @@ export default function CustomInput({
           backgroundColor: animatedBgColor,
         }}
       >
-        {icon && <View className="mr-3">{icon}</View>}
+        {icon && (
+          <View className="mr-3 w-6 items-center">{icon}</View>
+        )}
         <TextInput
           className="flex-1 text-secondary text-base font-medium"
           placeholder={placeholder}
@@ -91,9 +93,14 @@ export default function CustomInput({
         />
       </Animated.View>
       {error ? (
-        <Text className="text-danger text-sm mt-1.5 ml-1 font-medium">
-          {error}
-        </Text>
+        <View className="flex-row items-center mt-2 ml-1">
+          <View className="w-4 h-4 bg-danger/10 rounded-full items-center justify-center mr-1.5">
+            <Text className="text-danger text-[9px] font-bold">!</Text>
+          </View>
+          <Text className="text-danger text-sm font-medium">
+            {error}
+          </Text>
+        </View>
       ) : null}
     </Animated.View>
   );

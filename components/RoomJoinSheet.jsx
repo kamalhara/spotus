@@ -141,7 +141,8 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
         </View>
 
         {/* Action Buttons */}
-        <View className="flex-row gap-3.5 justify-between mt-8">
+        <View className="h-px bg-gray-100 mt-6 mb-5" />
+        <View className="flex-row gap-3.5 justify-between">
           <View className="flex-1">
             <CustomButton title="Cancel" type="ghost" onPress={handleDismiss} />
           </View>

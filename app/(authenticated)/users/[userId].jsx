@@ -163,7 +163,16 @@ export default function UserProfile() {
         {/* Avatar + Name */}
         <View className="items-center mt-6 mb-6 px-6">
           <View className="relative">
-            <View className="w-[110px] h-[110px] rounded-full overflow-hidden bg-gray-100 border-4 border-white shadow-lg shadow-gray-200">
+            <View
+              className="w-[110px] h-[110px] rounded-full overflow-hidden bg-gray-100 border-4 border-white"
+              style={{
+                shadowColor: '#4F46E5',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.12,
+                shadowRadius: 16,
+                elevation: 6,
+              }}
+            >
               <Image
                 source={user?.profilePic || "https://picsum.photos/200"}
                 contentFit="cover"
@@ -269,7 +278,10 @@ export default function UserProfile() {
         )}
 
         {/* Stats */}
-        <View className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-6">
+        <View
+          className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-6"
+          style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}
+        >
           <View className="flex-1 items-center">
             <Text className="text-[22px] font-extrabold text-primary">
               {user?.roomsCreated ?? 0}
@@ -337,9 +349,9 @@ export default function UserProfile() {
                 {["Music", "Tech", "Coffee"].map((tag) => (
                   <View
                     key={tag}
-                    className="bg-gray-50 px-2.5 py-1 rounded-lg border border-gray-100"
+                    className="bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100"
                   >
-                    <Text className="text-gray-500 text-xs font-medium">
+                    <Text className="text-gray-600 text-xs font-semibold">
                       {tag}
                     </Text>
                   </View>

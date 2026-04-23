@@ -1,14 +1,15 @@
 import { useAuth, useClerk } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Animated,
+  Keyboard,
   Text,
   TouchableOpacity,
-  View,
   TouchableWithoutFeedback,
-  Keyboard,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../components/CustomButton";
@@ -27,6 +28,25 @@ export default function SignUp() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Entrance animation
+  const fadeIn = useRef(new Animated.Value(0)).current;
+  const slideUp = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeIn, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideUp, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
@@ -82,85 +102,112 @@ export default function SignUp() {
             onPress={() =>
               pendingVerification ? setPendingVerification(false) : router.back()
             }
-            className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center"
+            className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
           >
             <Ionicons name="arrow-back" size={20} color="black" />
           </TouchableOpacity>
         </View>
 
-        <View className="mb-8 mt-8">
-          {/* Step dots — subtle, not flashy */}
-          <View className="flex-row gap-2 mb-6">
-            <View className={`h-1 rounded-full ${pendingVerification ? "bg-gray-200 w-5" : "bg-primary w-7"}`} />
-            <View className={`h-1 rounded-full ${pendingVerification ? "bg-primary w-7" : "bg-gray-200 w-5"}`} />
-          </View>
-
-          <Text className="text-secondary text-[32px] font-bold tracking-tight mb-1">
-            {pendingVerification ? "Verify Email" : "Create\nAccount"}
-          </Text>
-          <Text className="text-gray-400 text-base leading-6 mt-2">
-            {pendingVerification
-              ? `Enter the code sent to ${emailAddress}`
-              : "Join the local discovery circle and connect with people nearby."}
-          </Text>
-        </View>
-
-        {!pendingVerification ? (
-          <View className="gap-6">
-            <CustomInput
-              label="Full Name"
-              placeholder="e.g. Alexandria"
-              value={name}
-              onChangeText={setName}
-              autoCapitalize="words"
-              icon={<Ionicons name="person-outline" size={20} color="#9CA3AF" />}
-            />
-            <CustomInput
-              label="Email Address"
-              placeholder="example@gmail.com"
-              value={emailAddress}
-              onChangeText={setEmailAddress}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
-            />
-            <CustomInput
-              label="Password"
-              placeholder="Create a password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              icon={<Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />}
-            />
-
-            {error ? <Text className="text-red-500 text-sm ml-1">{error}</Text> : null}
-
-            <View className="mt-2">
-              <CustomButton title="Sign Up" onPress={onSignUpPress} loading={loading} />
+        <Animated.View
+          style={{
+            opacity: fadeIn,
+            transform: [{ translateY: slideUp }],
+          }}
+        >
+          <View className="mb-8 mt-8">
+            {/* Progress bar */}
+            <View className="flex-row gap-2 mb-6">
+              <View
+                className={`h-1.5 rounded-full ${pendingVerification ? "bg-gray-200 w-5" : "bg-primary w-8"}`}
+              />
+              <View
+                className={`h-1.5 rounded-full ${pendingVerification ? "bg-primary w-8" : "bg-gray-200 w-5"}`}
+              />
             </View>
-          </View>
-        ) : (
-          <View className="gap-6">
-            <CustomInput
-              label="Verification Code"
-              placeholder="123456"
-              value={code}
-              onChangeText={setCode}
-              keyboardType="number-pad"
-              icon={<Ionicons name="keypad-outline" size={20} color="#9CA3AF" />}
-            />
-            {error ? <Text className="text-red-500 text-sm ml-1">{error}</Text> : null}
-            <CustomButton title="Verify & Join" onPress={onPressVerify} loading={loading} />
-            <CustomButton title="Cancel" type="ghost" onPress={() => setPendingVerification(false)} />
-          </View>
-        )}
 
-        <View className="flex-row items-center justify-center gap-1.5 mt-8">
-          <Text className="text-gray-400 text-[15px]">Already have an account?</Text>
-          <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-            <Text className="text-primary font-semibold text-[15px]">Log In</Text>
-          </TouchableOpacity>
-        </View>
+            <Text className="text-secondary text-[32px] font-bold tracking-tight mb-1">
+              {pendingVerification ? "Verify Email" : "Create\nAccount"}
+            </Text>
+            {/* Accent line */}
+            <View className="mt-3 mb-3 w-12 h-1 rounded-full bg-primary" />
+            <Text className="text-gray-400 text-base leading-6">
+              {pendingVerification
+                ? `Enter the code sent to ${emailAddress}`
+                : "Join the local discovery circle and connect with people nearby."}
+            </Text>
+          </View>
+
+          {!pendingVerification ? (
+            <View className="gap-6">
+              <CustomInput
+                label="Full Name"
+                placeholder="e.g. Alexandria"
+                value={name}
+                onChangeText={setName}
+                autoCapitalize="words"
+                icon={<Ionicons name="person-outline" size={20} color="#9CA3AF" />}
+              />
+              <CustomInput
+                label="Email Address"
+                placeholder="example@gmail.com"
+                value={emailAddress}
+                onChangeText={setEmailAddress}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
+              />
+              <CustomInput
+                label="Password"
+                placeholder="Create a password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                icon={<Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />}
+              />
+
+              {error ? (
+                <View className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 flex-row items-start">
+                  <View className="w-5 h-5 bg-red-100 rounded-full items-center justify-center mr-2.5 mt-0.5">
+                    <Ionicons name="alert-circle" size={12} color="#EF4444" />
+                  </View>
+                  <Text className="text-red-500 text-sm flex-1 leading-5">{error}</Text>
+                </View>
+              ) : null}
+
+              <View className="mt-2">
+                <CustomButton title="Sign Up" onPress={onSignUpPress} loading={loading} />
+              </View>
+            </View>
+          ) : (
+            <View className="gap-6">
+              <CustomInput
+                label="Verification Code"
+                placeholder="123456"
+                value={code}
+                onChangeText={setCode}
+                keyboardType="number-pad"
+                icon={<Ionicons name="keypad-outline" size={20} color="#9CA3AF" />}
+              />
+              {error ? (
+                <View className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 flex-row items-start">
+                  <View className="w-5 h-5 bg-red-100 rounded-full items-center justify-center mr-2.5 mt-0.5">
+                    <Ionicons name="alert-circle" size={12} color="#EF4444" />
+                  </View>
+                  <Text className="text-red-500 text-sm flex-1 leading-5">{error}</Text>
+                </View>
+              ) : null}
+              <CustomButton title="Verify & Join" onPress={onPressVerify} loading={loading} />
+              <CustomButton title="Cancel" type="ghost" onPress={() => setPendingVerification(false)} />
+            </View>
+          )}
+
+          <View className="flex-row items-center justify-center gap-1.5 mt-8">
+            <Text className="text-gray-400 text-[15px]">Already have an account?</Text>
+            <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
+              <Text className="text-primary font-semibold text-[15px]">Log In</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );

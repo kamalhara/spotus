@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+
 import { useRouter } from "expo-router";
 import {
   collection,
@@ -8,8 +9,9 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  Animated,
   FlatList,
   Text,
   TextInput,
@@ -30,6 +32,26 @@ export default function Chat() {
   const [rooms, setRooms] = useState([]);
   const [chats, setChats] = useState([]);
   const [search, setSearch] = useState("");
+  const [searchFocused, setSearchFocused] = useState(false);
+
+  // Entrance animation
+  const fadeIn = useRef(new Animated.Value(0)).current;
+  const slideUp = useRef(new Animated.Value(15)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeIn, {
+        toValue: 1,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideUp, {
+        toValue: 0,
+        duration: 400,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   // Fetch rooms user is in
   // Fetch all rooms where the current user is a participant
@@ -89,41 +111,102 @@ export default function Chat() {
   return (
     <SafeAreaView className="flex-1 bg-bg px-6" edges={["top"]}>
       {/* Header */}
-      <View className="flex-row items-center justify-between mt-3 mb-6">
+      <Animated.View
+        className="flex-row items-center justify-between mt-3 mb-6"
+        style={{ opacity: fadeIn }}
+      >
         <Text className="text-secondary text-[28px] font-extrabold tracking-tight">
           Messages
         </Text>
         <TouchableOpacity className="w-10 h-10 bg-white rounded-full items-center justify-center border border-gray-100 shadow-sm shadow-gray-100">
           <Ionicons name="create-outline" size={20} color="#18181B" />
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
-      {/* Search Bar */}
-      <View className="flex-row items-center bg-white rounded-2xl px-4 py-3 border border-gray-100 mb-6 shadow-sm shadow-gray-100">
-        <Ionicons name="search" size={18} color="#9CA3AF" />
-        <TextInput
-          placeholder="Search messages..."
-          className="flex-1 ml-3 text-secondary text-[15px]"
-          placeholderTextColor="#9CA3AF"
-          value={search}
-          onChangeText={setSearch}
-        />
-      </View>
+      {/* Search Bar — with focus glow */}
+      <Animated.View
+        style={{
+          opacity: fadeIn,
+          transform: [{ translateY: slideUp }],
+        }}
+      >
+        <View
+          className={`flex-row items-center bg-white rounded-2xl px-4 py-3 mb-6 ${
+            searchFocused
+              ? "border-primary/30 border-[1.5px]"
+              : "border border-gray-100"
+          }`}
+          style={
+            searchFocused
+              ? {
+                  shadowColor: "#4F46E5",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 3,
+                }
+              : {
+                  shadowColor: "#94A3B8",
+                  shadowOffset: { width: 0, height: 1 },
+                  shadowOpacity: 0.05,
+                  shadowRadius: 4,
+                  elevation: 1,
+                }
+          }
+        >
+          <Ionicons
+            name="search"
+            size={18}
+            color={searchFocused ? "#4F46E5" : "#9CA3AF"}
+          />
+          <TextInput
+            placeholder="Search messages..."
+            className="flex-1 ml-3 text-secondary text-[15px]"
+            placeholderTextColor="#9CA3AF"
+            value={search}
+            onChangeText={setSearch}
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+          />
+        </View>
+      </Animated.View>
 
       {/* Rooms horizontal scroll */}
-      <View className="mb-6">
-        <Text className="text-secondary text-base font-bold mb-4">
-          Active Rooms
-        </Text>
+      <Animated.View
+        className="mb-6"
+        style={{
+          opacity: fadeIn,
+          transform: [{ translateY: slideUp }],
+        }}
+      >
+        <View className="flex-row items-center mb-4">
+          <Text className="text-secondary text-base font-bold">
+            Active Rooms
+          </Text>
+          {rooms.length > 0 && (
+            <View className="ml-2 bg-primary px-2 py-0.5 rounded-md">
+              <Text className="text-white text-[10px] font-bold">
+                {rooms.length}
+              </Text>
+            </View>
+          )}
+        </View>
         <RoomHorizontalList
           rooms={rooms}
           onRoomPress={(room) => router.push(`/rooms/${room.id}`)}
         />
-      </View>
+      </Animated.View>
 
       {/* Chat list */}
       <View className="flex-1 mt-2">
-        <Text className="text-secondary text-base font-bold mb-3">Recent</Text>
+        <View className="flex-row items-center mb-3">
+          <Text className="text-secondary text-base font-bold">Recent</Text>
+          {chats.length > 0 && (
+            <Text className="text-gray-300 text-xs font-semibold ml-2">
+              {chats.length} conversations
+            </Text>
+          )}
+        </View>
 
         {chats.length > 0 ? (
           <FlatList

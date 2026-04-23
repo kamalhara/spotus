@@ -67,6 +67,7 @@ export default function CreateRooms() {
               <TouchableOpacity
                 onPress={() => router.back()}
                 className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100 mr-3"
+                style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}
               >
                 <Ionicons name="arrow-back" size={20} color="#18181B" />
               </TouchableOpacity>
@@ -136,7 +137,10 @@ export default function CreateRooms() {
 
             {/* Age Similarity */}
             <View className="mt-8">
-              <View className="flex-row items-center bg-white p-4 rounded-2xl border border-gray-100">
+              <View
+                className="flex-row items-center bg-white p-4 rounded-2xl border border-gray-100"
+                style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 2 }}
+              >
                 <View className="bg-indigo-50 p-3 rounded-xl mr-3.5">
                   <Ionicons name="people-sharp" size={20} color="#4F46E5" />
                 </View>

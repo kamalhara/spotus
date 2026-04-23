@@ -195,13 +195,13 @@ export default function RoomChat() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       {/* Header */}
-      <View className="bg-white z-10 border-b border-gray-100">
+      <View className="bg-white z-10 border-b border-gray-100" style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4 }}>
         <SafeAreaView edges={["top"]}>
           <View className="flex-row items-center justify-between px-5 py-3">
             <View className="flex-row items-center flex-1">
               <TouchableOpacity
                 onPress={() => router.back()}
-                className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center mr-3"
+                className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center mr-3 border border-gray-100"
               >
                 <Ionicons name="chevron-back" size={20} color="#18181B" />
               </TouchableOpacity>
@@ -241,7 +241,7 @@ export default function RoomChat() {
       {/* Trust Meter — compact */}
       {trust < 10 && (
         <View className="px-5 pt-3 pb-1">
-          <View className="bg-white px-4 py-3 rounded-xl border border-gray-100">
+          <View className="bg-white px-4 py-3 rounded-xl border border-gray-100" style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}>
             <View className="flex-row items-center justify-between mb-2">
               <View className="flex-row items-center">
                 <Ionicons
@@ -284,7 +284,7 @@ export default function RoomChat() {
         />
       </View>
 
-      <View className="px-5 py-3 flex items-center pb-6">
+      <View className="px-5 py-3 flex items-center pb-6 border-t border-gray-50">
         <MessageSender
           handleSend={handleSend}
           chatId={roomId}

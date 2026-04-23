@@ -70,14 +70,26 @@ export default function RoomCard({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.95}
-        className={`rounded-2xl p-5 mb-3 border ${
+        className={`rounded-2xl p-5 mb-3 border overflow-hidden ${
           isDiscovery
             ? "bg-white border-gray-100"
             : isOwner
               ? "bg-indigo-50/30 border-indigo-100"
               : "bg-white border-gray-100"
         }`}
+        style={{
+          shadowColor: '#94A3B8',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.06,
+          shadowRadius: 8,
+          elevation: 2,
+        }}
       >
+        {/* Category accent stripe */}
+        <View
+          className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full"
+          style={{ backgroundColor: categoryColor }}
+        />
         {/* Category — colored per type */}
         <View className="flex-row justify-between items-center mb-3">
           <View
@@ -125,12 +137,19 @@ export default function RoomCard({
               ))}
             </View>
             <Text className="text-gray-400 text-xs">
-              {room.participants?.length || 1} members
+              {room.participants?.length || 1}{room.participants?.length > 3 ? "+" : ""} members
             </Text>
           </View>
           <TouchableOpacity
             onPress={() => onPress?.(room)}
-            className="bg-primary px-5 py-2 rounded-xl"
+            className="bg-primary px-5 py-2.5 rounded-xl"
+            style={{
+              shadowColor: '#4F46E5',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.15,
+              shadowRadius: 4,
+              elevation: 3,
+            }}
           >
             <Text className="text-white font-bold text-xs">Join</Text>
           </TouchableOpacity>
