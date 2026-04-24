@@ -51,6 +51,9 @@ export default function MessageSender({
   handleSendImage,
   replyTo,
   onCancelReply,
+  editingMessage,
+  setEditingMessage,
+  handleEditMessage,
 }) {
   const [message, setMessage] = useState("");
   const [showMediaMenu, setShowMediaMenu] = useState(false);
@@ -63,12 +66,18 @@ export default function MessageSender({
   const isTypingLocal = useRef(false);
   const inputRef = useRef(null);
 
-  // Auto-focus input when replying
+  // Auto-focus input when replying or editing
   useEffect(() => {
-    if (replyTo) {
+    if (replyTo || editingMessage) {
       inputRef.current?.focus();
     }
-  }, [replyTo]);
+  }, [replyTo, editingMessage]);
+
+  useEffect(() => {
+    if (editingMessage) {
+      setMessage(editingMessage.text || "");
+    }
+  }, [editingMessage]);
 
   const toggleMediaMenu = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -94,7 +103,7 @@ export default function MessageSender({
   };
 
   const onSend = () => {
-    if (!isActive || !handleSend) return;
+    if (!isActive) return;
 
     if (typingTimeout.current) {
       clearTimeout(typingTimeout.current);
@@ -103,7 +112,14 @@ export default function MessageSender({
     setTyping(chatId, currentUserId, false);
 
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    handleSend(message);
+
+    if (editingMessage && handleEditMessage) {
+      handleEditMessage(editingMessage.id, message);
+      setEditingMessage(null);
+    } else if (handleSend) {
+      handleSend(message);
+    }
+
     setMessage("");
     onCancelReply?.();
   };

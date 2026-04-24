@@ -53,6 +53,7 @@ export default function RoomChat() {
   const [members, setMembers] = useState([]);
   const [uploadingImageUri, setUploadingImageUri] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
+  const [editingMessage, setEditingMessage] = useState(null);
 
   const { firestoreUser: user } = useFirestoreUser();
   const currentUserId = user?.id;
@@ -68,7 +69,10 @@ export default function RoomChat() {
       orderBy("createdAt", "asc"),
     );
     const unsub = onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      const msgs = snapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .filter((msg) => !msg.deletedFor?.includes(currentUserId));
+      setMessages(msgs);
     });
     return unsub;
   }, [roomId]);
@@ -128,6 +132,19 @@ export default function RoomChat() {
     };
     fetchMemberData();
   }, [room?.participants, roomId]);
+
+  const handleEditMessage = async (messageId, newText) => {
+    if (!newText.trim() || !roomId) return;
+    try {
+      await updateDoc(doc(db, "rooms", roomId, "messages", messageId), {
+        text: newText.trim(),
+        isEdited: true,
+      });
+      setEditingMessage(null);
+    } catch (err) {
+      console.error("Error editing message:", err);
+    }
+  };
 
   const handleSend = async (text) => {
     if (!text.trim()) return;
@@ -320,6 +337,7 @@ export default function RoomChat() {
           uploadingImageUri={uploadingImageUri}
           collectionName="rooms"
           onReply={(msg) => setReplyTo(msg)}
+          onEditMessage={setEditingMessage}
         />
       </View>
 
@@ -331,6 +349,10 @@ export default function RoomChat() {
           handleSendImage={handleSendImage}
           replyTo={replyTo}
           onCancelReply={() => setReplyTo(null)}
+          setReplyTo={setReplyTo}
+          editingMessage={editingMessage}
+          setEditingMessage={setEditingMessage}
+          handleEditMessage={handleEditMessage}
         />
       </View>
 

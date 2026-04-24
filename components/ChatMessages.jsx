@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
+  Clipboard,
   FlatList,
   Image,
   Text,
@@ -13,6 +14,7 @@ import {
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import useTypingIndicator from "../hook/useTypingIndicator";
+import { useChatActions } from "../hook/useChatActions";
 import { toggleReaction } from "../lib/reactions";
 import ReactionPicker from "./ReactionPicker";
 import TypingIndicator from "./TypingIndicator";
@@ -83,13 +85,32 @@ export default function ChatMessages({
   uploadingImageUri,
   collectionName = "chats",
   onReply,
+  onEditMessage,
 }) {
   const flatListRef = useRef(null);
   const [reactionPicker, setReactionPicker] = useState(null);
   const swipeableRefs = useRef({});
 
   const isTyping = useTypingIndicator(chatDocId, currentUserId);
+  const { onCopy, onDeleteForMe, onUnsend } = useChatActions(
+    collectionName,
+    chatDocId,
+    currentUserId,
+  );
 
+  const handleMessageLongPress = (event, item) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const { pageX, pageY } = event.nativeEvent;
+    const currentReaction = item.reactions?.[currentUserId] || null;
+
+    setReactionPicker({
+      messageId: item.id,
+      message: { ...item, isSentByMe: item.senderId === currentUserId },
+      x: pageX,
+      y: pageY,
+      currentReaction,
+    });
+  };
   // Auto-scroll to the bottom of the list when new messages or typing indicators appear
   useEffect(() => {
     if (!messages?.length) return;
@@ -110,6 +131,7 @@ export default function ChatMessages({
       outputRange: [0, 0.5, 1],
       extrapolate: "clamp",
     });
+
     return (
       <Animated.View
         style={{
@@ -257,7 +279,9 @@ export default function ChatMessages({
             )}
 
             <Swipeable
-              ref={(ref) => { if (ref) swipeableRefs.current[item.id] = ref; }}
+              ref={(ref) => {
+                if (ref) swipeableRefs.current[item.id] = ref;
+              }}
               renderLeftActions={renderLeftActions}
               friction={2}
               leftThreshold={40}
@@ -273,15 +297,7 @@ export default function ChatMessages({
               <TouchableOpacity
                 activeOpacity={0.7}
                 onLongPress={(event) => {
-                  const { pageX, pageY } = event.nativeEvent;
-                  const currentReaction =
-                    item.reactions?.[currentUserId] || null;
-                  setReactionPicker({
-                    messageId: item.id,
-                    x: pageX,
-                    y: pageY,
-                    currentReaction,
-                  });
+                  handleMessageLongPress(event, item);
                 }}
                 className={`min-w-[72px] ${item.imageUrl ? "" : "px-3.5 py-2"} ${
                   isSentByMe
@@ -328,8 +344,12 @@ export default function ChatMessages({
                   <View
                     style={{
                       borderLeftWidth: 3,
-                      borderLeftColor: isSentByMe ? "rgba(255,255,255,0.4)" : "#4F46E5",
-                      backgroundColor: isSentByMe ? "rgba(255,255,255,0.12)" : "#F5F3FF",
+                      borderLeftColor: isSentByMe
+                        ? "rgba(255,255,255,0.4)"
+                        : "#4F46E5",
+                      backgroundColor: isSentByMe
+                        ? "rgba(255,255,255,0.12)"
+                        : "#F5F3FF",
                       borderRadius: 6,
                       paddingHorizontal: 10,
                       paddingVertical: 6,
@@ -352,7 +372,9 @@ export default function ChatMessages({
                       numberOfLines={1}
                       style={{
                         fontSize: 12,
-                        color: isSentByMe ? "rgba(255,255,255,0.55)" : "#6B7280",
+                        color: isSentByMe
+                          ? "rgba(255,255,255,0.55)"
+                          : "#6B7280",
                       }}
                     >
                       {item.replyTo.imageUrl ? "📷 Photo" : item.replyTo.text}
@@ -393,6 +415,7 @@ export default function ChatMessages({
                           : "text-gray-400"
                     }`}
                   >
+                    {item.isEdited && <Text className="italic">Edited • </Text>}
                     {formatTime(item.createdAt)}
                   </Text>
                   {isSentByMe && (
@@ -418,7 +441,12 @@ export default function ChatMessages({
               </TouchableOpacity>
               {/* Reaction pills — outside bubble to avoid overflow clipping */}
               {hasReactions && (
-                <View style={{ alignItems: isSentByMe ? 'flex-end' : 'flex-start', marginTop: -2 }}>
+                <View
+                  style={{
+                    alignItems: isSentByMe ? "flex-end" : "flex-start",
+                    marginTop: -2,
+                  }}
+                >
                   <ReactionDisplay
                     reactions={item.reactions}
                     isSentByMe={isSentByMe}
@@ -500,6 +528,23 @@ export default function ChatMessages({
         }}
         position={{ x: reactionPicker?.x, y: reactionPicker?.y }}
         currentReaction={reactionPicker?.currentReaction}
+        message={reactionPicker?.message}
+        onCopy={() => {
+          onCopy(reactionPicker?.message);
+          setReactionPicker(null);
+        }}
+        onEdit={() => {
+          onEditMessage?.(reactionPicker?.message);
+          setReactionPicker(null);
+        }}
+        onDeleteForMe={() => {
+          onDeleteForMe(reactionPicker?.message);
+          setReactionPicker(null);
+        }}
+        onUnsend={() => {
+          onUnsend(reactionPicker?.message);
+          setReactionPicker(null);
+        }}
       />
     </View>
   );

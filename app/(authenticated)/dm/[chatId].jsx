@@ -40,6 +40,7 @@ export default function ChatId() {
   const [otherUser, setOtherUser] = useState(null);
   const [uploadingImageUri, setUploadingImageUri] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
+  const [editingMessage, setEditingMessage] = useState(null);
   const [chatDoc, setChatDoc] = useState(null);
 
   // Deterministic chat doc ID so both users share the same conversation
@@ -101,7 +102,10 @@ export default function ChatId() {
       orderBy("createdAt", "asc"),
     );
     const unsub = onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      const msgs = snapshot.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((msg) => !msg.deletedFor?.includes(currentUserId));
+      setMessages(msgs);
     });
     return unsub;
   }, [chatDocId]);
@@ -118,6 +122,20 @@ export default function ChatId() {
     if (!chatDocId || !currentUserId) return;
     ChatSeen(chatDocId, currentUserId);
   }, [chatDocId, currentUserId]);
+
+  const handleEditMessage = async (messageId, newText) => {
+    if (!newText.trim() || !chatDocId) return;
+    try {
+      await setDoc(
+        doc(db, "chats", chatDocId, "messages", messageId),
+        { text: newText.trim(), isEdited: true },
+        { merge: true },
+      );
+      setEditingMessage(null);
+    } catch (err) {
+      console.error("Error editing message:", err);
+    }
+  };
 
   // Send a message
   const handleSend = async (text) => {
@@ -289,6 +307,7 @@ export default function ChatId() {
             uploadingImageUri={uploadingImageUri}
             collectionName="chats"
             onReply={(msg) => setReplyTo(msg)}
+            onEditMessage={setEditingMessage}
           />
         </View>
 
@@ -301,6 +320,10 @@ export default function ChatId() {
             handleSendImage={handleSendImage}
             replyTo={replyTo}
             onCancelReply={() => setReplyTo(null)}
+            setReplyTo={setReplyTo}
+            editingMessage={editingMessage}
+            setEditingMessage={setEditingMessage}
+            handleEditMessage={handleEditMessage}
           />
         </View>
       </KeyboardAvoidingView>
