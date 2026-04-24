@@ -28,6 +28,7 @@ import RoomDetailsSheet from "../../../components/RoomDetailsSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { RoomSeen } from "../../../lib/chatSeen";
+import { sendPushNotification } from "../../../lib/notification";
 import { updateTrustOnMessage } from "../../../lib/trust";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
@@ -161,6 +162,19 @@ export default function RoomChat() {
       });
 
       await updateTrustOnMessage(db, roomId, currentUserId, trimmedText);
+
+      // Notify all other room participants
+      const otherParticipants = (room?.participants || []).filter(
+        (uid) => uid !== currentUserId,
+      );
+      otherParticipants.forEach((uid) => {
+        sendPushNotification(
+          uid,
+          `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
+          trimmedText,
+          { screen: "room", roomId },
+        );
+      });
     } catch (err) {
       console.error("Error sending message:", err);
     }
@@ -191,6 +205,18 @@ export default function RoomChat() {
         lastMessageAt: serverTimestamp(),
         lastMessageSenderId: currentUserId,
         lastMessageSeenBy: [currentUserId],
+      });
+      // Notify all other room participants about the image
+      const otherParticipants = (room?.participants || []).filter(
+        (uid) => uid !== currentUserId,
+      );
+      otherParticipants.forEach((uid) => {
+        sendPushNotification(
+          uid,
+          `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
+          "📷 Sent a photo",
+          { screen: "room", roomId },
+        );
       });
     } catch (err) {
       console.error("Room image send error:", err);

@@ -3,9 +3,12 @@ import { doc, serverTimestamp, updateDoc } from "firebase/firestore";
 import { useEffect } from "react";
 import { db } from "../../config/firebase.config";
 import useFirestoreUser from "../../hook/useFireStoreUser";
+import { registerForPushNotifications } from "../../lib/notification";
 
 export default function AuthenticatedLayout() {
   const { firestoreUser: user } = useFirestoreUser();
+
+  // Heartbeat: update lastSeen every 30s
   useEffect(() => {
     if (!user?.id) return;
 
@@ -21,6 +24,13 @@ export default function AuthenticatedLayout() {
 
     return () => clearInterval(interval);
   }, [user?.id]);
+
+  // Register for push notifications
+  useEffect(() => {
+    if (!user?.id) return;
+    registerForPushNotifications(user.id);
+  }, [user?.id]);
+
   return (
     <Stack>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

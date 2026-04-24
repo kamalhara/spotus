@@ -70,7 +70,14 @@
           }
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#4F46E5"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

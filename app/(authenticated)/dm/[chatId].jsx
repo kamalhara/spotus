@@ -28,7 +28,7 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 import usePresenceStatus from "../../../hook/usePresenceStatus";
 import useTypingIndicator from "../../../hook/useTypingIndicator";
 import { ChatSeen } from "../../../lib/chatSeen";
-
+import { sendPushNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
 export default function ChatId() {
@@ -144,6 +144,13 @@ export default function ChatId() {
         },
         { merge: true },
       );
+      // Send push notification to the other user (fire-and-forget)
+      sendPushNotification(
+        chatId,
+        firestoreUser?.userName || "New message",
+        text.trim(),
+        { screen: "dm", chatId, chatDocId },
+      );
     } catch (err) {
       console.error("Error sending DM:", err);
     }
@@ -177,6 +184,13 @@ export default function ChatId() {
           lastMessageSeenBy: [currentUserId],
         },
         { merge: true },
+      );
+      // Send push notification for image
+      sendPushNotification(
+        chatId,
+        firestoreUser?.userName || "New message",
+        "📷 Sent a photo",
+        { screen: "dm", chatId, chatDocId },
       );
     } catch (err) {
       console.error("Error sending Image", err);
