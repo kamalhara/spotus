@@ -48,6 +48,8 @@ export default function MessageSender({
   chatId,
   currentUserId,
   handleSendImage,
+  replyTo,
+  onCancelReply,
 }) {
   const [message, setMessage] = useState("");
   const [showMediaMenu, setShowMediaMenu] = useState(false);
@@ -92,6 +94,7 @@ export default function MessageSender({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     handleSend(message);
     setMessage("");
+    onCancelReply?.();
   };
 
   const handleMediaOption = (key) => {
@@ -184,6 +187,65 @@ export default function MessageSender({
               ))}
             </View>
           </View>
+        </View>
+      )}
+
+      {/* Reply Preview Banner */}
+      {replyTo && (
+        <View
+          style={{
+            backgroundColor: "#FFFFFF",
+            borderLeftWidth: 3,
+            borderLeftColor: "#4F46E5",
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12,
+            paddingHorizontal: 14,
+            paddingVertical: 10,
+            marginBottom: 6,
+            flexDirection: "row",
+            alignItems: "center",
+            shadowColor: "#94A3B8",
+            shadowOffset: { width: 0, height: -1 },
+            shadowOpacity: 0.06,
+            shadowRadius: 4,
+            elevation: 2,
+          }}
+        >
+          <View className="mr-2">
+            <Ionicons name="arrow-undo" size={16} color="#4F46E5" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text
+              style={{
+                fontSize: 11,
+                fontWeight: "700",
+                color: "#4F46E5",
+                marginBottom: 1,
+              }}
+            >
+              {replyTo.user || "Unknown"}
+            </Text>
+            <Text
+              numberOfLines={1}
+              style={{ fontSize: 13, color: "#6B7280" }}
+            >
+              {replyTo.imageUrl ? "📷 Photo" : replyTo.text}
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={onCancelReply}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 14,
+              backgroundColor: "#F3F4F6",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Ionicons name="close" size={16} color="#9CA3AF" />
+          </TouchableOpacity>
         </View>
       )}
 

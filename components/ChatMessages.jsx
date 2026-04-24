@@ -1,14 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 
-import { useEffect, useRef, useState } from "react";
+import * as Haptics from "expo-haptics";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Animated,
   FlatList,
   Image,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 import useTypingIndicator from "../hook/useTypingIndicator";
 import { toggleReaction } from "../lib/reactions";
 import ReactionPicker from "./ReactionPicker";
@@ -79,9 +82,11 @@ export default function ChatMessages({
   chatDocId,
   uploadingImageUri,
   collectionName = "chats",
+  onReply,
 }) {
   const flatListRef = useRef(null);
   const [reactionPicker, setReactionPicker] = useState(null);
+  const swipeableRefs = useRef({});
 
   const isTyping = useTypingIndicator(chatDocId, currentUserId);
 
@@ -93,6 +98,43 @@ export default function ChatMessages({
     }, 100);
     return () => clearTimeout(timer);
   }, [messages?.length, isTyping]);
+
+  const renderRightActions = useCallback((progress, dragX) => {
+    const scale = dragX.interpolate({
+      inputRange: [-80, -40, 0],
+      outputRange: [1, 0.8, 0],
+      extrapolate: "clamp",
+    });
+    const opacity = dragX.interpolate({
+      inputRange: [-60, -30, 0],
+      outputRange: [1, 0.5, 0],
+      extrapolate: "clamp",
+    });
+    return (
+      <Animated.View
+        style={{
+          justifyContent: "center",
+          alignItems: "center",
+          width: 60,
+          transform: [{ scale }],
+          opacity,
+        }}
+      >
+        <View
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 16,
+            backgroundColor: "#EEF2FF",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Ionicons name="arrow-undo" size={18} color="#4F46E5" />
+        </View>
+      </Animated.View>
+    );
+  }, []);
 
   if (!messages || messages.length === 0) {
     return (
@@ -125,7 +167,7 @@ export default function ChatMessages({
 
     return (
       <View
-        className={`absolute -bottom-5 ${isSentByMe ? "right-1" : "left-0"} flex-row items-center bg-white border border-gray-100 rounded-full px-2 py-0.5 h-7`}
+        className={`flex-row items-center bg-white border border-gray-100 rounded-full px-2 py-0.5 h-7 ${isSentByMe ? "mr-1" : "ml-1"}`}
         style={{
           elevation: 4,
           zIndex: 20,
@@ -133,6 +175,7 @@ export default function ChatMessages({
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.08,
           shadowRadius: 4,
+          marginTop: -8,
         }}
       >
         <Text className="text-[13px] leading-tight">
@@ -180,7 +223,7 @@ export default function ChatMessages({
           </View>
         )}
         <View
-          className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-0.5"} ${hasReactions ? "mb-5" : ""} px-3`}
+          className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-0.5"} px-3`}
         >
           {!isSentByMe && (
             <View className="w-8 mr-2 flex justify-end pb-1">
@@ -213,119 +256,179 @@ export default function ChatMessages({
               </Text>
             )}
 
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onLongPress={(event) => {
-                const { pageX, pageY } = event.nativeEvent;
-                const currentReaction = item.reactions?.[currentUserId] || null;
-                setReactionPicker({
-                  messageId: item.id,
-                  x: pageX,
-                  y: pageY,
-                  currentReaction,
-                });
+            <Swipeable
+              ref={(ref) => { if (ref) swipeableRefs.current[item.id] = ref; }}
+              renderRightActions={renderRightActions}
+              friction={2}
+              rightThreshold={40}
+              overshootRight={false}
+              onSwipeableOpen={(direction) => {
+                if (direction === "right") {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                  onReply?.(item);
+                  // Close the swipeable after a short delay
+                  setTimeout(() => {
+                    swipeableRefs.current[item.id]?.close();
+                  }, 300);
+                }
               }}
-              className={`min-w-[72px] ${
-                item.imageUrl ? "" : "px-3.5 py-2"
-              } ${
-                isSentByMe
-                  ? "rounded-2xl rounded-br-sm overflow-hidden"
-                  : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm"
-              }`}
-              style={
-                !isSentByMe
-                  ? {
-                      shadowColor: "#94A3B8",
-                      shadowOffset: { width: 0, height: 1 },
-                      shadowOpacity: 0.06,
-                      shadowRadius: 4,
-                      elevation: 1,
-                    }
-                  : isSentByMe && !item.imageUrl
-                    ? {
-                        shadowColor: "#4F46E5",
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.15,
-                        shadowRadius: 6,
-                        elevation: 3,
-                      }
-                    : {}
-              }
             >
-              {/* Solid background for sent messages */}
-              {isSentByMe && (
-                <View
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: "#4F46E5",
-                    borderRadius: 16,
-                    borderBottomRightRadius: 4,
-                  }}
-                />
-              )}
-
-              {item.imageUrl ? (
-                <Image
-                  source={{ uri: item.imageUrl }}
-                  className={`w-56 h-56 ${
-                    isSentByMe
-                      ? "rounded-2xl rounded-br-sm"
-                      : "rounded-2xl rounded-bl-sm"
-                  }`}
-                />
-              ) : (
-                <Text
-                  className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"} pb-3.5`}
-                >
-                  {item.text}
-                </Text>
-              )}
-
-              <View
-                className={`${
-                  item.imageUrl
-                    ? "absolute bottom-2 right-2 bg-black/30 px-2 py-0.5 rounded-full border border-white/10"
-                    : "absolute bottom-1.5 right-2.5"
-                } flex-row items-center`}
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onLongPress={(event) => {
+                  const { pageX, pageY } = event.nativeEvent;
+                  const currentReaction =
+                    item.reactions?.[currentUserId] || null;
+                  setReactionPicker({
+                    messageId: item.id,
+                    x: pageX,
+                    y: pageY,
+                    currentReaction,
+                  });
+                }}
+                className={`min-w-[72px] ${item.imageUrl ? "" : "px-3.5 py-2"} ${
+                  isSentByMe
+                    ? "rounded-2xl rounded-br-sm overflow-hidden"
+                    : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm"
+                }`}
+                style={
+                  !isSentByMe
+                    ? {
+                        shadowColor: "#94A3B8",
+                        shadowOffset: { width: 0, height: 1 },
+                        shadowOpacity: 0.06,
+                        shadowRadius: 4,
+                        elevation: 1,
+                      }
+                    : isSentByMe && !item.imageUrl
+                      ? {
+                          shadowColor: "#4F46E5",
+                          shadowOffset: { width: 0, height: 2 },
+                          shadowOpacity: 0.15,
+                          shadowRadius: 6,
+                          elevation: 3,
+                        }
+                      : {}
+                }
               >
-                <Text
-                  className={`text-[9px] font-medium ${
-                    item.imageUrl
-                      ? "text-white"
-                      : isSentByMe
-                        ? "text-white/60"
-                        : "text-gray-400"
-                  }`}
-                >
-                  {formatTime(item.createdAt)}
-                </Text>
+                {/* Solid background for sent messages */}
                 {isSentByMe && (
-                  <View className="ml-1">
-                    <Ionicons
-                      name={
-                        item.seenBy?.length > 1 ? "checkmark-done" : "checkmark"
-                      }
-                      size={13}
-                      color={
-                        item.seenBy?.length > 1
-                          ? "#93C5FD"
-                          : item.imageUrl
-                            ? "rgba(255,255,255,0.8)"
-                            : "rgba(255,255,255,0.55)"
-                      }
-                    />
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: "#4F46E5",
+                      borderRadius: 16,
+                      borderBottomRightRadius: 4,
+                    }}
+                  />
+                )}
+                {/* Reply Preview */}
+                {item.replyTo && (
+                  <View
+                    style={{
+                      borderLeftWidth: 3,
+                      borderLeftColor: isSentByMe ? "rgba(255,255,255,0.4)" : "#4F46E5",
+                      backgroundColor: isSentByMe ? "rgba(255,255,255,0.12)" : "#F5F3FF",
+                      borderRadius: 6,
+                      paddingHorizontal: 10,
+                      paddingVertical: 6,
+                      marginBottom: 4,
+                      marginTop: item.imageUrl ? 8 : 0,
+                      marginHorizontal: item.imageUrl ? 8 : 0,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        fontWeight: "700",
+                        color: isSentByMe ? "rgba(255,255,255,0.7)" : "#4F46E5",
+                        marginBottom: 2,
+                      }}
+                    >
+                      {item.replyTo.user || "Unknown"}
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      style={{
+                        fontSize: 12,
+                        color: isSentByMe ? "rgba(255,255,255,0.55)" : "#6B7280",
+                      }}
+                    >
+                      {item.replyTo.imageUrl ? "📷 Photo" : item.replyTo.text}
+                    </Text>
                   </View>
                 )}
-              </View>
-              <ReactionDisplay
-                reactions={item.reactions}
-                isSentByMe={isSentByMe}
-              />
-            </TouchableOpacity>
+
+                {item.imageUrl ? (
+                  <Image
+                    source={{ uri: item.imageUrl }}
+                    className={`w-56 h-56 ${
+                      isSentByMe
+                        ? "rounded-2xl rounded-br-sm"
+                        : "rounded-2xl rounded-bl-sm"
+                    }`}
+                  />
+                ) : (
+                  <Text
+                    className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"} pb-3.5`}
+                  >
+                    {item.text}
+                  </Text>
+                )}
+
+                <View
+                  className={`${
+                    item.imageUrl
+                      ? "absolute bottom-2 right-2 bg-black/30 px-2 py-0.5 rounded-full border border-white/10"
+                      : "absolute bottom-1.5 right-2.5"
+                  } flex-row items-center`}
+                >
+                  <Text
+                    className={`text-[9px] font-medium ${
+                      item.imageUrl
+                        ? "text-white"
+                        : isSentByMe
+                          ? "text-white/60"
+                          : "text-gray-400"
+                    }`}
+                  >
+                    {formatTime(item.createdAt)}
+                  </Text>
+                  {isSentByMe && (
+                    <View className="ml-1">
+                      <Ionicons
+                        name={
+                          item.seenBy?.length > 1
+                            ? "checkmark-done"
+                            : "checkmark"
+                        }
+                        size={13}
+                        color={
+                          item.seenBy?.length > 1
+                            ? "#93C5FD"
+                            : item.imageUrl
+                              ? "rgba(255,255,255,0.8)"
+                              : "rgba(255,255,255,0.55)"
+                        }
+                      />
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+              {/* Reaction pills — outside bubble to avoid overflow clipping */}
+              {hasReactions && (
+                <View style={{ alignItems: isSentByMe ? 'flex-end' : 'flex-start', marginTop: -2 }}>
+                  <ReactionDisplay
+                    reactions={item.reactions}
+                    isSentByMe={isSentByMe}
+                  />
+                </View>
+              )}
+            </Swipeable>
           </View>
         </View>
       </View>
@@ -333,32 +436,33 @@ export default function ChatMessages({
   };
 
   return (
-    <FlatList
-      ref={flatListRef}
-      data={messages}
-      renderItem={renderMessage}
-      keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-      showsVerticalScrollIndicator={false}
-      initialNumToRender={10}
-      contentContainerClassName="py-4 px-1"
-      onContentSizeChange={() => {
-        setTimeout(
-          () => flatListRef.current?.scrollToEnd({ animated: true }),
-          100,
-        );
-      }}
-      onLayout={() => {
-        setTimeout(
-          () => flatListRef.current?.scrollToEnd({ animated: true }),
-          100,
-        );
-      }}
-      ListFooterComponent={
-        <View>
-          {uploadingImageUri && (
-            <View className="w-full flex-row justify-end mt-2 px-3 mb-2">
-              <View className="max-w-[78%] items-end">
-                <View className="rounded-2xl rounded-br-sm overflow-hidden border border-primary/20 shadow-sm bg-primary/10">
+    <View style={{ flex: 1 }}>
+      <FlatList
+        ref={flatListRef}
+        data={messages}
+        renderItem={renderMessage}
+        keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+        showsVerticalScrollIndicator={false}
+        initialNumToRender={10}
+        contentContainerClassName="py-4 px-1"
+        onContentSizeChange={() => {
+          setTimeout(
+            () => flatListRef.current?.scrollToEnd({ animated: true }),
+            100,
+          );
+        }}
+        onLayout={() => {
+          setTimeout(
+            () => flatListRef.current?.scrollToEnd({ animated: true }),
+            100,
+          );
+        }}
+        ListFooterComponent={
+          <View>
+            {uploadingImageUri && (
+              <View className="w-full flex-row justify-end mt-2 px-3 mb-2">
+                <View className="max-w-[78%] items-end">
+                  <View className="rounded-2xl rounded-br-sm overflow-hidden border border-primary/20 shadow-sm bg-primary/10">
                     <View className="relative">
                       <Image
                         source={{ uri: uploadingImageUri }}
@@ -373,37 +477,33 @@ export default function ChatMessages({
                         </View>
                       </View>
                     </View>
+                  </View>
                 </View>
               </View>
-            </View>
-          )}
-          {isTyping ? <TypingIndicator /> : <View className="h-2" />}
-        </View>
-      }
-      ListHeaderComponent={
-        <ReactionPicker
-          isVisible={!!reactionPicker}
-          onClose={() => setReactionPicker(null)}
-          onSelect={(emoji) => {
-            if (reactionPicker?.messageId) {
-              const currentReaction = reactionPicker.currentReaction;
-
-              // Toggle: if same emoji, remove it
-              const newEmoji = currentReaction === emoji ? "" : emoji;
-
-              toggleReaction(
-                collectionName,
-                chatDocId,
-                reactionPicker.messageId,
-                currentUserId,
-                newEmoji,
-              );
-            }
-          }}
-          position={{ x: reactionPicker?.x, y: reactionPicker?.y }}
-          currentReaction={reactionPicker?.currentReaction}
-        />
-      }
-    />
+            )}
+            {isTyping ? <TypingIndicator /> : <View className="h-2" />}
+          </View>
+        }
+      />
+      <ReactionPicker
+        isVisible={!!reactionPicker}
+        onClose={() => setReactionPicker(null)}
+        onSelect={(emoji) => {
+          if (reactionPicker?.messageId) {
+            const currentReaction = reactionPicker.currentReaction;
+            const newEmoji = currentReaction === emoji ? "" : emoji;
+            toggleReaction(
+              collectionName,
+              chatDocId,
+              reactionPicker.messageId,
+              currentUserId,
+              newEmoji,
+            );
+          }
+        }}
+        position={{ x: reactionPicker?.x, y: reactionPicker?.y }}
+        currentReaction={reactionPicker?.currentReaction}
+      />
+    </View>
   );
 }

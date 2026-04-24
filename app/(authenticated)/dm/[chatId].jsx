@@ -39,6 +39,7 @@ export default function ChatId() {
   const [messages, setMessages] = useState([]);
   const [otherUser, setOtherUser] = useState(null);
   const [uploadingImageUri, setUploadingImageUri] = useState(null);
+  const [replyTo, setReplyTo] = useState(null);
 
   // Deterministic chat doc ID so both users share the same conversation
   const chatDocId = useMemo(() => {
@@ -119,7 +120,18 @@ export default function ChatId() {
         createdAt: serverTimestamp(),
         seenBy: [currentUserId],
         reactions: {},
+        ...(replyTo
+          ? {
+              replyTo: {
+                id: replyTo.id,
+                text: replyTo.text || "",
+                user: replyTo.user || "Unknown",
+                imageUrl: replyTo.imageUrl || null,
+              },
+            }
+          : {}),
       });
+      setReplyTo(null);
       // Update the chat's last activity and message preview
       await setDoc(
         doc(db, "chats", chatDocId),
@@ -243,6 +255,7 @@ export default function ChatId() {
             chatDocId={chatDocId}
             uploadingImageUri={uploadingImageUri}
             collectionName="chats"
+            onReply={(msg) => setReplyTo(msg)}
           />
         </View>
 
@@ -253,6 +266,8 @@ export default function ChatId() {
             chatId={chatDocId}
             currentUserId={currentUserId}
             handleSendImage={handleSendImage}
+            replyTo={replyTo}
+            onCancelReply={() => setReplyTo(null)}
           />
         </View>
       </KeyboardAvoidingView>

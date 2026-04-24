@@ -147,7 +147,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
             <CustomButton title="Cancel" type="ghost" onPress={handleDismiss} />
           </View>
           <View className="flex-[2]">
-            <CustomButton title="Join Circle" onPress={handleConfirm} />
+            <CustomButton title="Join Room" onPress={handleConfirm} />
           </View>
         </View>
       </BottomSheetView>

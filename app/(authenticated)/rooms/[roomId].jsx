@@ -51,6 +51,7 @@ export default function RoomChat() {
   const [trust, setTrust] = useState(0);
   const [members, setMembers] = useState([]);
   const [uploadingImageUri, setUploadingImageUri] = useState(null);
+  const [replyTo, setReplyTo] = useState(null);
 
   const { firestoreUser: user } = useFirestoreUser();
   const currentUserId = user?.id;
@@ -138,7 +139,18 @@ export default function RoomChat() {
         createdAt: serverTimestamp(),
         seenBy: [currentUserId],
         reactions: {},
+        ...(replyTo
+          ? {
+              replyTo: {
+                id: replyTo.id,
+                text: replyTo.text || "",
+                user: replyTo.user || "Unknown",
+                imageUrl: replyTo.imageUrl || null,
+              },
+            }
+          : {}),
       });
+      setReplyTo(null);
 
       // Sync the parent room document with last message metadata
       await updateDoc(doc(db, "rooms", roomId), {
@@ -281,6 +293,7 @@ export default function RoomChat() {
           chatDocId={roomId}
           uploadingImageUri={uploadingImageUri}
           collectionName="rooms"
+          onReply={(msg) => setReplyTo(msg)}
         />
       </View>
 
@@ -290,6 +303,8 @@ export default function RoomChat() {
           chatId={roomId}
           currentUserId={currentUserId}
           handleSendImage={handleSendImage}
+          replyTo={replyTo}
+          onCancelReply={() => setReplyTo(null)}
         />
       </View>
 
