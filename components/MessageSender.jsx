@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useRef, useState } from "react";
@@ -53,6 +54,8 @@ export default function MessageSender({
 }) {
   const [message, setMessage] = useState("");
   const [showMediaMenu, setShowMediaMenu] = useState(false);
+
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
   const isActive = message.trim().length > 0;
 
@@ -132,8 +135,31 @@ export default function MessageSender({
       }
     };
 
+    const pickCamera = async () => {
+      if (!cameraPermission?.granted) {
+        const permission = await requestCameraPermission();
+        if (!permission?.granted) {
+          Alert.alert(
+            "Permission Required",
+            "Please grant permission to access the camera.",
+          );
+          return;
+        }
+      }
+      let result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const uri = result.assets[0].uri;
+        setShowMediaMenu(false);
+        handleSendImage(uri);
+      }
+    };
+
     if (key === "camera") {
-      // Handle camera functionality
+      pickCamera();
     }
     if (key === "photo") {
       pickImage();
@@ -163,7 +189,7 @@ export default function MessageSender({
           <View
             className="bg-white rounded-3xl py-5 px-4 mx-1 border border-gray-100"
             style={{
-              shadowColor: '#18181B',
+              shadowColor: "#18181B",
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.12,
               shadowRadius: 24,
@@ -233,10 +259,7 @@ export default function MessageSender({
             >
               {replyTo.user || "Unknown"}
             </Text>
-            <Text
-              numberOfLines={1}
-              style={{ fontSize: 13, color: "#6B7280" }}
-            >
+            <Text numberOfLines={1} style={{ fontSize: 13, color: "#6B7280" }}>
               {replyTo.imageUrl ? "📷 Photo" : replyTo.text}
             </Text>
           </View>
@@ -291,7 +314,7 @@ export default function MessageSender({
           style={
             isActive
               ? {
-                  shadowColor: '#4F46E5',
+                  shadowColor: "#4F46E5",
                   shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.3,
                   shadowRadius: 6,

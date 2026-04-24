@@ -194,7 +194,12 @@ export default function ChatId() {
         {/* Header */}
         <View
           className="flex-row items-center justify-between border-b border-gray-100 px-5 pb-3.5 pt-1"
-          style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4 }}
+          style={{
+            shadowColor: "#94A3B8",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.04,
+            shadowRadius: 4,
+          }}
         >
           <View className="flex-row items-center gap-3">
             <TouchableOpacity
@@ -234,9 +239,7 @@ export default function ChatId() {
                           : "bg-gray-400"
                       } rounded-full mr-1`}
                     />
-                    <Text className="text-gray-400 text-xs">
-                      {userStatus}
-                    </Text>
+                    <Text className="text-gray-400 text-xs">{userStatus}</Text>
                   </>
                 )}
               </View>
