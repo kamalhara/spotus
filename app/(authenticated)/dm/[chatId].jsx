@@ -40,6 +40,7 @@ export default function ChatId() {
   const [otherUser, setOtherUser] = useState(null);
   const [uploadingImageUri, setUploadingImageUri] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
+  const [chatDoc, setChatDoc] = useState(null);
 
   // Deterministic chat doc ID so both users share the same conversation
   const chatDocId = useMemo(() => {
@@ -104,6 +105,15 @@ export default function ChatId() {
     });
     return unsub;
   }, [chatDocId]);
+
+  // Listen to chat doc for mute status
+  useEffect(() => {
+    if (!chatDocId) return;
+    const unsub = onSnapshot(doc(db, "chats", chatDocId), (snap) => {
+      if (snap.exists()) setChatDoc(snap.data());
+    });
+    return unsub;
+  }, [chatDocId]);
   useEffect(() => {
     if (!chatDocId || !currentUserId) return;
     ChatSeen(chatDocId, currentUserId);
@@ -144,13 +154,16 @@ export default function ChatId() {
         },
         { merge: true },
       );
-      // Send push notification to the other user (fire-and-forget)
-      sendPushNotification(
-        chatId,
-        firestoreUser?.userName || "New message",
-        text.trim(),
-        { screen: "dm", chatId, chatDocId },
-      );
+      // Send push notification only if the other user hasn't muted the chat
+      const isMutedByRecipient = chatDoc?.mutedBy?.includes(chatId);
+      if (!isMutedByRecipient) {
+        sendPushNotification(
+          chatId,
+          firestoreUser?.userName || "New message",
+          text.trim(),
+          { screen: "dm", chatId, chatDocId },
+        );
+      }
     } catch (err) {
       console.error("Error sending DM:", err);
     }
@@ -185,13 +198,16 @@ export default function ChatId() {
         },
         { merge: true },
       );
-      // Send push notification for image
-      sendPushNotification(
-        chatId,
-        firestoreUser?.userName || "New message",
-        "📷 Sent a photo",
-        { screen: "dm", chatId, chatDocId },
-      );
+      // Send push notification only if the other user hasn't muted the chat
+      const isMutedByRecipient = chatDoc?.mutedBy?.includes(chatId);
+      if (!isMutedByRecipient) {
+        sendPushNotification(
+          chatId,
+          firestoreUser?.userName || "New message",
+          "📷 Sent a photo",
+          { screen: "dm", chatId, chatDocId },
+        );
+      }
     } catch (err) {
       console.error("Error sending Image", err);
     } finally {
