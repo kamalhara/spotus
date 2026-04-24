@@ -99,15 +99,15 @@ export default function ChatMessages({
     return () => clearTimeout(timer);
   }, [messages?.length, isTyping]);
 
-  const renderRightActions = useCallback((progress, dragX) => {
+  const renderLeftActions = useCallback((progress, dragX) => {
     const scale = dragX.interpolate({
-      inputRange: [-80, -40, 0],
-      outputRange: [1, 0.8, 0],
+      inputRange: [0, 40, 80],
+      outputRange: [0, 0.8, 1],
       extrapolate: "clamp",
     });
     const opacity = dragX.interpolate({
-      inputRange: [-60, -30, 0],
-      outputRange: [1, 0.5, 0],
+      inputRange: [0, 30, 60],
+      outputRange: [0, 0.5, 1],
       extrapolate: "clamp",
     });
     return (
@@ -258,18 +258,15 @@ export default function ChatMessages({
 
             <Swipeable
               ref={(ref) => { if (ref) swipeableRefs.current[item.id] = ref; }}
-              renderRightActions={renderRightActions}
+              renderLeftActions={renderLeftActions}
               friction={2}
-              rightThreshold={40}
-              overshootRight={false}
+              leftThreshold={40}
+              overshootLeft={false}
               onSwipeableOpen={(direction) => {
-                if (direction === "right") {
+                if (direction === "left") {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                   onReply?.(item);
-                  // Close the swipeable after a short delay
-                  setTimeout(() => {
-                    swipeableRefs.current[item.id]?.close();
-                  }, 300);
+                  swipeableRefs.current[item.id]?.close();
                 }
               }}
             >

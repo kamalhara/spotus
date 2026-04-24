@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Pressable,
@@ -58,6 +58,14 @@ export default function MessageSender({
 
   const typingTimeout = useRef(null);
   const isTypingLocal = useRef(false);
+  const inputRef = useRef(null);
+
+  // Auto-focus input when replying
+  useEffect(() => {
+    if (replyTo) {
+      inputRef.current?.focus();
+    }
+  }, [replyTo]);
 
   const toggleMediaMenu = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -263,6 +271,7 @@ export default function MessageSender({
         </TouchableOpacity>
 
         <TextInput
+          ref={inputRef}
           value={message}
           onChangeText={(text) => {
             setMessage(text);
