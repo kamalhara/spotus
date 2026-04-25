@@ -115,18 +115,6 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
           </TouchableOpacity>
         </View>
 
-        {/* Room Description */}
-        <View className="mb-8 pb-8 border-b border-border-light">
-          <Text className="text-muted text-[10px] font-bold uppercase tracking-[2px] mb-2.5">
-            Description
-          </Text>
-          <Text className="text-slate-500 leading-[22px] font-medium text-[14px]">
-            This discovery circle is dedicated to exploring{" "}
-            {room?.category || "new experiences"} and sharing local vibes with
-            fellow members in your area.
-          </Text>
-        </View>
-
         {/* Members Section */}
         <View>
           <View className="flex-row justify-between items-center mb-5">
@@ -148,7 +136,13 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                   onPress={() => handleProfilePress(member.id)}
                   key={member.id}
                   className="flex-row items-center justify-between bg-white p-3.5 rounded-2xl border border-gray-50"
-                  style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}
+                  style={{
+                    shadowColor: "#94A3B8",
+                    shadowOffset: { width: 0, height: 1 },
+                    shadowOpacity: 0.04,
+                    shadowRadius: 4,
+                    elevation: 1,
+                  }}
                 >
                   <View className="flex-row items-center flex-1">
                     <Image
