@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
-  Clipboard,
   FlatList,
   Image,
   Text,
@@ -13,8 +12,8 @@ import {
   View,
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
-import useTypingIndicator from "../hook/useTypingIndicator";
 import { useChatActions } from "../hook/useChatActions";
+import useTypingIndicator from "../hook/useTypingIndicator";
 import { toggleReaction } from "../lib/reactions";
 import ReactionPicker from "./ReactionPicker";
 import TypingIndicator from "./TypingIndicator";
@@ -116,7 +115,11 @@ export default function ChatMessages({
     const index = messages.findIndex((m) => m.id === messageId);
     if (index !== -1) {
       try {
-        flatListRef.current?.scrollToIndex({ index, animated: true, viewPosition: 0.5 });
+        flatListRef.current?.scrollToIndex({
+          index,
+          animated: true,
+          viewPosition: 0.5,
+        });
       } catch (error) {
         console.warn("Could not scroll to message:", error);
       }
@@ -486,7 +489,11 @@ export default function ChatMessages({
         onScrollToIndexFailed={(info) => {
           const wait = new Promise((resolve) => setTimeout(resolve, 500));
           wait.then(() => {
-            flatListRef.current?.scrollToIndex({ index: info.index, animated: true, viewPosition: 0.5 });
+            flatListRef.current?.scrollToIndex({
+              index: info.index,
+              animated: true,
+              viewPosition: 0.5,
+            });
           });
         }}
         contentContainerClassName="py-4 px-1"
