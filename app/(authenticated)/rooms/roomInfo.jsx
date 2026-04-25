@@ -1,9 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import {
+  arrayRemove,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import RoomOptionsModal from "../../../components/roomOptionsModal";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 
@@ -48,6 +56,7 @@ export default function RoomInfo() {
   const [loading, setLoading] = useState(true);
   const [isMembersExpanded, setIsMembersExpanded] = useState(false);
   const [showRoomTitle, setShowRoomTitle] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
 
   const maxVisibleMembers = 3;
   const visibleMembers = isMembersExpanded
@@ -103,7 +112,22 @@ export default function RoomInfo() {
       });
     }
   };
+  const handleLeaveRoom = async () => {
+    if (!roomId || !currentUserId) return;
 
+    try {
+      const roomRef = doc(db, "rooms", roomId);
+
+      await updateDoc(roomRef, {
+        participants: arrayRemove(currentUserId),
+      });
+
+      setShowOptions(false);
+      router.replace("/home");
+    } catch (err) {
+      console.error("Leave room error:", err);
+    }
+  };
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
 
   return (
@@ -129,7 +153,10 @@ export default function RoomInfo() {
         >
           {showRoomTitle ? room?.title : "Room Info"}
         </Text>
-        <TouchableOpacity className="h-10 w-10 rounded-full items-center justify-center">
+        <TouchableOpacity
+          onPress={() => setShowOptions(true)}
+          className="h-10 w-10 rounded-full items-center justify-center"
+        >
           <Ionicons name="ellipsis-vertical" size={20} color="#18181B" />
         </TouchableOpacity>
       </View>
@@ -352,7 +379,23 @@ export default function RoomInfo() {
             ))}
           </View>
         </View>
+        <TouchableOpacity
+          onPress={handleLeaveRoom}
+          activeOpacity={0.7}
+          className="mx-6 mt-7 bg-red-50 py-4 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
+        >
+          <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+          <Text className="text-red-500 font-semibold text-[15px]">
+            Leave Room
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
+      {showOptions && (
+        <RoomOptionsModal
+          showOptions={showOptions}
+          setShowOptions={setShowOptions}
+        />
+      )}
     </SafeAreaView>
   );
 }

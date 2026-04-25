@@ -111,6 +111,18 @@ export default function ChatMessages({
       currentReaction,
     });
   };
+
+  const handleScrollToMessage = (messageId) => {
+    const index = messages.findIndex((m) => m.id === messageId);
+    if (index !== -1) {
+      try {
+        flatListRef.current?.scrollToIndex({ index, animated: true, viewPosition: 0.5 });
+      } catch (error) {
+        console.warn("Could not scroll to message:", error);
+      }
+    }
+  };
+
   // Auto-scroll to the bottom of the list when new messages or typing indicators appear
   useEffect(() => {
     if (!messages?.length) return;
@@ -341,7 +353,9 @@ export default function ChatMessages({
                 )}
                 {/* Reply Preview */}
                 {item.replyTo && (
-                  <View
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => handleScrollToMessage(item.replyTo.id)}
                     style={{
                       borderLeftWidth: 3,
                       borderLeftColor: isSentByMe
@@ -379,7 +393,7 @@ export default function ChatMessages({
                     >
                       {item.replyTo.imageUrl ? "📷 Photo" : item.replyTo.text}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 )}
 
                 {item.imageUrl ? (
@@ -469,6 +483,12 @@ export default function ChatMessages({
         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
         showsVerticalScrollIndicator={false}
         initialNumToRender={10}
+        onScrollToIndexFailed={(info) => {
+          const wait = new Promise((resolve) => setTimeout(resolve, 500));
+          wait.then(() => {
+            flatListRef.current?.scrollToIndex({ index: info.index, animated: true, viewPosition: 0.5 });
+          });
+        }}
         contentContainerClassName="py-4 px-1"
         onContentSizeChange={() => {
           setTimeout(

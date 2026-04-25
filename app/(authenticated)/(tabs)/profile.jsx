@@ -3,7 +3,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 
-import { Redirect, useRouter } from "expo-router";
+import { Redirect, useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -13,6 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { getRooms } from "../../../lib/getRoom";
 
 const MenuItem = ({
   icon,
@@ -57,6 +59,18 @@ export default function Profile() {
   const { firestoreUser, loading } = useFirestoreUser();
   const router = useRouter();
 
+  const [rooms, setRooms] = useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadRooms = async () => {
+        const data = await getRooms();
+        setRooms(data);
+      };
+      loadRooms();
+    }, []),
+  );
+
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-bg">
@@ -74,6 +88,15 @@ export default function Profile() {
     await signOut();
     router.replace("/login");
   };
+
+  const createdRooms = rooms.filter(
+    (r) => r.createdBy === firestoreUser?.id,
+  ).length;
+  const joinedRooms = rooms.filter(
+    (r) =>
+      r.participants?.includes(firestoreUser?.id) &&
+      r.createdBy !== firestoreUser?.id,
+  ).length;
 
   return (
     <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
@@ -126,14 +149,14 @@ export default function Profile() {
         <View className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-7 shadow-sm shadow-gray-100">
           <View className="items-center flex-1">
             <Text className="text-[22px] font-extrabold text-primary">
-              {firestoreUser?.roomsCreated ?? 0}
+              {createdRooms}
             </Text>
             <Text className="text-gray-400 text-xs mt-1">Created</Text>
           </View>
           <View className="w-px bg-gray-100" />
           <View className="items-center flex-1">
             <Text className="text-[22px] font-extrabold text-secondary">
-              {firestoreUser?.roomsJoined ?? 0}
+              {joinedRooms}
             </Text>
             <Text className="text-gray-400 text-xs mt-1">Joined</Text>
           </View>
@@ -209,7 +232,7 @@ export default function Profile() {
         </TouchableOpacity>
 
         <Text className="text-center text-gray-300 text-[10px] mt-6 tracking-wider">
-          SpotUs v1.0.4
+          SpotUs v1.0.0
         </Text>
       </ScrollView>
     </SafeAreaView>
