@@ -71,6 +71,7 @@ export default function RoomsScreen() {
           <RoomCard
             room={item}
             onPress={() => router.push(`/rooms/${item.id}`)}
+            variant="joined"
           />
         )}
         renderSectionHeader={({ section }) => (
@@ -92,7 +93,11 @@ export default function RoomsScreen() {
             {section.isEmpty && (
               <View className="items-center py-10">
                 <View className="w-14 h-14 bg-white rounded-2xl items-center justify-center mb-3 border border-gray-100 shadow-sm shadow-gray-100">
-                  <Ionicons name={section.emptyIcon} size={28} color="#D1D5DB" />
+                  <Ionicons
+                    name={section.emptyIcon}
+                    size={28}
+                    color="#D1D5DB"
+                  />
                 </View>
                 <Text className="text-gray-400 text-sm mt-1">
                   {section.emptyText}

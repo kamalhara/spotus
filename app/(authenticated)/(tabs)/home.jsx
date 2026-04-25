@@ -4,7 +4,14 @@ import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  Animated,
+  FlatList,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/RoomCard";
 import RoomJoinSheet from "../../../components/RoomJoinSheet";
@@ -68,7 +75,7 @@ export default function Home() {
         }),
       ]),
     ]).start();
-  }, []);
+  }, [fadeInHeader, fadeInContent, slideUpContent]);
 
   // Sheet Ref
   const bottomSheetModalRef = useRef(null);

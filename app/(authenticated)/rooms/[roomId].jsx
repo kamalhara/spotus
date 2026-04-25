@@ -75,7 +75,7 @@ export default function RoomChat() {
       setMessages(msgs);
     });
     return unsub;
-  }, [roomId]);
+  }, [currentUserId, roomId]);
 
   // Mark room messages as seen when entering
   useEffect(() => {
@@ -244,13 +244,25 @@ export default function RoomChat() {
   const trustColor = trust < 3 ? "#EF4444" : trust < 7 ? "#F59E0B" : "#10B981";
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
 
+  const handleInfoPress = () => {
+    router.push(`/rooms/roomInfo?roomId=${roomId}`);
+  };
+
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-bg"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       {/* Header */}
-      <View className="bg-white z-10 border-b border-gray-100" style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4 }}>
+      <View
+        className="bg-white z-10 border-b border-gray-100"
+        style={{
+          shadowColor: "#94A3B8",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 4,
+        }}
+      >
         <SafeAreaView edges={["top"]}>
           <View className="flex-row items-center justify-between px-5 py-3">
             <View className="flex-row items-center flex-1">
@@ -286,7 +298,10 @@ export default function RoomChat() {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center">
+            <TouchableOpacity
+              onPress={handleInfoPress}
+              className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center"
+            >
               <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
             </TouchableOpacity>
           </View>
@@ -296,7 +311,16 @@ export default function RoomChat() {
       {/* Trust Meter — compact */}
       {trust < 10 && (
         <View className="px-5 pt-3 pb-1">
-          <View className="bg-white px-4 py-3 rounded-xl border border-gray-100" style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}>
+          <View
+            className="bg-white px-4 py-3 rounded-xl border border-gray-100"
+            style={{
+              shadowColor: "#94A3B8",
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.04,
+              shadowRadius: 4,
+              elevation: 1,
+            }}
+          >
             <View className="flex-row items-center justify-between mb-2">
               <View className="flex-row items-center">
                 <Ionicons

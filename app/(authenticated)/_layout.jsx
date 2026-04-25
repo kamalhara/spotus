@@ -41,6 +41,7 @@ export default function AuthenticatedLayout() {
       <Stack.Screen name="rooms/[roomId]" options={{ headerShown: false }} />
       <Stack.Screen name="users/[userId]" options={{ headerShown: false }} />
       <Stack.Screen name="dm/[chatId]" options={{ headerShown: false }} />
+      <Stack.Screen name="rooms/roomInfo" options={{ headerShown: false }} />
     </Stack>
   );
 }

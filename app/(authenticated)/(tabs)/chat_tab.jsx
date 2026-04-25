@@ -51,7 +51,7 @@ export default function Chat() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeIn, slideUp]);
 
   // Fetch rooms user is in
   // Fetch all rooms where the current user is a participant

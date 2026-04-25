@@ -47,6 +47,8 @@ export default function RoomCard({
   const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
   const categoryColor = CATEGORY_COLORS[room.category] || "#6B7280";
 
+  const buttonText = isDiscovery ? "Join" : "Enter";
+
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
       toValue: 0.98,
@@ -78,7 +80,7 @@ export default function RoomCard({
               : "bg-white border-gray-100"
         }`}
         style={{
-          shadowColor: '#94A3B8',
+          shadowColor: "#94A3B8",
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.06,
           shadowRadius: 8,
@@ -137,21 +139,22 @@ export default function RoomCard({
               ))}
             </View>
             <Text className="text-gray-400 text-xs">
-              {room.participants?.length || 1}{room.participants?.length > 3 ? "+" : ""} members
+              {room.participants?.length || 1}
+              {room.participants?.length > 3 ? "+" : ""} members
             </Text>
           </View>
           <TouchableOpacity
             onPress={() => onPress?.(room)}
             className="bg-primary px-5 py-2.5 rounded-xl"
             style={{
-              shadowColor: '#4F46E5',
+              shadowColor: "#4F46E5",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.15,
               shadowRadius: 4,
               elevation: 3,
             }}
           >
-            <Text className="text-white font-bold text-xs">Join</Text>
+            <Text className="text-white font-bold text-xs">{buttonText}</Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
