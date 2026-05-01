@@ -295,7 +295,10 @@ export default function ChatId() {
               </View>
             </View>
           </View>
-          <TouchableOpacity className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center border border-gray-100">
+          <TouchableOpacity
+            onPress={() => setShowOptions(true)}
+            className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center border border-gray-100"
+          >
             <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
           </TouchableOpacity>
         </View>

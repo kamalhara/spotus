@@ -4,12 +4,12 @@ import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 export default function UserOptionsModal({ showOptions, setShowOptions }) {
   const OPTIONS = [
     {
-      label: "Clear Chat",
+      label: "Report",
       onPress: () => {
-        console.log("Clear Chat");
+        console.log("Report");
         setShowOptions(false);
       },
-      icon: "backspace",
+      icon: "flag",
       color: "#EF4444",
     },
     {
