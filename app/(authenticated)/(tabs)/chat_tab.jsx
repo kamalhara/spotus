@@ -19,8 +19,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ChatRow from "../../../components/ChatList";
-import RoomHorizontalList from "../../../components/RoomHorizontalList";
+import ChatRow from "../../../components/chat/ChatList";
+import RoomHorizontalList from "../../../components/rooms/RoomHorizontalList";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 

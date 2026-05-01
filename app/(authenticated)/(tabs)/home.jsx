@@ -13,8 +13,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import RoomCard from "../../../components/RoomCard";
-import RoomJoinSheet from "../../../components/RoomJoinSheet";
+import RoomCard from "../../../components/rooms/RoomCard";
+import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";

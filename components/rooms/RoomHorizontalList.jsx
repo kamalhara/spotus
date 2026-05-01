@@ -1,8 +1,8 @@
 import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import { Animated, FlatList, Text, TouchableOpacity, View } from "react-native";
-import useFirestoreUser from "../hook/useFireStoreUser";
-import { isRoomUnseen } from "../lib/chatSeen";
+import useFirestoreUser from "../../hook/useFireStoreUser";
+import { isRoomUnseen } from "../../lib/chatSeen";
 
 const CATEGORY_COLORS = {
   Music: "#8B5CF6",

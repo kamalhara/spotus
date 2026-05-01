@@ -22,9 +22,9 @@ import {
 } from "react-native";
 import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ChatMessages from "../../../components/ChatMessages";
-import MessageSender from "../../../components/MessageSender";
-import RoomDetailsSheet from "../../../components/RoomDetailsSheet";
+import ChatMessages from "../../../components/chat/ChatMessages";
+import MessageSender from "../../../components/chat/MessageSender";
+import RoomDetailsSheet from "../../../components/rooms/RoomDetailsSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { RoomSeen } from "../../../lib/chatSeen";

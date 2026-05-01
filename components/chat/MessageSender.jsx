@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { setTyping } from "../lib/chatTyping";
+import { setTyping } from "../../lib/chatTyping";
 
 const MEDIA_OPTIONS = [
   {

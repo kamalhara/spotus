@@ -12,9 +12,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CustomButton from "../../components/CustomButton";
-import CustomInput from "../../components/CustomInput";
-import Oauth from "../../components/Oauth";
+import CustomButton from "../../components/ui/CustomButton";
+import CustomInput from "../../components/ui/CustomInput";
+import Oauth from "../../components/auth/Oauth";
 
 export default function Login() {
   const { isLoaded } = useAuth();

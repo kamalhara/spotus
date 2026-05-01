@@ -13,8 +13,8 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import CustomButton from "../../../components/CustomButton";
-import CustomInput from "../../../components/CustomInput";
+import CustomButton from "../../../components/ui/CustomButton";
+import CustomInput from "../../../components/ui/CustomInput";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { createRoom } from "../../../lib/createRoom";
 

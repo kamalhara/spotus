@@ -12,9 +12,9 @@ import {
   View,
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
-import { useChatActions } from "../hook/useChatActions";
-import useTypingIndicator from "../hook/useTypingIndicator";
-import { toggleReaction } from "../lib/reactions";
+import { useChatActions } from "../../hook/useChatActions";
+import useTypingIndicator from "../../hook/useTypingIndicator";
+import { toggleReaction } from "../../lib/reactions";
 import ReactionPicker from "./ReactionPicker";
 import TypingIndicator from "./TypingIndicator";
 

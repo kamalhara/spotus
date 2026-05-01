@@ -13,7 +13,7 @@ import {
   useRef,
 } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
-import CustomButton from "./CustomButton";
+import CustomButton from "../ui/CustomButton";
 
 const CATEGORY_ICONS = {
   Music: "musical-notes",

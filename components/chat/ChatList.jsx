@@ -12,11 +12,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { db } from "../config/firebase.config";
-import useFirestoreUser from "../hook/useFireStoreUser";
-import usePresenceStatus from "../hook/usePresenceStatus";
-import useTypingIndicator from "../hook/useTypingIndicator";
-import { isChatUnseen } from "../lib/chatSeen";
+import { db } from "../../config/firebase.config";
+import useFirestoreUser from "../../hook/useFireStoreUser";
+import usePresenceStatus from "../../hook/usePresenceStatus";
+import useTypingIndicator from "../../hook/useTypingIndicator";
+import { isChatUnseen } from "../../lib/chatSeen";
 
 function formatTime(timestamp) {
   if (!timestamp) return "";

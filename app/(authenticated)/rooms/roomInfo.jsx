@@ -11,7 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import RoomOptionsModal from "../../../components/roomOptionsModal";
+import RoomOptionsModal from "../../../components/rooms/roomOptionsModal";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 

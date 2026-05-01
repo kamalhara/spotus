@@ -21,9 +21,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ChatMessages from "../../../components/ChatMessages";
-import MessageSender from "../../../components/MessageSender";
-import UserOptionsModal from "../../../components/userOptionsModal";
+import ChatMessages from "../../../components/chat/ChatMessages";
+import MessageSender from "../../../components/chat/MessageSender";
+import UserOptionsModal from "../../../components/modals/userOptionsModal";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import usePresenceStatus from "../../../hook/usePresenceStatus";
@@ -335,6 +335,9 @@ export default function ChatId() {
           <UserOptionsModal
             showOptions={showOptions}
             setShowOptions={setShowOptions}
+            chatId={chatDocId}
+            currentUserId={currentUserId}
+            chatDoc={chatDoc}
           />
         )}
       </KeyboardAvoidingView>
