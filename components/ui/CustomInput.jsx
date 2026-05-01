@@ -10,6 +10,7 @@ export default function CustomInput({
   icon,
   error,
   className = "",
+  containerStyle,
   ...props
 }) {
   const borderAnim = useRef(new Animated.Value(0)).current;
@@ -70,12 +71,17 @@ export default function CustomInput({
         </Text>
       )}
       <Animated.View
-        className="flex-row items-center rounded-2xl px-4 py-[17px]"
-        style={{
-          borderWidth: 1.5,
-          borderColor: animatedBorderColor,
-          backgroundColor: animatedBgColor,
-        }}
+        className="flex-row items-center rounded-2xl"
+        style={[
+          {
+            paddingHorizontal: 16,
+            paddingVertical: 17,
+            borderWidth: 1.5,
+            borderColor: animatedBorderColor,
+            backgroundColor: animatedBgColor,
+          },
+          containerStyle,
+        ]}
       >
         {icon && (
           <View className="mr-3 w-6 items-center">{icon}</View>

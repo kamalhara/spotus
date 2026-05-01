@@ -179,7 +179,11 @@ export default function Profile() {
             label="Account Settings"
             subtitle={firestoreUser?.email}
           />
-          <MenuItem icon="create-outline" label="Edit Profile" />
+          <MenuItem
+            icon="create-outline"
+            label="Edit Profile"
+            onPress={() => router.push("/profile/edit")}
+          />
           <MenuItem icon="shield-checkmark-outline" label="Security" isLast />
         </View>
 
