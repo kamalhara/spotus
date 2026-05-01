@@ -1,6 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import * as Location from "expo-location";
+import { useRouter } from "expo-router";
+import { doc, updateDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   Keyboard,
   ScrollView,
@@ -11,6 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomInput from "../../../components/ui/CustomInput";
+import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 
 const INTERESTS = [
@@ -25,9 +30,84 @@ const INTERESTS = [
   { label: "Local Events", icon: "calendar", color: "#14B8A6" },
 ];
 export default function Edit() {
-  const [selectedInterests, setSelectedInterests] = useState([]);
-
+  const router = useRouter();
   const { firestoreUser: user } = useFirestoreUser();
+
+  const [selectedInterests, setSelectedInterests] = useState([]);
+  const [userName, setUserName] = useState("");
+  const [bio, setBio] = useState("");
+  const [currentLocation, setCurrentLocation] = useState("");
+  const [locationCoords, setLocationCoords] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setUserName(user.userName || "");
+      setBio(user.bio || "");
+      setCurrentLocation(user.currentLocation || "");
+      if (user.locationCoords) {
+        setLocationCoords(user.locationCoords);
+      }
+      if (user.interests) {
+        setSelectedInterests(user.interests);
+      }
+    }
+  }, [user]);
+
+  const handleGetLocation = async () => {
+    setIsLocating(true);
+    try {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        alert("Permission to access location was denied");
+        setIsLocating(false);
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      setLocationCoords(coords);
+
+      let geocode = await Location.reverseGeocodeAsync(coords);
+      if (geocode.length > 0) {
+        const place = geocode[0];
+        const locationName = `${place.city || place.subregion || place.name}, ${
+          place.region || place.country
+        }`;
+        setCurrentLocation(locationName);
+      }
+    } catch (error) {
+      console.error("Error getting location:", error);
+      alert("Failed to get current location.");
+    } finally {
+      setIsLocating(false);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    try {
+      const userRef = doc(db, "users", user.id);
+      await updateDoc(userRef, {
+        userName,
+        bio,
+        currentLocation,
+        locationCoords,
+        interests: selectedInterests,
+      });
+      router.back();
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      alert("Failed to save profile updates.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
   return (
     <SafeAreaView className="h-full bg-bg ">
       <ScrollView
@@ -36,12 +116,16 @@ export default function Edit() {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View>
             <View className="w-full flex flex-row items-center justify-between mt-4">
-              <TouchableOpacity>
+              <TouchableOpacity onPress={() => router.back()}>
                 <Text className="font-bold text-primary">Cancel</Text>
               </TouchableOpacity>
               <Text className="font-bold text-lg">Edit Profile</Text>
-              <TouchableOpacity>
-                <Text className="font-bold text-primary">Save</Text>
+              <TouchableOpacity onPress={handleSaveProfile} disabled={isSaving}>
+                {isSaving ? (
+                  <ActivityIndicator color="#4F46E5" size="small" />
+                ) : (
+                  <Text className="font-bold text-primary">Save</Text>
+                )}
               </TouchableOpacity>
             </View>
 
@@ -64,22 +148,47 @@ export default function Edit() {
               <View className="mt-12 flex flex-col gap-4">
                 <CustomInput
                   label="Full name"
-                  placeholder={user?.userName}
+                  placeholder="Enter full name"
+                  value={userName}
+                  onChangeText={setUserName}
                   containerStyle={{ paddingVertical: 10 }}
                 />
 
                 <CustomInput
                   label="Bio"
-                  placeholder={user?.bio || "Add a bio"}
+                  placeholder="Add a bio"
+                  value={bio}
+                  onChangeText={setBio}
                   containerStyle={{ paddingVertical: 30 }}
                 />
-
-                <CustomInput
-                  label="Location"
-                  placeholder={user?.currentLocation || "Add Location"}
-                  containerStyle={{ paddingVertical: 12 }}
-                  icon={<Ionicons name="location" size={18} color="#9CA3AF" />}
-                />
+                <View>
+                  <CustomInput
+                    label="Location"
+                    placeholder="Add Location"
+                    value={currentLocation}
+                    onChangeText={setCurrentLocation}
+                    containerStyle={{ paddingVertical: 12 }}
+                    icon={
+                      <Ionicons name="location" size={18} color="#9CA3AF" />
+                    }
+                  />
+                  <TouchableOpacity
+                    onPress={handleGetLocation}
+                    disabled={isLocating}
+                    className="w-full bg-primary/90 flex flex-row items-center justify-center rounded-lg p-3 mt-3"
+                  >
+                    {isLocating ? (
+                      <ActivityIndicator color="#ffffff" size="small" />
+                    ) : (
+                      <>
+                        <Ionicons name="location" size={18} color="#fff" />
+                        <Text className="text-white font-bold ml-2">
+                          Use Current Location
+                        </Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <View>

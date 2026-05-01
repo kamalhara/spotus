@@ -140,17 +140,21 @@ export default function UserProfile() {
   return (
     <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
       {/* Header */}
-      <View className="flex-row items-center justify-between px-6 py-2">
+      <View className="flex-row items-center justify-between px-4 py-2">
         <TouchableOpacity
           onPress={handleBack}
-          className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100"
+          className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100 z-10"
         >
           <Ionicons name="chevron-back" size={20} color="#18181B" />
         </TouchableOpacity>
-        <Text className="text-secondary font-semibold text-base">Profile</Text>
+
+        <Text className="absolute w-full text-center text-secondary font-semibold text-base z-0 pointer-events-none">
+          Profile
+        </Text>
+
         <TouchableOpacity
           onPress={handleOptions}
-          className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100"
+          className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100 z-10"
         >
           <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
         </TouchableOpacity>
@@ -166,7 +170,7 @@ export default function UserProfile() {
             <View
               className="w-[110px] h-[110px] rounded-full overflow-hidden bg-gray-100 border-4 border-white"
               style={{
-                shadowColor: '#4F46E5',
+                shadowColor: "#4F46E5",
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.12,
                 shadowRadius: 16,
@@ -280,7 +284,13 @@ export default function UserProfile() {
         {/* Stats */}
         <View
           className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-6"
-          style={{ shadowColor: '#94A3B8', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 1 }}
+          style={{
+            shadowColor: "#94A3B8",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.04,
+            shadowRadius: 4,
+            elevation: 1,
+          }}
         >
           <View className="flex-1 items-center">
             <Text className="text-[22px] font-extrabold text-primary">
@@ -346,7 +356,7 @@ export default function UserProfile() {
                 Interests
               </Text>
               <View className="flex-row flex-wrap gap-1.5 mt-1.5">
-                {["Music", "Tech", "Coffee"].map((tag) => (
+                {user.interests.map((tag) => (
                   <View
                     key={tag}
                     className="bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100"

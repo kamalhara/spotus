@@ -46,6 +46,12 @@
     },
     "plugins": [
       [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to find nearby spots and friends."
+        }
+      ],
+      [
         "expo-camera",
         {
           "cameraUsageDescription": "Allow $(PRODUCT_NAME) to use your camera to capture photos for posting and messaging"

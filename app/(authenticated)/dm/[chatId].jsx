@@ -243,7 +243,7 @@ export default function ChatId() {
       >
         {/* Header */}
         <View
-          className="flex-row items-center justify-between border-b border-gray-100 px-5 pb-3.5 pt-1"
+          className="flex-row items-center justify-between px-5 py-3"
           style={{
             shadowColor: "#94A3B8",
             shadowOffset: { width: 0, height: 1 },
@@ -251,49 +251,65 @@ export default function ChatId() {
             shadowRadius: 4,
           }}
         >
-          <View className="flex-row items-center gap-3">
+          <View className="flex-row items-center gap-3 flex-1 mr-2">
             <TouchableOpacity
               onPress={() => router.back()}
               className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center border border-gray-100"
             >
               <Ionicons name="chevron-back" size={20} color="#18181B" />
             </TouchableOpacity>
-            <Image
-              source={{ uri: profilePic || "https://picsum.photos/200" }}
-              className="w-11 h-11 rounded-full bg-gray-100"
-            />
-            <View>
-              <Text className="text-secondary font-bold text-base">
-                {userName}
-              </Text>
-              <View
-                className="flex-row items-center mt-0.5"
-                style={{ minHeight: 16 }}
-              >
-                {isTyping ? (
-                  <Text
-                    style={{
-                      color: "#4F46E5",
-                      fontSize: 12,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    Typing...
-                  </Text>
-                ) : (
-                  <>
-                    <View
-                      className={`w-1.5 h-1.5 ${
-                        userStatus === "Active now"
-                          ? "bg-green-400"
-                          : "bg-gray-400"
-                      } rounded-full mr-1`}
-                    />
-                    <Text className="text-gray-400 text-xs">{userStatus}</Text>
-                  </>
-                )}
+            <TouchableOpacity
+              className="flex-row items-center gap-3 flex-1"
+              onPress={() =>
+                router.push({
+                  pathname: "/(authenticated)/users/[userId]",
+                  params: { userId: chatId },
+                })
+              }
+            >
+              <Image
+                source={{ uri: profilePic || "https://picsum.photos/200" }}
+                className="w-11 h-11 rounded-full bg-gray-100"
+              />
+              <View className="flex-1">
+                <Text 
+                  className="text-secondary font-bold text-base"
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {userName}
+                </Text>
+                <View
+                  className="flex-row items-center mt-0.5"
+                  style={{ minHeight: 16 }}
+                >
+                  {isTyping ? (
+                    <Text
+                      style={{
+                        color: "#4F46E5",
+                        fontSize: 12,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Typing...
+                    </Text>
+                  ) : (
+                    <>
+                      <View
+                        className={`w-1.5 h-1.5 ${
+                          userStatus === "Active now"
+                            ? "bg-green-400"
+                            : "bg-gray-400"
+                        } rounded-full mr-1`}
+                      />
+                      <Text className="text-gray-400 text-xs">
+                        {userStatus}
+                      </Text>
+                    </>
+                  )}
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
           <TouchableOpacity
             onPress={() => setShowOptions(true)}
