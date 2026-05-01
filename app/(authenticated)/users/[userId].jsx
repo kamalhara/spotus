@@ -16,6 +16,7 @@ import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { getRooms } from "../../../lib/getRoom";
 import { canSendDM, getRoomTrust } from "../../../lib/trust";
 
 export default function UserProfile() {
@@ -26,7 +27,25 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [viewerRoomTrust, setViewerRoomTrust] = useState(0);
 
+  const [rooms, setRooms] = useState([]);
+
+  useEffect(() => {
+    const loadRooms = async () => {
+      try {
+        const data = await getRooms();
+        if (data) setRooms(data);
+      } catch (error) {
+        console.error("Failed to load rooms", error);
+      }
+    };
+    loadRooms();
+  }, []);
+
   const [vouchStatus, setVouchStatus] = useState(false);
+  const hostedRooms = rooms.filter((r) => r.createdBy === userId).length;
+  const joinedRooms = rooms.filter(
+    (r) => r.participants?.includes(userId) && r.createdBy !== userId,
+  ).length;
 
   // Fetch the viewed user's profile and check trust context for DM access
   useEffect(() => {
@@ -104,10 +123,10 @@ export default function UserProfile() {
       const url = `https://spotus.app/user/${userId}`;
 
       await Share.share({
-        message: `Check out my profile on SpotUs 👀\n${url}`,
+        message: `Check out ${user?.userName}'s profile on SpotUs 👀\n${url}`,
       });
     } catch (error) {
-      console.log("Share error:", error);
+      console.log("SpotUs share error:", error);
     }
   };
 
@@ -314,14 +333,14 @@ export default function UserProfile() {
         >
           <View className="flex-1 items-center">
             <Text className="text-[22px] font-extrabold text-primary">
-              {user?.roomsCreated ?? 0}
+              {hostedRooms}
             </Text>
             <Text className="text-gray-400 text-xs mt-1">Hosted</Text>
           </View>
           <View className="w-px bg-gray-100" />
           <View className="flex-1 items-center">
             <Text className="text-[22px] font-extrabold text-secondary">
-              {user?.roomsJoined ?? 0}
+              {joinedRooms}
             </Text>
             <Text className="text-gray-400 text-xs mt-1">Joined</Text>
           </View>

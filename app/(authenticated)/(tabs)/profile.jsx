@@ -107,7 +107,7 @@ export default function Profile() {
         {/* Profile Header */}
         <View className="items-center px-6 mt-2 mb-7">
           {/* Background accent */}
-          <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px] bg-indigo-50/50" />
+          <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px] bg-bg" />
 
           <View className="relative mt-6">
             <View
