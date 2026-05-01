@@ -19,6 +19,14 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 import { canSendDM, getRoomTrust } from "../../../lib/trust";
 
+const dateFormater = (timestamp) => {
+  const date = new Date(timestamp * 1000);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+  });
+};
+
 export default function UserProfile() {
   const { userId, roomId } = useLocalSearchParams();
   const router = useRouter();
@@ -381,7 +389,12 @@ export default function UserProfile() {
                 Verified Host
               </Text>
               <Text className="text-gray-400 text-sm leading-5 mt-0.5">
-                Member since 2023. Hosted 10+ rooms with positive feedback.
+                Member since{" "}
+                {user?.createdAt?.seconds
+                  ? dateFormater(user.createdAt.seconds)
+                  : "recently"}
+                . Hosted {hostedRooms} room{hostedRooms !== 1 ? "s" : ""} with
+                positive feedback.
               </Text>
             </View>
           </View>
@@ -395,7 +408,7 @@ export default function UserProfile() {
                 Interests
               </Text>
               <View className="flex-row flex-wrap gap-1.5 mt-1.5">
-                {user.interests.map((tag) => (
+                {user?.interests?.map((tag) => (
                   <View
                     key={tag}
                     className="bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100"
