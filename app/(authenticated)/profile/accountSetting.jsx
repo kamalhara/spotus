@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
+  Switch,
   Text,
   TouchableOpacity,
   View,
@@ -23,6 +24,8 @@ const MenuItem = ({
   onPress,
   color = "#4F46E5",
   isLast = false,
+  switchComponent = false,
+  tag,
 }) => (
   <TouchableOpacity
     onPress={() => {
@@ -50,7 +53,23 @@ const MenuItem = ({
         )}
       </View>
     </View>
-    <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+    {switchComponent ? (
+      <Switch
+        trackColor={{ false: "#E5E7EB", true: "#4F46E5" }}
+        ios_backgroundColor="#E5E7EB"
+        onValueChange={() => {}}
+        value={true}
+        thumbColor={"#fff"}
+      />
+    ) : tag ? (
+      <View className="flex-row items-center justify-center bg-primary/10 px-2 py-1 rounded-lg">
+        <Text className="text-primary text-xs font-semibold uppercase tracking-wide ">
+          {tag}
+        </Text>
+      </View>
+    ) : (
+      <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+    )}
   </TouchableOpacity>
 );
 
@@ -100,18 +119,40 @@ export default function Profile() {
 
   return (
     <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
+      {/* Header */}
+      <View className="px-4 py-2 flex-row items-center justify-between">
+        <View className="flex flex-row items-center">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50 mr-2"
+          >
+            <Ionicons name="arrow-back" size={20} color="#4F46E5" />
+          </TouchableOpacity>
+          <Text className="text-secondary font-extrabold text-xl">
+            Settings
+          </Text>
+        </View>
+        <View className="flex flex-row items-center gap-2">
+          <TouchableOpacity
+            onPress={() => router.push("/profile/search")}
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50 mr-2"
+          >
+            <Ionicons name="search" size={20} color="#4F46E5" />
+          </TouchableOpacity>
+        </View>
+      </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
       >
         {/* Profile Header */}
-        <View className="items-center px-6 mt-2 mb-7">
+        <View className=" flex flex-row  items-center px-10 mt-2 mb-7">
           {/* Background accent */}
-          <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px] bg-indigo-50/50" />
+          <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px] bg-bg" />
 
           <View className="relative mt-6">
             <View
-              className="w-[110px] h-[110px] rounded-full border-4 border-white overflow-hidden bg-gray-100"
+              className="w-[90px] h-[90px] rounded-full border-4 border-white overflow-hidden bg-gray-100"
               style={{
                 shadowColor: "#4F46E5",
                 shadowOffset: { width: 0, height: 4 },
@@ -129,82 +170,67 @@ export default function Profile() {
                 style={{ width: "100%", height: "100%" }}
               />
             </View>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              className="absolute -bottom-1 -right-1 bg-primary w-10 h-10 rounded-full border-4 border-bg items-center justify-center"
-            >
-              <Ionicons name="camera" size={16} color="white" />
-            </TouchableOpacity>
           </View>
-
-          <Text className="text-secondary text-[24px] font-extrabold mt-4 tracking-tight">
-            {firestoreUser?.userName || "User"}
-          </Text>
-          <Text className="text-gray-400 text-sm mt-1">
-            {firestoreUser?.email}
-          </Text>
+          <View className=" flex flex-col px-10">
+            <Text className="text-secondary text-[22px] font-extrabold mt-4 tracking-tight">
+              {firestoreUser?.userName || "User"}
+            </Text>
+            <Text className="text-gray-400 text-sm mt-1">
+              {firestoreUser?.email}
+            </Text>
+          </View>
         </View>
 
         {/* Stats — with gradient accent on primary stat */}
-        <View className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-7 shadow-sm shadow-gray-100">
-          <View className="items-center flex-1">
-            <Text className="text-[22px] font-extrabold text-primary">
-              {createdRooms}
-            </Text>
-            <Text className="text-gray-400 text-xs mt-1">Created</Text>
-          </View>
-          <View className="w-px bg-gray-100" />
-          <View className="items-center flex-1">
-            <Text className="text-[22px] font-extrabold text-secondary">
-              {joinedRooms}
-            </Text>
-            <Text className="text-gray-400 text-xs mt-1">Joined</Text>
-          </View>
-          <View className="w-px bg-gray-100" />
-          <View className="items-center flex-1">
-            <Text className="text-[22px] font-extrabold text-green-500">
-              {firestoreUser?.globalReputation ?? 0}
-            </Text>
-            <Text className="text-gray-400 text-xs mt-1">Reputation</Text>
-          </View>
-        </View>
 
         {/* Menu Groups */}
         <View className="bg-white mx-6 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
           <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
-            General
+            Account
           </Text>
+
           <MenuItem
-            icon="person-outline"
-            label="Settings"
+            icon="mail-outline"
+            label="Email Address"
             subtitle={firestoreUser?.email}
-            onPress={() => router.push("/profile/accountSetting")}
           />
           <MenuItem
-            icon="create-outline"
-            label="Edit Profile"
-            onPress={() => router.push("/profile/edit")}
+            icon="lock-closed-outline"
+            label="Password"
+            onPress={() => router.push("/profile/password")}
+            isLast
           />
-          <MenuItem icon="shield-checkmark-outline" label="Security" isLast />
         </View>
 
         <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
           <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
-            App
+            Preferences
           </Text>
           <MenuItem
             icon="notifications-outline"
             label="Notifications"
             color="#8B5CF6"
+            switchComponent={true}
           />
-          <MenuItem icon="eye-outline" label="Privacy & Data" color="#8B5CF6" />
           <MenuItem
-            icon="language-outline"
-            label="Language"
-            subtitle="English"
+            icon="at-outline"
+            label="Email Alerts"
             color="#8B5CF6"
-            isLast
+            switchComponent={true}
           />
+        </View>
+
+        <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
+          <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+            Privacy
+          </Text>
+          <MenuItem
+            icon="eye-off-outline"
+            label="Profile Visibility"
+            color="#8B5CF6"
+            tag="Public"
+          />
+          <MenuItem icon="ban" label="Blocked Users" color="#8B5CF6" />
         </View>
 
         <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
@@ -212,29 +238,24 @@ export default function Profile() {
             Support
           </Text>
           <MenuItem
-            icon="alert-circle-outline"
+            icon="information-circle-outline"
             label="Help Center"
-            color="#64748B"
+            color="#8B5CF6"
           />
           <MenuItem
-            icon="information-circle-outline"
-            label="About SpotUs"
-            color="#64748B"
+            icon="shield-checkmark"
+            label="Privacy Policy"
+            color="#8B5CF6"
+          />
+          <MenuItem
+            icon="document-text-outline"
+            label="Terms of Service"
+            color="#8B5CF6"
             isLast
           />
         </View>
 
         {/* Sign Out */}
-        <TouchableOpacity
-          onPress={handleSignOut}
-          activeOpacity={0.7}
-          className="mx-6 mt-7 bg-red-50 py-4 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
-        >
-          <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-          <Text className="text-red-500 font-semibold text-[15px]">
-            Sign Out
-          </Text>
-        </TouchableOpacity>
 
         <Text className="text-center text-gray-300 text-[10px] mt-6 tracking-wider">
           SpotUs v1.0.0

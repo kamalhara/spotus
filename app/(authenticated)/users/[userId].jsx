@@ -4,7 +4,14 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  ScrollView,
+  Share,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../../../config/firebase.config";
@@ -18,6 +25,8 @@ export default function UserProfile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [viewerRoomTrust, setViewerRoomTrust] = useState(0);
+
+  const [vouchStatus, setVouchStatus] = useState(false);
 
   // Fetch the viewed user's profile and check trust context for DM access
   useEffect(() => {
@@ -87,12 +96,19 @@ export default function UserProfile() {
 
   const handleVouch = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    // Vouch logic would go here
+    setVouchStatus(!vouchStatus);
   };
 
-  const handleShare = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // Share logic would go here
+  const handleShare = async () => {
+    try {
+      const url = `https://spotus.app/user/${userId}`;
+
+      await Share.share({
+        message: `Check out my profile on SpotUs 👀\n${url}`,
+      });
+    } catch (error) {
+      console.log("Share error:", error);
+    }
   };
 
   const handleBlock = () => {
@@ -232,11 +248,15 @@ export default function UserProfile() {
           <TouchableOpacity
             onPress={handleVouch}
             activeOpacity={0.8}
-            className="flex-1 py-3.5 rounded-2xl flex-row items-center justify-center bg-pink-50 border border-pink-100"
+            className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${vouchStatus ? "bg-pink-100" : "bg-pink-50"} border border-pink-100`}
           >
-            <Ionicons name="heart-outline" size={16} color="#EC4899" />
+            <Ionicons
+              name={vouchStatus ? "heart" : "heart-outline"}
+              size={16}
+              color={vouchStatus ? "#EC4899" : "#EC4899"}
+            />
             <Text className="text-pink-500 font-semibold text-sm ml-1.5">
-              Vouch
+              {vouchStatus ? "Vouched" : "Vouch"}
             </Text>
           </TouchableOpacity>
 
