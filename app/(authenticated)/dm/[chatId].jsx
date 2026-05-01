@@ -23,6 +23,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatMessages from "../../../components/ChatMessages";
 import MessageSender from "../../../components/MessageSender";
+import UserOptionsModal from "../../../components/userOptionsModal";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import usePresenceStatus from "../../../hook/usePresenceStatus";
@@ -42,6 +43,7 @@ export default function ChatId() {
   const [replyTo, setReplyTo] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
   const [chatDoc, setChatDoc] = useState(null);
+  const [showOptions, setShowOptions] = useState(false);
 
   // Deterministic chat doc ID so both users share the same conversation
   const chatDocId = useMemo(() => {
@@ -326,6 +328,12 @@ export default function ChatId() {
             handleEditMessage={handleEditMessage}
           />
         </View>
+        {showOptions && (
+          <UserOptionsModal
+            showOptions={showOptions}
+            setShowOptions={setShowOptions}
+          />
+        )}
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

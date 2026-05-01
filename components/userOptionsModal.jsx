@@ -1,19 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
 import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 
-export default function RoomOptionsModal({ showOptions, setShowOptions }) {
-  const router = useRouter();
-
+export default function UserOptionsModal({ showOptions, setShowOptions }) {
   const OPTIONS = [
     {
-      label: "Report",
+      label: "Clear Chat",
       onPress: () => {
-        console.log("Report");
+        console.log("Clear Chat");
         setShowOptions(false);
-        router.push("/feedback");
       },
-      icon: "flag",
+      icon: "backspace",
       color: "#EF4444",
     },
     {
@@ -24,6 +20,15 @@ export default function RoomOptionsModal({ showOptions, setShowOptions }) {
       },
       icon: "volume-mute",
       color: "#000000",
+    },
+    {
+      label: "Delete Chat",
+      onPress: () => {
+        console.log("Delete Chat");
+        setShowOptions(false);
+      },
+      icon: "trash",
+      color: "#EF4444",
     },
   ];
   return (
