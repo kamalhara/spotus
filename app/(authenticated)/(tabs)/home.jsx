@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/rooms/RoomCard";
+import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
@@ -48,6 +49,7 @@ export default function Home() {
   const { firestoreUser } = useFirestoreUser();
 
   const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState(null);
 
   // Entrance animations
@@ -97,8 +99,10 @@ export default function Home() {
   useFocusEffect(
     useCallback(() => {
       const loadRooms = async () => {
+        setLoading(true);
         const data = await getRooms();
         setRooms(data);
+        setLoading(false);
       };
 
       loadRooms();
@@ -276,17 +280,21 @@ export default function Home() {
         </View>
 
         <FlatList
-          data={nearbyRooms}
-          renderItem={({ item }) => (
-            <RoomCard
-              room={item}
-              onPress={() => handlePresentModalPress(item)}
-            />
-          )}
-          keyExtractor={(item) => item.id}
+          data={loading ? [1, 2, 3] : nearbyRooms}
+          renderItem={({ item }) =>
+            loading ? (
+              <RoomCardSkeleton />
+            ) : (
+              <RoomCard
+                room={item}
+                onPress={() => handlePresentModalPress(item)}
+              />
+            )
+          }
+          keyExtractor={(item, index) => (loading ? `skel-${index}` : item.id)}
           contentContainerStyle={{ paddingBottom: 100, paddingTop: 8 }}
           showsVerticalScrollIndicator={false}
-          ListEmptyComponent={<EmptyRooms />}
+          ListEmptyComponent={loading ? null : <EmptyRooms />}
         />
       </SafeAreaView>
 

@@ -20,6 +20,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatRow from "../../../components/chat/ChatList";
+import ChatListSkeleton from "../../../components/chat/ChatListSkeleton";
 import RoomHorizontalList from "../../../components/rooms/RoomHorizontalList";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
@@ -30,7 +31,9 @@ export default function Chat() {
   const router = useRouter();
 
   const [rooms, setRooms] = useState([]);
+  const [roomsLoading, setRoomsLoading] = useState(true);
   const [chats, setChats] = useState([]);
+  const [chatsLoading, setChatsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
 
@@ -57,12 +60,14 @@ export default function Chat() {
   // Fetch all rooms where the current user is a participant
   useEffect(() => {
     if (!currentUserId) return;
+    setRoomsLoading(true);
     const q = query(
       collection(db, "rooms"),
       where("participants", "array-contains", currentUserId),
     );
     const unsub = onSnapshot(q, (snapshot) => {
       setRooms(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      setRoomsLoading(false);
     });
     return unsub;
   }, [currentUserId]);
@@ -103,6 +108,7 @@ export default function Chat() {
       );
 
       setChats(enriched);
+      setChatsLoading(false);
     });
 
     return unsub;
@@ -193,6 +199,7 @@ export default function Chat() {
         </View>
         <RoomHorizontalList
           rooms={rooms}
+          isLoading={roomsLoading}
           onRoomPress={(room) => router.push(`/rooms/${room.id}`)}
         />
       </Animated.View>
@@ -208,7 +215,15 @@ export default function Chat() {
           )}
         </View>
 
-        {chats.length > 0 ? (
+        {chatsLoading ? (
+          <FlatList
+            data={[1, 2, 3, 4]}
+            keyExtractor={(item) => `skel-${item}`}
+            renderItem={() => <ChatListSkeleton />}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 100 }}
+          />
+        ) : chats.length > 0 ? (
           <FlatList
             data={chats.filter(
               (c) =>

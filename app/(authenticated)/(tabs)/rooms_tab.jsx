@@ -5,19 +5,23 @@ import { useCallback, useState } from "react";
 import { SectionList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/rooms/RoomCard";
+import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 
 export default function RoomsScreen() {
   const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { firestoreUser } = useFirestoreUser();
   const router = useRouter();
 
   useFocusEffect(
     useCallback(() => {
       const loadRooms = async () => {
+        setLoading(true);
         const data = await getRooms();
         setRooms(data);
+        setLoading(false);
       };
       loadRooms();
     }, []),
@@ -33,17 +37,17 @@ export default function RoomsScreen() {
   const sections = [
     {
       title: "Created by me",
-      count: myCreatedRooms.length,
-      data: myCreatedRooms,
-      isEmpty: myCreatedRooms.length === 0,
+      count: loading ? 0 : myCreatedRooms.length,
+      data: loading ? [1, 2] : myCreatedRooms,
+      isEmpty: !loading && myCreatedRooms.length === 0,
       emptyIcon: "add-circle-outline",
       emptyText: "You haven't created any rooms yet.",
     },
     {
       title: "Joined",
-      count: myJoinedRooms.length,
-      data: myJoinedRooms,
-      isEmpty: myJoinedRooms.length === 0,
+      count: loading ? 0 : myJoinedRooms.length,
+      data: loading ? [1, 2, 3] : myJoinedRooms,
+      isEmpty: !loading && myJoinedRooms.length === 0,
       emptyIcon: "compass-outline",
       emptyText: "You haven't joined any rooms.",
     },
@@ -66,14 +70,18 @@ export default function RoomsScreen() {
 
       <SectionList
         sections={sections}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <RoomCard
-            room={item}
-            onPress={() => router.push(`/rooms/${item.id}`)}
-            variant="joined"
-          />
-        )}
+        keyExtractor={(item, index) => (loading ? `skel-${item}-${index}` : item.id)}
+        renderItem={({ item }) =>
+          loading ? (
+            <RoomCardSkeleton />
+          ) : (
+            <RoomCard
+              room={item}
+              onPress={() => router.push(`/rooms/${item.id}`)}
+              variant="joined"
+            />
+          )
+        }
         renderSectionHeader={({ section }) => (
           <View className="bg-bg pt-5 pb-3">
             <View className="flex-row items-center gap-2">

@@ -1,6 +1,7 @@
 import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import { Animated, FlatList, Text, TouchableOpacity, View } from "react-native";
+import Skeleton from "../ui/Skeleton";
 import useFirestoreUser from "../../hook/useFireStoreUser";
 import { isRoomUnseen } from "../../lib/chatSeen";
 
@@ -106,8 +107,21 @@ export function RoomHorizontalItem({ room, onPress }) {
  * Reusable horizontal list for active rooms.
  * Handles scrolling logic and empty state gracefully.
  */
-export default function RoomHorizontalList({ rooms, onRoomPress }) {
-  if (!rooms || rooms.length === 0) return null;
+export default function RoomHorizontalList({ rooms, onRoomPress, isLoading }) {
+  if (!isLoading && (!rooms || rooms.length === 0)) return null;
+
+  if (isLoading) {
+    return (
+      <View className="flex-row px-1 py-1">
+        {[1, 2, 3, 4].map((i) => (
+          <View key={i} className="mr-5 items-center">
+            <Skeleton width={74} height={74} borderRadius={26} />
+            <Skeleton width={60} height={12} borderRadius={6} style={{ marginTop: 10 }} />
+          </View>
+        ))}
+      </View>
+    );
+  }
 
   return (
     <FlatList
