@@ -1,9 +1,9 @@
 import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import { Animated, FlatList, Text, TouchableOpacity, View } from "react-native";
-import Skeleton from "../ui/Skeleton";
 import useFirestoreUser from "../../hook/useFireStoreUser";
 import { isRoomUnseen } from "../../lib/chatSeen";
+import Skeleton from "../ui/Skeleton";
 
 const CATEGORY_COLORS = {
   Music: "#8B5CF6",
@@ -84,9 +84,7 @@ export function RoomHorizontalItem({ room, onPress }) {
           </View>
 
           {roomUnseen && (
-            <View
-              className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full border-2 border-white items-center justify-center shadow-md shadow-primary/30"
-            />
+            <View className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full border-2 border-white items-center justify-center shadow-md shadow-primary/30" />
           )}
         </View>
 
@@ -116,7 +114,12 @@ export default function RoomHorizontalList({ rooms, onRoomPress, isLoading }) {
         {[1, 2, 3, 4].map((i) => (
           <View key={i} className="mr-5 items-center">
             <Skeleton width={74} height={74} borderRadius={26} />
-            <Skeleton width={60} height={12} borderRadius={6} style={{ marginTop: 10 }} />
+            <Skeleton
+              width={60}
+              height={12}
+              borderRadius={6}
+              style={{ marginTop: 10 }}
+            />
           </View>
         ))}
       </View>
@@ -130,10 +133,7 @@ export default function RoomHorizontalList({ rooms, onRoomPress, isLoading }) {
       data={rooms}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
-        <RoomHorizontalItem
-          room={item}
-          onPress={() => onRoomPress?.(item)}
-        />
+        <RoomHorizontalItem room={item} onPress={() => onRoomPress?.(item)} />
       )}
       contentContainerClassName="px-1 py-1"
     />

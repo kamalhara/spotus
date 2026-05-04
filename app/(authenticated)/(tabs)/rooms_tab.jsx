@@ -70,7 +70,9 @@ export default function RoomsScreen() {
 
       <SectionList
         sections={sections}
-        keyExtractor={(item, index) => (loading ? `skel-${item}-${index}` : item.id)}
+        keyExtractor={(item, index) =>
+          loading ? `skel-${item}-${index}` : item.id
+        }
         renderItem={({ item }) =>
           loading ? (
             <RoomCardSkeleton />

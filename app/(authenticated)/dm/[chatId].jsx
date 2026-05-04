@@ -272,7 +272,7 @@ export default function ChatId() {
                 className="w-11 h-11 rounded-full bg-gray-100"
               />
               <View className="flex-1">
-                <Text 
+                <Text
                   className="text-secondary font-bold text-base"
                   numberOfLines={1}
                   ellipsizeMode="tail"

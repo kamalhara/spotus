@@ -326,8 +326,7 @@ export default function ChatRow({ chat, onPress }) {
                 <View className="flex-row items-center p-4 border-b border-gray-100">
                   <Image
                     source={{
-                      uri:
-                        otherUser?.profilePic || "https://picsum.photos/200",
+                      uri: otherUser?.profilePic || "https://picsum.photos/200",
                     }}
                     className="w-10 h-10 rounded-full bg-gray-100"
                   />

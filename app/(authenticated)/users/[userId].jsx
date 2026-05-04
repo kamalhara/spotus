@@ -160,8 +160,18 @@ export default function UserProfile() {
         </View>
         <View className="items-center mt-6 mb-6 px-6">
           <Skeleton width={110} height={110} borderRadius={55} />
-          <Skeleton width={150} height={28} borderRadius={14} style={{ marginTop: 16 }} />
-          <Skeleton width={200} height={20} borderRadius={10} style={{ marginTop: 8 }} />
+          <Skeleton
+            width={150}
+            height={28}
+            borderRadius={14}
+            style={{ marginTop: 16 }}
+          />
+          <Skeleton
+            width={200}
+            height={20}
+            borderRadius={10}
+            style={{ marginTop: 8 }}
+          />
         </View>
         <View className="flex-row px-6 gap-2.5 mb-6">
           <Skeleton width="50%" height={48} borderRadius={16} />
@@ -173,11 +183,26 @@ export default function UserProfile() {
         </View>
         <View className="px-6 mb-4">
           <View className="flex-row mb-4">
-            <Skeleton width={32} height={32} borderRadius={12} style={{ marginRight: 12 }} />
+            <Skeleton
+              width={32}
+              height={32}
+              borderRadius={12}
+              style={{ marginRight: 12 }}
+            />
             <View className="flex-1">
-              <Skeleton width={120} height={20} borderRadius={10} style={{ marginBottom: 4 }} />
+              <Skeleton
+                width={120}
+                height={20}
+                borderRadius={10}
+                style={{ marginBottom: 4 }}
+              />
               <Skeleton width="100%" height={16} borderRadius={8} />
-              <Skeleton width="80%" height={16} borderRadius={8} style={{ marginTop: 4 }} />
+              <Skeleton
+                width="80%"
+                height={16}
+                borderRadius={8}
+                style={{ marginTop: 4 }}
+              />
             </View>
           </View>
         </View>

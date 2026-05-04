@@ -5,12 +5,7 @@ import { Image } from "expo-image";
 
 import { Redirect, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import {
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Skeleton from "../../../components/ui/Skeleton";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
@@ -76,11 +71,31 @@ export default function Profile() {
       <SafeAreaView className="flex-1 bg-bg px-6" edges={["top"]}>
         <View className="items-center mt-8 mb-7">
           <Skeleton width={110} height={110} borderRadius={55} />
-          <Skeleton width={150} height={28} borderRadius={14} style={{ marginTop: 16 }} />
-          <Skeleton width={180} height={20} borderRadius={10} style={{ marginTop: 8 }} />
+          <Skeleton
+            width={150}
+            height={28}
+            borderRadius={14}
+            style={{ marginTop: 16 }}
+          />
+          <Skeleton
+            width={180}
+            height={20}
+            borderRadius={10}
+            style={{ marginTop: 8 }}
+          />
         </View>
-        <Skeleton width="100%" height={80} borderRadius={16} style={{ marginBottom: 28 }} />
-        <Skeleton width="100%" height={160} borderRadius={16} style={{ marginBottom: 16 }} />
+        <Skeleton
+          width="100%"
+          height={80}
+          borderRadius={16}
+          style={{ marginBottom: 28 }}
+        />
+        <Skeleton
+          width="100%"
+          height={160}
+          borderRadius={16}
+          style={{ marginBottom: 16 }}
+        />
         <Skeleton width="100%" height={160} borderRadius={16} />
       </SafeAreaView>
     );

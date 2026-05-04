@@ -36,7 +36,7 @@ export default function ReactionPicker({
       canUnsend = true;
     }
   }
-  
+
   const canEdit = canUnsend;
 
   return (
