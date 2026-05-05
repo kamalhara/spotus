@@ -104,7 +104,7 @@ export default function Login() {
       <SafeAreaView className="bg-white flex-1 px-8">
         <View className="flex-row items-center mt-4">
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => router.push("/")}
             className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
           >
             <Ionicons name="arrow-back" size={20} color="black" />

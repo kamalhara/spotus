@@ -280,7 +280,7 @@ export default function Profile() {
               filterMatch("Password") && (
                 <MenuItem
                   icon="lock-closed-outline"
-                  label="Password"
+                  label="Change Password"
                   isLast
                   onPress={() => router.push("/profile/changePassword")}
                 />
