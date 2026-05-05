@@ -52,7 +52,6 @@ export default function CreateRooms() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <SafeAreaView className="bg-bg flex-1 px-5">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -62,131 +61,137 @@ export default function CreateRooms() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
           >
-            {/* Header */}
-            <View className="flex-row items-center py-4">
-              <TouchableOpacity
-                onPress={() => router.back()}
-                className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100 mr-3"
-                style={{
-                  shadowColor: "#94A3B8",
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.04,
-                  shadowRadius: 4,
-                  elevation: 1,
-                }}
-              >
-                <Ionicons name="arrow-back" size={20} color="#18181B" />
-              </TouchableOpacity>
-            </View>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View className="flex-1">
+                {/* Header */}
+                <View className="flex-row items-center py-4">
+                  <TouchableOpacity
+                    onPress={() => router.back()}
+                    className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100 mr-3"
+                    style={{
+                      shadowColor: "#94A3B8",
+                      shadowOffset: { width: 0, height: 1 },
+                      shadowOpacity: 0.04,
+                      shadowRadius: 4,
+                      elevation: 1,
+                    }}
+                  >
+                    <Ionicons name="arrow-back" size={20} color="#18181B" />
+                  </TouchableOpacity>
+                </View>
 
-            {/* Title */}
-            <View className="mt-4 mb-8">
-              <Text className="text-secondary text-[28px] font-extrabold tracking-tight leading-[34px]">
-                Create a Room
-              </Text>
-              <Text className="text-gray-400 text-sm leading-5 mt-2">
-                Define the vibe and invite others to your circle.
-              </Text>
-            </View>
+                {/* Title */}
+                <View className="mt-4 mb-8">
+                  <Text className="text-secondary text-[28px] font-extrabold tracking-tight leading-[34px]">
+                    Create a Room
+                  </Text>
+                  <Text className="text-gray-400 text-sm leading-5 mt-2">
+                    Define the vibe and invite others to your circle.
+                  </Text>
+                </View>
 
-            {/* Room Title Input */}
-            <View className="mb-1">
-              <CustomInput
-                label="Room Title"
-                placeholder="e.g. Saturday coffee and vinyl"
-                value={title}
-                onChangeText={(text) => {
-                  if (text.length <= MAX_TITLE) setTitle(text);
-                }}
-              />
-              <Text className="text-gray-300 text-xs self-end mt-1.5 mr-1">
-                {title.length}/{MAX_TITLE}
-              </Text>
-            </View>
+                {/* Room Title Input */}
+                <View className="mb-1">
+                  <CustomInput
+                    label="Room Title"
+                    placeholder="e.g. Saturday coffee and vinyl"
+                    value={title}
+                    onChangeText={(text) => {
+                      if (text.length <= MAX_TITLE) setTitle(text);
+                    }}
+                  />
+                  <Text className="text-gray-300 text-xs self-end mt-1.5 mr-1">
+                    {title.length}/{MAX_TITLE}
+                  </Text>
+                </View>
 
-            {/* Categories — each with its own color */}
-            <View className="mt-5">
-              <Text className="text-gray-500 text-sm font-medium mb-3 ml-1">
-                Category
-              </Text>
+                {/* Categories — each with its own color */}
+                <View className="mt-5">
+                  <Text className="text-gray-500 text-sm font-medium mb-3 ml-1">
+                    Category
+                  </Text>
 
-              <View className="flex-row flex-wrap gap-2.5">
-                {CATEGORIES.map(({ label, icon, color }) => {
-                  const selected = selectedCategory === label;
-                  return (
-                    <TouchableOpacity
-                      key={label}
-                      onPress={() => setSelectedCategory(label)}
-                      className={`px-3.5 py-2.5 rounded-xl flex-row items-center gap-2 border ${
-                        selected
-                          ? "border-transparent"
-                          : "bg-white border-gray-100"
-                      }`}
-                      style={
-                        selected
-                          ? {
-                              backgroundColor: `${color}15`,
-                              borderColor: `${color}30`,
-                            }
-                          : {}
-                      }
-                    >
-                      <Ionicons
-                        name={selected ? "checkmark" : icon}
-                        size={14}
-                        color={selected ? color : "#9CA3AF"}
-                      />
-                      <Text
-                        className={`text-sm font-medium ${!selected ? "text-secondary" : ""}`}
-                        style={selected ? { color } : {}}
-                      >
-                        {label}
+                  <View className="flex-row flex-wrap gap-2.5">
+                    {CATEGORIES.map(({ label, icon, color }) => {
+                      const selected = selectedCategory === label;
+                      return (
+                        <TouchableOpacity
+                          key={label}
+                          onPress={() => setSelectedCategory(label)}
+                          className={`px-3.5 py-2.5 rounded-xl flex-row items-center gap-2 border ${
+                            selected
+                              ? "border-transparent"
+                              : "bg-white border-gray-100"
+                          }`}
+                          style={
+                            selected
+                              ? {
+                                  backgroundColor: `${color}15`,
+                                  borderColor: `${color}30`,
+                                }
+                              : {}
+                          }
+                        >
+                          <Ionicons
+                            name={selected ? "checkmark" : icon}
+                            size={14}
+                            color={selected ? color : "#9CA3AF"}
+                          />
+                          <Text
+                            className={`text-sm font-medium ${!selected ? "text-secondary" : ""}`}
+                            style={selected ? { color } : {}}
+                          >
+                            {label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+
+                {/* Age Similarity */}
+                <View className="mt-8">
+                  <View
+                    className="flex-row items-center bg-white p-4 rounded-2xl border border-gray-100"
+                    style={{
+                      shadowColor: "#94A3B8",
+                      shadowOffset: { width: 0, height: 2 },
+                      shadowOpacity: 0.06,
+                      shadowRadius: 8,
+                      elevation: 2,
+                    }}
+                  >
+                    <View className="bg-indigo-50 p-3 rounded-xl mr-3.5">
+                      <Ionicons name="people-sharp" size={20} color="#4F46E5" />
+                    </View>
+                    <View className="flex-1">
+                      <Text className="text-secondary text-[15px] font-semibold">
+                        Age Similarity
                       </Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
-
-            {/* Age Similarity */}
-            <View className="mt-8">
-              <View
-                className="flex-row items-center bg-white p-4 rounded-2xl border border-gray-100"
-                style={{
-                  shadowColor: "#94A3B8",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.06,
-                  shadowRadius: 8,
-                  elevation: 2,
-                }}
-              >
-                <View className="bg-indigo-50 p-3 rounded-xl mr-3.5">
-                  <Ionicons name="people-sharp" size={20} color="#4F46E5" />
+                      <Text className="text-gray-400 text-xs mt-0.5">
+                        Show only to my age bracket
+                      </Text>
+                    </View>
+                    <Switch
+                      trackColor={{ false: "#E5E7EB", true: "#4F46E5" }}
+                      onValueChange={() => setIsEnabled((p) => !p)}
+                      ios_backgroundColor="#E5E7EB"
+                      value={isEnabled}
+                    />
+                  </View>
                 </View>
-                <View className="flex-1">
-                  <Text className="text-secondary text-[15px] font-semibold">
-                    Age Similarity
-                  </Text>
-                  <Text className="text-gray-400 text-xs mt-0.5">
-                    Show only to my age bracket
-                  </Text>
-                </View>
-                <Switch
-                  trackColor={{ false: "#E5E7EB", true: "#4F46E5" }}
-                  onValueChange={() => setIsEnabled((p) => !p)}
-                  ios_backgroundColor="#E5E7EB"
-                  value={isEnabled}
-                />
-              </View>
-            </View>
 
-            {/* Create Button */}
-            <View className="flex-1 justify-end mt-10">
-              <CustomButton title="Create Room" onPress={handleCreateRoom} />
-            </View>
+                {/* Create Button */}
+                <View className="flex-1 justify-end mt-10">
+                  <CustomButton
+                    title="Create Room"
+                    onPress={handleCreateRoom}
+                  />
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
           </ScrollView>
         </KeyboardAvoidingView>
       </SafeAreaView>
-    </TouchableWithoutFeedback>
   );
 }

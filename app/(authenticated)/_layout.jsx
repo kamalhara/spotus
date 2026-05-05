@@ -44,6 +44,10 @@ export default function AuthenticatedLayout() {
       <Stack.Screen name="rooms/roomInfo" options={{ headerShown: false }} />
       <Stack.Screen name="profile/edit" options={{ headerShown: false }} />
       <Stack.Screen
+        name="profile/changePassword"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="profile/accountSetting"
         options={{ headerShown: false }}
       />

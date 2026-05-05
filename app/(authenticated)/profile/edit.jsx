@@ -111,10 +111,14 @@ export default function Edit() {
   return (
     <SafeAreaView className="h-full bg-bg ">
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 20, marginHorizontal: 16 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingBottom: 20,
+          paddingHorizontal: 16,
+        }}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View>
+          <View className="flex-1">
             <View className="w-full flex flex-row items-center justify-between mt-4">
               <TouchableOpacity onPress={() => router.back()}>
                 <Text className="font-bold text-primary">Cancel</Text>

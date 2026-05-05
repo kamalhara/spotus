@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Tabs } from "expo-router";
 import {
   Badge,
@@ -6,9 +7,43 @@ import {
   Label,
   NativeTabs,
 } from "expo-router/unstable-native-tabs";
-import { Platform } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Platform, TouchableWithoutFeedback } from "react-native";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import useUnreadCount from "../../../hook/useUnreadCount";
+
+const AnimatedTabButton = ({ children, onPress, accessibilityState }) => {
+  const focused = accessibilityState?.selected ?? false;
+  const scale = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.spring(scale, {
+      toValue: focused ? 1.2 : 1,
+      friction: 5,
+      useNativeDriver: true,
+    }).start();
+  }, [focused]);
+
+  return (
+    <TouchableWithoutFeedback
+      onPress={(e) => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        if (onPress) onPress(e);
+      }}
+    >
+      <Animated.View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          transform: [{ scale }],
+        }}
+      >
+        {children}
+      </Animated.View>
+    </TouchableWithoutFeedback>
+  );
+};
 
 export default function TabsLayout() {
   const { firestoreUser } = useFirestoreUser();
@@ -20,6 +55,7 @@ export default function TabsLayout() {
         headerShown: false,
         tabBarStyle: {
           backgroundColor: "#FAFAFA",
+          backfaceVisibility: "hidden",
           borderTopWidth: 1,
           borderTopColor: "#E5E5E5",
           paddingTop: 5,
@@ -31,6 +67,7 @@ export default function TabsLayout() {
         name="home"
         options={{
           title: "Home",
+          tabBarButton: (props) => <AnimatedTabButton {...props} />,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "home" : "home-outline"}
@@ -44,6 +81,7 @@ export default function TabsLayout() {
         name="rooms_tab"
         options={{
           title: "Rooms",
+          tabBarButton: (props) => <AnimatedTabButton {...props} />,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "people" : "people-outline"}
@@ -57,6 +95,7 @@ export default function TabsLayout() {
         name="chat_tab"
         options={{
           title: "Chat",
+          tabBarButton: (props) => <AnimatedTabButton {...props} />,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "chatbubbles" : "chatbubbles-outline"}
@@ -70,6 +109,7 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: "Profile",
+          tabBarButton: (props) => <AnimatedTabButton {...props} />,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "person" : "person-outline"}

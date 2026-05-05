@@ -83,7 +83,9 @@
           "icon": "./assets/images/icon.png",
           "color": "#4F46E5"
         }
-      ]
+      ],
+      "expo-audio",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

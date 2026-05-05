@@ -1,4 +1,4 @@
-import { useAuth } from "@clerk/expo";
+import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
@@ -7,15 +7,27 @@ import { Redirect, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
+  Keyboard,
+  LayoutAnimation,
+  Platform,
   ScrollView,
   Switch,
   Text,
+  TextInput,
   TouchableOpacity,
+  UIManager,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
+
+if (
+  Platform.OS === "android" &&
+  UIManager.setLayoutAnimationEnabledExperimental
+) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const MenuItem = ({
   icon,
@@ -26,11 +38,13 @@ const MenuItem = ({
   isLast = false,
   switchComponent = false,
   tag,
+  goto = true,
+  rightComponent,
 }) => (
   <TouchableOpacity
     onPress={() => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      onPress?.();
+      if (onPress) onPress();
     }}
     activeOpacity={0.6}
     className={`px-5 py-4 flex-row items-center justify-between ${!isLast ? "border-b border-gray-50" : ""}`}
@@ -53,7 +67,9 @@ const MenuItem = ({
         )}
       </View>
     </View>
-    {switchComponent ? (
+    {rightComponent ? (
+      rightComponent
+    ) : switchComponent ? (
       <Switch
         trackColor={{ false: "#E5E7EB", true: "#4F46E5" }}
         ios_backgroundColor="#E5E7EB"
@@ -68,15 +84,46 @@ const MenuItem = ({
         </Text>
       </View>
     ) : (
-      <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+      goto && <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
     )}
   </TouchableOpacity>
 );
 
 export default function Profile() {
-  const { signOut } = useAuth();
+  const { user: clerkUser } = useUser();
   const { firestoreUser, loading } = useFirestoreUser();
   const router = useRouter();
+  const [activeSearch, setActiveSearch] = useState(false);
+  const [visibility, setVisibility] = useState("Public");
+
+  const toggleSearch = (active) => {
+    LayoutAnimation.configureNext({
+      duration: 300,
+      create: { type: "easeInEaseOut", property: "opacity" },
+      update: { type: "easeInEaseOut" },
+      delete: { type: "easeInEaseOut", property: "opacity" },
+    });
+    setActiveSearch(active);
+  };
+
+  const getAuthMethod = () => {
+    if (!clerkUser) return { name: "Email & Password", icon: "mail-outline" };
+
+    if (clerkUser.externalAccounts && clerkUser.externalAccounts.length > 0) {
+      const provider = clerkUser.externalAccounts[0].provider;
+      if (provider.includes("google"))
+        return { name: "Google", icon: "logo-google" };
+      if (provider.includes("apple"))
+        return { name: "Apple", icon: "logo-apple" };
+      if (provider.includes("github"))
+        return { name: "GitHub", icon: "logo-github" };
+      return { name: "OAuth Provider", icon: "shield-checkmark-outline" };
+    }
+
+    return { name: "Email & Password", icon: "mail-outline" };
+  };
+
+  const authMethod = getAuthMethod();
 
   const [rooms, setRooms] = useState([]);
 
@@ -102,48 +149,63 @@ export default function Profile() {
     return <Redirect href="/welcome" />;
   }
 
-  const handleSignOut = async () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    await signOut();
-    router.replace("/login");
-  };
-
-  const createdRooms = rooms.filter(
-    (r) => r.createdBy === firestoreUser?.id,
-  ).length;
-  const joinedRooms = rooms.filter(
-    (r) =>
-      r.participants?.includes(firestoreUser?.id) &&
-      r.createdBy !== firestoreUser?.id,
-  ).length;
-
   return (
     <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
       {/* Header */}
-      <View className="px-4 py-2 flex-row items-center justify-between">
-        <View className="flex flex-row items-center">
+      <View className="px-4 py-2 flex-row items-center justify-between min-h-[60px]">
+        <View className="flex flex-row items-center flex-1">
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={() => {
+              if (activeSearch) toggleSearch(false);
+              else router.back();
+            }}
             className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50 mr-2"
           >
-            <Ionicons name="arrow-back" size={20} color="#4F46E5" />
+            <Ionicons
+              name={activeSearch ? "close" : "arrow-back"}
+              size={20}
+              color="#4F46E5"
+            />
           </TouchableOpacity>
-          <Text className="text-secondary font-extrabold text-xl">
-            Settings
-          </Text>
+          {!activeSearch ? (
+            <Text
+              className="text-secondary font-extrabold text-xl"
+              numberOfLines={1}
+            >
+              Settings
+            </Text>
+          ) : (
+            <TextInput
+              className="text-secondary font-extrabold text-xl"
+              placeholder="Search"
+            />
+          )}
         </View>
-        <View className="flex flex-row items-center gap-2">
+        {!activeSearch && (
           <TouchableOpacity
-            onPress={() => router.push("/profile/search")}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50 mr-2"
+            onPress={() => toggleSearch(true)}
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50"
           >
             <Ionicons name="search" size={20} color="#4F46E5" />
           </TouchableOpacity>
-        </View>
+        )}
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
+        keyboardShouldPersistTaps="handled"
+        onScrollBeginDrag={() => {
+          if (activeSearch) {
+            Keyboard.dismiss();
+            toggleSearch(false);
+          }
+        }}
+        onTouchStart={() => {
+          if (activeSearch) {
+            Keyboard.dismiss();
+            toggleSearch(false);
+          }
+        }}
       >
         {/* Profile Header */}
         <View className=" flex flex-row  items-center px-10 mt-2 mb-7">
@@ -193,13 +255,24 @@ export default function Profile() {
             icon="mail-outline"
             label="Email Address"
             subtitle={firestoreUser?.email}
+            goto={false}
           />
-          <MenuItem
-            icon="lock-closed-outline"
-            label="Password"
-            onPress={() => router.push("/profile/password")}
-            isLast
-          />
+          {
+            <MenuItem
+              icon={authMethod.icon}
+              label="Sign-In Method"
+              subtitle={authMethod.name}
+              goto={false}
+            />
+          }
+          {authMethod.name === "Email & Password" && (
+            <MenuItem
+              icon="lock-closed-outline"
+              label="Password"
+              isLast
+              onPress={() => router.push("/profile/changePassword")}
+            />
+          )}
         </View>
 
         <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
@@ -224,12 +297,50 @@ export default function Profile() {
           <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             Privacy
           </Text>
-          <MenuItem
-            icon="eye-off-outline"
-            label="Profile Visibility"
-            color="#8B5CF6"
-            tag="Public"
-          />
+          <View className="px-5 py-4 flex-row items-center justify-between border-b border-gray-50">
+            <View className="flex-row items-center flex-1">
+              <View
+                className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
+                style={{ backgroundColor: "#8B5CF612" }}
+              >
+                <Ionicons name="eye-off-outline" size={18} color="#8B5CF6" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-secondary font-semibold text-[15px]">
+                  Profile Visibility
+                </Text>
+                <Text className="text-gray-400 text-xs mt-0.5">
+                  {visibility === "Public"
+                    ? "Anyone can view your profile"
+                    : "Only approved users can view"}
+                </Text>
+              </View>
+            </View>
+
+            <View className="flex-row items-center bg-gray-50 px-2 py-0.5 rounded-2xl border border-gray-100">
+              <Text
+                className={`text-[10px] font-bold ml-1 ${visibility === "Public" ? "text-primary" : "text-gray-300"}`}
+              >
+                Public
+              </Text>
+              <Switch
+                value={visibility === "Private"}
+                onValueChange={(val) => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setVisibility(val ? "Private" : "Public");
+                }}
+                trackColor={{ false: "#CBD5E1", true: "#4F46E5" }}
+                thumbColor="#fff"
+                ios_backgroundColor="#CBD5E1"
+                style={{ transform: [{ scale: 0.8 }] }}
+              />
+              <Text
+                className={`text-[10px] font-bold mr-1 ${visibility === "Private" ? "text-primary" : "text-gray-300"}`}
+              >
+                Private
+              </Text>
+            </View>
+          </View>
           <MenuItem icon="ban" label="Blocked Users" color="#8B5CF6" />
         </View>
 
@@ -254,8 +365,6 @@ export default function Profile() {
             isLast
           />
         </View>
-
-        {/* Sign Out */}
 
         <Text className="text-center text-gray-300 text-[10px] mt-6 tracking-wider">
           SpotUs v1.0.0
