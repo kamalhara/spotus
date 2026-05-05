@@ -109,47 +109,66 @@ export default function Edit() {
     }
   };
   return (
-    <SafeAreaView className="h-full bg-bg ">
+    <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-          paddingBottom: 20,
-          paddingHorizontal: 16,
+          paddingBottom: 32,
+          paddingHorizontal: 20,
         }}
+        showsVerticalScrollIndicator={false}
       >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View className="flex-1">
-            <View className="w-full flex flex-row items-center justify-between mt-4">
-              <TouchableOpacity onPress={() => router.back()}>
+            <View className="w-full flex-row items-center justify-between mt-2 py-3">
+              <TouchableOpacity
+                onPress={() => router.back()}
+                activeOpacity={0.75}
+                className="px-3 py-2 rounded-xl bg-white border border-gray-100"
+              >
                 <Text className="font-bold text-primary">Cancel</Text>
               </TouchableOpacity>
-              <Text className="font-bold text-lg">Edit Profile</Text>
-              <TouchableOpacity onPress={handleSaveProfile} disabled={isSaving}>
+              <Text className="font-extrabold text-lg text-secondary">
+                Edit Profile
+              </Text>
+              <TouchableOpacity
+                onPress={handleSaveProfile}
+                disabled={isSaving}
+                activeOpacity={0.75}
+                className="min-w-16 px-3 py-2 rounded-xl bg-primary items-center"
+              >
                 {isSaving ? (
-                  <ActivityIndicator color="#4F46E5" size="small" />
+                  <ActivityIndicator color="#FFFFFF" size="small" />
                 ) : (
-                  <Text className="font-bold text-primary">Save</Text>
+                  <Text className="font-bold text-white">Save</Text>
                 )}
               </TouchableOpacity>
             </View>
 
             <View className="w-full mt-8">
-              <View className="w-full flex flex-col items-center gap-4 ">
-                <View className=" rounded-full border border-gray-200 w-32 h-32 bg-gray-100">
-                  <Image
-                    source={{
-                      uri:
-                        user?.profilePic ||
-                        "https://api.dicebear.com/7.x/initials/svg?seed=Felix",
-                    }}
-                    className="w-full h-full rounded-full"
-                    resizeMode="cover"
-                  />
+              <View className="w-full bg-white border border-gray-100 rounded-2xl p-5 items-center">
+                <View className="relative">
+                  <View className="rounded-full border-4 border-gray-50 w-32 h-32 bg-gray-100 overflow-hidden">
+                    <Image
+                      source={{
+                        uri:
+                          user?.profilePic ||
+                          "https://api.dicebear.com/7.x/initials/svg?seed=Felix",
+                      }}
+                      className="w-full h-full rounded-full"
+                      resizeMode="cover"
+                    />
+                  </View>
+                  <View className="absolute bottom-1 right-1 w-10 h-10 rounded-full bg-primary border-4 border-white items-center justify-center">
+                    <Ionicons name="camera" size={16} color="#FFFFFF" />
+                  </View>
                 </View>
-                <Text className="font-bold text-primary">Edit Picture</Text>
+                <Text className="font-bold text-primary mt-4">
+                  Edit Picture
+                </Text>
               </View>
 
-              <View className="mt-12 flex flex-col gap-4">
+              <View className="mt-6 bg-white border border-gray-100 rounded-2xl p-4 gap-4">
                 <CustomInput
                   label="Full name"
                   placeholder="Enter full name"
@@ -179,7 +198,8 @@ export default function Edit() {
                   <TouchableOpacity
                     onPress={handleGetLocation}
                     disabled={isLocating}
-                    className="w-full bg-primary/90 flex flex-row items-center justify-center rounded-lg p-3 mt-3"
+                    className="w-full bg-primary flex-row items-center justify-center rounded-2xl p-3.5 mt-3"
+                    activeOpacity={0.75}
                   >
                     {isLocating ? (
                       <ActivityIndicator color="#ffffff" size="small" />
@@ -195,20 +215,19 @@ export default function Edit() {
                 </View>
               </View>
 
-              <View>
-                <View className="w-full flex flex-row items-center justify-between mt-10">
-                  <Text className="text-secondary text-lg font-bold">
+              <View className="bg-white border border-gray-100 rounded-2xl p-4 mt-6">
+                <View className="w-full flex flex-row items-center justify-between">
+                  <Text className="text-secondary text-lg font-extrabold">
                     Manage Interests
                   </Text>
-                  <TouchableOpacity>
-                    <Text className="text-primary flex flex-row items-center gap-1 text-sm font-medium">
-                      <Ionicons name="add" size={20} color="#3B82F6" />
-                      Add more
+                  <View className="bg-primary/10 px-2.5 py-1 rounded-lg">
+                    <Text className="text-primary text-xs font-bold">
+                      {selectedInterests.length}
                     </Text>
-                  </TouchableOpacity>
+                  </View>
                 </View>
 
-                <View className="flex flex-row flex-wrap gap-4 mt-5">
+                <View className="flex flex-row flex-wrap gap-2.5 mt-5">
                   {INTERESTS.map((item) => {
                     const isSelected = selectedInterests.includes(item.label);
                     return (
@@ -255,7 +274,7 @@ export default function Edit() {
 
             <TouchableOpacity
               activeOpacity={0.7}
-              className="mx-6 mt-24 bg-red-50 py-4 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
+              className="mx-2 mt-8 bg-red-50 py-4 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
             >
               <Ionicons name="trash" size={18} color="#EF4444" />
               <Text className="text-red-500 font-semibold text-[15px]">

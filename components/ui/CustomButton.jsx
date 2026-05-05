@@ -66,7 +66,7 @@ export default function CustomButton({
       case "ghost":
         return "bg-transparent";
       default:
-        return "bg-primary shadow-md shadow-indigo-200";
+        return "bg-primary";
     }
   };
 

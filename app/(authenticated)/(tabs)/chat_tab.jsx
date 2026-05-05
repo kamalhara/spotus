@@ -10,20 +10,15 @@ import {
   where,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  FlatList,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Animated, FlatList, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatRow from "../../../components/chat/ChatList";
 import ChatListSkeleton from "../../../components/chat/ChatListSkeleton";
 import RoomHorizontalList from "../../../components/rooms/RoomHorizontalList";
+import EmptyState from "../../../components/ui/EmptyState";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { isChatUnseen } from "../../../lib/chatSeen";
 
 export default function Chat() {
   const { firestoreUser } = useFirestoreUser();
@@ -36,6 +31,7 @@ export default function Chat() {
   const [chatsLoading, setChatsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("all");
 
   // Entrance animation
   const fadeIn = useRef(new Animated.Value(0)).current;
@@ -114,22 +110,46 @@ export default function Chat() {
     return unsub;
   }, [currentUserId]);
 
+  const unreadCount = chats.filter((chat) =>
+    isChatUnseen(chat, currentUserId),
+  ).length;
+
+  const filteredChats = chats.filter((chat) => {
+    const matchesSearch =
+      search === "" ||
+      chat.otherUser?.userName?.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter =
+      activeFilter === "all" || isChatUnseen(chat, currentUserId);
+
+    return matchesSearch && matchesFilter;
+  });
+
   return (
     <SafeAreaView className="flex-1 bg-bg px-6" edges={["top"]}>
       {/* Header */}
       <Animated.View
-        className="flex-row items-center justify-between mt-3 mb-6"
+        className="flex-row items-center justify-between mt-3 mb-5"
         style={{ opacity: fadeIn }}
       >
-        <Text className="text-secondary text-[28px] font-extrabold tracking-tight">
-          Messages
-        </Text>
-        <TouchableOpacity className="w-10 h-10 bg-white rounded-full items-center justify-center border border-gray-100 shadow-sm shadow-gray-100">
-          <Ionicons name="create-outline" size={20} color="#18181B" />
-        </TouchableOpacity>
+        <View>
+          <Text className="text-secondary text-[28px] font-extrabold tracking-tight">
+            Messages
+          </Text>
+          <Text className="text-gray-400 text-xs font-semibold mt-0.5">
+            {chats.length} DM{chats.length === 1 ? "" : "s"} · {rooms.length}{" "}
+            room{rooms.length === 1 ? "" : "s"}
+          </Text>
+        </View>
+        {unreadCount > 0 && (
+          <View className="bg-primary px-3 py-1.5 rounded-xl">
+            <Text className="text-white text-xs font-bold">
+              {unreadCount} new
+            </Text>
+          </View>
+        )}
       </Animated.View>
 
-      {/* Search Bar — with focus glow */}
+      {/* Search Bar */}
       <Animated.View
         style={{
           opacity: fadeIn,
@@ -137,28 +157,9 @@ export default function Chat() {
         }}
       >
         <View
-          className={`flex-row items-center bg-white rounded-2xl px-4 py-3 mb-6 ${
-            searchFocused
-              ? "border-primary/30 border-[1.5px]"
-              : "border border-gray-100"
+          className={`flex-row items-center bg-white rounded-2xl px-4 py-3 mb-4 border ${
+            searchFocused ? "border-primary/40" : "border-gray-100"
           }`}
-          style={
-            searchFocused
-              ? {
-                  shadowColor: "#4F46E5",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 8,
-                  elevation: 3,
-                }
-              : {
-                  shadowColor: "#94A3B8",
-                  shadowOffset: { width: 0, height: 1 },
-                  shadowOpacity: 0.05,
-                  shadowRadius: 4,
-                  elevation: 1,
-                }
-          }
         >
           <Ionicons
             name="search"
@@ -179,13 +180,13 @@ export default function Chat() {
 
       {/* Rooms horizontal scroll */}
       <Animated.View
-        className="mb-6"
+        className="mb-5"
         style={{
           opacity: fadeIn,
           transform: [{ translateY: slideUp }],
         }}
       >
-        <View className="flex-row items-center mb-4">
+        <View className="flex-row items-center justify-between mb-3">
           <Text className="text-secondary text-base font-bold">
             Active Rooms
           </Text>
@@ -197,19 +198,30 @@ export default function Chat() {
             </View>
           )}
         </View>
-        <RoomHorizontalList
-          rooms={rooms}
-          isLoading={roomsLoading}
-          onRoomPress={(room) => router.push(`/rooms/${room.id}`)}
-        />
+        {!roomsLoading && rooms.length === 0 ? (
+          <View className="bg-white border border-gray-100 rounded-2xl px-4 py-3 flex-row items-center">
+            <View className="w-9 h-9 rounded-xl bg-surface-alt items-center justify-center mr-3">
+              <Ionicons name="people-outline" size={17} color="#94A3B8" />
+            </View>
+            <Text className="text-gray-400 text-sm font-medium">
+              No active rooms
+            </Text>
+          </View>
+        ) : (
+          <RoomHorizontalList
+            rooms={rooms}
+            isLoading={roomsLoading}
+            onRoomPress={(room) => router.push(`/rooms/${room.id}`)}
+          />
+        )}
       </Animated.View>
 
       {/* Chat list */}
       <View className="flex-1 mt-2">
-        <View className="flex-row items-center mb-3">
+        <View className="flex-row items-center justify-between mb-3">
           <Text className="text-secondary text-base font-bold">Recent</Text>
           {chats.length > 0 && (
-            <Text className="text-gray-300 text-xs font-semibold ml-2">
+            <Text className="text-gray-300 text-xs font-semibold">
               {chats.length} conversations
             </Text>
           )}
@@ -225,12 +237,7 @@ export default function Chat() {
           />
         ) : chats.length > 0 ? (
           <FlatList
-            data={chats.filter(
-              (c) =>
-                c.otherUser?.userName
-                  ?.toLowerCase()
-                  .includes(search.toLowerCase()) || search === "",
-            )}
+            data={filteredChats}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <ChatRow
@@ -248,6 +255,13 @@ export default function Chat() {
             )}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 100 }}
+            ListEmptyComponent={
+              <EmptyState
+                icon="search-outline"
+                title="No messages found"
+                description="Try a different name or clear the search field."
+              />
+            }
           />
         ) : (
           <View className="flex-1 items-center justify-center pt-6">

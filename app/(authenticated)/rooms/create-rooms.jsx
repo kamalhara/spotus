@@ -39,6 +39,10 @@ export default function CreateRooms() {
   const [title, setTitle] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isEnabled, setIsEnabled] = useState(false);
+  const selectedCategoryMeta = CATEGORIES.find(
+    (item) => item.label === selectedCategory,
+  );
+  const canCreateRoom = title.trim().length > 0 && !!selectedCategory;
 
   const handleCreateRoom = async () => {
     if (!title || !selectedCategory) return alert("Please fill all the fields");
@@ -86,7 +90,7 @@ export default function CreateRooms() {
                     Create a Room
                   </Text>
                   <Text className="text-gray-400 text-sm leading-5 mt-2">
-                    Define the vibe and invite others to your circle.
+                    Set a clear topic so people know what they are joining.
                   </Text>
                 </View>
 
@@ -149,6 +153,57 @@ export default function CreateRooms() {
                   </View>
                 </View>
 
+                {/* Preview */}
+                <View className="mt-8">
+                  <Text className="text-gray-500 text-sm font-medium mb-3 ml-1">
+                    Preview
+                  </Text>
+                  <View className="bg-white rounded-2xl border border-gray-100 p-4">
+                    <View className="flex-row items-center justify-between mb-3">
+                      <View
+                        className="px-3 py-1.5 rounded-xl flex-row items-center"
+                        style={{
+                          backgroundColor: selectedCategoryMeta
+                            ? `${selectedCategoryMeta.color}12`
+                            : "#F1F5F9",
+                        }}
+                      >
+                        <Ionicons
+                          name={selectedCategoryMeta?.icon || "grid-outline"}
+                          size={13}
+                          color={selectedCategoryMeta?.color || "#94A3B8"}
+                        />
+                        <Text
+                          className="text-xs font-bold ml-1.5"
+                          style={{
+                            color: selectedCategoryMeta?.color || "#94A3B8",
+                          }}
+                        >
+                          {selectedCategory || "Choose category"}
+                        </Text>
+                      </View>
+                      {isEnabled && (
+                        <View className="bg-primary/10 px-2.5 py-1 rounded-lg">
+                          <Text className="text-primary text-[10px] font-bold">
+                            Age match
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text
+                      className={`text-lg font-extrabold tracking-tight ${
+                        title ? "text-secondary" : "text-gray-300"
+                      }`}
+                      numberOfLines={2}
+                    >
+                      {title || "Your room title"}
+                    </Text>
+                    <Text className="text-gray-400 text-xs mt-2 leading-4">
+                      This is how your room will appear in the list.
+                    </Text>
+                  </View>
+                </View>
+
                 {/* Age Similarity */}
                 <View className="mt-8">
                   <View
@@ -186,6 +241,7 @@ export default function CreateRooms() {
                   <CustomButton
                     title="Create Room"
                     onPress={handleCreateRoom}
+                    disabled={!canCreateRoom}
                   />
                 </View>
               </View>

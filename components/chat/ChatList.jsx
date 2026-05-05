@@ -35,12 +35,11 @@ function formatTime(timestamp) {
 
 export default function ChatRow({ chat, onPress }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(10)).current;
   const otherUser = chat?.otherUser;
   const lastMsg = chat?.lastMessage;
   const time = chat?.lastMessageAt ? formatTime(chat.lastMessageAt) : "";
-
-  // Pulsing animation for online status dot
-  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -75,27 +74,21 @@ export default function ChatRow({ chat, onPress }) {
     chat?.mutedBy?.includes(currentUserId) || false,
   );
 
-  // Pulse animation for active users
   useEffect(() => {
-    if (isOnline) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 1.3,
-            duration: 1200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 1200,
-            useNativeDriver: true,
-          }),
-        ]),
-      ).start();
-    } else {
-      pulseAnim.setValue(1);
-    }
-  }, [isOnline]);
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 260,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        useNativeDriver: true,
+        speed: 18,
+        bounciness: 3,
+      }),
+    ]).start();
+  }, [fadeAnim, slideAnim]);
 
   const handleLongPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -195,70 +188,51 @@ export default function ChatRow({ chat, onPress }) {
   ];
 
   return (
-    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+    <Animated.View
+      style={{
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
+      }}
+    >
       <TouchableOpacity
         onPress={handlePress}
         onLongPress={handleLongPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.9}
-        className={`flex-row items-center p-4 border rounded-3xl mb-3 ${
+        className={`flex-row items-center px-3.5 py-3 border rounded-2xl mb-3 ${
           isUnread
-            ? "border-indigo-100 bg-indigo-50/30"
+            ? "border-primary/20 bg-primary/5"
             : "border-gray-100 bg-white"
         }`}
-        style={
-          isUnread
-            ? {
-                shadowColor: "#4F46E5",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.08,
-                shadowRadius: 8,
-                elevation: 2,
-              }
-            : {
-                shadowColor: "#94A3B8",
-                shadowOffset: { width: 0, height: 1 },
-                shadowOpacity: 0.04,
-                shadowRadius: 4,
-                elevation: 1,
-              }
-        }
+        style={{
+          shadowColor: "#94A3B8",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.04,
+          shadowRadius: 4,
+          elevation: 1,
+        }}
       >
         <View className="relative">
           <Image
             source={{
               uri: otherUser?.profilePic || "https://picsum.photos/200",
             }}
-            className="rounded-[22px] bg-gray-100 border border-gray-50"
-            style={{ width: 60, height: 60 }}
+            className="rounded-2xl bg-gray-100 border border-gray-50"
+            style={{ width: 52, height: 52 }}
           />
-          {/* Pulse ring behind status dot */}
-          {isOnline && (
-            <Animated.View
-              style={{
-                position: "absolute",
-                bottom: -1,
-                right: -1,
-                width: 20,
-                height: 20,
-                borderRadius: 10,
-                backgroundColor: "rgba(74, 222, 128, 0.3)",
-                transform: [{ scale: pulseAnim }],
-              }}
-            />
-          )}
           <View
-            className={`absolute -bottom-1 -right-1 w-5 h-5 ${
+            className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 ${
               isOnline ? "bg-green-400" : "bg-gray-300"
-            } rounded-full border-[3px] border-white z-10`}
+            } rounded-full border-[2px] border-white z-10`}
           />
         </View>
 
-        <View className="flex-1 ml-4 justify-center">
+        <View className="flex-1 ml-3.5 justify-center">
           <View className="flex-row justify-between items-center mb-1">
             <Text
-              className={`text-secondary ${isUnread ? "font-black" : "font-extrabold"} text-[17px] tracking-tight`}
+              className={`text-secondary ${isUnread ? "font-black" : "font-bold"} text-[16px] tracking-tight flex-1 mr-3`}
+              numberOfLines={1}
             >
               {otherUser?.userName || "User"}
             </Text>
@@ -276,9 +250,6 @@ export default function ChatRow({ chat, onPress }) {
               >
                 {time}
               </Text>
-              {isUnread && (
-                <View className="w-2.5 h-2.5 bg-primary rounded-full ml-2" />
-              )}
             </View>
           </View>
 
@@ -292,8 +263,13 @@ export default function ChatRow({ chat, onPress }) {
                 className={`${isUnread ? "text-secondary font-bold" : "text-gray-500"} text-[13px] leading-5 flex-1`}
                 numberOfLines={1}
               >
-                {lastMsg || "Click to start the conversation..."}
+                {lastMsg || "No messages yet"}
               </Text>
+            )}
+            {isUnread && (
+              <View className="bg-primary/10 px-2 py-0.5 rounded-md ml-2">
+                <Text className="text-primary text-[10px] font-black">New</Text>
+              </View>
             )}
           </View>
         </View>

@@ -146,13 +146,6 @@ export default function RoomCard({
           <TouchableOpacity
             onPress={() => onPress?.(room)}
             className="bg-primary px-5 py-2.5 rounded-xl"
-            style={{
-              shadowColor: "#4F46E5",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.15,
-              shadowRadius: 4,
-              elevation: 3,
-            }}
           >
             <Text className="text-white font-bold text-xs">{buttonText}</Text>
           </TouchableOpacity>

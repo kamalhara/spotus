@@ -135,11 +135,11 @@ export default function Profile() {
             <View
               className="w-[110px] h-[110px] rounded-full border-4 border-white overflow-hidden bg-gray-100"
               style={{
-                shadowColor: "#4F46E5",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.15,
-                shadowRadius: 16,
-                elevation: 8,
+                shadowColor: "#94A3B8",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 8,
+                elevation: 2,
               }}
             >
               <Image
@@ -167,7 +167,7 @@ export default function Profile() {
           </Text>
         </View>
 
-        {/* Stats — with gradient accent on primary stat */}
+        {/* Stats */}
         <View className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-7 shadow-sm shadow-gray-100">
           <View className="items-center flex-1">
             <Text className="text-[22px] font-extrabold text-primary">
@@ -207,7 +207,12 @@ export default function Profile() {
             label="Edit Profile"
             onPress={() => router.push("/profile/edit")}
           />
-          <MenuItem icon="shield-checkmark-outline" label="Security" isLast />
+          <MenuItem
+            icon="shield-checkmark-outline"
+            label="Security"
+            onPress={() => router.push("/profile/security")}
+            isLast
+          />
         </View>
 
         <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
@@ -218,13 +223,20 @@ export default function Profile() {
             icon="notifications-outline"
             label="Notifications"
             color="#8B5CF6"
+            onPress={() => router.push("/profile/notifications")}
           />
-          <MenuItem icon="eye-outline" label="Privacy & Data" color="#8B5CF6" />
+          <MenuItem
+            icon="eye-outline"
+            label="Privacy & Data"
+            color="#8B5CF6"
+            onPress={() => router.push("/profile/privacyData")}
+          />
           <MenuItem
             icon="language-outline"
             label="Language"
             subtitle="English"
             color="#8B5CF6"
+            onPress={() => router.push("/profile/language")}
             isLast
           />
         </View>
@@ -237,11 +249,13 @@ export default function Profile() {
             icon="alert-circle-outline"
             label="Help Center"
             color="#64748B"
+            onPress={() => router.push("/profile/helpCenter")}
           />
           <MenuItem
             icon="information-circle-outline"
             label="About SpotUs"
             color="#64748B"
+            onPress={() => router.push("/profile/about")}
             isLast
           />
         </View>

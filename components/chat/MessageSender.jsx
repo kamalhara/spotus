@@ -5,6 +5,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useEffect, useRef, useState } from "react";
 import {
   Alert,
+  Animated,
   Pressable,
   Text,
   TextInput,
@@ -28,20 +29,6 @@ const MEDIA_OPTIONS = [
     bgColor: "#F0FDF4",
     iconColor: "#10B981",
   },
-  {
-    key: "file",
-    icon: "document-text",
-    label: "File",
-    bgColor: "#FFF7ED",
-    iconColor: "#F59E0B",
-  },
-  {
-    key: "location",
-    icon: "location",
-    label: "Location",
-    bgColor: "#FDF2F8",
-    iconColor: "#EC4899",
-  },
 ];
 
 export default function MessageSender({
@@ -57,6 +44,7 @@ export default function MessageSender({
 }) {
   const [message, setMessage] = useState("");
   const [showMediaMenu, setShowMediaMenu] = useState(false);
+  const menuAnim = useRef(new Animated.Value(0)).current;
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
@@ -78,6 +66,17 @@ export default function MessageSender({
       setMessage(editingMessage.text || "");
     }
   }, [editingMessage]);
+
+  useEffect(() => {
+    if (!showMediaMenu) return;
+    menuAnim.setValue(0);
+    Animated.spring(menuAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 18,
+      bounciness: 4,
+    }).start();
+  }, [menuAnim, showMediaMenu]);
 
   const toggleMediaMenu = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -122,6 +121,11 @@ export default function MessageSender({
 
     setMessage("");
     onCancelReply?.();
+  };
+
+  const handleCancelEdit = () => {
+    setEditingMessage?.(null);
+    setMessage("");
   };
 
   const handleMediaOption = (key) => {
@@ -180,13 +184,6 @@ export default function MessageSender({
     if (key === "photo") {
       pickImage();
     }
-    if (key === "file") {
-      // Handle file functionality
-    }
-    if (key === "location") {
-      // Handle location functionality
-    }
-    // Placeholder — each key can route to actual functionality later
   };
 
   return (
@@ -201,42 +198,85 @@ export default function MessageSender({
 
       {/* Media Menu Popup */}
       {showMediaMenu && (
-        <View className="absolute bottom-[60px] left-0 right-0 z-10">
+        <Animated.View
+          className="absolute bottom-[60px] left-0 right-0 z-10"
+          style={{
+            opacity: menuAnim,
+            transform: [
+              {
+                translateY: menuAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [8, 0],
+                }),
+              },
+              {
+                scale: menuAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.98, 1],
+                }),
+              },
+            ],
+          }}
+        >
           <View
-            className="bg-white rounded-3xl py-5 px-4 mx-1 border border-gray-100"
+            className="bg-white rounded-2xl py-3 px-3 mx-1 border border-gray-100"
             style={{
-              shadowColor: "#18181B",
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.12,
-              shadowRadius: 24,
-              elevation: 12,
+              shadowColor: "#94A3B8",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.08,
+              shadowRadius: 8,
+              elevation: 3,
             }}
           >
-            <View className="flex-row justify-around items-center">
+            <View className="flex-row gap-3">
               {MEDIA_OPTIONS.map((option) => (
                 <TouchableOpacity
                   key={option.key}
                   onPress={() => handleMediaOption(option.key)}
                   activeOpacity={0.7}
-                  className="items-center w-[72px]"
+                  className="flex-1 flex-row items-center bg-gray-50 rounded-2xl p-3 border border-gray-100"
                 >
                   <View
-                    className="w-14 h-14 rounded-2xl items-center justify-center mb-2"
+                    className="w-10 h-10 rounded-xl items-center justify-center mr-3"
                     style={{ backgroundColor: option.bgColor }}
                   >
                     <Ionicons
                       name={option.icon}
-                      size={24}
+                      size={20}
                       color={option.iconColor}
                     />
                   </View>
-                  <Text className="text-[11px] font-semibold text-gray-500 tracking-tight">
+                  <Text className="text-sm font-bold text-secondary tracking-tight">
                     {option.label}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
           </View>
+        </Animated.View>
+      )}
+
+      {/* Edit Preview Banner */}
+      {editingMessage && (
+        <View className="bg-white border border-gray-100 rounded-2xl px-4 py-3 mb-2 flex-row items-center">
+          <View className="w-8 h-8 rounded-xl bg-primary/10 items-center justify-center mr-3">
+            <Ionicons name="create-outline" size={15} color="#4F46E5" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-primary text-xs font-bold">
+              Editing message
+            </Text>
+            <Text className="text-gray-400 text-xs mt-0.5" numberOfLines={1}>
+              {editingMessage.text}
+            </Text>
+          </View>
+          <TouchableOpacity
+            onPress={handleCancelEdit}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            className="w-8 h-8 rounded-xl bg-surface-alt items-center justify-center"
+          >
+            <Ionicons name="close" size={16} color="#94A3B8" />
+          </TouchableOpacity>
         </View>
       )}
 
@@ -297,7 +337,7 @@ export default function MessageSender({
       )}
 
       {/* Input Bar */}
-      <View className="flex-row items-center w-full bg-white rounded-full p-1.5 border border-border shadow-sm shadow-slate-100">
+      <View className="flex-row items-center w-full bg-white rounded-full p-1.5 border border-border">
         <TouchableOpacity
           className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-alt ml-0.5"
           onPress={toggleMediaMenu}
@@ -318,7 +358,7 @@ export default function MessageSender({
           }}
           placeholder="Type a message..."
           placeholderTextColor="#CBD5E1"
-          className="flex-1 px-3.5 text-[15px] text-secondary font-medium tracking-wide h-11"
+          className="flex-1 px-3.5 text-[15px] text-secondary font-medium h-11"
           returnKeyType="send"
           onSubmitEditing={onSend}
         />
@@ -327,17 +367,6 @@ export default function MessageSender({
           disabled={!isActive}
           onPress={onSend}
           className={`w-[42px] h-[42px] rounded-full items-center justify-center mr-0.5 ${isActive ? "bg-primary" : "bg-surface-alt"}`}
-          style={
-            isActive
-              ? {
-                  shadowColor: "#4F46E5",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.3,
-                  shadowRadius: 6,
-                  elevation: 4,
-                }
-              : {}
-          }
         >
           <Ionicons
             name="send"

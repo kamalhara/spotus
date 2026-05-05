@@ -135,8 +135,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
           </View>
 
           <Text className="text-muted text-[13px] leading-5 font-medium">
-            By joining this room, you&apos;ll be able to chat and share
-            experiences with others in this discovery circle.
+            Join to chat with the members in this room.
           </Text>
         </View>
 

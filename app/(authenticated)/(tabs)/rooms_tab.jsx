@@ -6,6 +6,7 @@ import { SectionList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
+import EmptyState from "../../../components/ui/EmptyState";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 
@@ -42,6 +43,8 @@ export default function RoomsScreen() {
       isEmpty: !loading && myCreatedRooms.length === 0,
       emptyIcon: "add-circle-outline",
       emptyText: "You haven't created any rooms yet.",
+      emptyAction: "Create room",
+      emptyRoute: "/rooms/create-rooms",
     },
     {
       title: "Joined",
@@ -50,6 +53,8 @@ export default function RoomsScreen() {
       isEmpty: !loading && myJoinedRooms.length === 0,
       emptyIcon: "compass-outline",
       emptyText: "You haven't joined any rooms.",
+      emptyAction: "Explore rooms",
+      emptyRoute: "/home",
     },
   ];
 
@@ -101,17 +106,18 @@ export default function RoomsScreen() {
               </View>
             </View>
             {section.isEmpty && (
-              <View className="items-center py-10">
-                <View className="w-14 h-14 bg-white rounded-2xl items-center justify-center mb-3 border border-gray-100 shadow-sm shadow-gray-100">
-                  <Ionicons
-                    name={section.emptyIcon}
-                    size={28}
-                    color="#D1D5DB"
-                  />
-                </View>
-                <Text className="text-gray-400 text-sm mt-1">
-                  {section.emptyText}
-                </Text>
+              <View className="bg-white rounded-2xl border border-gray-100 mt-3">
+                <EmptyState
+                  icon={section.emptyIcon}
+                  title={section.emptyText}
+                  description={
+                    section.title === "Created by me"
+                      ? "Start a room around a topic people can join."
+                      : "Find active rooms from the Home tab."
+                  }
+                  actionLabel={section.emptyAction}
+                  onAction={() => router.push(section.emptyRoute)}
+                />
               </View>
             )}
           </View>

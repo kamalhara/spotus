@@ -232,13 +232,6 @@ export default function Home() {
             onPress={handleCreateRoom}
             activeOpacity={0.9}
             className="bg-primary py-5 px-6 rounded-3xl flex-row items-center"
-            style={{
-              shadowColor: "#4F46E5",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.2,
-              shadowRadius: 12,
-              elevation: 6,
-            }}
           >
             <View className="w-12 h-12 bg-white/20 rounded-2xl items-center justify-center mr-4">
               <Ionicons name="add" size={24} color="white" />
@@ -248,7 +241,7 @@ export default function Home() {
                 Create a Room
               </Text>
               <Text className="text-white/70 text-xs font-semibold mt-0.5">
-                Start your own discovery circle
+                Start a room nearby
               </Text>
             </View>
             <View className="w-8 h-8 bg-white/15 rounded-xl items-center justify-center">

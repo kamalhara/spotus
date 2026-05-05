@@ -176,14 +176,14 @@ export default function ChatMessages({
   if (!messages || messages.length === 0) {
     return (
       <View className="flex-1 items-center justify-center px-10">
-        <View className="w-16 h-16 bg-primary/5 rounded-3xl items-center justify-center mb-4">
-          <Ionicons name="chatbubble-outline" size={28} color="#818CF8" />
+        <View className="w-16 h-16 bg-white border border-gray-100 rounded-2xl items-center justify-center mb-4">
+          <Ionicons name="chatbubble-outline" size={28} color="#4F46E5" />
         </View>
-        <Text className="text-secondary text-base font-semibold mt-1">
-          Start the conversation
+        <Text className="text-secondary text-base font-bold mt-1">
+          No messages yet
         </Text>
         <Text className="text-gray-400 text-sm text-center mt-1.5 leading-5">
-          Be the first to say something.
+          Send a message to start the chat.
         </Text>
       </View>
     );
@@ -206,12 +206,7 @@ export default function ChatMessages({
       <View
         className={`flex-row items-center bg-white border border-gray-100 rounded-full px-2 py-0.5 h-7 ${isSentByMe ? "mr-1" : "ml-1"}`}
         style={{
-          elevation: 4,
           zIndex: 20,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.08,
-          shadowRadius: 4,
           marginTop: -8,
         }}
       >
@@ -249,9 +244,9 @@ export default function ChatMessages({
     return (
       <View className="w-full">
         {showDateSeparator && (
-          <View className="items-center my-6 flex-row justify-center px-10">
+          <View className="items-center my-5 flex-row justify-center px-10">
             <View className="h-[1px] bg-gray-100 flex-1" />
-            <View className="bg-white border border-gray-200 px-4 py-1.5 rounded-full mx-4 shadow-sm shadow-gray-100">
+            <View className="bg-surface-alt border border-gray-100 px-3 py-1 rounded-full mx-3">
               <Text className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
                 {formatSeparatorDate(item.createdAt)}
               </Text>
@@ -260,7 +255,7 @@ export default function ChatMessages({
           </View>
         )}
         <View
-          className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-0.5"} px-3`}
+          className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-0.5"} px-2`}
         >
           {!isSentByMe && (
             <View className="w-8 mr-2 flex justify-end pb-1">
@@ -269,10 +264,6 @@ export default function ChatMessages({
                   className="w-7 h-7 rounded-full items-center justify-center"
                   style={{
                     backgroundColor: getUserColor(item.user),
-                    shadowColor: getUserColor(item.user),
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 4,
                   }}
                 >
                   <Text className="text-white text-[11px] font-bold">
@@ -285,7 +276,7 @@ export default function ChatMessages({
             </View>
           )}
           <View
-            className={`max-w-[78%] flex-col ${isSentByMe ? "items-end" : "items-start"}`}
+            className={`max-w-[80%] flex-col ${isSentByMe ? "items-end" : "items-start"}`}
           >
             {showAvatarAndName && (
               <Text className="text-muted text-[10px] font-semibold mb-1 ml-1 uppercase tracking-wide">
@@ -314,9 +305,11 @@ export default function ChatMessages({
                 onLongPress={(event) => {
                   handleMessageLongPress(event, item);
                 }}
-                className={`min-w-[72px] ${item.imageUrl ? "" : "px-3.5 py-2"} ${
+                className={`min-w-[76px] ${item.imageUrl ? "" : "px-3.5 pt-2.5 pb-5"} ${
                   isSentByMe
-                    ? "rounded-2xl rounded-br-sm overflow-hidden"
+                    ? item.imageUrl
+                      ? "rounded-2xl rounded-br-md overflow-hidden"
+                      : "bg-primary rounded-2xl rounded-br-md"
                     : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm"
                 }`}
                 style={
@@ -328,32 +321,9 @@ export default function ChatMessages({
                         shadowRadius: 4,
                         elevation: 1,
                       }
-                    : isSentByMe && !item.imageUrl
-                      ? {
-                          shadowColor: "#4F46E5",
-                          shadowOffset: { width: 0, height: 2 },
-                          shadowOpacity: 0.15,
-                          shadowRadius: 6,
-                          elevation: 3,
-                        }
-                      : {}
+                    : {}
                 }
               >
-                {/* Solid background for sent messages */}
-                {isSentByMe && (
-                  <View
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: "#4F46E5",
-                      borderRadius: 16,
-                      borderBottomRightRadius: 4,
-                    }}
-                  />
-                )}
                 {/* Reply Preview */}
                 {item.replyTo && (
                   <TouchableOpacity
@@ -410,7 +380,7 @@ export default function ChatMessages({
                   />
                 ) : (
                   <Text
-                    className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"} pb-3.5`}
+                    className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"}`}
                   >
                     {item.text}
                   </Text>
@@ -514,14 +484,14 @@ export default function ChatMessages({
             {uploadingImageUri && (
               <View className="w-full flex-row justify-end mt-2 px-3 mb-2">
                 <View className="max-w-[78%] items-end">
-                  <View className="rounded-2xl rounded-br-sm overflow-hidden border border-primary/20 shadow-sm bg-primary/10">
+                  <View className="rounded-2xl rounded-br-md overflow-hidden border border-primary/20 bg-primary/10">
                     <View className="relative">
                       <Image
                         source={{ uri: uploadingImageUri }}
                         className="w-56 h-56 opacity-50"
                       />
                       <View className="absolute inset-0 items-center justify-center bg-black/10">
-                        <View className="bg-white/90 p-3 rounded-2xl items-center shadow-xl">
+                        <View className="bg-white/90 p-3 rounded-2xl items-center">
                           <ActivityIndicator color="#4F46E5" size="small" />
                           <Text className="text-[10px] font-bold text-primary mt-2 tracking-widest">
                             SENDING...

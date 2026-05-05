@@ -254,24 +254,20 @@ export default function RoomChat() {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       {/* Header */}
-      <View
-        className="bg-white z-10 border-b border-gray-100"
-        style={{
-          shadowColor: "#94A3B8",
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.04,
-          shadowRadius: 4,
-        }}
-      >
+      <View className="bg-white z-10 border-b border-gray-100">
         <SafeAreaView edges={["top"]}>
           <View className="flex-row items-center justify-between px-5 py-3">
             <View className="flex-row items-center flex-1">
               <TouchableOpacity
                 onPress={() => router.back()}
-                className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center mr-3 border border-gray-100"
+                className="w-10 h-10 bg-gray-50 rounded-2xl items-center justify-center mr-3 border border-gray-100"
               >
                 <Ionicons name="chevron-back" size={20} color="#18181B" />
               </TouchableOpacity>
+
+              <View className="w-11 h-11 rounded-2xl bg-primary/10 items-center justify-center mr-3">
+                <Ionicons name={categoryIcon} size={18} color="#4F46E5" />
+              </View>
 
               <TouchableOpacity
                 className="flex-1"
@@ -279,19 +275,14 @@ export default function RoomChat() {
                 activeOpacity={0.7}
               >
                 <Text
-                  className="text-secondary text-base font-bold"
+                  className="text-secondary text-base font-extrabold"
                   numberOfLines={1}
                 >
                   {room?.title || "Loading..."}
                 </Text>
                 <View className="flex-row items-center mt-0.5">
-                  <Ionicons
-                    name={categoryIcon}
-                    size={10}
-                    color="#9CA3AF"
-                    style={{ marginRight: 4 }}
-                  />
                   <Text className="text-gray-400 text-xs">
+                    {room?.category || "Room"} ·{" "}
                     {room?.participants?.length || 0} members
                   </Text>
                 </View>
@@ -300,7 +291,7 @@ export default function RoomChat() {
 
             <TouchableOpacity
               onPress={handleInfoPress}
-              className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center"
+              className="w-10 h-10 bg-gray-50 rounded-2xl items-center justify-center border border-gray-100"
             >
               <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
             </TouchableOpacity>
@@ -311,16 +302,7 @@ export default function RoomChat() {
       {/* Trust Meter — compact */}
       {trust < 10 && (
         <View className="px-5 pt-3 pb-1">
-          <View
-            className="bg-white px-4 py-3 rounded-xl border border-gray-100"
-            style={{
-              shadowColor: "#94A3B8",
-              shadowOffset: { width: 0, height: 1 },
-              shadowOpacity: 0.04,
-              shadowRadius: 4,
-              elevation: 1,
-            }}
-          >
+          <View className="bg-white px-4 py-3 rounded-2xl border border-gray-100">
             <View className="flex-row items-center justify-between mb-2">
               <View className="flex-row items-center">
                 <Ionicons
@@ -365,7 +347,7 @@ export default function RoomChat() {
         />
       </View>
 
-      <View className="px-5 py-3 flex items-center pb-6 border-t border-gray-50">
+      <View className="px-5 py-3 flex items-center pb-6 bg-bg border-t border-gray-100">
         <MessageSender
           handleSend={handleSend}
           chatId={roomId}

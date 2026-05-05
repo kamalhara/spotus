@@ -12,9 +12,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Oauth from "../../components/auth/Oauth";
 import CustomButton from "../../components/ui/CustomButton";
 import CustomInput from "../../components/ui/CustomInput";
-import Oauth from "../../components/auth/Oauth";
 
 export default function Login() {
   const { isLoaded } = useAuth();
@@ -124,7 +124,7 @@ export default function Login() {
             {/* Accent line */}
             <View className="mt-3 mb-3 w-12 h-1 rounded-full bg-primary" />
             <Text className="text-gray-400 text-base leading-6">
-              Sign in to your account and continue your journey.
+              Sign in to continue where you left off.
             </Text>
           </View>
 
@@ -146,7 +146,11 @@ export default function Login() {
               onChangeText={setPassword}
               secureTextEntry
               icon={
-                <Ionicons name="lock-closed-outline" size={20} color="#9CA3AF" />
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={20}
+                  color="#9CA3AF"
+                />
               }
             />
 
@@ -161,7 +165,9 @@ export default function Login() {
                 <View className="w-5 h-5 bg-red-100 rounded-full items-center justify-center mr-2.5 mt-0.5">
                   <Ionicons name="alert-circle" size={12} color="#EF4444" />
                 </View>
-                <Text className="text-red-500 text-sm flex-1 leading-5">{error}</Text>
+                <Text className="text-red-500 text-sm flex-1 leading-5">
+                  {error}
+                </Text>
               </View>
             ) : null}
           </View>
@@ -174,7 +180,9 @@ export default function Login() {
 
           <View className="flex-row items-center justify-center gap-3 my-7">
             <View className="flex-1 h-px bg-gray-100" />
-            <Text className="text-gray-300 text-xs font-semibold uppercase tracking-wider">Or</Text>
+            <Text className="text-gray-300 text-xs font-semibold uppercase tracking-wider">
+              Or
+            </Text>
             <View className="flex-1 h-px bg-gray-100" />
           </View>
 

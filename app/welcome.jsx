@@ -71,10 +71,7 @@ export default function Welcome() {
             transform: [{ scale: scaleHero }],
           }}
         >
-          {/* Decorative background circles for depth */}
-          <View className="absolute w-80 h-80 rounded-full bg-primary/[0.03]" />
-          <View className="absolute w-60 h-60 rounded-full bg-primary/[0.05]" />
-          <View className="w-72 h-72 items-center justify-center">
+          <View className="w-72 h-72 items-center justify-center bg-gray-50 rounded-[36px] border border-gray-100">
             <Image
               source={require("../assets/images/trans.png")}
               className="w-full h-full"

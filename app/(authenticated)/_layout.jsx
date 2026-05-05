@@ -51,6 +51,26 @@ export default function AuthenticatedLayout() {
         name="profile/accountSetting"
         options={{ headerShown: false }}
       />
+      <Stack.Screen name="profile/security" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="profile/notifications"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="profile/privacyData"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="profile/language" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="profile/helpCenter"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="profile/about" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="profile/privacyPolicy"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="profile/terms" options={{ headerShown: false }} />
     </Stack>
   );
 }

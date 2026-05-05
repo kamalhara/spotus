@@ -55,7 +55,7 @@ export default function CustomInput({
 
   const animatedBgColor = borderAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ["#FFFFFF", "#FAFAFF"],
+    outputRange: ["#FFFFFF", "#FFFFFF"],
   });
 
   return (

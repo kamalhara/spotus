@@ -64,18 +64,13 @@ export function RoomHorizontalItem({ room, onPress }) {
         className="items-center"
       >
         <View
-          className="w-[74px] h-[74px] rounded-[26px] items-center justify-center border border-white shadow-sm shadow-gray-200"
+          className="w-[74px] h-[74px] rounded-[26px] items-center justify-center border border-white"
           style={{ backgroundColor: `${categoryColor}15` }}
         >
           <View
-            className="w-[60px] h-[60px] rounded-[21px] items-center justify-center shadow-lg"
+            className="w-[60px] h-[60px] rounded-[21px] items-center justify-center"
             style={{
               backgroundColor: categoryColor,
-              shadowColor: categoryColor,
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.25,
-              shadowRadius: 8,
-              elevation: 6,
             }}
           >
             <Text className="text-white text-xl font-extrabold">
@@ -84,7 +79,7 @@ export function RoomHorizontalItem({ room, onPress }) {
           </View>
 
           {roomUnseen && (
-            <View className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full border-2 border-white items-center justify-center shadow-md shadow-primary/30" />
+            <View className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full border-2 border-white items-center justify-center" />
           )}
         </View>
 

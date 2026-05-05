@@ -3,8 +3,8 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 
-import { Redirect, useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useRef, useState } from "react";
+import { Redirect, useRouter } from "expo-router";
+import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
@@ -21,7 +21,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import BlockedUserModal from "../../../components/users/BlockedUserModal";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
-import { getRooms } from "../../../lib/getRoom";
 
 if (
   Platform.OS === "android" &&
@@ -130,18 +129,6 @@ export default function Profile() {
 
   const authMethod = getAuthMethod();
 
-  const [rooms, setRooms] = useState([]);
-
-  useFocusEffect(
-    useCallback(() => {
-      const loadRooms = async () => {
-        const data = await getRooms();
-        setRooms(data);
-      };
-      loadRooms();
-    }, []),
-  );
-
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-bg">
@@ -226,19 +213,19 @@ export default function Profile() {
         }}
       >
         {/* Profile Header */}
-        <View className=" flex flex-row  items-center px-10 mt-2 mb-7">
+        <View className="flex-row items-center px-6 mt-2 mb-7">
           {/* Background accent */}
           <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px] bg-bg" />
 
           <View className="relative mt-6">
             <View
-              className="w-[90px] h-[90px] rounded-full border-4 border-white overflow-hidden bg-gray-100"
+              className="w-[82px] h-[82px] rounded-full border-4 border-white overflow-hidden bg-gray-100"
               style={{
-                shadowColor: "#4F46E5",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.15,
-                shadowRadius: 16,
-                elevation: 8,
+                shadowColor: "#94A3B8",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 8,
+                elevation: 2,
               }}
             >
               <Image
@@ -251,17 +238,18 @@ export default function Profile() {
               />
             </View>
           </View>
-          <View className=" flex flex-col px-10">
-            <Text className="text-secondary text-[22px] font-extrabold mt-4 tracking-tight">
+          <View className="flex-1 ml-4">
+            <Text
+              className="text-secondary text-[22px] font-extrabold tracking-tight"
+              numberOfLines={1}
+            >
               {firestoreUser?.userName || "User"}
             </Text>
-            <Text className="text-gray-400 text-sm mt-1">
+            <Text className="text-gray-400 text-sm mt-1" numberOfLines={1}>
               {firestoreUser?.email}
             </Text>
           </View>
         </View>
-
-        {/* Stats — with gradient accent on primary stat */}
 
         {/* Menu Groups */}
         {(filterMatch("Email Address") ||
@@ -324,7 +312,8 @@ export default function Profile() {
           </View>
         )}
 
-        {(filterMatch("Profile Visibility") || filterMatch("Blocked Users")) && (
+        {(filterMatch("Profile Visibility") ||
+          filterMatch("Blocked Users")) && (
           <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
             <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Privacy
@@ -336,7 +325,11 @@ export default function Profile() {
                     className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
                     style={{ backgroundColor: "#8B5CF612" }}
                   >
-                    <Ionicons name="eye-off-outline" size={18} color="#8B5CF6" />
+                    <Ionicons
+                      name="eye-off-outline"
+                      size={18}
+                      color="#8B5CF6"
+                    />
                   </View>
                   <View className="flex-1">
                     <Text className="text-secondary font-semibold text-[15px]">
@@ -411,6 +404,7 @@ export default function Profile() {
                 icon="information-circle-outline"
                 label="Help Center"
                 color="#8B5CF6"
+                onPress={() => router.push("/profile/helpCenter")}
               />
             )}
             {filterMatch("Privacy Policy") && (
@@ -418,6 +412,7 @@ export default function Profile() {
                 icon="shield-checkmark"
                 label="Privacy Policy"
                 color="#8B5CF6"
+                onPress={() => router.push("/profile/privacyPolicy")}
               />
             )}
             {filterMatch("Terms of Service") && (
@@ -425,6 +420,7 @@ export default function Profile() {
                 icon="document-text-outline"
                 label="Terms of Service"
                 color="#8B5CF6"
+                onPress={() => router.push("/profile/terms")}
                 isLast
               />
             )}
@@ -445,7 +441,7 @@ export default function Profile() {
             <View className="flex-1 items-center justify-center py-10">
               <Ionicons name="search-outline" size={48} color="#E5E7EB" />
               <Text className="text-gray-400 mt-4 font-medium">
-                No results found for "{searchQuery}"
+                {`No results found for "${searchQuery}"`}
               </Text>
             </View>
           )}

@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomInput from "../../../components/ui/CustomInput";
-import useFirestoreUser from "../../../hook/useFireStoreUser";
 
 export default function ChangePassword() {
   const router = useRouter();
@@ -21,7 +20,6 @@ export default function ChangePassword() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { firestoreUser: user } = useFirestoreUser();
 
   return (
     <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
@@ -99,7 +97,7 @@ export default function ChangePassword() {
                 />
 
                 <TouchableOpacity
-                  className="bg-primary py-4 rounded-2xl mt-4 items-center shadow-md shadow-primary/20"
+                  className="bg-primary py-4 rounded-2xl mt-4 items-center"
                   activeOpacity={0.8}
                   onPress={() => {
                     // Logic to update password will go here

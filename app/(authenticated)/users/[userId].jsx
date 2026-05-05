@@ -265,11 +265,11 @@ export default function UserProfile() {
             <View
               className="w-[110px] h-[110px] rounded-full overflow-hidden bg-gray-100 border-4 border-white"
               style={{
-                shadowColor: "#4F46E5",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.12,
-                shadowRadius: 16,
-                elevation: 6,
+                shadowColor: "#94A3B8",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.08,
+                shadowRadius: 8,
+                elevation: 2,
               }}
             >
               <Image

@@ -30,18 +30,18 @@ const CATEGORY_ICONS = {
 const roomRules = [
   {
     title: "Be respectful",
-    description: "Constructive critique only. Keep it proffesional and kind",
+    description: "Constructive critique only. Keep it professional and kind.",
     icon: "chatbubble",
   },
   {
     title: "No Spam or Self-Promotion",
-    description: "Unless it directly relevent to current discussion thread",
+    description: "Share links only when they are relevant to the discussion.",
     icon: "remove-circle",
   },
   {
     title: "Share your work",
     description:
-      "We are here to learn. Don't be shy about posting work in progress",
+      "We are here to learn. Don't be shy about posting work in progress.",
     icon: "color-palette",
   },
 ];
@@ -210,9 +210,8 @@ export default function RoomInfo() {
                 Description
               </Text>
               <Text className="text-slate-500 leading-[22px] font-medium text-[14px]">
-                This discovery circle is dedicated to exploring{" "}
-                {room?.category || "new experiences"} and sharing local vibes
-                with fellow members in your area.
+                A local room for {room?.category || "nearby"} discussions and
+                plans with members in your area.
               </Text>
             </View>
 
