@@ -4,7 +4,7 @@ import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 
 import { Redirect, useFocusEffect, useRouter } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
@@ -19,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import BlockedUserModal from "../../../components/users/BlockedUserModal";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 
@@ -94,16 +95,20 @@ export default function Profile() {
   const { firestoreUser, loading } = useFirestoreUser();
   const router = useRouter();
   const [activeSearch, setActiveSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputRef = useRef(null);
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [visibility, setVisibility] = useState("Public");
 
   const toggleSearch = (active) => {
-    LayoutAnimation.configureNext({
-      duration: 300,
-      create: { type: "easeInEaseOut", property: "opacity" },
-      update: { type: "easeInEaseOut" },
-      delete: { type: "easeInEaseOut", property: "opacity" },
-    });
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setActiveSearch(active);
+    if (!active) setSearchQuery("");
+  };
+
+  const filterMatch = (text) => {
+    if (!searchQuery) return true;
+    return text.toLowerCase().includes(searchQuery.toLowerCase());
   };
 
   const getAuthMethod = () => {
@@ -175,10 +180,23 @@ export default function Profile() {
               Settings
             </Text>
           ) : (
-            <TextInput
-              className="text-secondary font-extrabold text-xl"
-              placeholder="Search"
-            />
+            <View className="flex-1 flex-row items-center bg-gray-100/80 rounded-2xl px-4 py-2.5 ml-2 border border-gray-200">
+              <Ionicons name="search" size={18} color="#9CA3AF" />
+              <TextInput
+                ref={searchInputRef}
+                autoFocus
+                className="flex-1 ml-3 text-secondary text-base font-semibold"
+                placeholder="Search settings..."
+                placeholderTextColor="#9CA3AF"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery("")}>
+                  <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+                </TouchableOpacity>
+              )}
+            </View>
           )}
         </View>
         {!activeSearch && (
@@ -246,125 +264,191 @@ export default function Profile() {
         {/* Stats — with gradient accent on primary stat */}
 
         {/* Menu Groups */}
-        <View className="bg-white mx-6 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-          <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
-            Account
-          </Text>
+        {(filterMatch("Email Address") ||
+          filterMatch("Sign-In Method") ||
+          filterMatch("Password")) && (
+          <View className="bg-white mx-6 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
+            <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+              Account
+            </Text>
 
-          <MenuItem
-            icon="mail-outline"
-            label="Email Address"
-            subtitle={firestoreUser?.email}
-            goto={false}
-          />
-          {
-            <MenuItem
-              icon={authMethod.icon}
-              label="Sign-In Method"
-              subtitle={authMethod.name}
-              goto={false}
-            />
-          }
-          {authMethod.name === "Email & Password" && (
-            <MenuItem
-              icon="lock-closed-outline"
-              label="Password"
-              isLast
-              onPress={() => router.push("/profile/changePassword")}
-            />
-          )}
-        </View>
-
-        <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-          <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
-            Preferences
-          </Text>
-          <MenuItem
-            icon="notifications-outline"
-            label="Notifications"
-            color="#8B5CF6"
-            switchComponent={true}
-          />
-          <MenuItem
-            icon="at-outline"
-            label="Email Alerts"
-            color="#8B5CF6"
-            switchComponent={true}
-          />
-        </View>
-
-        <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-          <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
-            Privacy
-          </Text>
-          <View className="px-5 py-4 flex-row items-center justify-between border-b border-gray-50">
-            <View className="flex-row items-center flex-1">
-              <View
-                className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
-                style={{ backgroundColor: "#8B5CF612" }}
-              >
-                <Ionicons name="eye-off-outline" size={18} color="#8B5CF6" />
-              </View>
-              <View className="flex-1">
-                <Text className="text-secondary font-semibold text-[15px]">
-                  Profile Visibility
-                </Text>
-                <Text className="text-gray-400 text-xs mt-0.5">
-                  {visibility === "Public"
-                    ? "Anyone can view your profile"
-                    : "Only approved users can view"}
-                </Text>
-              </View>
-            </View>
-
-            <View className="flex-row items-center bg-gray-50 px-2 py-0.5 rounded-2xl border border-gray-100">
-              <Text
-                className={`text-[10px] font-bold ml-1 ${visibility === "Public" ? "text-primary" : "text-gray-300"}`}
-              >
-                Public
-              </Text>
-              <Switch
-                value={visibility === "Private"}
-                onValueChange={(val) => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setVisibility(val ? "Private" : "Public");
-                }}
-                trackColor={{ false: "#CBD5E1", true: "#4F46E5" }}
-                thumbColor="#fff"
-                ios_backgroundColor="#CBD5E1"
-                style={{ transform: [{ scale: 0.8 }] }}
+            {filterMatch("Email Address") && (
+              <MenuItem
+                icon="mail-outline"
+                label="Email Address"
+                subtitle={firestoreUser?.email}
+                goto={false}
               />
-              <Text
-                className={`text-[10px] font-bold mr-1 ${visibility === "Private" ? "text-primary" : "text-gray-300"}`}
-              >
-                Private
+            )}
+            {filterMatch("Sign-In Method") && (
+              <MenuItem
+                icon={authMethod.icon}
+                label="Sign-In Method"
+                subtitle={authMethod.name}
+                goto={false}
+              />
+            )}
+            {authMethod.name === "Email & Password" &&
+              filterMatch("Password") && (
+                <MenuItem
+                  icon="lock-closed-outline"
+                  label="Password"
+                  isLast
+                  onPress={() => router.push("/profile/changePassword")}
+                />
+              )}
+          </View>
+        )}
+
+        {(filterMatch("Notifications") || filterMatch("Email Alerts")) && (
+          <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
+            <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+              Preferences
+            </Text>
+            {filterMatch("Notifications") && (
+              <MenuItem
+                icon="notifications-outline"
+                label="Notifications"
+                color="#8B5CF6"
+                switchComponent={true}
+              />
+            )}
+            {filterMatch("Email Alerts") && (
+              <MenuItem
+                icon="at-outline"
+                label="Email Alerts"
+                color="#8B5CF6"
+                switchComponent={true}
+              />
+            )}
+          </View>
+        )}
+
+        {(filterMatch("Profile Visibility") || filterMatch("Blocked Users")) && (
+          <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
+            <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+              Privacy
+            </Text>
+            {filterMatch("Profile Visibility") && (
+              <View className="px-5 py-4 flex-row items-center justify-between border-b border-gray-50">
+                <View className="flex-row items-center flex-1">
+                  <View
+                    className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
+                    style={{ backgroundColor: "#8B5CF612" }}
+                  >
+                    <Ionicons name="eye-off-outline" size={18} color="#8B5CF6" />
+                  </View>
+                  <View className="flex-1">
+                    <Text className="text-secondary font-semibold text-[15px]">
+                      Profile Visibility
+                    </Text>
+                    <Text className="text-gray-400 text-xs mt-0.5">
+                      {visibility === "Public"
+                        ? "Anyone can view your profile"
+                        : "Only approved users can view"}
+                    </Text>
+                  </View>
+                </View>
+
+                <View className="flex-row items-center bg-gray-50 px-2 py-0.5 rounded-2xl border border-gray-100">
+                  <Text
+                    className={`text-[10px] font-bold ml-1 ${visibility === "Public" ? "text-primary" : "text-gray-300"}`}
+                  >
+                    Public
+                  </Text>
+                  <Switch
+                    value={visibility === "Private"}
+                    onValueChange={(val) => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setVisibility(val ? "Private" : "Public");
+                    }}
+                    trackColor={{ false: "#CBD5E1", true: "#4F46E5" }}
+                    thumbColor="#fff"
+                    ios_backgroundColor="#CBD5E1"
+                    style={{ transform: [{ scale: 0.8 }] }}
+                  />
+                  <Text
+                    className={`text-[10px] font-bold mr-1 ${visibility === "Private" ? "text-primary" : "text-gray-300"}`}
+                  >
+                    Private
+                  </Text>
+                </View>
+              </View>
+            )}
+            {filterMatch("Blocked Users") && (
+              <MenuItem
+                icon="ban"
+                label="Blocked Users"
+                color="#8B5CF6"
+                rightComponent={
+                  <View className="flex-row items-center bg-gray-50 px-2 py-0.5 rounded-2xl border border-gray-100">
+                    <Text className="text-[10px] font-bold mr-1 text-gray-300">
+                      10
+                    </Text>
+                    <Ionicons name="arrow-forward" size={20} color="#9CA3AF" />
+                  </View>
+                }
+                onPress={() => setShowBlockedModal(true)}
+              />
+            )}
+          </View>
+        )}
+
+        <BlockedUserModal
+          showBlockedModal={showBlockedModal}
+          setShowBlockedModal={setShowBlockedModal}
+        />
+
+        {(filterMatch("Help Center") ||
+          filterMatch("Privacy Policy") ||
+          filterMatch("Terms of Service")) && (
+          <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
+            <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+              Support
+            </Text>
+            {filterMatch("Help Center") && (
+              <MenuItem
+                icon="information-circle-outline"
+                label="Help Center"
+                color="#8B5CF6"
+              />
+            )}
+            {filterMatch("Privacy Policy") && (
+              <MenuItem
+                icon="shield-checkmark"
+                label="Privacy Policy"
+                color="#8B5CF6"
+              />
+            )}
+            {filterMatch("Terms of Service") && (
+              <MenuItem
+                icon="document-text-outline"
+                label="Terms of Service"
+                color="#8B5CF6"
+                isLast
+              />
+            )}
+          </View>
+        )}
+
+        {searchQuery.length > 0 &&
+          !filterMatch("Email Address") &&
+          !filterMatch("Sign-In Method") &&
+          !filterMatch("Password") &&
+          !filterMatch("Notifications") &&
+          !filterMatch("Email Alerts") &&
+          !filterMatch("Profile Visibility") &&
+          !filterMatch("Blocked Users") &&
+          !filterMatch("Help Center") &&
+          !filterMatch("Privacy Policy") &&
+          !filterMatch("Terms of Service") && (
+            <View className="flex-1 items-center justify-center py-10">
+              <Ionicons name="search-outline" size={48} color="#E5E7EB" />
+              <Text className="text-gray-400 mt-4 font-medium">
+                No results found for "{searchQuery}"
               </Text>
             </View>
-          </View>
-          <MenuItem icon="ban" label="Blocked Users" color="#8B5CF6" />
-        </View>
-
-        <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-          <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
-            Support
-          </Text>
-          <MenuItem
-            icon="information-circle-outline"
-            label="Help Center"
-            color="#8B5CF6"
-          />
-          <MenuItem
-            icon="shield-checkmark"
-            label="Privacy Policy"
-            color="#8B5CF6"
-          />
-          <MenuItem
-            icon="document-text-outline"
-            label="Terms of Service"
-            color="#8B5CF6"
-            isLast
-          />
-        </View>
+          )}
 
         <Text className="text-center text-gray-300 text-[10px] mt-6 tracking-wider">
           SpotUs v1.0.0
