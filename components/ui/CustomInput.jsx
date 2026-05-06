@@ -1,18 +1,21 @@
-import { useRef } from "react";
+import { forwardRef, useRef } from "react";
 import { Animated, Text, TextInput, View } from "react-native";
 
-export default function CustomInput({
-  label,
-  value,
-  onChangeText,
-  placeholder,
-  secureTextEntry,
-  icon,
-  error,
-  className = "",
-  containerStyle,
-  ...props
-}) {
+const CustomInput = forwardRef(function CustomInput(
+  {
+    label,
+    value,
+    onChangeText,
+    placeholder,
+    secureTextEntry,
+    icon,
+    error,
+    className = "",
+    containerStyle,
+    ...props
+  },
+  ref,
+) {
   const borderAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
@@ -87,6 +90,7 @@ export default function CustomInput({
           <View className="mr-3 w-6 items-center">{icon}</View>
         )}
         <TextInput
+          ref={ref}
           className="flex-1 text-secondary text-base font-medium"
           placeholder={placeholder}
           placeholderTextColor="#CBD5E1"
@@ -110,4 +114,6 @@ export default function CustomInput({
       ) : null}
     </Animated.View>
   );
-}
+});
+
+export default CustomInput;

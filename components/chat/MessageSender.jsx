@@ -5,7 +5,6 @@ import * as ImagePicker from "expo-image-picker";
 import { useEffect, useRef, useState } from "react";
 import {
   Alert,
-  Animated,
   Pressable,
   Text,
   TextInput,
@@ -44,7 +43,6 @@ export default function MessageSender({
 }) {
   const [message, setMessage] = useState("");
   const [showMediaMenu, setShowMediaMenu] = useState(false);
-  const menuAnim = useRef(new Animated.Value(0)).current;
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
@@ -66,17 +64,6 @@ export default function MessageSender({
       setMessage(editingMessage.text || "");
     }
   }, [editingMessage]);
-
-  useEffect(() => {
-    if (!showMediaMenu) return;
-    menuAnim.setValue(0);
-    Animated.spring(menuAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 18,
-      bounciness: 4,
-    }).start();
-  }, [menuAnim, showMediaMenu]);
 
   const toggleMediaMenu = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -198,26 +185,7 @@ export default function MessageSender({
 
       {/* Media Menu Popup */}
       {showMediaMenu && (
-        <Animated.View
-          className="absolute bottom-[60px] left-0 right-0 z-10"
-          style={{
-            opacity: menuAnim,
-            transform: [
-              {
-                translateY: menuAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [8, 0],
-                }),
-              },
-              {
-                scale: menuAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0.98, 1],
-                }),
-              },
-            ],
-          }}
-        >
+        <View className="absolute bottom-[60px] left-0 right-0 z-10">
           <View
             className="bg-white rounded-2xl py-3 px-3 mx-1 border border-gray-100"
             style={{
@@ -253,7 +221,7 @@ export default function MessageSender({
               ))}
             </View>
           </View>
-        </Animated.View>
+        </View>
       )}
 
       {/* Edit Preview Banner */}

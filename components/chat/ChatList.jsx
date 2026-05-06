@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { deleteDoc, doc, setDoc } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Alert,
   Animated,
@@ -35,8 +35,6 @@ function formatTime(timestamp) {
 
 export default function ChatRow({ chat, onPress }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(10)).current;
   const otherUser = chat?.otherUser;
   const lastMsg = chat?.lastMessage;
   const time = chat?.lastMessageAt ? formatTime(chat.lastMessageAt) : "";
@@ -73,22 +71,6 @@ export default function ChatRow({ chat, onPress }) {
   const [isMuted, setIsMuted] = useState(
     chat?.mutedBy?.includes(currentUserId) || false,
   );
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 260,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        useNativeDriver: true,
-        speed: 18,
-        bounciness: 3,
-      }),
-    ]).start();
-  }, [fadeAnim, slideAnim]);
 
   const handleLongPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -188,12 +170,7 @@ export default function ChatRow({ chat, onPress }) {
   ];
 
   return (
-    <Animated.View
-      style={{
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }, { scale: scaleAnim }],
-      }}
-    >
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
         onPress={handlePress}
         onLongPress={handleLongPress}
