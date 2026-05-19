@@ -8,7 +8,7 @@ SpotUs is a location-based social discovery and real-time chat application built
 - **Interest-Based Rooms**: Create and join rooms categorized by topics like Music, Tech, Coffee, Local Events, and more.
 - **Dual Trust System**: A unique reputation mechanism where users must build "Room Trust" (by participating in public rooms) to unlock Direct Messaging, preventing spam and fostering organic connections.
 - **Real-Time Chat**: Fast, reliable messaging powered by Firebase Firestore with read receipts, typing indicators, and immediate synchronization.
-- **Secure Authentication**: Passwordless OTP, Google OAuth, and Apple Sign-In powered by Clerk.
+- **Secure Authentication**: Passwordless OTP, Google OAuth, and Apple Sign-In.
 
 ## Tech Stack
 
