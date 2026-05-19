@@ -1,4 +1,4 @@
-# SpotUs
+# SpotUs💥
 
 SpotUs is a location-based social discovery and real-time chat application built with React Native and Expo. It allows users to discover active rooms within a specific radius, join dynamic conversations based on interests, and organically build trust with other users to unlock direct messaging capabilities.
 
