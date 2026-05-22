@@ -4,7 +4,7 @@ SpotUs is a location-based social discovery and real-time chat application built
 
 ## Features
 
-- **Location-Based Discovery**: Find nearby chat rooms using a dynamic radius slider.
+- **Location-Based Discovery**: Find nearby chat rooms using a  radius slider.
 - **Interest-Based Rooms**: Create and join rooms categorized by topics like Music, Tech, Coffee, Local Events, and more.
 - **Dual Trust System**: A unique reputation mechanism where users must build "Room Trust" (by participating in public rooms) to unlock Direct Messaging, preventing spam and fostering organic connections.
 - **Real-Time Chat**: Fast, reliable messaging powered by Firebase Firestore with read receipts, typing indicators, and immediate synchronization.
