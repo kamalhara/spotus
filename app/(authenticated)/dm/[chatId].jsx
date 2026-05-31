@@ -31,10 +31,8 @@ import useTypingIndicator from "../../../hook/useTypingIndicator";
 import { ChatSeen } from "../../../lib/chatSeen";
 import { sendPushNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
-import { useTheme } from "../../../context/ThemeContext";
 
 export default function ChatId() {
-  const { isDark } = useTheme();
   const { chatId, userName, profilePic } = useLocalSearchParams();
   const router = useRouter();
   const { firestoreUser } = useFirestoreUser();
@@ -258,7 +256,7 @@ export default function ChatId() {
               onPress={() => router.back()}
               className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#23232E] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
             >
-              <Ionicons name="chevron-back" size={20} color={isDark ? "#F3F4F6" : "#18181B"} />
+              <Ionicons name="chevron-back" size={20} color="#18181B" />
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-row items-center gap-3 flex-1"
@@ -335,7 +333,7 @@ export default function ChatId() {
         </View>
 
         {/* Input */}
-        <View className="px-5 py-3 pb-5 ">
+        <View className="px-5 py-3 pb-5">
           <MessageSender
             handleSend={handleSend}
             chatId={chatDocId}
