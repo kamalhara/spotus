@@ -30,7 +30,7 @@ export default function ScreenHeader({
               activeOpacity={0.75}
               className="w-11 h-11 rounded-2xl bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] items-center justify-center mr-3"
             >
-              <Ionicons name="chevron-back" size={21} color={isDark ? "#F3F4F6" : "#18181B"} />
+              <Ionicons name="chevron-back" size={21} color={isDark ? "white" : "#18181B"} />
             </TouchableOpacity>
           )}
           <View className="flex-1">

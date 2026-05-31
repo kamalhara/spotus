@@ -109,7 +109,7 @@ export default function Login() {
             onPress={() => router.push("/")}
             className="w-10 h-10 bg-gray-50 dark:bg-[#1A1A22] rounded-full items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
           >
-            <Ionicons name="arrow-back" size={20} color={isDark ? "#F3F4F6" : "black"} />
+            <Ionicons name="arrow-back" size={20} color={isDark ? "white" : "black"} />
           </TouchableOpacity>
         </View>
 

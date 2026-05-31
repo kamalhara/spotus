@@ -220,7 +220,7 @@ export default function UserProfile() {
           onPress={handleBack}
           className="mx-6 mt-4 w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
         >
-          <Ionicons name="chevron-back" size={20} color={isDark ? "#F3F4F6" : "#18181B"} className="dark:text-gray-100" />
+          <Ionicons name="chevron-back" size={20} color={isDark ? "white" : "#18181B"} className="dark:text-gray-100" />
         </TouchableOpacity>
         <View className="flex-1 items-center justify-center px-10 -mt-10">
           <Ionicons name="person-outline" size={48} color="#D1D5DB" />
@@ -243,7 +243,7 @@ export default function UserProfile() {
           onPress={handleBack}
           className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36] z-10"
         >
-          <Ionicons name="chevron-back" size={20} color={isDark ? "#F3F4F6" : "#18181B"} className="dark:text-gray-100" />
+          <Ionicons name="chevron-back" size={20} color={isDark ? "white" : "#18181B"} className="dark:text-gray-100" />
         </TouchableOpacity>
 
         <Text className="absolute w-full text-center text-secondary dark:text-gray-100 font-semibold text-base z-0 pointer-events-none">

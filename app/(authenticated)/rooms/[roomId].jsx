@@ -266,7 +266,7 @@ export default function RoomChat() {
                 onPress={() => router.back()}
                 className="w-10 h-10 bg-gray-50 dark:bg-[#23232E] rounded-2xl items-center justify-center mr-3 border border-gray-100 dark:border-[#2A2A36]"
               >
-                <Ionicons name="chevron-back" size={20} color={isDark ? "#F3F4F6" : "#18181B"} />
+                <Ionicons name="chevron-back" size={20} color={isDark ? "white" : "#18181B"} />
               </TouchableOpacity>
 
               <View className="w-11 h-11 rounded-2xl bg-primary/10 items-center justify-center mr-3">
