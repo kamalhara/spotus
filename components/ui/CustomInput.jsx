@@ -86,9 +86,7 @@ const CustomInput = forwardRef(function CustomInput(
           containerStyle,
         ]}
       >
-        {icon && (
-          <View className="mr-3 w-6 items-center">{icon}</View>
-        )}
+        {icon && <View className="mr-3 w-6 items-center">{icon}</View>}
         <TextInput
           ref={ref}
           className="flex-1 text-secondary text-base font-medium"
@@ -103,13 +101,11 @@ const CustomInput = forwardRef(function CustomInput(
         />
       </Animated.View>
       {error ? (
-        <View className="flex-row items-center mt-2 ml-1">
+        <View className="flex-row items-center mt -2 ml-1">
           <View className="w-4 h-4 bg-danger/10 rounded-full items-center justify-center mr-1.5">
             <Text className="text-danger text-[9px] font-bold">!</Text>
           </View>
-          <Text className="text-danger text-sm font-medium">
-            {error}
-          </Text>
+          <Text className="text-danger text-sm font-medium">{error}</Text>
         </View>
       ) : null}
     </Animated.View>

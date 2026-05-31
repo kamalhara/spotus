@@ -25,6 +25,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ChatMessages from "../../../components/chat/ChatMessages";
 import MessageSender from "../../../components/chat/MessageSender";
 import RoomDetailsSheet from "../../../components/rooms/RoomDetailsSheet";
+import TrustInfoSheet from "../../../components/rooms/TrustInfoSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { RoomSeen } from "../../../lib/chatSeen";
@@ -58,6 +59,7 @@ export default function RoomChat() {
   const { firestoreUser: user } = useFirestoreUser();
   const currentUserId = user?.id;
   const detailsSheetRef = useRef(null);
+  const trustSheetRef = useRef(null);
 
   const { roomId } = useLocalSearchParams();
 
@@ -301,7 +303,10 @@ export default function RoomChat() {
 
       {/* Trust Meter — compact */}
       {trust < 10 && (
-        <View className="px-5 pt-3 pb-1">
+        <TouchableOpacity
+          className="px-5 pt-3 pb-1"
+          onPress={() => trustSheetRef.current?.present()}
+        >
           <View className="bg-white px-4 py-3 rounded-2xl border border-gray-100">
             <View className="flex-row items-center justify-between mb-2">
               <View className="flex-row items-center">
@@ -332,7 +337,7 @@ export default function RoomChat() {
               animated={true}
             />
           </View>
-        </View>
+        </TouchableOpacity>
       )}
 
       <View className="flex-1">
@@ -367,6 +372,11 @@ export default function RoomChat() {
         room={room}
         members={members}
         currentUserId={currentUserId}
+      />
+
+      <TrustInfoSheet
+        ref={trustSheetRef}
+        trust={trust}
       />
     </KeyboardAvoidingView>
   );
