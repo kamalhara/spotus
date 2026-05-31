@@ -13,6 +13,7 @@ import {
 } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import * as Progress from "react-native-progress";
+import { useTheme } from "../../context/ThemeContext";
 
 const TRUST_TIERS = [
   {
@@ -75,6 +76,7 @@ const HOW_IT_WORKS_STEPS = [
 
 const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
   const bottomSheetModalRef = useRef(null);
+  const { isDark } = useTheme();
 
   useImperativeHandle(ref, () => ({
     dismiss: () => bottomSheetModalRef.current?.dismiss(),
@@ -132,7 +134,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
         height: 4,
         borderRadius: 2,
       }}
-      backgroundStyle={{ borderRadius: 32, backgroundColor: "#FFFFFF" }}
+      backgroundStyle={{ borderRadius: 32, backgroundColor: isDark ? "#1A1A22" : "#FFFFFF" }}
       enableDynamicSizing={false}
     >
       <BottomSheetScrollView
@@ -159,13 +161,13 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
                 Trust System
               </Text>
             </View>
-            <Text className="text-secondary text-2xl font-black leading-tight tracking-tighter">
+            <Text className="text-secondary dark:text-gray-100 text-2xl font-black leading-tight tracking-tighter">
               How Trust Works
             </Text>
           </View>
           <TouchableOpacity
             onPress={handleDismiss}
-            className="w-10 h-10 bg-surface-alt rounded-2xl items-center justify-center"
+            className="w-10 h-10 bg-surface-alt dark:bg-[#23232E] rounded-2xl items-center justify-center"
           >
             <Ionicons name="close" size={18} color="#94A3B8" />
           </TouchableOpacity>
@@ -193,7 +195,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
                 />
               </View>
               <View>
-                <Text className="text-gray-400 text-[10px] font-black uppercase tracking-[1.5px]">
+                <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[1.5px]">
                   Your Trust Level
                 </Text>
                 <Text
@@ -229,7 +231,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
           />
 
           {trust < 10 && (
-            <Text className="text-gray-400 text-xs font-semibold mt-2.5">
+            <Text className="text-gray-400 dark:text-gray-500 text-xs font-semibold mt-2.5">
               {10 - clampedTrust} more message
               {10 - clampedTrust !== 1 ? "s" : ""} to unlock DMs
             </Text>
@@ -238,27 +240,26 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
 
         {/* How It Works Section */}
         <View className="mb-6">
-          <Text className="text-secondary text-lg font-black tracking-tight mb-4">
+          <Text className="text-secondary dark:text-gray-100 text-lg font-black tracking-tight mb-4">
             How It Works
           </Text>
 
           {HOW_IT_WORKS_STEPS.map((step, index) => (
             <View key={index} className="flex-row items-start mb-3">
-              <View className="w-10 h-10 rounded-2xl bg-primary/10 items-center justify-center mr-3.5 mt-0.5">
+              <View className="w-10 h-10 rounded-full bg-primary-surface dark:bg-primary-surface items-center justify-center mr-3.5 mt-0.5">
                 <Ionicons name={step.icon} size={18} color="#4F46E5" />
               </View>
               <View className="flex-1">
-                <Text className="text-secondary text-sm font-black tracking-tight">
+                <Text className="text-secondary dark:text-gray-100 text-sm font-black tracking-tight">
                   {step.title}
                 </Text>
-                <Text className="text-gray-400 text-xs font-medium leading-[18px] mt-1">
+                <Text className="text-gray-400 dark:text-gray-500 text-xs font-medium leading-[18px] mt-1">
                   {step.detail}
                 </Text>
               </View>
               {index < HOW_IT_WORKS_STEPS.length - 1 && (
                 <View
-                  className="absolute left-[19px] top-[44px] w-[2px] h-3"
-                  style={{ backgroundColor: "#E2E8F0" }}
+                  className="absolute left-[19px] top-[44px] w-[2px] h-3 bg-border-light dark:bg-[#2A2A36]"
                 />
               )}
             </View>
@@ -269,9 +270,9 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
         <View
           className="rounded-2xl p-4 mt-4"
           style={{
-            backgroundColor: "#F8FAFC",
+            backgroundColor: isDark ? "#23232E" : "#F8FAFC",
             borderWidth: 1,
-            borderColor: "#F1F5F9",
+            borderColor: isDark ? "#2A2A36" : "#F1F5F9",
           }}
         >
           <View className="flex-row items-center mb-2">
@@ -281,11 +282,11 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
               color="#4F46E5"
               style={{ marginRight: 6 }}
             />
-            <Text className="text-secondary font-black text-sm tracking-tight">
+            <Text className="text-secondary dark:text-gray-100 font-black text-sm tracking-tight">
               Why Trust Matters
             </Text>
           </View>
-          <Text className="text-gray-400 text-xs font-medium leading-[18px]">
+          <Text className="text-gray-400 dark:text-gray-500 text-xs font-medium leading-[18px]">
             Trust keeps Spotus safe and authentic. By participating in rooms
             first, you show you&apos;re a genuine member before sliding into
             DMs. It helps everyone feel comfortable connecting.

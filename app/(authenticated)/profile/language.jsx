@@ -22,7 +22,7 @@ export default function Language() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
       >
-        <View className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
           {LANGUAGES.map((language, index) => {
             const selected = selectedLanguage === language.code;
             return (
@@ -32,13 +32,13 @@ export default function Language() {
                 activeOpacity={0.75}
                 className={`px-5 py-4 flex-row items-center ${
                   index !== LANGUAGES.length - 1
-                    ? "border-b border-gray-50"
+                    ? "border-b border-gray-50 dark:border-[#2A2A36]"
                     : ""
                 }`}
               >
                 <View
                   className={`w-10 h-10 rounded-2xl items-center justify-center mr-3.5 ${
-                    selected ? "bg-primary/10" : "bg-surface-alt"
+                    selected ? "bg-primary-surface dark:bg-primary-surface" : "bg-surface-alt dark:bg-[#23232E]"
                   }`}
                 >
                   <Ionicons
@@ -48,10 +48,10 @@ export default function Language() {
                   />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-secondary text-[15px] font-bold">
+                  <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
                     {language.label}
                   </Text>
-                  <Text className="text-gray-400 text-xs mt-0.5">
+                  <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
                     {language.region}
                   </Text>
                 </View>

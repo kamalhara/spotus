@@ -176,13 +176,13 @@ export default function ChatMessages({
   if (!messages || messages.length === 0) {
     return (
       <View className="flex-1 items-center justify-center px-10">
-        <View className="w-16 h-16 bg-white border border-gray-100 rounded-2xl items-center justify-center mb-4">
+        <View className="w-16 h-16 bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl items-center justify-center mb-4">
           <Ionicons name="chatbubble-outline" size={28} color="#4F46E5" />
         </View>
-        <Text className="text-secondary text-base font-bold mt-1">
+        <Text className="text-secondary dark:text-gray-100 text-base font-bold mt-1">
           No messages yet
         </Text>
-        <Text className="text-gray-400 text-sm text-center mt-1.5 leading-5">
+        <Text className="text-gray-400 dark:text-gray-500 text-sm text-center mt-1.5 leading-5">
           Send a message to start the chat.
         </Text>
       </View>
@@ -204,7 +204,7 @@ export default function ChatMessages({
 
     return (
       <View
-        className={`flex-row items-center bg-white border border-gray-100 rounded-full px-2 py-0.5 h-7 ${isSentByMe ? "mr-1" : "ml-1"}`}
+        className={`flex-row items-center bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-full px-2 py-0.5 h-7 ${isSentByMe ? "mr-1" : "ml-1"}`}
         style={{
           zIndex: 20,
           marginTop: -8,
@@ -245,13 +245,13 @@ export default function ChatMessages({
       <View className="w-full">
         {showDateSeparator && (
           <View className="items-center my-5 flex-row justify-center px-10">
-            <View className="h-[1px] bg-gray-100 flex-1" />
-            <View className="bg-surface-alt border border-gray-100 px-3 py-1 rounded-full mx-3">
-              <Text className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+            <View className="h-[1px] bg-gray-100 dark:bg-[#2A2A36] flex-1" />
+            <View className="bg-surface-alt dark:bg-[#23232E] border border-gray-100 dark:border-[#2A2A36] px-3 py-1 rounded-full mx-3">
+              <Text className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                 {formatSeparatorDate(item.createdAt)}
               </Text>
             </View>
-            <View className="h-[1px] bg-gray-100 flex-1" />
+            <View className="h-[1px] bg-gray-100 dark:bg-[#2A2A36] flex-1" />
           </View>
         )}
         <View
@@ -310,7 +310,7 @@ export default function ChatMessages({
                     ? item.imageUrl
                       ? "rounded-2xl rounded-br-md overflow-hidden"
                       : "bg-primary rounded-2xl rounded-br-md"
-                    : "bg-white border border-gray-100 rounded-2xl rounded-bl-sm"
+                    : "bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl rounded-bl-sm"
                 }`}
                 style={
                   !isSentByMe
@@ -380,7 +380,7 @@ export default function ChatMessages({
                   />
                 ) : (
                   <Text
-                    className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary"}`}
+                    className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary dark:text-gray-100"}`}
                   >
                     {item.text}
                   </Text>
@@ -491,7 +491,7 @@ export default function ChatMessages({
                         className="w-56 h-56 opacity-50"
                       />
                       <View className="absolute inset-0 items-center justify-center bg-black/10">
-                        <View className="bg-white/90 p-3 rounded-2xl items-center">
+                        <View className="bg-white/90 dark:bg-[#1A1A22]/90 p-3 rounded-2xl items-center">
                           <ActivityIndicator color="#4F46E5" size="small" />
                           <Text className="text-[10px] font-bold text-primary mt-2 tracking-widest">
                             SENDING...

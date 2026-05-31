@@ -2,8 +2,10 @@ import { ClerkLoaded, ClerkProvider, useUser } from "@clerk/expo";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
+import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../global.css";
+import { ThemeProvider, useTheme } from "../context/ThemeContext";
 import syncUserToFirebase from "../lib/syncUser";
 import { tokenCache } from "../utils/cache";
 
@@ -26,25 +28,37 @@ function UserSync() {
   return null;
 }
 
+function ThemedApp() {
+  const { colorScheme } = useTheme();
+
+  return (
+    <View style={{ flex: 1 }} className={`bg-bg dark:bg-[#0F0F13] ${colorScheme === "dark" ? "dark" : ""}`}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ClerkProvider
+          publishableKey={publishableKey}
+          tokenCache={tokenCache}
+        >
+          <ClerkLoaded>
+            <BottomSheetModalProvider>
+              <Stack>
+                <Stack.Screen name="index" options={{ headerShown: false }} />
+                <Stack.Screen name="welcome" options={{ headerShown: false }} />
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
+              </Stack>
+              <UserSync />
+            </BottomSheetModalProvider>
+          </ClerkLoaded>
+        </ClerkProvider>
+      </GestureHandlerRootView>
+    </View>
+  );
+}
+
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <ClerkProvider
-        publishableKey={publishableKey}
-        tokenCache={tokenCache}
-      >
-        <ClerkLoaded>
-          <BottomSheetModalProvider>
-            <Stack>
-              <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="welcome" options={{ headerShown: false }} />
-              <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-              <Stack.Screen name="(authenticated)" options={{ headerShown: false }} />
-            </Stack>
-            <UserSync />
-          </BottomSheetModalProvider>
-        </ClerkLoaded>
-      </ClerkProvider>
-    </GestureHandlerRootView>
+    <ThemeProvider>
+      <ThemedApp />
+    </ThemeProvider>
   );
 }

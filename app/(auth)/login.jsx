@@ -15,12 +15,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Oauth from "../../components/auth/Oauth";
 import CustomButton from "../../components/ui/CustomButton";
 import CustomInput from "../../components/ui/CustomInput";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function Login() {
   const { isLoaded } = useAuth();
   const { client, setActive } = useClerk();
   const signIn = client?.signIn;
   const router = useRouter();
+  const { isDark } = useTheme();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -93,7 +95,7 @@ export default function Login() {
 
   if (!isLoaded) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-white">
+      <SafeAreaView className="flex-1 justify-center items-center bg-bg dark:bg-[#0F0F13]">
         <ActivityIndicator size="large" color="#4F46E5" />
       </SafeAreaView>
     );
@@ -101,13 +103,13 @@ export default function Login() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="bg-white flex-1 px-8">
+      <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1 px-8">
         <View className="flex-row items-center mt-4">
           <TouchableOpacity
             onPress={() => router.push("/")}
-            className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
+            className="w-10 h-10 bg-gray-50 dark:bg-[#1A1A22] rounded-full items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
           >
-            <Ionicons name="arrow-back" size={20} color="black" />
+            <Ionicons name="arrow-back" size={20} color={isDark ? "#F3F4F6" : "black"} />
           </TouchableOpacity>
         </View>
 
@@ -118,12 +120,12 @@ export default function Login() {
           }}
         >
           <View className="mt-8 mb-10">
-            <Text className="text-secondary text-[32px] font-bold tracking-tight mb-1">
+            <Text className="text-secondary dark:text-gray-100 text-[32px] font-bold tracking-tight mb-1">
               Welcome{"\n"}Back
             </Text>
             {/* Accent line */}
             <View className="mt-3 mb-3 w-12 h-1 rounded-full bg-primary" />
-            <Text className="text-gray-400 text-base leading-6">
+            <Text className="text-gray-400 dark:text-gray-500 text-base leading-6">
               Sign in to continue where you left off.
             </Text>
           </View>
@@ -189,21 +191,21 @@ export default function Login() {
           />
 
           <View className="flex-row items-center justify-center gap-3 my-7">
-            <View className="flex-1 h-px bg-gray-100" />
-            <Text className="text-gray-300 text-xs font-semibold uppercase tracking-wider">
+            <View className="flex-1 h-px bg-border-light dark:bg-[#2A2A36]" />
+            <Text className="text-gray-300 dark:text-gray-600 text-xs font-semibold uppercase tracking-wider">
               Or
             </Text>
-            <View className="flex-1 h-px bg-gray-100" />
+            <View className="flex-1 h-px bg-border-light dark:bg-[#2A2A36]" />
           </View>
 
           <Oauth />
 
           <View className="flex-row items-center justify-center gap-1.5 mt-4">
-            <Text className="text-gray-400 text-[15px]">
+            <Text className="text-gray-400 dark:text-gray-500 text-[15px]">
               Don&apos;t have an account?
             </Text>
             <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
-              <Text className="text-primary font-semibold text-[15px]">
+              <Text className="text-primary dark:text-primary-light font-semibold text-[15px]">
                 Sign Up
               </Text>
             </TouchableOpacity>

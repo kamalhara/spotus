@@ -124,11 +124,11 @@ export default function Edit() {
               <TouchableOpacity
                 onPress={() => router.back()}
                 activeOpacity={0.75}
-                className="px-3 py-2 rounded-xl bg-white border border-gray-100"
+                className="px-3 py-2 rounded-xl bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
               >
-                <Text className="font-bold text-primary">Cancel</Text>
+                <Text className="font-bold text-primary dark:text-primary-light">Cancel</Text>
               </TouchableOpacity>
-              <Text className="font-extrabold text-lg text-secondary">
+              <Text className="font-extrabold text-lg text-secondary dark:text-gray-100">
                 Edit Profile
               </Text>
               <TouchableOpacity
@@ -146,9 +146,9 @@ export default function Edit() {
             </View>
 
             <View className="w-full mt-8">
-              <View className="w-full bg-white border border-gray-100 rounded-2xl p-5 items-center">
+              <View className="w-full bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl p-5 items-center">
                 <View className="relative">
-                  <View className="rounded-full border-4 border-gray-50 w-32 h-32 bg-gray-100 overflow-hidden">
+                  <View className="rounded-full border-4 border-gray-50 dark:border-[#23232E] w-32 h-32 bg-gray-100 dark:bg-gray-800 overflow-hidden">
                     <Image
                       source={{
                         uri:
@@ -163,12 +163,12 @@ export default function Edit() {
                     <Ionicons name="camera" size={16} color="#FFFFFF" />
                   </View>
                 </View>
-                <Text className="font-bold text-primary mt-4">
+                <Text className="font-bold text-primary dark:text-primary-light mt-4">
                   Edit Picture
                 </Text>
               </View>
 
-              <View className="mt-6 bg-white border border-gray-100 rounded-2xl p-4 gap-4">
+              <View className="mt-6 bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl p-4 gap-4">
                 <CustomInput
                   label="Full name"
                   placeholder="Enter full name"
@@ -215,13 +215,13 @@ export default function Edit() {
                 </View>
               </View>
 
-              <View className="bg-white border border-gray-100 rounded-2xl p-4 mt-6">
+              <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl p-4 mt-6">
                 <View className="w-full flex flex-row items-center justify-between">
-                  <Text className="text-secondary text-lg font-extrabold">
+                  <Text className="text-secondary dark:text-gray-100 text-lg font-extrabold">
                     Manage Interests
                   </Text>
-                  <View className="bg-primary/10 px-2.5 py-1 rounded-lg">
-                    <Text className="text-primary text-xs font-bold">
+                  <View className="bg-primary-surface dark:bg-primary-surface px-2.5 py-1 rounded-lg">
+                    <Text className="text-primary dark:text-primary-light text-xs font-bold">
                       {selectedInterests.length}
                     </Text>
                   </View>
@@ -243,7 +243,7 @@ export default function Edit() {
                         className={`flex-row items-center gap-2 px-3 py-2 rounded-xl border ${
                           isSelected
                             ? "border-transparent"
-                            : "bg-white border-gray-100"
+                            : "bg-white dark:bg-[#1A1A22] border-gray-100 dark:border-[#2A2A36]"
                         }`}
                         style={
                           isSelected
@@ -274,7 +274,7 @@ export default function Edit() {
 
             <TouchableOpacity
               activeOpacity={0.7}
-              className="mx-2 mt-8 bg-red-50 py-4 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
+              className="mx-2 mt-8 bg-red-50 dark:bg-red-500/10 py-4 rounded-2xl border border-red-100 dark:border-red-500/20 flex-row items-center justify-center gap-2"
             >
               <Ionicons name="trash" size={18} color="#EF4444" />
               <Text className="text-red-500 font-semibold text-[15px]">

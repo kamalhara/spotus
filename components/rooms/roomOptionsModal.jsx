@@ -40,14 +40,7 @@ export default function RoomOptionsModal({ showOptions, setShowOptions }) {
         <View className="flex-1 justify-end pb-12 px-5">
           <Pressable>
             <View
-              className="bg-white rounded-2xl overflow-hidden"
-              style={{
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: -4 },
-                shadowOpacity: 0.15,
-                shadowRadius: 20,
-                elevation: 20,
-              }}
+              className="bg-white dark:bg-[#1A1A22] rounded-2xl overflow-hidden shadow-xl shadow-black/10 dark:shadow-none border border-border-light dark:border-[#2A2A36]"
             >
               {/* Options */}
               {OPTIONS.map((option, index) => (
@@ -58,14 +51,14 @@ export default function RoomOptionsModal({ showOptions, setShowOptions }) {
                   }}
                   activeOpacity={0.6}
                   className={`flex-row items-center px-5 py-3.5 ${
-                    index < OPTIONS.length - 1 ? "border-b border-gray-50" : ""
+                    index < OPTIONS.length - 1 ? "border-b border-gray-50 dark:border-[#2A2A36]" : ""
                   }`}
                 >
                   <View
-                    className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
+                    className="w-10 h-10 rounded-xl items-center justify-center mr-3.5"
                     style={{
                       backgroundColor:
-                        option.color === "#EF4444" ? "#FEF2F2" : "#F3F4F6",
+                        option.color === "#EF4444" ? "rgba(239, 68, 68, 0.1)" : "rgba(156, 163, 175, 0.1)",
                     }}
                   >
                     <Ionicons
@@ -80,7 +73,7 @@ export default function RoomOptionsModal({ showOptions, setShowOptions }) {
                   >
                     {option.label}
                   </Text>
-                  <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+                  <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
                 </TouchableOpacity>
               ))}
             </View>
@@ -89,16 +82,9 @@ export default function RoomOptionsModal({ showOptions, setShowOptions }) {
             <TouchableOpacity
               onPress={() => setShowOptions(false)}
               activeOpacity={0.7}
-              className="bg-white rounded-2xl mt-2 py-4 items-center"
-              style={{
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.08,
-                shadowRadius: 8,
-                elevation: 4,
-              }}
+              className="bg-white dark:bg-[#1A1A22] rounded-2xl mt-2 py-4 items-center border border-border-light dark:border-[#2A2A36] shadow-sm shadow-gray-200 dark:shadow-none"
             >
-              <Text className="text-primary font-bold text-[15px]">Cancel</Text>
+              <Text className="text-secondary dark:text-gray-100 font-bold text-[15px]">Cancel</Text>
             </TouchableOpacity>
           </Pressable>
         </View>

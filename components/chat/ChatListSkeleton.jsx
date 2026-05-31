@@ -4,14 +4,7 @@ import Skeleton from "../ui/Skeleton";
 export default function ChatListSkeleton() {
   return (
     <View
-      className="flex-row items-center p-4 border rounded-3xl mb-3 bg-white border-gray-100"
-      style={{
-        shadowColor: "#94A3B8",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.04,
-        shadowRadius: 4,
-        elevation: 1,
-      }}
+      className="flex-row items-center px-4 py-3.5 border rounded-[24px] mb-4 bg-white dark:bg-[#1A1A22] border-border-light dark:border-[#2A2A36]"
     >
       <View className="relative">
         <Skeleton width={60} height={60} borderRadius={22} />

@@ -18,6 +18,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../components/ui/CustomButton";
 import CustomInput from "../../components/ui/CustomInput";
+import { useTheme } from "../../context/ThemeContext";
 
 // Enable LayoutAnimation on Android
 if (
@@ -61,6 +62,7 @@ export default function ForgotPassword() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { isLoaded, signIn, setActive } = useSignIn();
+  const { isDark } = useTheme();
 
   const [emailAddress, setEmailAddress] = useState("");
   const [code, setCode] = useState("");
@@ -254,7 +256,7 @@ export default function ForgotPassword() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="bg-white flex-1">
+      <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           className="flex-1 px-8"
@@ -263,9 +265,9 @@ export default function ForgotPassword() {
           <View className="flex-row items-center mt-4">
             <TouchableOpacity
               onPress={() => router.back()}
-              className="w-10 h-10 bg-gray-50 rounded-full items-center justify-center border border-gray-100"
+              className="w-10 h-10 bg-gray-50 dark:bg-[#1A1A22] rounded-full items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
             >
-              <Ionicons name="arrow-back" size={20} color="black" />
+              <Ionicons name="arrow-back" size={20} color={isDark ? "#F3F4F6" : "black"} />
             </TouchableOpacity>
 
             {/* Step indicator */}
@@ -288,11 +290,11 @@ export default function ForgotPassword() {
           >
             {/* Title Section */}
             <View className="mt-8 mb-8">
-              <Text className="text-secondary text-[32px] font-bold tracking-tight mb-1">
+              <Text className="text-secondary dark:text-gray-100 text-[32px] font-bold tracking-tight mb-1">
                 {codeSent ? "Reset\nPassword" : "Forgot\nPassword"}
               </Text>
               <View className="mt-3 mb-3 w-12 h-1 rounded-full bg-primary" />
-              <Text className="text-gray-400 text-base leading-6">
+              <Text className="text-gray-400 dark:text-gray-500 text-base leading-6">
                 {codeSent
                   ? "Enter the code and choose a new password."
                   : "Enter your email to receive a reset code."}
@@ -346,7 +348,7 @@ export default function ForgotPassword() {
               ) : (
                 <>
                   {/* Locked email display */}
-                  <View className="bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3 flex-row items-center">
+                  <View className="bg-gray-50 dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl px-4 py-3 flex-row items-center">
                     <View className="w-6 items-center mr-3">
                       <Ionicons
                         name="mail-outline"
@@ -355,10 +357,10 @@ export default function ForgotPassword() {
                       />
                     </View>
                     <View className="flex-1">
-                      <Text className="text-gray-400 text-[11px] font-bold uppercase tracking-[1.5px]">
+                      <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-bold uppercase tracking-[1.5px]">
                         Email
                       </Text>
-                      <Text className="text-secondary text-base font-semibold mt-0.5">
+                      <Text className="text-secondary dark:text-gray-100 text-base font-semibold mt-0.5">
                         {emailAddress}
                       </Text>
                     </View>
@@ -531,7 +533,7 @@ export default function ForgotPassword() {
             >
               <View className="flex-row justify-center items-center gap-1.5">
                 <Ionicons name="arrow-back" size={14} color="#9CA3AF" />
-                <Text className="text-gray-400 text-[15px]">
+                <Text className="text-gray-400 dark:text-gray-500 text-[15px]">
                   Back to login
                 </Text>
               </View>

@@ -18,6 +18,7 @@ import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { useTheme } from "../../../context/ThemeContext";
 import { getRooms } from "../../../lib/getRoom";
 
 function getGreeting() {
@@ -29,15 +30,15 @@ function getGreeting() {
 
 function EmptyRooms() {
   return (
-    <View className="items-center justify-center py-16 px-6">
-      <View className="w-20 h-20 bg-surface-alt rounded-3xl items-center justify-center mb-5">
-        <Ionicons name="compass-outline" size={36} color="#CBD5E1" />
+    <View className="items-center justify-center py-20 px-6">
+      <View className="w-24 h-24 bg-info-surface rounded-full items-center justify-center mb-6">
+        <Ionicons name="compass" size={40} color="#3B82F6" />
       </View>
-      <Text className="text-secondary text-lg font-black tracking-tight text-center mb-2">
+      <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight text-center mb-2.5">
         No rooms nearby
       </Text>
-      <Text className="text-muted text-sm font-medium text-center leading-5">
-        Try expanding your search radius or create the first room in your area.
+      <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">
+        Expand your search radius or be the first to start a conversation in your area.
       </Text>
     </View>
   );
@@ -46,6 +47,7 @@ function EmptyRooms() {
 export default function Home() {
   const [distance, setDistance] = useState(5);
   const router = useRouter();
+  const { isDark } = useTheme();
   const { firestoreUser } = useFirestoreUser();
 
   const [rooms, setRooms] = useState([]);
@@ -131,7 +133,7 @@ export default function Home() {
 
   return (
     <>
-      <SafeAreaView className="bg-bg h-screen px-6">
+      <SafeAreaView className="bg-bg dark:bg-[#0F0F13] h-screen px-6">
         {/* Header */}
         <Animated.View
           className="flex flex-row justify-between items-center my-3"
@@ -145,20 +147,22 @@ export default function Home() {
               source={{
                 uri: firestoreUser?.profilePic || "https://picsum.photos/200",
               }}
-              className="w-12 h-12 rounded-2xl border-2 border-white shadow-sm shadow-slate-200"
+              className="w-12 h-12 rounded-2xl border-2 border-white dark:border-gray-800 shadow-sm shadow-slate-200 dark:shadow-none"
             />
           </TouchableOpacity>
           <View className="flex-row items-center">
-            <Text className="text-secondary tracking-tighter text-[22px] font-black">
+            <Text className="text-secondary dark:text-gray-100 tracking-tighter text-[22px] font-black">
               Spot Us
             </Text>
             <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
           </View>
           <TouchableOpacity
             onPress={handleNotificationPress}
-            className="w-12 h-12 bg-white rounded-2xl items-center justify-center border border-border-light shadow-sm shadow-gray-100"
+            className="w-12 h-12 bg-white dark:bg-[#1A1A22] rounded-full items-center justify-center border border-border-light dark:border-[#2A2A36]"
           >
-            <Ionicons name="notifications-outline" size={20} color="#18181B" />
+            <Ionicons name="notifications" size={20} color={isDark ? "#F8FAFC" : "#18181B"} />
+            {/* Optional Notification Dot */}
+            <View className="absolute top-3 right-3 w-2.5 h-2.5 bg-danger rounded-full border-2 border-white dark:border-[#1A1A22]" />
           </TouchableOpacity>
         </Animated.View>
 
@@ -173,7 +177,7 @@ export default function Home() {
           <Text className="text-muted text-sm font-bold uppercase tracking-[1.5px]">
             {getGreeting()}
           </Text>
-          <Text className="text-secondary text-[28px] font-black tracking-tight mt-1">
+          <Text className="text-secondary dark:text-gray-100 text-[28px] font-black tracking-tight mt-1">
             {firstName} 👋
           </Text>
         </Animated.View>
@@ -186,13 +190,13 @@ export default function Home() {
             transform: [{ translateY: slideUpContent }],
           }}
         >
-          <View className="bg-white rounded-3xl px-5 py-5 border border-border-light shadow-sm shadow-gray-100">
+          <View className="bg-white dark:bg-[#1A1A22] rounded-3xl px-6 py-5 border border-border-light dark:border-[#2A2A36]">
             <View className="flex-row items-center justify-between mb-3">
               <View className="flex-row items-center">
                 <View className="w-7 h-7 bg-primary/10 rounded-lg items-center justify-center mr-2.5">
                   <Ionicons name="locate" size={14} color="#4F46E5" />
                 </View>
-                <Text className="text-secondary text-sm font-bold">
+                <Text className="text-secondary dark:text-gray-100 text-sm font-bold">
                   Search Radius
                 </Text>
               </View>
@@ -210,8 +214,8 @@ export default function Home() {
               value={distance}
               onValueChange={setDistance}
               minimumTrackTintColor="#4F46E5"
-              maximumTrackTintColor="#E2E8F0"
-              thumbTintColor="#4F46E5"
+              maximumTrackTintColor={isDark ? "#2A2A36" : "#E2E8F0"}
+              thumbTintColor={isDark ? "#818CF8" : "#4F46E5"}
             />
             <View className="flex flex-row justify-between mt-1">
               <Text className="text-muted text-xs font-semibold">1 mile</Text>
@@ -232,23 +236,30 @@ export default function Home() {
             onPress={handleCreateRoom}
             activeOpacity={0.9}
             className="bg-primary py-5 px-6 rounded-3xl flex-row items-center"
+            style={{
+              shadowColor: "#4F46E5",
+              shadowOffset: { width: 0, height: 8 },
+              shadowOpacity: 0.2,
+              shadowRadius: 12,
+              elevation: 4,
+            }}
           >
-            <View className="w-12 h-12 bg-white/20 rounded-2xl items-center justify-center mr-4">
-              <Ionicons name="add" size={24} color="white" />
+            <View className="w-12 h-12 bg-white/20 rounded-full items-center justify-center mr-4">
+              <Ionicons name="add" size={26} color="white" />
             </View>
             <View className="flex-1">
               <Text className="text-white font-black text-lg tracking-tight">
                 Create a Room
               </Text>
-              <Text className="text-white/70 text-xs font-semibold mt-0.5">
-                Start a room nearby
+              <Text className="text-white/80 text-[13px] font-semibold mt-0.5">
+                Start a conversation nearby
               </Text>
             </View>
-            <View className="w-8 h-8 bg-white/15 rounded-xl items-center justify-center">
+            <View className="w-8 h-8 bg-white/20 rounded-full items-center justify-center">
               <Ionicons
                 name="chevron-forward"
-                size={16}
-                color="rgba(255,255,255,0.8)"
+                size={18}
+                color="white"
               />
             </View>
           </TouchableOpacity>
@@ -258,12 +269,12 @@ export default function Home() {
         <View className="mt-8 mb-2">
           <View className="flex flex-row justify-between items-center">
             <View className="flex-row items-center gap-2.5">
-              <Text className="text-secondary text-xl font-black tracking-tight">
+              <Text className="text-secondary dark:text-gray-100 text-[22px] font-extrabold tracking-tight">
                 Nearby Rooms
               </Text>
               {nearbyRooms.length > 0 && (
-                <View className="bg-primary px-2.5 py-1 rounded-lg">
-                  <Text className="text-white text-[11px] font-black">
+                <View className="bg-primary-surface px-2.5 py-1 rounded-full">
+                  <Text className="text-primary text-[12px] font-black">
                     {nearbyRooms.length}
                   </Text>
                 </View>

@@ -13,6 +13,7 @@ import {
   useRef,
 } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
+import { useTheme } from "../../context/ThemeContext";
 
 const CATEGORY_ICONS = {
   Music: "musical-notes",
@@ -29,6 +30,7 @@ const CATEGORY_ICONS = {
 const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
   const bottomSheetModalRef = useRef(null);
   const router = useRouter();
+  const { isDark } = useTheme();
   useImperativeHandle(ref, () => ({
     dismiss: () => bottomSheetModalRef.current?.dismiss(),
     present: () => bottomSheetModalRef.current?.present(),
@@ -79,7 +81,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
         height: 4,
         borderRadius: 2,
       }}
-      backgroundStyle={{ borderRadius: 32, backgroundColor: "#FFFFFF" }}
+      backgroundStyle={{ borderRadius: 32, backgroundColor: isDark ? "#1A1A22" : "#FFFFFF" }}
       enableDynamicSizing={false}
     >
       <BottomSheetScrollView
@@ -92,7 +94,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
         {/* Header section */}
         <View className="flex-row justify-between items-start mb-6">
           <View className="flex-1 mr-4">
-            <View className="bg-surface-alt self-start px-3.5 py-2 rounded-xl mb-4 flex-row items-center">
+            <View className="bg-surface-alt dark:bg-[#23232E] self-start px-3.5 py-2 rounded-xl mb-4 flex-row items-center">
               <Ionicons
                 name={categoryIcon}
                 size={12}
@@ -103,13 +105,13 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                 {room?.category || "Discovery Circle"}
               </Text>
             </View>
-            <Text className="text-secondary text-3xl font-black leading-tight tracking-tighter">
+            <Text className="text-secondary dark:text-gray-100 text-3xl font-black leading-tight tracking-tighter">
               {room?.title}
             </Text>
           </View>
           <TouchableOpacity
             onPress={handleDismiss}
-            className="w-10 h-10 bg-surface-alt rounded-2xl items-center justify-center"
+            className="w-10 h-10 bg-surface-alt dark:bg-[#23232E] rounded-2xl items-center justify-center"
           >
             <Ionicons name="close" size={18} color="#94A3B8" />
           </TouchableOpacity>
@@ -118,10 +120,10 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
         {/* Members Section */}
         <View>
           <View className="flex-row justify-between items-center mb-5">
-            <Text className="text-secondary text-xl font-black tracking-tight">
+            <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight">
               Members
             </Text>
-            <View className="bg-surface-alt px-3.5 py-1.5 rounded-xl">
+            <View className="bg-surface-alt dark:bg-[#23232E] px-3.5 py-1.5 rounded-xl">
               <Text className="text-muted font-black text-[10px] uppercase tracking-[1.5px]">
                 {room?.participants?.length || 0} Total
               </Text>
@@ -135,43 +137,36 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                   activeOpacity={0.7}
                   onPress={() => handleProfilePress(member.id)}
                   key={member.id}
-                  className="flex-row items-center justify-between bg-white p-3.5 rounded-2xl border border-gray-50"
-                  style={{
-                    shadowColor: "#94A3B8",
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.04,
-                    shadowRadius: 4,
-                    elevation: 1,
-                  }}
+                  className="flex-row items-center justify-between bg-white dark:bg-[#23232E] p-4 rounded-[24px] border border-border-light dark:border-[#2A2A36]"
                 >
                   <View className="flex-row items-center flex-1">
                     <Image
                       source={{
                         uri: member.profilePic || "https://picsum.photos/200",
                       }}
-                      className="w-11 h-11 rounded-xl mr-3.5 border-2 border-gray-50"
+                      className="w-12 h-12 rounded-full mr-3.5 border-2 border-gray-50 dark:border-gray-700"
                     />
                     <View>
-                      <Text className="text-secondary font-black text-sm tracking-tight">
+                      <Text className="text-secondary dark:text-gray-100 font-black text-sm tracking-tight">
                         {member.userName || "Unknown Member"}
                       </Text>
                       <View className="flex-row items-center mt-2 gap-2">
                         {member.trustScore > 0 && (
-                          <View className="bg-success/10 px-2.5 py-1 rounded-lg flex-row items-center">
+                          <View className="bg-success-surface dark:bg-success-surface px-2.5 py-1 rounded-full flex-row items-center">
                             <Ionicons
                               name="checkmark-circle"
                               size={10}
                               color="#10B981"
                             />
-                            <Text className="text-success font-black text-[8px] uppercase tracking-widest ml-1">
+                            <Text className="text-success font-black text-[9px] uppercase tracking-widest ml-1">
                               Trust {Math.min(member.trustScore * 10, 100)}%
                             </Text>
                           </View>
                         )}
                         {member.id === room.createdBy && (
-                          <View className="bg-warning/10 px-2.5 py-1 rounded-lg flex-row items-center">
+                          <View className="bg-warning-surface dark:bg-warning-surface px-2.5 py-1 rounded-full flex-row items-center">
                             <Ionicons name="star" size={10} color="#F59E0B" />
-                            <Text className="text-warning font-black text-[8px] uppercase tracking-widest ml-1">
+                            <Text className="text-warning font-black text-[9px] uppercase tracking-widest ml-1">
                               Creator
                             </Text>
                           </View>

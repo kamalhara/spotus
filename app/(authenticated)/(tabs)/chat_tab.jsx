@@ -31,7 +31,7 @@ export default function Chat() {
   const [chatsLoading, setChatsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
-  const [activeFilter, setActiveFilter] = useState("all");
+  const [activeFilter] = useState("all");
 
   // Entrance animation
   const fadeIn = useRef(new Animated.Value(0)).current;
@@ -125,24 +125,24 @@ export default function Chat() {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-bg px-6" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13] px-6" edges={["top"]}>
       {/* Header */}
       <Animated.View
-        className="flex-row items-center justify-between mt-3 mb-5"
+        className="flex-row items-center justify-between mt-3 mb-6"
         style={{ opacity: fadeIn }}
       >
         <View>
-          <Text className="text-secondary text-[28px] font-extrabold tracking-tight">
+          <Text className="text-secondary dark:text-gray-100 text-[26px] font-extrabold tracking-tight">
             Messages
           </Text>
-          <Text className="text-gray-400 text-xs font-semibold mt-0.5">
+          <Text className="text-muted dark:text-gray-500 text-[13px] font-semibold mt-1">
             {chats.length} DM{chats.length === 1 ? "" : "s"} · {rooms.length}{" "}
             room{rooms.length === 1 ? "" : "s"}
           </Text>
         </View>
         {unreadCount > 0 && (
-          <View className="bg-primary px-3 py-1.5 rounded-xl">
-            <Text className="text-white text-xs font-bold">
+          <View className="bg-primary-surface dark:bg-primary-surface px-3 py-1.5 rounded-full">
+            <Text className="text-primary text-[12px] font-black">
               {unreadCount} new
             </Text>
           </View>
@@ -157,19 +157,19 @@ export default function Chat() {
         }}
       >
         <View
-          className={`flex-row items-center bg-white rounded-2xl px-4 py-3 mb-4 border ${
-            searchFocused ? "border-primary/40" : "border-gray-100"
+          className={`flex-row items-center bg-white dark:bg-[#1A1A22] rounded-full px-4 py-3.5 mb-5 border ${
+            searchFocused ? "border-primary/40 shadow-sm shadow-indigo-100 dark:shadow-none" : "border-border-light dark:border-[#2A2A36]"
           }`}
         >
           <Ionicons
             name="search"
             size={18}
-            color={searchFocused ? "#4F46E5" : "#9CA3AF"}
+            color={searchFocused ? "#4F46E5" : "#94A3B8"}
           />
           <TextInput
             placeholder="Search messages..."
-            className="flex-1 ml-3 text-secondary text-[15px]"
-            placeholderTextColor="#9CA3AF"
+            className="flex-1 ml-3 text-secondary dark:text-gray-100 text-[15px] font-medium"
+            placeholderTextColor="#94A3B8"
             value={search}
             onChangeText={setSearch}
             onFocus={() => setSearchFocused(true)}
@@ -186,24 +186,24 @@ export default function Chat() {
           transform: [{ translateY: slideUp }],
         }}
       >
-        <View className="flex-row items-center justify-between mb-3">
-          <Text className="text-secondary text-base font-bold">
+        <View className="flex-row items-center justify-between mb-4">
+          <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
             Active Rooms
           </Text>
           {rooms.length > 0 && (
-            <View className="ml-2 bg-primary px-2 py-0.5 rounded-md">
-              <Text className="text-white text-[10px] font-bold">
+            <View className="ml-2 bg-primary-surface dark:bg-primary-surface px-2.5 py-1 rounded-full">
+              <Text className="text-primary text-[11px] font-black">
                 {rooms.length}
               </Text>
             </View>
           )}
         </View>
         {!roomsLoading && rooms.length === 0 ? (
-          <View className="bg-white border border-gray-100 rounded-2xl px-4 py-3 flex-row items-center">
+          <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl px-4 py-3 flex-row items-center">
             <View className="w-9 h-9 rounded-xl bg-surface-alt items-center justify-center mr-3">
               <Ionicons name="people-outline" size={17} color="#94A3B8" />
             </View>
-            <Text className="text-gray-400 text-sm font-medium">
+            <Text className="text-gray-400 dark:text-gray-500 text-sm font-medium">
               No active rooms
             </Text>
           </View>
@@ -218,10 +218,10 @@ export default function Chat() {
 
       {/* Chat list */}
       <View className="flex-1 mt-2">
-        <View className="flex-row items-center justify-between mb-3">
-          <Text className="text-secondary text-base font-bold">Recent</Text>
+        <View className="flex-row items-center justify-between mb-4">
+          <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">Recent</Text>
           {chats.length > 0 && (
-            <Text className="text-gray-300 text-xs font-semibold">
+            <Text className="text-muted dark:text-gray-500 text-[13px] font-medium">
               {chats.length} conversations
             </Text>
           )}
@@ -265,21 +265,21 @@ export default function Chat() {
           />
         ) : (
           <View className="flex-1 items-center justify-center pt-6">
-            <View className="w-16 h-16 bg-white rounded-3xl items-center justify-center mb-5 border border-gray-100 shadow-sm shadow-gray-200">
+            <View className="w-16 h-16 bg-white dark:bg-[#1A1A22] rounded-3xl items-center justify-center mb-5 border border-gray-100 dark:border-[#2A2A36] shadow-sm shadow-gray-200 dark:shadow-none">
               <Ionicons name="chatbubble-outline" size={30} color="#4F46E5" />
             </View>
-            <Text className="text-secondary text-[17px] font-bold tracking-tight">
+            <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
               No conversations yet
             </Text>
-            <Text className="text-gray-400 text-sm mt-1.5 text-center px-10 leading-5">
+            <Text className="text-gray-400 dark:text-gray-500 text-sm mt-1.5 text-center px-10 leading-5">
               Build trust in rooms to unlock direct messages with other members.
             </Text>
 
-            <View className="mt-6 bg-white rounded-2xl px-4 py-3.5 flex-row items-center border border-gray-100 shadow-sm shadow-gray-100">
+            <View className="mt-6 bg-white dark:bg-[#1A1A22] rounded-2xl px-4 py-3.5 flex-row items-center border border-gray-100 dark:border-[#2A2A36] shadow-sm shadow-gray-100 dark:shadow-none">
               <View className="w-7 h-7 bg-indigo-50 rounded-lg items-center justify-center mr-3">
                 <Ionicons name="shield-checkmark" size={14} color="#4F46E5" />
               </View>
-              <Text className="text-gray-500 text-[13px] font-medium flex-1">
+              <Text className="text-gray-500 dark:text-gray-400 text-[13px] font-medium flex-1">
                 10 room messages = DM access
               </Text>
             </View>

@@ -19,6 +19,7 @@ import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 import { canSendDM, getRoomTrust } from "../../../lib/trust";
+import { useTheme } from "../../../context/ThemeContext";
 
 const dateFormater = (timestamp) => {
   const date = new Date(timestamp * 1000);
@@ -29,6 +30,7 @@ const dateFormater = (timestamp) => {
 };
 
 export default function UserProfile() {
+  const { isDark } = useTheme();
   const { userId, roomId } = useLocalSearchParams();
   const router = useRouter();
   const { firestoreUser: viewer } = useFirestoreUser();
@@ -154,7 +156,7 @@ export default function UserProfile() {
 
   if (loading) {
     return (
-      <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
+      <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1" edges={["top"]}>
         <View className="flex-row items-center justify-between px-4 py-2">
           <Skeleton width={40} height={40} borderRadius={20} />
           <Skeleton width={40} height={40} borderRadius={20} />
@@ -213,19 +215,19 @@ export default function UserProfile() {
 
   if (!user) {
     return (
-      <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
+      <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
         <TouchableOpacity
           onPress={handleBack}
-          className="mx-6 mt-4 w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100"
+          className="mx-6 mt-4 w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
         >
-          <Ionicons name="chevron-back" size={20} color="#18181B" />
+          <Ionicons name="chevron-back" size={20} color={isDark ? "#F3F4F6" : "#18181B"} className="dark:text-gray-100" />
         </TouchableOpacity>
         <View className="flex-1 items-center justify-center px-10 -mt-10">
           <Ionicons name="person-outline" size={48} color="#D1D5DB" />
-          <Text className="text-secondary text-lg font-bold mt-4">
+          <Text className="text-secondary dark:text-gray-100 text-lg font-bold mt-4">
             User not found
           </Text>
-          <Text className="text-gray-400 text-sm mt-1 text-center">
+          <Text className="text-gray-400 dark:text-gray-500 text-sm mt-1 text-center">
             This profile doesn&apos;t exist anymore.
           </Text>
         </View>
@@ -234,23 +236,23 @@ export default function UserProfile() {
   }
 
   return (
-    <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
+    <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1" edges={["top"]}>
       {/* Header */}
       <View className="flex-row items-center justify-between px-4 py-2">
         <TouchableOpacity
           onPress={handleBack}
-          className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100 z-10"
+          className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36] z-10"
         >
-          <Ionicons name="chevron-back" size={20} color="#18181B" />
+          <Ionicons name="chevron-back" size={20} color={isDark ? "#F3F4F6" : "#18181B"} className="dark:text-gray-100" />
         </TouchableOpacity>
 
-        <Text className="absolute w-full text-center text-secondary font-semibold text-base z-0 pointer-events-none">
+        <Text className="absolute w-full text-center text-secondary dark:text-gray-100 font-semibold text-base z-0 pointer-events-none">
           Profile
         </Text>
 
         <TouchableOpacity
           onPress={handleOptions}
-          className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100 z-10"
+          className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36] z-10"
         >
           <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
         </TouchableOpacity>
@@ -264,7 +266,7 @@ export default function UserProfile() {
         <View className="items-center mt-6 mb-6 px-6">
           <View className="relative">
             <View
-              className="w-[110px] h-[110px] rounded-full overflow-hidden bg-gray-100 border-4 border-white"
+              className="w-[110px] h-[110px] rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800 border-4 border-white dark:border-[#1A1A22]"
               style={{
                 shadowColor: "#94A3B8",
                 shadowOffset: { width: 0, height: 2 },
@@ -280,22 +282,22 @@ export default function UserProfile() {
                 style={{ width: "100%", height: "100%" }}
               />
             </View>
-            <View className="absolute bottom-0 right-0 w-7 h-7 bg-green-400 rounded-full border-[4px] border-bg" />
+            <View className="absolute bottom-0 right-0 w-7 h-7 bg-green-400 rounded-full border-[4px] border-bg dark:border-[#0F0F13]" />
           </View>
 
-          <Text className="text-secondary text-[24px] font-extrabold mt-4 tracking-tight">
+          <Text className="text-secondary dark:text-gray-100 text-[24px] font-extrabold mt-4 tracking-tight">
             {user?.userName || "User"}
           </Text>
           {user?.bio ? (
-            <Text className="text-gray-400 text-sm text-center mt-1.5 px-6 leading-5">
+            <Text className="text-gray-400 dark:text-gray-500 text-sm text-center mt-1.5 px-6 leading-5">
               {user.bio}
             </Text>
           ) : null}
 
           {(user?.globalReputation ?? 0) > 0 && (
-            <View className="mt-3 flex-row items-center bg-green-50 px-3.5 py-1.5 rounded-full">
+            <View className="mt-3 flex-row items-center bg-green-50 dark:bg-green-900/20 px-3.5 py-1.5 rounded-full">
               <Ionicons name="star" size={12} color="#10B981" />
-              <Text className="text-green-600 text-xs font-semibold ml-1.5">
+              <Text className="text-green-600 dark:text-green-400 text-xs font-semibold ml-1.5">
                 {user.globalReputation} rep
               </Text>
             </View>
@@ -311,7 +313,7 @@ export default function UserProfile() {
                 onPress={handleMessage}
                 activeOpacity={0.8}
                 className={`flex-[2] py-3.5 rounded-2xl flex-row items-center justify-center ${
-                  hasDMAccess ? "bg-primary" : "bg-gray-100"
+                  hasDMAccess ? "bg-primary" : "bg-gray-100 dark:bg-gray-800"
                 }`}
               >
                 <Ionicons
@@ -321,7 +323,7 @@ export default function UserProfile() {
                 />
                 <Text
                   className={`font-semibold text-sm ml-2 ${
-                    hasDMAccess ? "text-white" : "text-gray-400"
+                    hasDMAccess ? "text-white" : "text-gray-400 dark:text-gray-500"
                   }`}
                 >
                   {hasDMAccess ? "Message" : "Locked"}
@@ -331,7 +333,7 @@ export default function UserProfile() {
               <TouchableOpacity
                 onPress={handleVouch}
                 activeOpacity={0.8}
-                className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${vouchStatus ? "bg-pink-100" : "bg-pink-50"} border border-pink-100`}
+                className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${vouchStatus ? "bg-pink-100 dark:bg-pink-900/30" : "bg-pink-50 dark:bg-pink-900/10"} border border-pink-100 dark:border-pink-900/20`}
               >
                 <Ionicons
                   name={vouchStatus ? "heart" : "heart-outline"}
@@ -346,7 +348,7 @@ export default function UserProfile() {
               <TouchableOpacity
                 onPress={handleShare}
                 activeOpacity={0.8}
-                className="py-3.5 px-4 rounded-2xl bg-gray-50 border border-gray-100 items-center justify-center"
+                className="py-3.5 px-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] items-center justify-center"
               >
                 <Ionicons name="share-outline" size={16} color="#6B7280" />
               </TouchableOpacity>
@@ -355,9 +357,9 @@ export default function UserProfile() {
             {/* Trust progress — room context only */}
             {!hasDMAccess && (
               <View className="px-6 mb-6">
-                <View className="bg-white rounded-2xl px-4 py-4 border border-gray-100">
+                <View className="bg-white dark:bg-[#1A1A22] rounded-2xl px-4 py-4 border border-gray-100 dark:border-[#2A2A36]">
                   <View className="flex-row items-center justify-between mb-2.5">
-                    <Text className="text-gray-500 text-xs font-medium">
+                    <Text className="text-gray-500 dark:text-gray-400 text-xs font-medium">
                       Room trust
                     </Text>
                     <Text
@@ -377,7 +379,7 @@ export default function UserProfile() {
                     borderRadius={3}
                     animated={true}
                   />
-                  <Text className="text-gray-400 text-[11px] mt-2">
+                  <Text className="text-gray-400 dark:text-gray-500 text-[11px] mt-2">
                     {10 - viewerRoomTrust} more messages to unlock DMs
                   </Text>
                 </View>
@@ -404,7 +406,7 @@ export default function UserProfile() {
               <TouchableOpacity
                 onPress={handleVouch}
                 activeOpacity={0.8}
-                className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${vouchStatus ? "bg-pink-100" : "bg-pink-50"} border border-pink-100`}
+                className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${vouchStatus ? "bg-pink-100 dark:bg-pink-900/30" : "bg-pink-50 dark:bg-pink-900/10"} border border-pink-100 dark:border-pink-900/20`}
               >
                 <Ionicons
                   name={vouchStatus ? "heart" : "heart-outline"}
@@ -419,10 +421,10 @@ export default function UserProfile() {
               <TouchableOpacity
                 onPress={handleShare}
                 activeOpacity={0.8}
-                className="flex-1 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex-row items-center justify-center"
+                className="flex-1 py-3.5 rounded-2xl bg-gray-50 dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] flex-row items-center justify-center"
               >
                 <Ionicons name="share-outline" size={16} color="#6B7280" />
-                <Text className="text-gray-500 font-semibold text-sm ml-1.5">
+                <Text className="text-gray-500 dark:text-gray-400 font-semibold text-sm ml-1.5">
                   Share
                 </Text>
               </TouchableOpacity>
@@ -433,7 +435,7 @@ export default function UserProfile() {
         {/* Stats — with icons */}
         <View className="mx-6 mb-6">
           <View
-            className="flex-row bg-white rounded-2xl border border-gray-100 overflow-hidden"
+            className="flex-row bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden"
             style={{
               shadowColor: "#94A3B8",
               shadowOffset: { width: 0, height: 1 },
@@ -449,31 +451,31 @@ export default function UserProfile() {
               <Text className="text-[20px] font-extrabold text-primary">
                 {hostedRooms}
               </Text>
-              <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
+              <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider mt-0.5">
                 Hosted
               </Text>
             </View>
-            <View className="w-px bg-gray-100 my-4" />
+            <View className="w-px bg-gray-100 dark:bg-[#2A2A36] my-4" />
             <View className="flex-1 items-center py-5">
-              <View className="w-9 h-9 bg-blue-50 rounded-xl items-center justify-center mb-2">
+              <View className="w-9 h-9 bg-blue-50 dark:bg-blue-900/20 rounded-xl items-center justify-center mb-2">
                 <Ionicons name="enter-outline" size={16} color="#3B82F6" />
               </View>
-              <Text className="text-[20px] font-extrabold text-secondary">
+              <Text className="text-[20px] font-extrabold text-secondary dark:text-gray-100">
                 {joinedRooms}
               </Text>
-              <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
+              <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider mt-0.5">
                 Joined
               </Text>
             </View>
-            <View className="w-px bg-gray-100 my-4" />
+            <View className="w-px bg-gray-100 dark:bg-[#2A2A36] my-4" />
             <View className="flex-1 items-center py-5">
-              <View className="w-9 h-9 bg-green-50 rounded-xl items-center justify-center mb-2">
+              <View className="w-9 h-9 bg-green-50 dark:bg-green-900/20 rounded-xl items-center justify-center mb-2">
                 <Ionicons name="star-outline" size={16} color="#10B981" />
               </View>
               <Text className="text-[20px] font-extrabold text-green-500">
                 {user?.globalReputation ?? 0}
               </Text>
-              <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
+              <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider mt-0.5">
                 Rep
               </Text>
             </View>
@@ -482,14 +484,14 @@ export default function UserProfile() {
 
         {/* Bio Section */}
         <View className="px-6 mb-5">
-          <View className="bg-white rounded-2xl border border-gray-100 p-4">
+          <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4">
             <View className="flex-row items-center mb-3">
               <View className="w-7 h-7 bg-primary/10 rounded-lg items-center justify-center mr-2.5">
                 <Ionicons name="document-text-outline" size={14} color="#4F46E5" />
               </View>
-              <Text className="text-secondary text-sm font-bold">Bio</Text>
+              <Text className="text-secondary dark:text-gray-100 text-sm font-bold">Bio</Text>
             </View>
-            <Text className="text-gray-500 text-[13px] leading-5">
+            <Text className="text-gray-500 dark:text-gray-400 text-[13px] leading-5">
               {user?.bio || "This user hasn\u0027t added a bio yet."}
             </Text>
           </View>
@@ -497,17 +499,17 @@ export default function UserProfile() {
 
         {/* Info Cards */}
         <View className="px-6 mb-5">
-          <View className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
             {/* Member Since */}
-            <View className="flex-row items-center px-4 py-3.5 border-b border-gray-50">
-              <View className="w-8 h-8 bg-indigo-50 rounded-xl items-center justify-center mr-3">
+            <View className="flex-row items-center px-4 py-3.5 border-b border-gray-50 dark:border-[#2A2A36]">
+              <View className="w-8 h-8 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl items-center justify-center mr-3">
                 <Ionicons name="calendar-outline" size={14} color="#4F46E5" />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">
+                <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider">
                   Member Since
                 </Text>
-                <Text className="text-secondary text-sm font-semibold mt-0.5">
+                <Text className="text-secondary dark:text-gray-100 text-sm font-semibold mt-0.5">
                   {user?.createdAt?.seconds
                     ? dateFormater(user.createdAt.seconds)
                     : "Recently joined"}
@@ -516,15 +518,15 @@ export default function UserProfile() {
             </View>
 
             {/* Location */}
-            <View className="flex-row items-center px-4 py-3.5 border-b border-gray-50">
-              <View className="w-8 h-8 bg-amber-50 rounded-xl items-center justify-center mr-3">
+            <View className="flex-row items-center px-4 py-3.5 border-b border-gray-50 dark:border-[#2A2A36]">
+              <View className="w-8 h-8 bg-amber-50 dark:bg-amber-900/20 rounded-xl items-center justify-center mr-3">
                 <Ionicons name="location-outline" size={14} color="#F59E0B" />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">
+                <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider">
                   Location
                 </Text>
-                <Text className="text-secondary text-sm font-semibold mt-0.5">
+                <Text className="text-secondary dark:text-gray-100 text-sm font-semibold mt-0.5">
                   {user?.location || "Nearby"}
                 </Text>
               </View>
@@ -532,14 +534,14 @@ export default function UserProfile() {
 
             {/* Activity Status */}
             <View className="flex-row items-center px-4 py-3.5">
-              <View className="w-8 h-8 bg-green-50 rounded-xl items-center justify-center mr-3">
+              <View className="w-8 h-8 bg-green-50 dark:bg-green-900/20 rounded-xl items-center justify-center mr-3">
                 <Ionicons name="pulse-outline" size={14} color="#10B981" />
               </View>
               <View className="flex-1">
-                <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">
+                <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider">
                   Activity
                 </Text>
-                <Text className="text-secondary text-sm font-semibold mt-0.5">
+                <Text className="text-secondary dark:text-gray-100 text-sm font-semibold mt-0.5">
                   {hostedRooms + joinedRooms > 5
                     ? "Very active"
                     : hostedRooms + joinedRooms > 0
@@ -554,12 +556,12 @@ export default function UserProfile() {
         {/* Interests */}
         {user?.interests?.length > 0 && (
           <View className="px-6 mb-5">
-            <View className="bg-white rounded-2xl border border-gray-100 p-4">
+            <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4">
               <View className="flex-row items-center mb-3">
                 <View className="w-7 h-7 bg-pink-50 rounded-lg items-center justify-center mr-2.5">
                   <Ionicons name="heart" size={14} color="#EC4899" />
                 </View>
-                <Text className="text-secondary text-sm font-bold">
+                <Text className="text-secondary dark:text-gray-100 text-sm font-bold">
                   Interests
                 </Text>
               </View>
@@ -567,9 +569,9 @@ export default function UserProfile() {
                 {user.interests.map((tag) => (
                   <View
                     key={tag}
-                    className="bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100"
+                    className="bg-gray-50 dark:bg-[#23232E] px-3.5 py-2 rounded-xl border border-gray-100 dark:border-[#2A2A36]"
                   >
-                    <Text className="text-gray-600 text-xs font-bold">
+                    <Text className="text-gray-600 dark:text-gray-300 text-xs font-bold">
                       {tag}
                     </Text>
                   </View>
@@ -586,13 +588,13 @@ export default function UserProfile() {
             r.participants?.includes(viewer?.id),
         ).length > 0 && (
           <View className="px-6 mb-5">
-            <View className="bg-white rounded-2xl border border-gray-100 p-4">
+            <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4">
               <View className="flex-row items-center justify-between mb-3">
                 <View className="flex-row items-center">
                   <View className="w-7 h-7 bg-blue-50 rounded-lg items-center justify-center mr-2.5">
                     <Ionicons name="people" size={14} color="#3B82F6" />
                   </View>
-                  <Text className="text-secondary text-sm font-bold">
+                  <Text className="text-secondary dark:text-gray-100 text-sm font-bold">
                     Mutual Rooms
                   </Text>
                 </View>
@@ -626,7 +628,7 @@ export default function UserProfile() {
                       <Ionicons name="chatbubbles-outline" size={14} color="#4F46E5" />
                     </View>
                     <Text
-                      className="text-secondary text-sm font-semibold flex-1"
+                      className="text-secondary dark:text-gray-100 text-sm font-semibold flex-1"
                       numberOfLines={1}
                     >
                       {r.title}
@@ -644,7 +646,7 @@ export default function UserProfile() {
             <TouchableOpacity
               onPress={handleBlock}
               activeOpacity={0.7}
-              className="flex-1 py-3.5 rounded-2xl bg-red-50 border border-red-100 flex-row items-center justify-center"
+              className="flex-1 py-3.5 rounded-2xl bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 flex-row items-center justify-center"
             >
               <Ionicons name="ban-outline" size={14} color="#EF4444" />
               <Text className="text-red-400 text-xs font-semibold ml-1.5">
@@ -654,7 +656,7 @@ export default function UserProfile() {
             <TouchableOpacity
               onPress={handleOptions}
               activeOpacity={0.7}
-              className="flex-1 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex-row items-center justify-center"
+              className="flex-1 py-3.5 rounded-2xl bg-gray-50 dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] flex-row items-center justify-center"
             >
               <Ionicons name="flag-outline" size={14} color="#9CA3AF" />
               <Text className="text-gray-400 text-xs font-semibold ml-1.5">

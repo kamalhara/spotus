@@ -10,6 +10,7 @@ import {
 import { useEffect, useRef } from "react";
 import { Animated, Platform, TouchableWithoutFeedback } from "react-native";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { useTheme } from "../../../context/ThemeContext";
 import useUnreadCount from "../../../hook/useUnreadCount";
 
 const AnimatedTabButton = ({ children, onPress, accessibilityState }) => {
@@ -18,11 +19,12 @@ const AnimatedTabButton = ({ children, onPress, accessibilityState }) => {
 
   useEffect(() => {
     Animated.spring(scale, {
-      toValue: focused ? 1.2 : 1,
-      friction: 5,
+      toValue: focused ? 1.08 : 1, // Subtle scale
+      friction: 6,
+      tension: 40, // More snappy, less bouncy
       useNativeDriver: true,
     }).start();
-  }, [focused]);
+  }, [focused, scale]);
 
   return (
     <TouchableWithoutFeedback
@@ -47,17 +49,19 @@ const AnimatedTabButton = ({ children, onPress, accessibilityState }) => {
 
 export default function TabsLayout() {
   const { firestoreUser } = useFirestoreUser();
+  const { isDark } = useTheme();
   const unreadCount = useUnreadCount(firestoreUser?.id);
   return Platform.OS === "android" ? (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "#4F46E5", // primary color
+        tabBarActiveTintColor: isDark ? "#818CF8" : "#4F46E5",
+        tabBarInactiveTintColor: isDark ? "#4B5563" : "#9CA3AF",
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: "#FAFAFA",
+          backgroundColor: isDark ? "#0F0F13" : "#FAFAFA",
           backfaceVisibility: "hidden",
           borderTopWidth: 1,
-          borderTopColor: "#E5E5E5",
+          borderTopColor: isDark ? "#1A1A22" : "#E5E5E5",
           paddingTop: 5,
           height: 80,
         },
@@ -125,21 +129,21 @@ export default function TabsLayout() {
       <NativeTabs.Trigger name="home">
         <Label>Home</Label>
         <Icon
-          selectedColor="#4F46E5"
+          selectedColor={isDark ? "#818CF8" : "#4F46E5"}
           sf={{ default: "house", selected: "house.fill" }}
         />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="rooms_tab">
         <Label>Rooms</Label>
         <Icon
-          selectedColor="#4F46E5"
+          selectedColor={isDark ? "#818CF8" : "#4F46E5"}
           sf={{ default: "person.2", selected: "person.2.fill" }}
         />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="chat_tab">
         <Label>Chat</Label>
         <Icon
-          selectedColor="#4F46E5"
+          selectedColor={isDark ? "#818CF8" : "#4F46E5"}
           sf={{ default: "message", selected: "message.fill" }}
         />
         {unreadCount > 0 && <Badge>{unreadCount}</Badge>}
@@ -147,7 +151,7 @@ export default function TabsLayout() {
       <NativeTabs.Trigger name="profile">
         <Label>Profile</Label>
         <Icon
-          selectedColor="#4F46E5"
+          selectedColor={isDark ? "#818CF8" : "#4F46E5"}
           sf={{
             default: "person.crop.circle",
             selected: "person.crop.circle.fill",

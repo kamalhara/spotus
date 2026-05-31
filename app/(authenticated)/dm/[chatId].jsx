@@ -31,8 +31,10 @@ import useTypingIndicator from "../../../hook/useTypingIndicator";
 import { ChatSeen } from "../../../lib/chatSeen";
 import { sendPushNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function ChatId() {
+  const { isDark } = useTheme();
   const { chatId, userName, profilePic } = useLocalSearchParams();
   const router = useRouter();
   const { firestoreUser } = useFirestoreUser();
@@ -110,7 +112,7 @@ export default function ChatId() {
       setMessages(msgs);
     });
     return unsub;
-  }, [chatDocId]);
+  }, [chatDocId, currentUserId]);
 
   // Listen to chat doc for mute status
   useEffect(() => {
@@ -236,7 +238,7 @@ export default function ChatId() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -254,9 +256,9 @@ export default function ChatId() {
           <View className="flex-row items-center gap-3 flex-1 mr-2">
             <TouchableOpacity
               onPress={() => router.back()}
-              className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center border border-gray-100"
+              className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#23232E] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
             >
-              <Ionicons name="chevron-back" size={20} color="#18181B" />
+              <Ionicons name="chevron-back" size={20} color={isDark ? "#F3F4F6" : "#18181B"} />
             </TouchableOpacity>
             <TouchableOpacity
               className="flex-row items-center gap-3 flex-1"
@@ -269,11 +271,11 @@ export default function ChatId() {
             >
               <Image
                 source={{ uri: profilePic || "https://picsum.photos/200" }}
-                className="w-11 h-11 rounded-full bg-gray-100"
+                className="w-11 h-11 rounded-full bg-gray-100 dark:bg-gray-800"
               />
               <View className="flex-1">
                 <Text
-                  className="text-secondary font-bold text-base"
+                  className="text-secondary dark:text-gray-100 font-bold text-base"
                   numberOfLines={1}
                   ellipsizeMode="tail"
                 >
@@ -313,7 +315,7 @@ export default function ChatId() {
           </View>
           <TouchableOpacity
             onPress={() => setShowOptions(true)}
-            className="w-10 h-10 rounded-full bg-gray-50 items-center justify-center border border-gray-100"
+            className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#23232E] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
           >
             <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
           </TouchableOpacity>
@@ -333,7 +335,7 @@ export default function ChatId() {
         </View>
 
         {/* Input */}
-        <View className="px-5 py-3 pb-5 border-t border-gray-50">
+        <View className="px-5 py-3 pb-5 ">
           <MessageSender
             handleSend={handleSend}
             chatId={chatDocId}

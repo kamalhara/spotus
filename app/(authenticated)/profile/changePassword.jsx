@@ -13,9 +13,11 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomInput from "../../../components/ui/CustomInput";
+import { useTheme } from "../../../context/ThemeContext";
 
 export default function ChangePassword() {
   const router = useRouter();
+  const { isDark } = useTheme();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -39,11 +41,11 @@ export default function ChangePassword() {
               <View className="flex-row items-center gap-3 mt-4">
                 <TouchableOpacity
                   onPress={() => router.back()}
-                  className="w-10 h-10 rounded-full bg-gray-100 items-center justify-center"
+                  className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A1A22] items-center justify-center border border-transparent dark:border-[#2A2A36]"
                 >
-                  <Ionicons name="arrow-back" size={20} color="#4F46E5" />
+                  <Ionicons name="arrow-back" size={20} color={isDark ? "#818CF8" : "#4F46E5"} />
                 </TouchableOpacity>
-                <Text className="text-secondary font-extrabold text-xl">
+                <Text className="text-secondary dark:text-gray-100 font-extrabold text-xl">
                   Change Password
                 </Text>
               </View>
@@ -51,7 +53,7 @@ export default function ChangePassword() {
               {/* Progress/Step Indicator */}
               <View className="flex-row gap-2 mt-8 mb-8">
                 <View className="h-1.5 rounded-full bg-primary w-10" />
-                <View className="h-1.5 rounded-full bg-gray-200 w-6" />
+                <View className="h-1.5 rounded-full bg-gray-200 dark:bg-gray-800 w-6" />
               </View>
 
               <View className="flex flex-col gap-4">
@@ -109,7 +111,7 @@ export default function ChangePassword() {
                 </TouchableOpacity>
               </View>
 
-              <Text className="text-gray-400 text-xs text-center mt-8 px-4">
+              <Text className="text-gray-400 dark:text-gray-500 text-xs text-center mt-8 px-4">
                 Your password must be at least 8 characters long and include a
                 mix of letters and numbers.
               </Text>

@@ -59,10 +59,10 @@ export default function RoomsScreen() {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-bg px-6">
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13] px-6">
       {/* Header */}
-      <View className="flex-row items-center justify-between my-3">
-        <Text className="text-secondary text-2xl font-extrabold tracking-tight">
+      <View className="flex-row items-center justify-between mt-3 mb-5">
+        <Text className="text-secondary dark:text-gray-100 text-[26px] font-extrabold tracking-tight">
           My Rooms
         </Text>
         <TouchableOpacity
@@ -90,23 +90,23 @@ export default function RoomsScreen() {
           )
         }
         renderSectionHeader={({ section }) => (
-          <View className="bg-bg pt-5 pb-3">
+          <View className="bg-bg dark:bg-[#0F0F13] pt-6 pb-4">
             <View className="flex-row items-center gap-2">
-              <Text className="text-secondary text-lg font-bold">
+              <Text className="text-secondary dark:text-gray-100 text-[18px] font-extrabold">
                 {section.title}
               </Text>
               <View
-                className={`px-2 py-0.5 rounded-md ${section.count > 0 ? "bg-primary" : "bg-gray-100"}`}
+                className={`px-2.5 py-1 rounded-full ${section.count > 0 ? "bg-primary-surface dark:bg-primary-surface" : "bg-gray-100 dark:bg-gray-800"}`}
               >
                 <Text
-                  className={`text-xs font-semibold ${section.count > 0 ? "text-white" : "text-gray-400"}`}
+                  className={`text-[12px] font-black ${section.count > 0 ? "text-primary" : "text-gray-500 dark:text-gray-400"}`}
                 >
                   {section.count}
                 </Text>
               </View>
             </View>
             {section.isEmpty && (
-              <View className="bg-white rounded-2xl border border-gray-100 mt-3">
+              <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] mt-3">
                 <EmptyState
                   icon={section.emptyIcon}
                   title={section.emptyText}

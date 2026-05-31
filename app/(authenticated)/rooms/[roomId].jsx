@@ -27,6 +27,7 @@ import MessageSender from "../../../components/chat/MessageSender";
 import RoomDetailsSheet from "../../../components/rooms/RoomDetailsSheet";
 import TrustInfoSheet from "../../../components/rooms/TrustInfoSheet";
 import { db } from "../../../config/firebase.config";
+import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { RoomSeen } from "../../../lib/chatSeen";
 import { sendPushNotification } from "../../../lib/notification";
@@ -46,6 +47,7 @@ const CATEGORY_ICONS = {
 };
 
 export default function RoomChat() {
+  const { isDark } = useTheme();
   const router = useRouter();
 
   const [room, setRoom] = useState(null);
@@ -252,19 +254,19 @@ export default function RoomChat() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-bg"
+      className="flex-1 bg-bg dark:bg-[#0F0F13]"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       {/* Header */}
-      <View className="bg-white z-10 border-b border-gray-100">
+      <View className="bg-white dark:bg-[#1A1A22] z-10 border-b border-gray-100 dark:border-[#2A2A36]">
         <SafeAreaView edges={["top"]}>
           <View className="flex-row items-center justify-between px-5 py-3">
             <View className="flex-row items-center flex-1">
               <TouchableOpacity
                 onPress={() => router.back()}
-                className="w-10 h-10 bg-gray-50 rounded-2xl items-center justify-center mr-3 border border-gray-100"
+                className="w-10 h-10 bg-gray-50 dark:bg-[#23232E] rounded-2xl items-center justify-center mr-3 border border-gray-100 dark:border-[#2A2A36]"
               >
-                <Ionicons name="chevron-back" size={20} color="#18181B" />
+                <Ionicons name="chevron-back" size={20} color={isDark ? "#F3F4F6" : "#18181B"} />
               </TouchableOpacity>
 
               <View className="w-11 h-11 rounded-2xl bg-primary/10 items-center justify-center mr-3">
@@ -277,13 +279,13 @@ export default function RoomChat() {
                 activeOpacity={0.7}
               >
                 <Text
-                  className="text-secondary text-base font-extrabold"
+                  className="text-secondary dark:text-gray-100 text-base font-extrabold"
                   numberOfLines={1}
                 >
                   {room?.title || "Loading..."}
                 </Text>
                 <View className="flex-row items-center mt-0.5">
-                  <Text className="text-gray-400 text-xs">
+                  <Text className="text-gray-400 dark:text-gray-500 text-xs">
                     {room?.category || "Room"} ·{" "}
                     {room?.participants?.length || 0} members
                   </Text>
@@ -293,7 +295,7 @@ export default function RoomChat() {
 
             <TouchableOpacity
               onPress={handleInfoPress}
-              className="w-10 h-10 bg-gray-50 rounded-2xl items-center justify-center border border-gray-100"
+              className="w-10 h-10 bg-gray-50 dark:bg-[#23232E] rounded-2xl items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
             >
               <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
             </TouchableOpacity>
@@ -307,7 +309,7 @@ export default function RoomChat() {
           className="px-5 pt-3 pb-1"
           onPress={() => trustSheetRef.current?.present()}
         >
-          <View className="bg-white px-4 py-3 rounded-2xl border border-gray-100">
+          <View className="bg-white dark:bg-[#1A1A22] px-4 py-3 rounded-2xl border border-gray-100 dark:border-[#2A2A36]">
             <View className="flex-row items-center justify-between mb-2">
               <View className="flex-row items-center">
                 <Ionicons
@@ -352,7 +354,7 @@ export default function RoomChat() {
         />
       </View>
 
-      <View className="px-5 py-3 flex items-center pb-6 bg-bg border-t border-gray-100">
+      <View className="px-5 py-3 flex items-center pb-6 bg-bg dark:bg-[#0F0F13] border-t border-gray-100 dark:border-[#2A2A36]">
         <MessageSender
           handleSend={handleSend}
           chatId={roomId}

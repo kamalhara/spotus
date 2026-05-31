@@ -70,9 +70,9 @@ export default function PrivacyData() {
 
         <TouchableOpacity
           activeOpacity={0.75}
-          className="bg-white rounded-2xl border border-gray-100 mt-4 px-5 py-4"
+          className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] mt-4 px-5 py-4"
         >
-          <Text className="text-primary text-sm font-bold">
+          <Text className="text-primary dark:text-primary-light text-sm font-bold">
             Review privacy policy
           </Text>
         </TouchableOpacity>

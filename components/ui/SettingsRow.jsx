@@ -22,7 +22,7 @@ export default function SettingsRow({
       }}
       activeOpacity={0.7}
       className={`px-5 py-4 flex-row items-center justify-between ${
-        !isLast ? "border-b border-gray-50" : ""
+        !isLast ? "border-b border-gray-50 dark:border-gray-800" : ""
       }`}
     >
       <View className="flex-row items-center flex-1">
@@ -33,10 +33,10 @@ export default function SettingsRow({
           <Ionicons name={icon} size={18} color={color} />
         </View>
         <View className="flex-1">
-          <Text className="text-secondary text-[15px] font-bold">{title}</Text>
+          <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">{title}</Text>
           {description ? (
             <Text
-              className="text-gray-400 text-xs leading-4 mt-0.5"
+              className="text-gray-400 dark:text-gray-500 text-xs leading-4 mt-0.5"
               numberOfLines={2}
             >
               {description}

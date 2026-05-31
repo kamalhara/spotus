@@ -177,38 +177,31 @@ export default function ChatRow({ chat, onPress }) {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.9}
-        className={`flex-row items-center px-3.5 py-3 border rounded-2xl mb-3 ${
+        className={`flex-row items-center px-4 py-3.5 border rounded-[24px] mb-3 ${
           isUnread
-            ? "border-primary/20 bg-primary/5"
-            : "border-gray-100 bg-white"
+            ? "border-primary/30 bg-primary-surface dark:bg-primary-surface"
+            : "border-border-light dark:border-[#2A2A36] bg-white dark:bg-[#1A1A22]"
         }`}
-        style={{
-          shadowColor: "#94A3B8",
-          shadowOffset: { width: 0, height: 1 },
-          shadowOpacity: 0.04,
-          shadowRadius: 4,
-          elevation: 1,
-        }}
       >
         <View className="relative">
           <Image
             source={{
               uri: otherUser?.profilePic || "https://picsum.photos/200",
             }}
-            className="rounded-2xl bg-gray-100 border border-gray-50"
-            style={{ width: 52, height: 52 }}
+            className="rounded-[18px] bg-skeleton dark:bg-skeleton border border-border-light dark:border-gray-700"
+            style={{ width: 56, height: 56 }}
           />
           <View
             className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 ${
               isOnline ? "bg-green-400" : "bg-gray-300"
-            } rounded-full border-[2px] border-white z-10`}
+            } rounded-full border-[2px] border-white dark:border-[#1A1A22] z-10`}
           />
         </View>
 
         <View className="flex-1 ml-3.5 justify-center">
-          <View className="flex-row justify-between items-center mb-1">
+          <View className="flex-row justify-between items-center mb-1.5">
             <Text
-              className={`text-secondary ${isUnread ? "font-black" : "font-bold"} text-[16px] tracking-tight flex-1 mr-3`}
+              className={`text-secondary dark:text-gray-100 ${isUnread ? "font-black" : "font-bold"} text-[17px] tracking-tight flex-1 mr-3`}
               numberOfLines={1}
             >
               {otherUser?.userName || "User"}
@@ -223,7 +216,7 @@ export default function ChatRow({ chat, onPress }) {
                 />
               )}
               <Text
-                className={`${isUnread ? "text-primary font-bold" : "text-gray-400 font-semibold"} text-xs`}
+                className={`${isUnread ? "text-primary font-bold" : "text-muted dark:text-gray-500 font-semibold"} text-[13px]`}
               >
                 {time}
               </Text>
@@ -237,7 +230,7 @@ export default function ChatRow({ chat, onPress }) {
               </Text>
             ) : (
               <Text
-                className={`${isUnread ? "text-secondary font-bold" : "text-gray-500"} text-[13px] leading-5 flex-1`}
+                className={`${isUnread ? "text-secondary dark:text-gray-100 font-bold" : "text-muted dark:text-gray-400 font-medium"} text-[14px] leading-5 flex-1`}
                 numberOfLines={1}
               >
                 {lastMsg || "No messages yet"}
@@ -266,7 +259,7 @@ export default function ChatRow({ chat, onPress }) {
           <View className="flex-1 justify-end pb-12 px-5">
             <Pressable>
               <View
-                className="bg-white rounded-2xl overflow-hidden"
+                className="bg-white dark:bg-[#1A1A22] rounded-2xl overflow-hidden"
                 style={{
                   shadowColor: "#000",
                   shadowOffset: { width: 0, height: -4 },
@@ -276,18 +269,18 @@ export default function ChatRow({ chat, onPress }) {
                 }}
               >
                 {/* Header */}
-                <View className="flex-row items-center p-4 border-b border-gray-100">
+                <View className="flex-row items-center p-4 border-b border-gray-100 dark:border-gray-800">
                   <Image
                     source={{
                       uri: otherUser?.profilePic || "https://picsum.photos/200",
                     }}
-                    className="w-10 h-10 rounded-full bg-gray-100"
+                    className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800"
                   />
                   <View className="ml-3 flex-1">
-                    <Text className="text-secondary font-bold text-[15px]">
+                    <Text className="text-secondary dark:text-gray-100 font-bold text-[15px]">
                       {otherUser?.userName || "User"}
                     </Text>
-                    <Text className="text-gray-400 text-xs mt-0.5">
+                    <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
                       {userStatus}
                     </Text>
                   </View>
@@ -304,7 +297,7 @@ export default function ChatRow({ chat, onPress }) {
                     activeOpacity={0.6}
                     className={`flex-row items-center px-5 py-3.5 ${
                       index < OPTIONS.length - 1
-                        ? "border-b border-gray-50"
+                        ? "border-b border-gray-50 dark:border-gray-800"
                         : ""
                     }`}
                   >
@@ -340,7 +333,7 @@ export default function ChatRow({ chat, onPress }) {
               <TouchableOpacity
                 onPress={() => setShowOptions(false)}
                 activeOpacity={0.7}
-                className="bg-white rounded-2xl mt-2 py-4 items-center"
+                className="bg-white dark:bg-[#1A1A22] rounded-2xl mt-2 py-4 items-center"
                 style={{
                   shadowColor: "#000",
                   shadowOffset: { width: 0, height: 2 },

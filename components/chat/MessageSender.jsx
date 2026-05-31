@@ -187,7 +187,7 @@ export default function MessageSender({
       {showMediaMenu && (
         <View className="absolute bottom-[60px] left-0 right-0 z-10">
           <View
-            className="bg-white rounded-2xl py-3 px-3 mx-1 border border-gray-100"
+            className="bg-white dark:bg-[#1A1A22] rounded-2xl py-3 px-3 mx-1 border border-gray-100 dark:border-[#2A2A36]"
             style={{
               shadowColor: "#94A3B8",
               shadowOffset: { width: 0, height: 2 },
@@ -202,7 +202,7 @@ export default function MessageSender({
                   key={option.key}
                   onPress={() => handleMediaOption(option.key)}
                   activeOpacity={0.7}
-                  className="flex-1 flex-row items-center bg-gray-50 rounded-2xl p-3 border border-gray-100"
+                  className="flex-1 flex-row items-center bg-gray-50 dark:bg-[#23232E] rounded-2xl p-3 border border-gray-100 dark:border-[#2A2A36]"
                 >
                   <View
                     className="w-10 h-10 rounded-xl items-center justify-center mr-3"
@@ -214,7 +214,7 @@ export default function MessageSender({
                       color={option.iconColor}
                     />
                   </View>
-                  <Text className="text-sm font-bold text-secondary tracking-tight">
+                  <Text className="text-sm font-bold text-secondary dark:text-gray-100 tracking-tight">
                     {option.label}
                   </Text>
                 </TouchableOpacity>
@@ -226,7 +226,7 @@ export default function MessageSender({
 
       {/* Edit Preview Banner */}
       {editingMessage && (
-        <View className="bg-white border border-gray-100 rounded-2xl px-4 py-3 mb-2 flex-row items-center">
+        <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl px-4 py-3 mb-2 flex-row items-center">
           <View className="w-8 h-8 rounded-xl bg-primary/10 items-center justify-center mr-3">
             <Ionicons name="create-outline" size={15} color="#4F46E5" />
           </View>
@@ -234,14 +234,14 @@ export default function MessageSender({
             <Text className="text-primary text-xs font-bold">
               Editing message
             </Text>
-            <Text className="text-gray-400 text-xs mt-0.5" numberOfLines={1}>
+            <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5" numberOfLines={1}>
               {editingMessage.text}
             </Text>
           </View>
           <TouchableOpacity
             onPress={handleCancelEdit}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            className="w-8 h-8 rounded-xl bg-surface-alt items-center justify-center"
+            className="w-8 h-8 rounded-xl bg-surface-alt dark:bg-[#23232E] items-center justify-center"
           >
             <Ionicons name="close" size={16} color="#94A3B8" />
           </TouchableOpacity>
@@ -250,64 +250,34 @@ export default function MessageSender({
 
       {/* Reply Preview Banner */}
       {replyTo && (
-        <View
-          style={{
-            backgroundColor: "#FFFFFF",
-            borderLeftWidth: 3,
-            borderLeftColor: "#4F46E5",
-            borderTopLeftRadius: 12,
-            borderTopRightRadius: 12,
-            paddingHorizontal: 14,
-            paddingVertical: 10,
-            marginBottom: 6,
-            flexDirection: "row",
-            alignItems: "center",
-            shadowColor: "#94A3B8",
-            shadowOffset: { width: 0, height: -1 },
-            shadowOpacity: 0.06,
-            shadowRadius: 4,
-            elevation: 2,
-          }}
-        >
+        <View className="bg-white dark:bg-[#1A1A22] border-l-4 border-l-primary border-y border-r border-border-light dark:border-y-[#2A2A36] dark:border-r-[#2A2A36] rounded-t-xl px-4 py-3 mb-2 flex-row items-center shadow-sm shadow-indigo-100 dark:shadow-none">
           <View className="mr-2">
             <Ionicons name="arrow-undo" size={16} color="#4F46E5" />
           </View>
           <View style={{ flex: 1 }}>
             <Text
-              style={{
-                fontSize: 11,
-                fontWeight: "700",
-                color: "#4F46E5",
-                marginBottom: 1,
-              }}
+              className="text-[11px] font-bold text-primary mb-0.5"
             >
               {replyTo.user || "Unknown"}
             </Text>
-            <Text numberOfLines={1} style={{ fontSize: 13, color: "#6B7280" }}>
+            <Text numberOfLines={1} className="text-[13px] text-muted dark:text-gray-400">
               {replyTo.imageUrl ? "📷 Photo" : replyTo.text}
             </Text>
           </View>
           <TouchableOpacity
             onPress={onCancelReply}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 14,
-              backgroundColor: "#F3F4F6",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+            className="w-7 h-7 rounded-full bg-surface-alt dark:bg-[#23232E] items-center justify-center"
           >
-            <Ionicons name="close" size={16} color="#9CA3AF" />
+            <Ionicons name="close" size={16} color="#94A3B8" />
           </TouchableOpacity>
         </View>
       )}
 
       {/* Input Bar */}
-      <View className="flex-row items-center w-full bg-white rounded-full p-1.5 border border-border">
+      <View className="flex-row items-center w-full bg-white dark:bg-[#1A1A22] rounded-full p-1.5 border border-border dark:border-[#2A2A36]">
         <TouchableOpacity
-          className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-alt ml-0.5"
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-alt dark:bg-[#23232E] ml-0.5"
           onPress={toggleMediaMenu}
         >
           <Ionicons
@@ -326,7 +296,7 @@ export default function MessageSender({
           }}
           placeholder="Type a message..."
           placeholderTextColor="#CBD5E1"
-          className="flex-1 px-3.5 text-[15px] text-secondary font-medium h-11"
+          className="flex-1 px-3.5 text-[15px] text-secondary dark:text-gray-100 font-medium h-11"
           returnKeyType="send"
           onSubmitEditing={onSend}
         />

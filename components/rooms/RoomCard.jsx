@@ -72,20 +72,13 @@ export default function RoomCard({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.95}
-        className={`rounded-2xl p-5 mb-3 border overflow-hidden ${
+        className={`rounded-[24px] p-5 mb-4 border overflow-hidden ${
           isDiscovery
-            ? "bg-white border-gray-100"
+            ? "bg-white dark:bg-[#1A1A22] border-border-light dark:border-[#2A2A36]"
             : isOwner
-              ? "bg-indigo-50/30 border-indigo-100"
-              : "bg-white border-gray-100"
+              ? "bg-primary-surface dark:bg-primary-surface border-primary/20"
+              : "bg-white dark:bg-[#1A1A22] border-border-light dark:border-[#2A2A36]"
         }`}
-        style={{
-          shadowColor: "#94A3B8",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 8,
-          elevation: 2,
-        }}
       >
         {/* Category accent stripe */}
         <View
@@ -114,7 +107,7 @@ export default function RoomCard({
         </View>
 
         {/* Title */}
-        <Text className="text-secondary text-[18px] font-bold tracking-tight mb-1">
+        <Text className="text-secondary dark:text-gray-100 text-[19px] font-extrabold tracking-tight mb-1.5 leading-6">
           {room.title}
         </Text>
         <View className="flex-row items-center mb-4">
@@ -123,31 +116,31 @@ export default function RoomCard({
         </View>
 
         {/* Footer */}
-        <View className="flex-row justify-between items-center pt-3.5 border-t border-gray-50">
+        <View className="flex-row justify-between items-center pt-4 mt-1 border-t border-border-light dark:border-[#2A2A36]">
           <View className="flex-row items-center">
-            <View className="flex-row -space-x-2 mr-2.5">
+            <View className="flex-row -space-x-2 mr-3">
               {[0, 1, 2].map((i) => (
                 <View
                   key={i}
-                  className="w-6 h-6 rounded-full border-2 border-white items-center justify-center"
+                  className="w-7 h-7 rounded-full border-2 border-white dark:border-[#1A1A22] items-center justify-center"
                   style={{ backgroundColor: AVATAR_COLORS[i] }}
                 >
-                  <Text className="text-white text-[8px] font-bold">
+                  <Text className="text-white text-[9px] font-black">
                     {String.fromCharCode(65 + i)}
                   </Text>
                 </View>
               ))}
             </View>
-            <Text className="text-gray-400 text-xs">
+            <Text className="text-muted dark:text-gray-500 text-[13px] font-semibold">
               {room.participants?.length || 1}
               {room.participants?.length > 3 ? "+" : ""} members
             </Text>
           </View>
           <TouchableOpacity
             onPress={() => onPress?.(room)}
-            className="bg-primary px-5 py-2.5 rounded-xl"
+            className="bg-primary px-5 py-2.5 rounded-full"
           >
-            <Text className="text-white font-bold text-xs">{buttonText}</Text>
+            <Text className="text-white font-bold text-[13px]">{buttonText}</Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>

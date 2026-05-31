@@ -131,11 +131,11 @@ export default function RoomInfo() {
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
 
   return (
-    <SafeAreaView className="flex-1 bg-bg px-5">
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13] px-5">
       <View className="flex-row justify-between items-center py-4">
         <TouchableOpacity
           onPress={() => router.back()}
-          className="h-10 w-10 rounded-full bg-white items-center justify-center border border-gray-100"
+          className="h-10 w-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
           style={{
             shadowColor: "#94A3B8",
             shadowOffset: { width: 0, height: 1 },
@@ -144,10 +144,10 @@ export default function RoomInfo() {
             elevation: 1,
           }}
         >
-          <Ionicons name="arrow-back" size={20} color="#18181B" />
+          <Ionicons name="arrow-back" size={20} color="#18181B" className="dark:text-gray-100" />
         </TouchableOpacity>
         <Text
-          className="text-secondary text-xl font-bold"
+          className="text-secondary dark:text-gray-100 text-xl font-bold"
           numberOfLines={1}
           style={{ maxWidth: 200 }}
         >
@@ -157,7 +157,7 @@ export default function RoomInfo() {
           onPress={() => setShowOptions(true)}
           className="h-10 w-10 rounded-full items-center justify-center"
         >
-          <Ionicons name="ellipsis-vertical" size={20} color="#18181B" />
+          <Ionicons name="ellipsis-vertical" size={20} color="#18181B" className="dark:text-gray-100" />
         </TouchableOpacity>
       </View>
 
@@ -180,7 +180,7 @@ export default function RoomInfo() {
             {/* Header section */}
             <View className="mb-6 mt-4">
               <View className="flex-row items-center justify-between mb-3">
-                <View className="bg-surface-alt self-start px-3.5 py-2 rounded-xl flex-row items-center ">
+                <View className="bg-surface-alt dark:bg-[#23232E] self-start px-3.5 py-2 rounded-xl flex-row items-center ">
                   <Ionicons
                     name={categoryIcon}
                     size={12}
@@ -199,13 +199,13 @@ export default function RoomInfo() {
                 </View>
               </View>
 
-              <Text className="text-secondary text-3xl font-black leading-tight tracking-tighter">
+              <Text className="text-secondary dark:text-gray-100 text-3xl font-black leading-tight tracking-tighter">
                 {room?.title}
               </Text>
             </View>
 
             {/* Room Description */}
-            <View className="mb-8 pb-8 border-b border-border-light">
+            <View className="mb-8 pb-8 border-b border-border-light dark:border-gray-800">
               <Text className="text-muted text-[10px] font-bold uppercase tracking-[2px] mb-2.5">
                 Description
               </Text>
@@ -218,10 +218,10 @@ export default function RoomInfo() {
             {/* Members Section */}
             <View>
               <View className="flex-row justify-between items-center mb-5">
-                <Text className="text-secondary text-xl font-black tracking-tight">
+                <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight">
                   Members
                 </Text>
-                <View className="bg-surface-alt px-3.5 py-1.5 rounded-xl">
+                <View className="bg-surface-alt dark:bg-[#23232E] px-3.5 py-1.5 rounded-xl">
                   <Text className="text-muted font-black text-[10px] uppercase tracking-[1.5px]">
                     {room?.participants?.length || 0} Total
                   </Text>
@@ -236,7 +236,7 @@ export default function RoomInfo() {
                         activeOpacity={0.7}
                         onPress={() => handleProfilePress(member.id)}
                         key={member.id}
-                        className="flex-row items-center justify-between bg-white p-3.5 rounded-2xl border border-gray-50"
+                        className="flex-row items-center justify-between bg-white dark:bg-[#23232E] p-3.5 rounded-2xl border border-gray-50 dark:border-[#2A2A36]"
                         style={{
                           shadowColor: "#94A3B8",
                           shadowOffset: { width: 0, height: 1 },
@@ -252,10 +252,10 @@ export default function RoomInfo() {
                                 member.profilePic ||
                                 "https://picsum.photos/200",
                             }}
-                            className="w-11 h-11 rounded-xl mr-3.5 border-2 border-gray-50"
+                            className="w-11 h-11 rounded-xl mr-3.5 border-2 border-gray-50 dark:border-gray-700"
                           />
                           <View>
-                            <Text className="text-secondary font-black text-sm tracking-tight">
+                            <Text className="text-secondary dark:text-gray-100 font-black text-sm tracking-tight">
                               {member.userName || "Unknown Member"}
                             </Text>
                             <View className="flex-row items-center mt-2 gap-2">
@@ -299,7 +299,7 @@ export default function RoomInfo() {
                     {hasMoreMembers && (
                       <TouchableOpacity
                         onPress={() => setIsMembersExpanded(!isMembersExpanded)}
-                        className="flex-row items-center justify-center py-3 mt-2 bg-white rounded-2xl border border-gray-50"
+                        className="flex-row items-center justify-center py-3 mt-2 bg-white dark:bg-[#23232E] rounded-2xl border border-gray-50 dark:border-[#2A2A36]"
                         style={{
                           shadowColor: "#94A3B8",
                           shadowOffset: { width: 0, height: 1 },
@@ -325,7 +325,7 @@ export default function RoomInfo() {
                   </>
                 ) : (
                   <View className="py-8 items-center">
-                    <View className="w-14 h-14 bg-surface-alt rounded-2xl items-center justify-center mb-3">
+                    <View className="w-14 h-14 bg-surface-alt dark:bg-[#23232E] rounded-2xl items-center justify-center mb-3">
                       <Ionicons
                         name="people-outline"
                         size={24}
@@ -343,13 +343,13 @@ export default function RoomInfo() {
         )}
 
         {/* Room Rules Section */}
-        <View className="bg-bg my-10 px-4">
-          <Text className="text-secondary text-xl font-black tracking-tight mb-4">
+        <View className="bg-bg dark:bg-[#0F0F13] my-10 px-4">
+          <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight mb-4">
             Room Rules
           </Text>
 
           <View
-            className="bg-white rounded-3xl p-5 border border-gray-100"
+            className="bg-white dark:bg-[#1A1A22] rounded-3xl p-5 border border-gray-100 dark:border-[#2A2A36]"
             style={{
               shadowColor: "#94A3B8",
               shadowOffset: { width: 0, height: 4 },
@@ -361,13 +361,13 @@ export default function RoomInfo() {
             {roomRules.map((rule, index) => (
               <View
                 key={rule.title}
-                className={`flex flex-row items-start ${index !== roomRules.length - 1 ? "mb-5 pb-5 border-b border-gray-50" : ""}`}
+                className={`flex flex-row items-start ${index !== roomRules.length - 1 ? "mb-5 pb-5 border-b border-gray-50 dark:border-[#2A2A36]" : ""}`}
               >
-                <View className="w-10 h-10 bg-gray-50 rounded-2xl flex items-center justify-center mr-4">
+                <View className="w-10 h-10 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mr-4">
                   <Ionicons name={rule.icon} size={20} color="#4B5563" />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-secondary font-bold text-base mb-1">
+                  <Text className="text-secondary dark:text-gray-100 font-bold text-base mb-1">
                     {rule.title}
                   </Text>
                   <Text className="text-muted font-medium text-sm leading-5">
@@ -381,7 +381,7 @@ export default function RoomInfo() {
         <TouchableOpacity
           onPress={handleLeaveRoom}
           activeOpacity={0.7}
-          className="mx-6 mt-7 bg-red-50 py-4 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
+          className="mx-6 mt-7 bg-red-50 dark:bg-red-900/20 py-4 rounded-2xl border border-red-100 dark:border-red-900/30 flex-row items-center justify-center gap-2"
         >
           <Ionicons name="log-out-outline" size={18} color="#EF4444" />
           <Text className="text-red-500 font-semibold text-[15px]">

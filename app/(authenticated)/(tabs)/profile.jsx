@@ -25,7 +25,7 @@ const MenuItem = ({
       onPress?.();
     }}
     activeOpacity={0.6}
-    className={`px-5 py-4 flex-row items-center justify-between ${!isLast ? "border-b border-gray-50" : ""}`}
+    className={`px-5 py-4 flex-row items-center justify-between ${!isLast ? "border-b border-gray-50 dark:border-gray-800" : ""}`}
   >
     <View className="flex-row items-center flex-1">
       <View
@@ -35,11 +35,11 @@ const MenuItem = ({
         <Ionicons name={icon} size={18} color={color} />
       </View>
       <View className="flex-1">
-        <Text className="text-secondary font-semibold text-[15px]">
+        <Text className="text-secondary dark:text-gray-100 font-semibold text-[15px]">
           {label}
         </Text>
         {subtitle && (
-          <Text className="text-gray-400 text-xs mt-0.5" numberOfLines={1}>
+          <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5" numberOfLines={1}>
             {subtitle}
           </Text>
         )}
@@ -121,7 +121,7 @@ export default function Profile() {
   ).length;
 
   return (
-    <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
+    <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1" edges={["top"]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
@@ -133,7 +133,7 @@ export default function Profile() {
 
           <View className="relative mt-6">
             <View
-              className="w-[110px] h-[110px] rounded-full border-4 border-white overflow-hidden bg-gray-100"
+              className="w-[110px] h-[110px] rounded-full border-4 border-white dark:border-gray-800 overflow-hidden bg-gray-100 dark:bg-gray-800"
               style={{
                 shadowColor: "#94A3B8",
                 shadowOffset: { width: 0, height: 2 },
@@ -159,47 +159,55 @@ export default function Profile() {
             </TouchableOpacity>
           </View>
 
-          <Text className="text-secondary text-[24px] font-extrabold mt-4 tracking-tight">
+          <Text className="text-secondary dark:text-gray-100 text-[26px] font-extrabold mt-4 tracking-tight">
             {firestoreUser?.userName || "User"}
           </Text>
-          <Text className="text-gray-400 text-sm mt-1">
-            {firestoreUser?.email}
-          </Text>
+
           <Text
-            className="text-gray-500 text-xs mt-2 text-center px-8"
+            className="text-muted dark:text-gray-400 text-[14px] mt-2 text-center px-8 font-medium leading-5"
             numberOfLines={2}
           >
-            {firestoreUser?.bio || "No bio yet — tell the world about yourself!"}
+            {firestoreUser?.bio ||
+              "No bio yet — tell the world about yourself!"}
           </Text>
         </View>
 
         {/* Stats */}
-        <View className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-7 shadow-sm shadow-gray-100">
+        <View className="flex-row mx-6 bg-white dark:bg-[#1A1A22] rounded-[24px] border border-border-light dark:border-[#2A2A36] py-5 mb-7">
           <View className="items-center flex-1">
-            <Text className="text-[22px] font-extrabold text-primary">
+            <View className="w-10 h-10 rounded-full bg-primary-surface dark:bg-primary-surface items-center justify-center mb-2">
+              <Ionicons name="chatbubbles" size={18} color="#4F46E5" />
+            </View>
+            <Text className="text-[20px] font-extrabold text-secondary dark:text-white">
               {createdRooms}
             </Text>
-            <Text className="text-gray-400 text-xs mt-1">Created</Text>
+            <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">Created</Text>
           </View>
-          <View className="w-px bg-gray-100" />
+          <View className="w-px bg-border-light dark:bg-[#2A2A36] my-2" />
           <View className="items-center flex-1">
-            <Text className="text-[22px] font-extrabold text-secondary">
+            <View className="w-10 h-10 rounded-full bg-info-surface dark:bg-info-surface items-center justify-center mb-2">
+              <Ionicons name="people" size={18} color="#3B82F6" />
+            </View>
+            <Text className="text-[20px] font-extrabold text-secondary dark:text-white">
               {joinedRooms}
             </Text>
-            <Text className="text-gray-400 text-xs mt-1">Joined</Text>
+            <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">Joined</Text>
           </View>
-          <View className="w-px bg-gray-100" />
+          <View className="w-px bg-border-light dark:bg-[#2A2A36] my-2" />
           <View className="items-center flex-1">
-            <Text className="text-[22px] font-extrabold text-green-500">
+            <View className="w-10 h-10 rounded-full bg-success-surface dark:bg-success-surface items-center justify-center mb-2">
+              <Ionicons name="star" size={18} color="#10B981" />
+            </View>
+            <Text className="text-[20px] font-extrabold text-secondary dark:text-white">
               {firestoreUser?.globalReputation ?? 0}
             </Text>
-            <Text className="text-gray-400 text-xs mt-1">Reputation</Text>
+            <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">Reputation</Text>
           </View>
         </View>
 
         {/* Menu Groups */}
-        <View className="bg-white mx-6 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-          <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+        <View className="bg-white dark:bg-[#1A1A22] mx-6 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+          <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             General
           </Text>
           <MenuItem
@@ -221,8 +229,8 @@ export default function Profile() {
           />
         </View>
 
-        <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-          <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+        <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+          <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             App
           </Text>
           <MenuItem
@@ -247,8 +255,8 @@ export default function Profile() {
           />
         </View>
 
-        <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-          <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+        <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+          <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             Support
           </Text>
           <MenuItem
@@ -270,7 +278,7 @@ export default function Profile() {
         <TouchableOpacity
           onPress={handleSignOut}
           activeOpacity={0.7}
-          className="mx-6 mt-7 bg-red-50 py-4 rounded-2xl border border-red-100 flex-row items-center justify-center gap-2"
+          className="mx-6 mt-7 bg-red-50 dark:bg-red-950/30 py-4 rounded-2xl border border-red-100 dark:border-red-900/30 flex-row items-center justify-center gap-2"
         >
           <Ionicons name="log-out-outline" size={18} color="#EF4444" />
           <Text className="text-red-500 font-semibold text-[15px]">
@@ -278,7 +286,7 @@ export default function Profile() {
           </Text>
         </TouchableOpacity>
 
-        <Text className="text-center text-gray-300 text-[10px] mt-6 tracking-wider">
+        <Text className="text-center text-gray-300 dark:text-gray-600 text-[10px] mt-6 tracking-wider">
           SpotUs v1.0.0
         </Text>
       </ScrollView>

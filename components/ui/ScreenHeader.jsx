@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function ScreenHeader({
   title,
@@ -12,6 +13,7 @@ export default function ScreenHeader({
   showBack = true,
 }) {
   const router = useRouter();
+  const { isDark } = useTheme();
 
   const handleBack = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -26,21 +28,21 @@ export default function ScreenHeader({
             <TouchableOpacity
               onPress={handleBack}
               activeOpacity={0.75}
-              className="w-11 h-11 rounded-2xl bg-white border border-gray-100 items-center justify-center mr-3"
+              className="w-11 h-11 rounded-2xl bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] items-center justify-center mr-3"
             >
-              <Ionicons name="chevron-back" size={21} color="#18181B" />
+              <Ionicons name="chevron-back" size={21} color={isDark ? "#F3F4F6" : "#18181B"} />
             </TouchableOpacity>
           )}
           <View className="flex-1">
             <Text
-              className="text-secondary text-xl font-extrabold tracking-tight"
+              className="text-secondary dark:text-gray-100 text-xl font-extrabold tracking-tight"
               numberOfLines={1}
             >
               {title}
             </Text>
             {subtitle ? (
               <Text
-                className="text-gray-400 text-xs font-medium mt-0.5"
+                className="text-gray-400 dark:text-gray-500 text-xs font-medium mt-0.5"
                 numberOfLines={1}
               >
                 {subtitle}
@@ -56,12 +58,12 @@ export default function ScreenHeader({
               onRightPress?.();
             }}
             activeOpacity={0.75}
-            className="min-w-11 h-11 rounded-2xl bg-white border border-gray-100 items-center justify-center px-3"
+            className="min-w-11 h-11 rounded-2xl bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] items-center justify-center px-3"
           >
             {rightIcon ? (
-              <Ionicons name={rightIcon} size={19} color="#4F46E5" />
+              <Ionicons name={rightIcon} size={19} color={isDark ? "#818CF8" : "#4F46E5"} />
             ) : (
-              <Text className="text-primary text-sm font-bold">
+              <Text className="text-primary dark:text-primary-light text-sm font-bold">
                 {rightLabel}
               </Text>
             )}

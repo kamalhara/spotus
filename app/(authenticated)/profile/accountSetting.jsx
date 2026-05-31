@@ -20,6 +20,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BlockedUserModal from "../../../components/users/BlockedUserModal";
+import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 
 if (
@@ -47,7 +48,7 @@ const MenuItem = ({
       if (onPress) onPress();
     }}
     activeOpacity={0.6}
-    className={`px-5 py-4 flex-row items-center justify-between ${!isLast ? "border-b border-gray-50" : ""}`}
+    className={`px-5 py-4 flex-row items-center justify-between ${!isLast ? "border-b border-gray-50 dark:border-gray-800" : ""}`}
   >
     <View className="flex-row items-center flex-1">
       <View
@@ -57,11 +58,11 @@ const MenuItem = ({
         <Ionicons name={icon} size={18} color={color} />
       </View>
       <View className="flex-1">
-        <Text className="text-secondary font-semibold text-[15px]">
+        <Text className="text-secondary dark:text-gray-100 font-semibold text-[15px]">
           {label}
         </Text>
         {subtitle && (
-          <Text className="text-gray-400 text-xs mt-0.5" numberOfLines={1}>
+          <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5" numberOfLines={1}>
             {subtitle}
           </Text>
         )}
@@ -98,6 +99,7 @@ export default function Profile() {
   const searchInputRef = useRef(null);
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [visibility, setVisibility] = useState("Public");
+  const { theme, setTheme, isDark } = useTheme();
 
   const toggleSearch = (active) => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -131,8 +133,8 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <View className="flex-1 items-center justify-center bg-bg">
-        <ActivityIndicator size="large" color="#4F46E5" />
+      <View className="flex-1 items-center justify-center bg-bg dark:bg-[#0F0F13]">
+        <ActivityIndicator size="large" color={isDark ? "#818CF8" : "#4F46E5"} />
       </View>
     );
   }
@@ -142,7 +144,7 @@ export default function Profile() {
   }
 
   return (
-    <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
+    <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1" edges={["top"]}>
       {/* Header */}
       <View className="px-4 py-2 flex-row items-center justify-between min-h-[60px]">
         <View className="flex flex-row items-center flex-1">
@@ -151,28 +153,28 @@ export default function Profile() {
               if (activeSearch) toggleSearch(false);
               else router.back();
             }}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50 mr-2"
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50 dark:bg-gray-800/50 mr-2"
           >
             <Ionicons
               name={activeSearch ? "close" : "arrow-back"}
               size={20}
-              color="#4F46E5"
+              color={isDark ? "#818CF8" : "#4F46E5"}
             />
           </TouchableOpacity>
           {!activeSearch ? (
             <Text
-              className="text-secondary font-extrabold text-xl"
+              className="text-secondary dark:text-gray-100 font-extrabold text-xl"
               numberOfLines={1}
             >
               Settings
             </Text>
           ) : (
-            <View className="flex-1 flex-row items-center bg-gray-100/80 rounded-2xl px-4 py-2.5 ml-2 border border-gray-200">
+            <View className="flex-1 flex-row items-center bg-gray-100/80 dark:bg-gray-800/80 rounded-2xl px-4 py-2.5 ml-2 border border-gray-200 dark:border-gray-700">
               <Ionicons name="search" size={18} color="#9CA3AF" />
               <TextInput
                 ref={searchInputRef}
                 autoFocus
-                className="flex-1 ml-3 text-secondary text-base font-semibold"
+                className="flex-1 ml-3 text-secondary dark:text-gray-100 text-base font-semibold"
                 placeholder="Search settings..."
                 placeholderTextColor="#9CA3AF"
                 value={searchQuery}
@@ -189,9 +191,9 @@ export default function Profile() {
         {!activeSearch && (
           <TouchableOpacity
             onPress={() => toggleSearch(true)}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50"
+            className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50 dark:bg-gray-800/50"
           >
-            <Ionicons name="search" size={20} color="#4F46E5" />
+            <Ionicons name="search" size={20} color={isDark ? "#818CF8" : "#4F46E5"} />
           </TouchableOpacity>
         )}
       </View>
@@ -219,7 +221,7 @@ export default function Profile() {
 
           <View className="relative mt-6">
             <View
-              className="w-[82px] h-[82px] rounded-full border-4 border-white overflow-hidden bg-gray-100"
+              className="w-[82px] h-[82px] rounded-full border-4 border-white dark:border-gray-800 overflow-hidden bg-gray-100 dark:bg-gray-800"
               style={{
                 shadowColor: "#94A3B8",
                 shadowOffset: { width: 0, height: 2 },
@@ -240,12 +242,12 @@ export default function Profile() {
           </View>
           <View className="flex-1 ml-4">
             <Text
-              className="text-secondary text-[22px] font-extrabold tracking-tight"
+              className="text-secondary dark:text-gray-100 text-[22px] font-extrabold tracking-tight"
               numberOfLines={1}
             >
               {firestoreUser?.userName || "User"}
             </Text>
-            <Text className="text-gray-400 text-sm mt-1" numberOfLines={1}>
+            <Text className="text-gray-400 dark:text-gray-500 text-sm mt-1" numberOfLines={1}>
               {firestoreUser?.email}
             </Text>
           </View>
@@ -255,8 +257,8 @@ export default function Profile() {
         {(filterMatch("Email Address") ||
           filterMatch("Sign-In Method") ||
           filterMatch("Password")) && (
-          <View className="bg-white mx-6 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-            <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+          <View className="bg-white dark:bg-[#1A1A22] mx-6 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+            <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Account
             </Text>
 
@@ -289,8 +291,8 @@ export default function Profile() {
         )}
 
         {(filterMatch("Notifications") || filterMatch("Email Alerts")) && (
-          <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-            <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+            <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Preferences
             </Text>
             {filterMatch("Notifications") && (
@@ -312,10 +314,74 @@ export default function Profile() {
           </View>
         )}
 
+        {/* Appearance / Theme */}
+        {(filterMatch("Theme") || filterMatch("Appearance") || filterMatch("Dark Mode")) && (
+          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+            <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+              Appearance
+            </Text>
+            <View className="px-5 py-4">
+              <View className="flex-row items-center mb-3">
+                <View
+                  className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
+                  style={{ backgroundColor: isDark ? "#6366F118" : "#4F46E512" }}
+                >
+                  <Ionicons name="color-palette-outline" size={18} color={isDark ? "#818CF8" : "#4F46E5"} />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-secondary dark:text-gray-100 font-semibold text-[15px]">
+                    Theme
+                  </Text>
+                  <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
+                    {theme === "system" ? "Follows system" : theme === "dark" ? "Dark mode" : "Light mode"}
+                  </Text>
+                </View>
+              </View>
+              <View className="flex-row bg-gray-100 dark:bg-[#23232E] rounded-2xl p-1">
+                {[
+                  { key: "light", label: "Light", icon: "sunny" },
+                  { key: "dark", label: "Dark", icon: "moon" },
+                  { key: "system", label: "System", icon: "phone-portrait-outline" },
+                ].map((opt) => (
+                  <TouchableOpacity
+                    key={opt.key}
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setTheme(opt.key);
+                    }}
+                    activeOpacity={0.7}
+                    className={`flex-1 flex-row items-center justify-center py-2.5 rounded-xl ${
+                      theme === opt.key
+                        ? "bg-white dark:bg-[#1A1A22] shadow-sm shadow-gray-200 dark:shadow-none"
+                        : ""
+                    }`}
+                  >
+                    <Ionicons
+                      name={opt.icon}
+                      size={14}
+                      color={theme === opt.key ? (isDark ? "#818CF8" : "#4F46E5") : (isDark ? "#6B7280" : "#9CA3AF")}
+                      style={{ marginRight: 5 }}
+                    />
+                    <Text
+                      className={`text-xs font-bold ${
+                        theme === opt.key
+                          ? "text-primary dark:text-primary-light"
+                          : "text-gray-400 dark:text-gray-500"
+                      }`}
+                    >
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </View>
+        )}
+
         {(filterMatch("Profile Visibility") ||
           filterMatch("Blocked Users")) && (
-          <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-            <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+            <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Privacy
             </Text>
             {filterMatch("Profile Visibility") && (
@@ -332,10 +398,10 @@ export default function Profile() {
                     />
                   </View>
                   <View className="flex-1">
-                    <Text className="text-secondary font-semibold text-[15px]">
+                    <Text className="text-secondary dark:text-gray-100 font-semibold text-[15px]">
                       Profile Visibility
                     </Text>
-                    <Text className="text-gray-400 text-xs mt-0.5">
+                    <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
                       {visibility === "Public"
                         ? "Anyone can view your profile"
                         : "Only approved users can view"}
@@ -395,8 +461,8 @@ export default function Profile() {
         {(filterMatch("Help Center") ||
           filterMatch("Privacy Policy") ||
           filterMatch("Terms of Service")) && (
-          <View className="bg-white mx-6 mt-4 rounded-2xl border border-gray-100 overflow-hidden shadow-sm shadow-gray-100">
-            <Text className="text-gray-400 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+            <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Support
             </Text>
             {filterMatch("Help Center") && (
@@ -437,7 +503,10 @@ export default function Profile() {
           !filterMatch("Blocked Users") &&
           !filterMatch("Help Center") &&
           !filterMatch("Privacy Policy") &&
-          !filterMatch("Terms of Service") && (
+          !filterMatch("Terms of Service") &&
+          !filterMatch("Theme") &&
+          !filterMatch("Appearance") &&
+          !filterMatch("Dark Mode") && (
             <View className="flex-1 items-center justify-center py-10">
               <Ionicons name="search-outline" size={48} color="#E5E7EB" />
               <Text className="text-gray-400 mt-4 font-medium">
@@ -446,7 +515,7 @@ export default function Profile() {
             </View>
           )}
 
-        <Text className="text-center text-gray-300 text-[10px] mt-6 tracking-wider">
+        <Text className="text-center text-gray-300 dark:text-gray-600 text-[10px] mt-6 tracking-wider">
           SpotUs v1.0.0
         </Text>
       </ScrollView>

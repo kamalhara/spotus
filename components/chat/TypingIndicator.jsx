@@ -48,7 +48,7 @@ export default function TypingIndicator() {
       <View className="w-8 mr-2 flex justify-end pb-5">
         <View className="w-7 h-7" />
       </View>
-      <View className="bg-white border border-gray-100 rounded-2xl rounded-bl-md px-4 py-3.5 items-center justify-center flex-row mb-1 shadow-sm shadow-gray-100">
+      <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl rounded-bl-md px-4 py-3.5 items-center justify-center flex-row mb-1 shadow-sm shadow-gray-100 dark:shadow-none">
         <Animated.View
           style={{ transform: [{ translateY: dot1 }] }}
           className="w-2 h-2 bg-primary/40 rounded-full mx-[2.5px]"

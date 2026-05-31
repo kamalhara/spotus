@@ -85,7 +85,7 @@ export function RoomHorizontalItem({ room, onPress }) {
 
         <Text
           className={`text-[11px] font-bold mt-2.5 text-center w-20 tracking-tight ${
-            roomUnseen ? "text-primary" : "text-secondary/60"
+            roomUnseen ? "text-primary" : "text-secondary opacity-60"
           }`}
           numberOfLines={1}
         >

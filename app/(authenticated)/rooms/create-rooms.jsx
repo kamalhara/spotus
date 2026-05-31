@@ -56,7 +56,7 @@ export default function CreateRooms() {
   };
 
   return (
-      <SafeAreaView className="bg-bg flex-1 px-5">
+      <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1 px-5">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
@@ -71,7 +71,7 @@ export default function CreateRooms() {
                 <View className="flex-row items-center py-4">
                   <TouchableOpacity
                     onPress={() => router.back()}
-                    className="w-10 h-10 rounded-full bg-white items-center justify-center border border-gray-100 mr-3"
+                    className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36] mr-3"
                     style={{
                       shadowColor: "#94A3B8",
                       shadowOffset: { width: 0, height: 1 },
@@ -86,10 +86,10 @@ export default function CreateRooms() {
 
                 {/* Title */}
                 <View className="mt-4 mb-8">
-                  <Text className="text-secondary text-[28px] font-extrabold tracking-tight leading-[34px]">
+                  <Text className="text-secondary dark:text-gray-100 text-[28px] font-extrabold tracking-tight leading-[34px]">
                     Create a Room
                   </Text>
-                  <Text className="text-gray-400 text-sm leading-5 mt-2">
+                  <Text className="text-gray-400 dark:text-gray-500 text-sm leading-5 mt-2">
                     Set a clear topic so people know what they are joining.
                   </Text>
                 </View>
@@ -104,14 +104,14 @@ export default function CreateRooms() {
                       if (text.length <= MAX_TITLE) setTitle(text);
                     }}
                   />
-                  <Text className="text-gray-300 text-xs self-end mt-1.5 mr-1">
+                  <Text className="text-gray-300 dark:text-gray-600 text-xs self-end mt-1.5 mr-1">
                     {title.length}/{MAX_TITLE}
                   </Text>
                 </View>
 
                 {/* Categories — each with its own color */}
                 <View className="mt-5">
-                  <Text className="text-gray-500 text-sm font-medium mb-3 ml-1">
+                  <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
                     Category
                   </Text>
 
@@ -125,7 +125,7 @@ export default function CreateRooms() {
                           className={`px-3.5 py-2.5 rounded-xl flex-row items-center gap-2 border ${
                             selected
                               ? "border-transparent"
-                              : "bg-white border-gray-100"
+                              : "bg-white dark:bg-[#1A1A22] border-gray-100 dark:border-[#2A2A36]"
                           }`}
                           style={
                             selected
@@ -142,7 +142,7 @@ export default function CreateRooms() {
                             color={selected ? color : "#9CA3AF"}
                           />
                           <Text
-                            className={`text-sm font-medium ${!selected ? "text-secondary" : ""}`}
+                            className={`text-sm font-medium ${!selected ? "text-secondary dark:text-gray-100" : ""}`}
                             style={selected ? { color } : {}}
                           >
                             {label}
@@ -155,10 +155,10 @@ export default function CreateRooms() {
 
                 {/* Preview */}
                 <View className="mt-8">
-                  <Text className="text-gray-500 text-sm font-medium mb-3 ml-1">
+                  <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
                     Preview
                   </Text>
-                  <View className="bg-white rounded-2xl border border-gray-100 p-4">
+                  <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4">
                     <View className="flex-row items-center justify-between mb-3">
                       <View
                         className="px-3 py-1.5 rounded-xl flex-row items-center"
@@ -192,13 +192,13 @@ export default function CreateRooms() {
                     </View>
                     <Text
                       className={`text-lg font-extrabold tracking-tight ${
-                        title ? "text-secondary" : "text-gray-300"
+                        title ? "text-secondary dark:text-gray-100" : "text-gray-300 dark:text-gray-600"
                       }`}
                       numberOfLines={2}
                     >
                       {title || "Your room title"}
                     </Text>
-                    <Text className="text-gray-400 text-xs mt-2 leading-4">
+                    <Text className="text-gray-400 dark:text-gray-500 text-xs mt-2 leading-4">
                       This is how your room will appear in the list.
                     </Text>
                   </View>
@@ -207,7 +207,7 @@ export default function CreateRooms() {
                 {/* Age Similarity */}
                 <View className="mt-8">
                   <View
-                    className="flex-row items-center bg-white p-4 rounded-2xl border border-gray-100"
+                    className="flex-row items-center bg-white dark:bg-[#1A1A22] p-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36]"
                     style={{
                       shadowColor: "#94A3B8",
                       shadowOffset: { width: 0, height: 2 },
@@ -220,10 +220,10 @@ export default function CreateRooms() {
                       <Ionicons name="people-sharp" size={20} color="#4F46E5" />
                     </View>
                     <View className="flex-1">
-                      <Text className="text-secondary text-[15px] font-semibold">
+                      <Text className="text-secondary dark:text-gray-100 text-[15px] font-semibold">
                         Age Similarity
                       </Text>
-                      <Text className="text-gray-400 text-xs mt-0.5">
+                      <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
                         Show only to my age bracket
                       </Text>
                     </View>
