@@ -165,6 +165,12 @@ export default function Profile() {
           <Text className="text-gray-400 text-sm mt-1">
             {firestoreUser?.email}
           </Text>
+          <Text
+            className="text-gray-500 text-xs mt-2 text-center px-8"
+            numberOfLines={2}
+          >
+            {firestoreUser?.bio || "No bio yet — tell the world about yourself!"}
+          </Text>
         </View>
 
         {/* Stats */}

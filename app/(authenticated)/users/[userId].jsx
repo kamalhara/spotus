@@ -83,7 +83,8 @@ export default function UserProfile() {
     fetchProfileData();
   }, [userId, roomId, viewer?.id]);
 
-  const hasDMAccess = canSendDM(viewerRoomTrust);
+  // If no roomId is provided (e.g. came from DMs), the user already has access
+  const hasDMAccess = !roomId || canSendDM(viewerRoomTrust);
   const trustProgress = Math.min(viewerRoomTrust / 10, 1);
   const trustColor =
     viewerRoomTrust < 3
@@ -301,171 +302,274 @@ export default function UserProfile() {
           )}
         </View>
 
-        {/* Action Buttons — varied sizes give visual interest */}
-        <View className="flex-row px-6 gap-2.5 mb-6">
-          <TouchableOpacity
-            onPress={handleMessage}
-            activeOpacity={0.8}
-            className={`flex-[2] py-3.5 rounded-2xl flex-row items-center justify-center ${
-              hasDMAccess ? "bg-primary" : "bg-gray-100"
-            }`}
-          >
-            <Ionicons
-              name={hasDMAccess ? "send" : "lock-closed-outline"}
-              size={16}
-              color={hasDMAccess ? "white" : "#9CA3AF"}
-            />
-            <Text
-              className={`font-semibold text-sm ml-2 ${
-                hasDMAccess ? "text-white" : "text-gray-400"
-              }`}
-            >
-              {hasDMAccess ? "Message" : "Locked"}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleVouch}
-            activeOpacity={0.8}
-            className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${vouchStatus ? "bg-pink-100" : "bg-pink-50"} border border-pink-100`}
-          >
-            <Ionicons
-              name={vouchStatus ? "heart" : "heart-outline"}
-              size={16}
-              color={vouchStatus ? "#EC4899" : "#EC4899"}
-            />
-            <Text className="text-pink-500 font-semibold text-sm ml-1.5">
-              {vouchStatus ? "Vouched" : "Vouch"}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleShare}
-            activeOpacity={0.8}
-            className="py-3.5 px-4 rounded-2xl bg-gray-50 border border-gray-100 items-center justify-center"
-          >
-            <Ionicons name="share-outline" size={16} color="#6B7280" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Trust progress */}
-        {!hasDMAccess && (
-          <View className="px-6 mb-6">
-            <View className="bg-white rounded-2xl px-4 py-4 border border-gray-100">
-              <View className="flex-row items-center justify-between mb-2.5">
-                <Text className="text-gray-500 text-xs font-medium">
-                  Room trust
-                </Text>
+        {/* Action Buttons — context-aware */}
+        {roomId ? (
+          <>
+            {/* === ROOM CONTEXT === */}
+            <View className="flex-row px-6 gap-2.5 mb-6">
+              <TouchableOpacity
+                onPress={handleMessage}
+                activeOpacity={0.8}
+                className={`flex-[2] py-3.5 rounded-2xl flex-row items-center justify-center ${
+                  hasDMAccess ? "bg-primary" : "bg-gray-100"
+                }`}
+              >
+                <Ionicons
+                  name={hasDMAccess ? "send" : "lock-closed-outline"}
+                  size={16}
+                  color={hasDMAccess ? "white" : "#9CA3AF"}
+                />
                 <Text
-                  className="text-xs font-bold"
-                  style={{ color: trustColor }}
+                  className={`font-semibold text-sm ml-2 ${
+                    hasDMAccess ? "text-white" : "text-gray-400"
+                  }`}
                 >
-                  {viewerRoomTrust}/10
+                  {hasDMAccess ? "Message" : "Locked"}
                 </Text>
-              </View>
-              <Progress.Bar
-                progress={trustProgress}
-                width={null}
-                color={trustColor}
-                unfilledColor="#F3F4F6"
-                borderWidth={0}
-                height={5}
-                borderRadius={3}
-                animated={true}
-              />
-              <Text className="text-gray-400 text-[11px] mt-2">
-                {10 - viewerRoomTrust} more messages to unlock DMs
-              </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleVouch}
+                activeOpacity={0.8}
+                className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${vouchStatus ? "bg-pink-100" : "bg-pink-50"} border border-pink-100`}
+              >
+                <Ionicons
+                  name={vouchStatus ? "heart" : "heart-outline"}
+                  size={16}
+                  color="#EC4899"
+                />
+                <Text className="text-pink-500 font-semibold text-sm ml-1.5">
+                  {vouchStatus ? "Vouched" : "Vouch"}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleShare}
+                activeOpacity={0.8}
+                className="py-3.5 px-4 rounded-2xl bg-gray-50 border border-gray-100 items-center justify-center"
+              >
+                <Ionicons name="share-outline" size={16} color="#6B7280" />
+              </TouchableOpacity>
             </View>
-          </View>
+
+            {/* Trust progress — room context only */}
+            {!hasDMAccess && (
+              <View className="px-6 mb-6">
+                <View className="bg-white rounded-2xl px-4 py-4 border border-gray-100">
+                  <View className="flex-row items-center justify-between mb-2.5">
+                    <Text className="text-gray-500 text-xs font-medium">
+                      Room trust
+                    </Text>
+                    <Text
+                      className="text-xs font-bold"
+                      style={{ color: trustColor }}
+                    >
+                      {viewerRoomTrust}/10
+                    </Text>
+                  </View>
+                  <Progress.Bar
+                    progress={trustProgress}
+                    width={null}
+                    color={trustColor}
+                    unfilledColor="#F3F4F6"
+                    borderWidth={0}
+                    height={5}
+                    borderRadius={3}
+                    animated={true}
+                  />
+                  <Text className="text-gray-400 text-[11px] mt-2">
+                    {10 - viewerRoomTrust} more messages to unlock DMs
+                  </Text>
+                </View>
+              </View>
+            )}
+          </>
+        ) : (
+          <>
+            {/* === DM CONTEXT === */}
+            <View className="px-6 mb-6">
+              <TouchableOpacity
+                onPress={handleMessage}
+                activeOpacity={0.8}
+                className="py-4 rounded-2xl bg-primary flex-row items-center justify-center"
+              >
+                <Ionicons name="chatbubble" size={16} color="white" />
+                <Text className="text-white font-semibold text-sm ml-2">
+                  Continue Chat
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View className="flex-row px-6 gap-2.5 mb-6">
+              <TouchableOpacity
+                onPress={handleVouch}
+                activeOpacity={0.8}
+                className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${vouchStatus ? "bg-pink-100" : "bg-pink-50"} border border-pink-100`}
+              >
+                <Ionicons
+                  name={vouchStatus ? "heart" : "heart-outline"}
+                  size={16}
+                  color="#EC4899"
+                />
+                <Text className="text-pink-500 font-semibold text-sm ml-1.5">
+                  {vouchStatus ? "Vouched" : "Vouch"}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={handleShare}
+                activeOpacity={0.8}
+                className="flex-1 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex-row items-center justify-center"
+              >
+                <Ionicons name="share-outline" size={16} color="#6B7280" />
+                <Text className="text-gray-500 font-semibold text-sm ml-1.5">
+                  Share
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </>
         )}
 
-        {/* Stats */}
-        <View
-          className="flex-row mx-6 bg-white rounded-2xl border border-gray-100 py-5 mb-6"
-          style={{
-            shadowColor: "#94A3B8",
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.04,
-            shadowRadius: 4,
-            elevation: 1,
-          }}
-        >
-          <View className="flex-1 items-center">
-            <Text className="text-[22px] font-extrabold text-primary">
-              {hostedRooms}
-            </Text>
-            <Text className="text-gray-400 text-xs mt-1">Hosted</Text>
-          </View>
-          <View className="w-px bg-gray-100" />
-          <View className="flex-1 items-center">
-            <Text className="text-[22px] font-extrabold text-secondary">
-              {joinedRooms}
-            </Text>
-            <Text className="text-gray-400 text-xs mt-1">Joined</Text>
-          </View>
-          <View className="w-px bg-gray-100" />
-          <View className="flex-1 items-center">
-            <Text className="text-[22px] font-extrabold text-green-500">
-              {user?.globalReputation ?? 0}
-            </Text>
-            <Text className="text-gray-400 text-xs mt-1">Rep</Text>
+        {/* Stats — with icons */}
+        <View className="mx-6 mb-6">
+          <View
+            className="flex-row bg-white rounded-2xl border border-gray-100 overflow-hidden"
+            style={{
+              shadowColor: "#94A3B8",
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.04,
+              shadowRadius: 4,
+              elevation: 1,
+            }}
+          >
+            <View className="flex-1 items-center py-5">
+              <View className="w-9 h-9 bg-primary/10 rounded-xl items-center justify-center mb-2">
+                <Ionicons name="mic-outline" size={16} color="#4F46E5" />
+              </View>
+              <Text className="text-[20px] font-extrabold text-primary">
+                {hostedRooms}
+              </Text>
+              <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
+                Hosted
+              </Text>
+            </View>
+            <View className="w-px bg-gray-100 my-4" />
+            <View className="flex-1 items-center py-5">
+              <View className="w-9 h-9 bg-blue-50 rounded-xl items-center justify-center mb-2">
+                <Ionicons name="enter-outline" size={16} color="#3B82F6" />
+              </View>
+              <Text className="text-[20px] font-extrabold text-secondary">
+                {joinedRooms}
+              </Text>
+              <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
+                Joined
+              </Text>
+            </View>
+            <View className="w-px bg-gray-100 my-4" />
+            <View className="flex-1 items-center py-5">
+              <View className="w-9 h-9 bg-green-50 rounded-xl items-center justify-center mb-2">
+                <Ionicons name="star-outline" size={16} color="#10B981" />
+              </View>
+              <Text className="text-[20px] font-extrabold text-green-500">
+                {user?.globalReputation ?? 0}
+              </Text>
+              <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">
+                Rep
+              </Text>
+            </View>
           </View>
         </View>
 
-        {/* About — mixed visual approach */}
-        <View className="px-6 mb-4">
-          <Text className="text-secondary text-lg font-bold mb-4">About</Text>
-
-          <View className="flex-row mb-4">
-            <View className="w-8 h-8 rounded-xl bg-amber-50 items-center justify-center mr-3 mt-0.5">
-              <Ionicons name="flash" size={14} color="#F59E0B" />
+        {/* Bio Section */}
+        <View className="px-6 mb-5">
+          <View className="bg-white rounded-2xl border border-gray-100 p-4">
+            <View className="flex-row items-center mb-3">
+              <View className="w-7 h-7 bg-primary/10 rounded-lg items-center justify-center mr-2.5">
+                <Ionicons name="document-text-outline" size={14} color="#4F46E5" />
+              </View>
+              <Text className="text-secondary text-sm font-bold">Bio</Text>
             </View>
-            <View className="flex-1">
-              <Text className="text-secondary text-sm font-semibold">
-                Activity
-              </Text>
-              <Text className="text-gray-400 text-sm leading-5 mt-0.5">
-                Active in Music and Tech rooms. Recently hosted &quot;Late Night
-                coding&quot;.
-              </Text>
+            <Text className="text-gray-500 text-[13px] leading-5">
+              {user?.bio || "This user hasn\u0027t added a bio yet."}
+            </Text>
+          </View>
+        </View>
+
+        {/* Info Cards */}
+        <View className="px-6 mb-5">
+          <View className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+            {/* Member Since */}
+            <View className="flex-row items-center px-4 py-3.5 border-b border-gray-50">
+              <View className="w-8 h-8 bg-indigo-50 rounded-xl items-center justify-center mr-3">
+                <Ionicons name="calendar-outline" size={14} color="#4F46E5" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">
+                  Member Since
+                </Text>
+                <Text className="text-secondary text-sm font-semibold mt-0.5">
+                  {user?.createdAt?.seconds
+                    ? dateFormater(user.createdAt.seconds)
+                    : "Recently joined"}
+                </Text>
+              </View>
+            </View>
+
+            {/* Location */}
+            <View className="flex-row items-center px-4 py-3.5 border-b border-gray-50">
+              <View className="w-8 h-8 bg-amber-50 rounded-xl items-center justify-center mr-3">
+                <Ionicons name="location-outline" size={14} color="#F59E0B" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">
+                  Location
+                </Text>
+                <Text className="text-secondary text-sm font-semibold mt-0.5">
+                  {user?.location || "Nearby"}
+                </Text>
+              </View>
+            </View>
+
+            {/* Activity Status */}
+            <View className="flex-row items-center px-4 py-3.5">
+              <View className="w-8 h-8 bg-green-50 rounded-xl items-center justify-center mr-3">
+                <Ionicons name="pulse-outline" size={14} color="#10B981" />
+              </View>
+              <View className="flex-1">
+                <Text className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">
+                  Activity
+                </Text>
+                <Text className="text-secondary text-sm font-semibold mt-0.5">
+                  {hostedRooms + joinedRooms > 5
+                    ? "Very active"
+                    : hostedRooms + joinedRooms > 0
+                      ? "Active"
+                      : "New member"}
+                </Text>
+              </View>
             </View>
           </View>
+        </View>
 
-          <View className="flex-row mb-4">
-            <View className="w-8 h-8 rounded-xl bg-indigo-50 items-center justify-center mr-3 mt-0.5">
-              <Ionicons name="shield-checkmark" size={14} color="#4F46E5" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-secondary text-sm font-semibold">
-                Verified Host
-              </Text>
-              <Text className="text-gray-400 text-sm leading-5 mt-0.5">
-                Member since{" "}
-                {user?.createdAt?.seconds
-                  ? dateFormater(user.createdAt.seconds)
-                  : "recently"}
-                . Hosted {hostedRooms} room{hostedRooms !== 1 ? "s" : ""} with
-                positive feedback.
-              </Text>
-            </View>
-          </View>
-
-          <View className="flex-row">
-            <View className="w-8 h-8 rounded-xl bg-green-50 items-center justify-center mr-3 mt-0.5">
-              <Ionicons name="heart" size={14} color="#10B981" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-secondary text-sm font-semibold">
-                Interests
-              </Text>
-              <View className="flex-row flex-wrap gap-1.5 mt-1.5">
-                {user?.interests?.map((tag) => (
+        {/* Interests */}
+        {user?.interests?.length > 0 && (
+          <View className="px-6 mb-5">
+            <View className="bg-white rounded-2xl border border-gray-100 p-4">
+              <View className="flex-row items-center mb-3">
+                <View className="w-7 h-7 bg-pink-50 rounded-lg items-center justify-center mr-2.5">
+                  <Ionicons name="heart" size={14} color="#EC4899" />
+                </View>
+                <Text className="text-secondary text-sm font-bold">
+                  Interests
+                </Text>
+              </View>
+              <View className="flex-row flex-wrap gap-2">
+                {user.interests.map((tag) => (
                   <View
                     key={tag}
-                    className="bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100"
+                    className="bg-gray-50 px-3.5 py-2 rounded-xl border border-gray-100"
                   >
-                    <Text className="text-gray-600 text-xs font-semibold">
+                    <Text className="text-gray-600 text-xs font-bold">
                       {tag}
                     </Text>
                   </View>
@@ -473,15 +577,92 @@ export default function UserProfile() {
               </View>
             </View>
           </View>
-        </View>
+        )}
 
-        {/* Block */}
-        <TouchableOpacity
-          className="mt-6 py-4 items-center"
-          onPress={handleBlock}
-        >
-          <Text className="text-gray-300 text-sm">Block this user</Text>
-        </TouchableOpacity>
+        {/* Mutual Rooms */}
+        {rooms.filter(
+          (r) =>
+            r.participants?.includes(userId) &&
+            r.participants?.includes(viewer?.id),
+        ).length > 0 && (
+          <View className="px-6 mb-5">
+            <View className="bg-white rounded-2xl border border-gray-100 p-4">
+              <View className="flex-row items-center justify-between mb-3">
+                <View className="flex-row items-center">
+                  <View className="w-7 h-7 bg-blue-50 rounded-lg items-center justify-center mr-2.5">
+                    <Ionicons name="people" size={14} color="#3B82F6" />
+                  </View>
+                  <Text className="text-secondary text-sm font-bold">
+                    Mutual Rooms
+                  </Text>
+                </View>
+                <View className="bg-blue-50 px-2.5 py-1 rounded-lg">
+                  <Text className="text-blue-500 text-[10px] font-bold">
+                    {
+                      rooms.filter(
+                        (r) =>
+                          r.participants?.includes(userId) &&
+                          r.participants?.includes(viewer?.id),
+                      ).length
+                    }
+                  </Text>
+                </View>
+              </View>
+              {rooms
+                .filter(
+                  (r) =>
+                    r.participants?.includes(userId) &&
+                    r.participants?.includes(viewer?.id),
+                )
+                .slice(0, 3)
+                .map((r) => (
+                  <TouchableOpacity
+                    key={r.id}
+                    activeOpacity={0.7}
+                    onPress={() => router.push(`/rooms/${r.id}`)}
+                    className="flex-row items-center py-2.5"
+                  >
+                    <View className="w-8 h-8 bg-primary/10 rounded-xl items-center justify-center mr-3">
+                      <Ionicons name="chatbubbles-outline" size={14} color="#4F46E5" />
+                    </View>
+                    <Text
+                      className="text-secondary text-sm font-semibold flex-1"
+                      numberOfLines={1}
+                    >
+                      {r.title}
+                    </Text>
+                    <Ionicons name="chevron-forward" size={14} color="#D1D5DB" />
+                  </TouchableOpacity>
+                ))}
+            </View>
+          </View>
+        )}
+
+        {/* Block / Report */}
+        <View className="px-6 mt-2 mb-4">
+          <View className="flex-row gap-3">
+            <TouchableOpacity
+              onPress={handleBlock}
+              activeOpacity={0.7}
+              className="flex-1 py-3.5 rounded-2xl bg-red-50 border border-red-100 flex-row items-center justify-center"
+            >
+              <Ionicons name="ban-outline" size={14} color="#EF4444" />
+              <Text className="text-red-400 text-xs font-semibold ml-1.5">
+                Block
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleOptions}
+              activeOpacity={0.7}
+              className="flex-1 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 flex-row items-center justify-center"
+            >
+              <Ionicons name="flag-outline" size={14} color="#9CA3AF" />
+              <Text className="text-gray-400 text-xs font-semibold ml-1.5">
+                Report
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

@@ -5,14 +5,18 @@ import {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
+import { doc, getDoc } from "firebase/firestore";
 import {
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
+import { db } from "../../config/firebase.config";
 import CustomButton from "../ui/CustomButton";
 
 const CATEGORY_ICONS = {
@@ -30,6 +34,24 @@ const CATEGORY_ICONS = {
 const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
   const bottomSheetModalRef = useRef(null);
   const router = useRouter();
+  const [creator, setCreator] = useState(null);
+
+  // Fetch room creator profile
+  useEffect(() => {
+    if (!room?.createdBy) {
+      setCreator(null);
+      return;
+    }
+    const fetchCreator = async () => {
+      try {
+        const snap = await getDoc(doc(db, "users", room.createdBy));
+        if (snap.exists()) setCreator({ id: snap.id, ...snap.data() });
+      } catch (err) {
+        console.error("Error fetching room creator:", err);
+      }
+    };
+    fetchCreator();
+  }, [room?.createdBy]);
   // Expose the dismiss and present methods to the parent
   useImperativeHandle(ref, () => ({
     dismiss: () => bottomSheetModalRef.current?.dismiss(),
@@ -37,7 +59,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
   }));
 
   // variables
-  const snapPoints = useMemo(() => ["48%"], []);
+  const snapPoints = useMemo(() => ["55%"], []);
 
   // renders
   const renderBackdrop = useCallback(
@@ -133,6 +155,29 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
               </View>
             </View>
           </View>
+
+          {/* Creator */}
+          {creator && (
+            <View className="flex-row items-center bg-surface-alt px-4 py-3 rounded-2xl mb-7">
+              <Image
+                source={{
+                  uri: creator.profilePic || "https://picsum.photos/200",
+                }}
+                className="w-9 h-9 rounded-xl mr-3 border-2 border-white"
+              />
+              <View className="flex-1">
+                <Text className="text-secondary font-bold text-sm">
+                  {creator.userName || "Unknown"}
+                </Text>
+              </View>
+              <View className="bg-warning/10 px-2.5 py-1.5 rounded-xl flex-row items-center">
+                <Ionicons name="star" size={10} color="#F59E0B" />
+                <Text className="text-warning font-black text-[9px] uppercase tracking-widest ml-1">
+                  Creator
+                </Text>
+              </View>
+            </View>
+          )}
 
           <Text className="text-muted text-[13px] leading-5 font-medium">
             Join to chat with the members in this room.
