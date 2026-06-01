@@ -110,6 +110,7 @@ export default function RoomCard({
  <Text className="text-secondary dark:text-gray-100 text-[19px] font-extrabold tracking-tight mb-1.5 leading-6">
  {room.title}
  </Text>
+
  <View className="flex-row items-center mb-4">
  <View className="w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5"/>
  <Text className="text-gray-400 text-xs">Active now</Text>

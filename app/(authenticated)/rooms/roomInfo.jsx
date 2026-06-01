@@ -210,8 +210,7 @@ export default function RoomInfo() {
  Description
  </Text>
  <Text className="text-slate-500 leading-[22px] font-medium text-[14px]">
- A local room for {room?.category ||"nearby"} discussions and
- plans with members in your area.
+ {room?.description || `A local room for ${room?.category ||"nearby"} discussions and plans with members in your area.`}
  </Text>
  </View>
 
