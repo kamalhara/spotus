@@ -1,8 +1,9 @@
-import { Ionicons } from"@expo/vector-icons";
-import * as Location from"expo-location";
-import { useRouter } from"expo-router";
-import { doc, updateDoc } from"firebase/firestore";
-import { useEffect, useState } from"react";
+import { Ionicons } from "@expo/vector-icons";
+import * as Location from "expo-location";
+import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import { doc, updateDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import {
  ActivityIndicator,
  Image,
@@ -14,9 +15,10 @@ import {
  View,
 } from"react-native";
 import { SafeAreaView } from"react-native-safe-area-context";
-import CustomInput from"../../../components/ui/CustomInput";
-import { db } from"../../../config/firebase.config";
-import useFirestoreUser from"../../../hook/useFireStoreUser";
+import CustomInput from "../../../components/ui/CustomInput";
+import { db } from "../../../config/firebase.config";
+import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
 const INTERESTS = [
  { label:"Music", icon:"musical-notes", color:"#8B5CF6"},
@@ -40,6 +42,7 @@ export default function Edit() {
  const [locationCoords, setLocationCoords] = useState(null);
  const [isSaving, setIsSaving] = useState(false);
  const [isLocating, setIsLocating] = useState(false);
+ const [newImageUri, setNewImageUri] = useState(null);
 
  useEffect(() => {
  if (user) {
@@ -88,26 +91,49 @@ export default function Edit() {
  }
  };
 
- const handleSaveProfile = async () => {
- if (!user) return;
- setIsSaving(true);
- try {
- const userRef = doc(db,"users", user.id);
- await updateDoc(userRef, {
- userName,
- bio,
- currentLocation,
- locationCoords,
- interests: selectedInterests,
- });
- router.back();
- } catch (error) {
- console.error("Error saving profile:", error);
- alert("Failed to save profile updates.");
- } finally {
- setIsSaving(false);
- }
- };
+ const handlePickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+      shape: "oval",
+    });
+
+    if (!result.canceled) {
+      setNewImageUri(result.assets[0].uri);
+    }
+  };
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    setIsSaving(true);
+    try {
+      let finalImageUrl = user.profilePic;
+      if (newImageUri) {
+        const uploadedUrl = await uploadToCloudinary(newImageUri);
+        if (uploadedUrl) {
+          finalImageUrl = uploadedUrl;
+        }
+      }
+
+      const userRef = doc(db, "users", user.id);
+      await updateDoc(userRef, {
+        userName,
+        bio,
+        currentLocation,
+        locationCoords,
+        interests: selectedInterests,
+        profilePic: finalImageUrl || null,
+      });
+      router.back();
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      alert("Failed to save profile updates.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
  return (
  <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]"edges={["top"]}>
  <ScrollView
@@ -149,19 +175,23 @@ export default function Edit() {
  <View className="w-full bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl p-5 items-center">
  <View className="relative">
  <View className="rounded-full border-4 border-gray-50 dark:border-[#23232E] w-32 h-32 bg-gray-100 dark:bg-gray-800 overflow-hidden">
- <Image
- source={{
- uri:
- user?.profilePic ||
-"https://api.dicebear.com/7.x/initials/svg?seed=Felix",
- }}
- className="w-full h-full rounded-full"
- resizeMode="cover"
- />
- </View>
- <View className="absolute bottom-1 right-1 w-10 h-10 rounded-full bg-primary border-4 border-white dark:border-[#1A1A22] items-center justify-center">
- <Ionicons name="camera"size={16} color="#FFFFFF"/>
- </View>
+                  <Image
+                    source={{
+                      uri:
+                        newImageUri ||
+                        user?.profilePic ||
+                        "https://api.dicebear.com/7.x/initials/svg?seed=Felix",
+                    }}
+                    className="w-full h-full rounded-full"
+                    resizeMode="cover"
+                  />
+                </View>
+                <TouchableOpacity 
+                  onPress={handlePickImage}
+                  className="absolute bottom-1 right-1 w-10 h-10 rounded-full bg-primary border-4 border-white dark:border-[#1A1A22] items-center justify-center"
+                >
+                  <Ionicons name="camera" size={16} color="#FFFFFF" />
+                </TouchableOpacity>
  </View>
  <Text className="font-bold text-primary dark:text-primary-light mt-4">
  Edit Picture

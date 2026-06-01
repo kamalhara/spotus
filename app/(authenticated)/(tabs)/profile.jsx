@@ -58,7 +58,6 @@ export default function Profile() {
   const router = useRouter();
 
   const [rooms, setRooms] = useState([]);
-
   useFocusEffect(
     useCallback(() => {
       const loadRooms = async () => {
