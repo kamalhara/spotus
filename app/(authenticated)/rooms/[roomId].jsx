@@ -158,6 +158,7 @@ export default function RoomChat() {
  text: trimmedText,
  senderId: currentUserId ||"unknown-id",
  user: user?.userName ||"Unknown",
+ profilePic: user?.profilePic || null,
  createdAt: serverTimestamp(),
  seenBy: [currentUserId],
  reactions: {},
@@ -216,7 +217,8 @@ export default function RoomChat() {
  type:"image",
  imageUrl,
  senderId: currentUserId,
- user: user?.userName ||"Unknown",
+ user: user?.userName || "Unknown",
+ profilePic: user?.profilePic || null,
  createdAt: serverTimestamp(),
  seenBy: [currentUserId],
  });
