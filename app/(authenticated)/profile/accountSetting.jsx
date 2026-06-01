@@ -41,54 +41,63 @@ const MenuItem = ({
   tag,
   goto = true,
   rightComponent,
-}) => (
-  <TouchableOpacity
-    onPress={() => {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      if (onPress) onPress();
-    }}
-    activeOpacity={0.6}
-    className={`px-5 py-4 flex-row items-center justify-between ${!isLast ? "border-b border-gray-50 dark:border-gray-800" : ""}`}
-  >
-    <View className="flex-row items-center flex-1">
-      <View
-        className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
-        style={{ backgroundColor: `${color}12` }}
-      >
-        <Ionicons name={icon} size={18} color={color} />
-      </View>
-      <View className="flex-1">
-        <Text className="text-secondary dark:text-gray-100 font-semibold text-[15px]">
-          {label}
-        </Text>
-        {subtitle && (
-          <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5" numberOfLines={1}>
-            {subtitle}
+}) => {
+  const { isDark } = useTheme();
+  return (
+    <TouchableOpacity
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        if (onPress) onPress();
+      }}
+      activeOpacity={0.6}
+      className={`px-5 py-4 flex-row items-center justify-between ${!isLast ? "border-b border-gray-50 dark:border-gray-800" : ""}`}
+    >
+      <View className="flex-row items-center flex-1">
+        <View
+          className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
+          style={{ backgroundColor: `${color}12` }}
+        >
+          <Ionicons name={icon} size={18} color={color} />
+        </View>
+        <View className="flex-1">
+          <Text className="text-secondary dark:text-gray-100 font-semibold text-[15px]">
+            {label}
           </Text>
-        )}
+          {subtitle && (
+            <Text
+              className="text-gray-400 dark:text-gray-500 text-xs mt-0.5"
+              numberOfLines={1}
+            >
+              {subtitle}
+            </Text>
+          )}
+        </View>
       </View>
-    </View>
-    {rightComponent ? (
-      rightComponent
-    ) : switchComponent ? (
-      <Switch
-        trackColor={{ false: "#E5E7EB", true: "#4F46E5" }}
-        ios_backgroundColor="#E5E7EB"
-        onValueChange={() => {}}
-        value={true}
-        thumbColor={"#fff"}
-      />
-    ) : tag ? (
-      <View className="flex-row items-center justify-center bg-primary/10 px-2 py-1 rounded-lg">
-        <Text className="text-primary text-xs font-semibold uppercase tracking-wide ">
-          {tag}
-        </Text>
-      </View>
-    ) : (
-      goto && <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
-    )}
-  </TouchableOpacity>
-);
+      {rightComponent ? (
+        rightComponent
+      ) : switchComponent ? (
+        <Switch
+          trackColor={{
+            false: isDark ? "#23232E" : "#E5E7EB",
+            true: "#4F46E5",
+          }}
+          ios_backgroundColor="#E5E7EB"
+          onValueChange={() => {}}
+          value={true}
+          thumbColor={"#fff"}
+        />
+      ) : tag ? (
+        <View className="flex-row items-center justify-center bg-primary/10 px-2 py-1 rounded-lg">
+          <Text className="text-primary text-xs font-semibold uppercase tracking-wide">
+            {tag}
+          </Text>
+        </View>
+      ) : (
+        goto && <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+      )}
+    </TouchableOpacity>
+  );
+};
 
 export default function Profile() {
   const { user: clerkUser } = useUser();
@@ -134,7 +143,10 @@ export default function Profile() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-bg dark:bg-[#0F0F13]">
-        <ActivityIndicator size="large" color={isDark ? "#818CF8" : "#4F46E5"} />
+        <ActivityIndicator
+          size="large"
+          color={isDark ? "#818CF8" : "#4F46E5"}
+        />
       </View>
     );
   }
@@ -193,7 +205,11 @@ export default function Profile() {
             onPress={() => toggleSearch(true)}
             className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50 dark:bg-gray-800/50"
           >
-            <Ionicons name="search" size={20} color={isDark ? "#818CF8" : "#4F46E5"} />
+            <Ionicons
+              name="search"
+              size={20}
+              color={isDark ? "#818CF8" : "#4F46E5"}
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -217,7 +233,7 @@ export default function Profile() {
         {/* Profile Header */}
         <View className="flex-row items-center px-6 mt-2 mb-7">
           {/* Background accent */}
-          <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px] bg-bg" />
+          <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px]" />
 
           <View className="relative mt-6">
             <View
@@ -247,7 +263,10 @@ export default function Profile() {
             >
               {firestoreUser?.userName || "User"}
             </Text>
-            <Text className="text-gray-400 dark:text-gray-500 text-sm mt-1" numberOfLines={1}>
+            <Text
+              className="text-gray-400 dark:text-gray-500 text-sm mt-1"
+              numberOfLines={1}
+            >
               {firestoreUser?.email}
             </Text>
           </View>
@@ -257,7 +276,7 @@ export default function Profile() {
         {(filterMatch("Email Address") ||
           filterMatch("Sign-In Method") ||
           filterMatch("Password")) && (
-          <View className="bg-white dark:bg-[#1A1A22] mx-6 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+          <View className="bg-white dark:bg-[#1A1A22] mx-6 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
             <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Account
             </Text>
@@ -291,7 +310,7 @@ export default function Profile() {
         )}
 
         {(filterMatch("Notifications") || filterMatch("Email Alerts")) && (
-          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
             <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Preferences
             </Text>
@@ -315,8 +334,10 @@ export default function Profile() {
         )}
 
         {/* Appearance / Theme */}
-        {(filterMatch("Theme") || filterMatch("Appearance") || filterMatch("Dark Mode")) && (
-          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+        {(filterMatch("Theme") ||
+          filterMatch("Appearance") ||
+          filterMatch("Dark Mode")) && (
+          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
             <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Appearance
             </Text>
@@ -324,16 +345,26 @@ export default function Profile() {
               <View className="flex-row items-center mb-3">
                 <View
                   className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
-                  style={{ backgroundColor: isDark ? "#6366F118" : "#4F46E512" }}
+                  style={{
+                    backgroundColor: isDark ? "#6366F118" : "#4F46E512",
+                  }}
                 >
-                  <Ionicons name="color-palette-outline" size={18} color={isDark ? "#818CF8" : "#4F46E5"} />
+                  <Ionicons
+                    name="color-palette-outline"
+                    size={18}
+                    color={isDark ? "#818CF8" : "#4F46E5"}
+                  />
                 </View>
                 <View className="flex-1">
                   <Text className="text-secondary dark:text-gray-100 font-semibold text-[15px]">
                     Theme
                   </Text>
                   <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
-                    {theme === "system" ? "Follows system" : theme === "dark" ? "Dark mode" : "Light mode"}
+                    {theme === "system"
+                      ? "Follows system"
+                      : theme === "dark"
+                        ? "Dark mode"
+                        : "Light mode"}
                   </Text>
                 </View>
               </View>
@@ -341,7 +372,11 @@ export default function Profile() {
                 {[
                   { key: "light", label: "Light", icon: "sunny" },
                   { key: "dark", label: "Dark", icon: "moon" },
-                  { key: "system", label: "System", icon: "phone-portrait-outline" },
+                  {
+                    key: "system",
+                    label: "System",
+                    icon: "phone-portrait-outline",
+                  },
                 ].map((opt) => (
                   <TouchableOpacity
                     key={opt.key}
@@ -351,15 +386,21 @@ export default function Profile() {
                     }}
                     activeOpacity={0.7}
                     className={`flex-1 flex-row items-center justify-center py-2.5 rounded-xl ${
-                      theme === opt.key
-                        ? "bg-white dark:bg-[#1A1A22] shadow-sm shadow-gray-200 dark:shadow-none"
-                        : ""
+                      theme === opt.key ? "bg-white dark:bg-[#1A1A22]" : ""
                     }`}
                   >
                     <Ionicons
                       name={opt.icon}
                       size={14}
-                      color={theme === opt.key ? (isDark ? "#818CF8" : "#4F46E5") : (isDark ? "#6B7280" : "#9CA3AF")}
+                      color={
+                        theme === opt.key
+                          ? isDark
+                            ? "#818CF8"
+                            : "#4F46E5"
+                          : isDark
+                            ? "#6B7280"
+                            : "#9CA3AF"
+                      }
                       style={{ marginRight: 5 }}
                     />
                     <Text
@@ -380,7 +421,7 @@ export default function Profile() {
 
         {(filterMatch("Profile Visibility") ||
           filterMatch("Blocked Users")) && (
-          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
             <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Privacy
             </Text>
@@ -421,7 +462,10 @@ export default function Profile() {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                       setVisibility(val ? "Private" : "Public");
                     }}
-                    trackColor={{ false: "#CBD5E1", true: "#4F46E5" }}
+                    trackColor={{
+                      false: isDark ? "#23232E" : "#CBD5E1",
+                      true: "#4F46E5",
+                    }}
                     thumbColor="#fff"
                     ios_backgroundColor="#CBD5E1"
                     style={{ transform: [{ scale: 0.8 }] }}
@@ -461,7 +505,7 @@ export default function Profile() {
         {(filterMatch("Help Center") ||
           filterMatch("Privacy Policy") ||
           filterMatch("Terms of Service")) && (
-          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+          <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
             <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Support
             </Text>
@@ -510,7 +554,7 @@ export default function Profile() {
             <View className="flex-1 items-center justify-center py-10">
               <Ionicons name="search-outline" size={48} color="#E5E7EB" />
               <Text className="text-gray-400 mt-4 font-medium">
-                {`No results found for "${searchQuery}"`}
+                {`No results found for"${searchQuery}"`}
               </Text>
             </View>
           )}

@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useColorScheme as useNativeWindColorScheme } from "nativewind";
 import { createContext, useContext, useEffect, useState } from "react";
 import { useColorScheme as useSystemColorScheme } from "react-native";
 
@@ -13,8 +14,20 @@ const ThemeContext = createContext({
 
 export function ThemeProvider({ children }) {
   const systemScheme = useSystemColorScheme();
+  const { setColorScheme: setNativeWindColorScheme } =
+    useNativeWindColorScheme();
   const [theme, setThemeState] = useState("system"); // "light" | "dark" | "system"
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Resolve the actual color scheme
+  const colorScheme =
+    theme === "system" ? systemScheme || "light" : theme;
+  const isDark = colorScheme === "dark";
+
+  // Sync NativeWind's color scheme whenever our resolved scheme changes
+  useEffect(() => {
+    setNativeWindColorScheme(colorScheme);
+  }, [colorScheme, setNativeWindColorScheme]);
 
   // Load persisted preference on mount
   useEffect(() => {
@@ -42,11 +55,6 @@ export function ThemeProvider({ children }) {
       console.error("Error saving theme preference:", err);
     }
   };
-
-  // Resolve the actual color scheme
-  const colorScheme =
-    theme === "system" ? systemScheme || "light" : theme;
-  const isDark = colorScheme === "dark";
 
   if (!isLoaded) return null;
 

@@ -39,7 +39,10 @@ const MenuItem = ({
           {label}
         </Text>
         {subtitle && (
-          <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5" numberOfLines={1}>
+          <Text
+            className="text-gray-400 dark:text-gray-500 text-xs mt-0.5"
+            numberOfLines={1}
+          >
             {subtitle}
           </Text>
         )}
@@ -68,7 +71,10 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 bg-bg px-6" edges={["top"]}>
+      <SafeAreaView
+        className="flex-1 bg-bg dark:bg-[#0F0F13] px-6"
+        edges={["top"]}
+      >
         <View className="items-center mt-8 mb-7">
           <Skeleton width={110} height={110} borderRadius={55} />
           <Skeleton
@@ -129,7 +135,7 @@ export default function Profile() {
         {/* Profile Header */}
         <View className="items-center px-6 mt-2 mb-7">
           {/* Background accent */}
-          <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px] bg-bg" />
+          <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px] " />
 
           <View className="relative mt-6">
             <View
@@ -153,7 +159,7 @@ export default function Profile() {
             </View>
             <TouchableOpacity
               activeOpacity={0.8}
-              className="absolute -bottom-1 -right-1 bg-primary w-10 h-10 rounded-full border-4 border-bg items-center justify-center"
+              className="absolute -bottom-1 -right-1 bg-primary w-10 h-10 rounded-full border-4 border-bg dark:border-[#0F0F13] items-center justify-center"
             >
               <Ionicons name="camera" size={16} color="white" />
             </TouchableOpacity>
@@ -181,7 +187,9 @@ export default function Profile() {
             <Text className="text-[20px] font-extrabold text-secondary dark:text-white">
               {createdRooms}
             </Text>
-            <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">Created</Text>
+            <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">
+              Created
+            </Text>
           </View>
           <View className="w-px bg-border-light dark:bg-[#2A2A36] my-2" />
           <View className="items-center flex-1">
@@ -191,7 +199,9 @@ export default function Profile() {
             <Text className="text-[20px] font-extrabold text-secondary dark:text-white">
               {joinedRooms}
             </Text>
-            <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">Joined</Text>
+            <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">
+              Joined
+            </Text>
           </View>
           <View className="w-px bg-border-light dark:bg-[#2A2A36] my-2" />
           <View className="items-center flex-1">
@@ -201,12 +211,14 @@ export default function Profile() {
             <Text className="text-[20px] font-extrabold text-secondary dark:text-white">
               {firestoreUser?.globalReputation ?? 0}
             </Text>
-            <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">Reputation</Text>
+            <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">
+              Reputation
+            </Text>
           </View>
         </View>
 
         {/* Menu Groups */}
-        <View className="bg-white dark:bg-[#1A1A22] mx-6 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+        <View className="bg-white dark:bg-[#1A1A22] mx-6 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
           <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             General
           </Text>
@@ -229,7 +241,7 @@ export default function Profile() {
           />
         </View>
 
-        <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+        <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
           <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             App
           </Text>
@@ -255,7 +267,7 @@ export default function Profile() {
           />
         </View>
 
-        <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden shadow-sm shadow-gray-100 dark:shadow-none">
+        <View className="bg-white dark:bg-[#1A1A22] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
           <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             Support
           </Text>

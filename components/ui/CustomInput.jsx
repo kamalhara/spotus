@@ -1,115 +1,117 @@
-import { forwardRef, useRef } from "react";
-import { Animated, Text, TextInput, View } from "react-native";
+import { forwardRef, useRef } from"react";
+import { Animated, Text, TextInput, View } from"react-native";
+import { useTheme } from"../../context/ThemeContext";
 
 const CustomInput = forwardRef(function CustomInput(
-  {
-    label,
-    value,
-    onChangeText,
-    placeholder,
-    secureTextEntry,
-    icon,
-    error,
-    className = "",
-    containerStyle,
-    ...props
-  },
-  ref,
+ {
+ label,
+ value,
+ onChangeText,
+ placeholder,
+ secureTextEntry,
+ icon,
+ error,
+ className ="",
+ containerStyle,
+ ...props
+ },
+ ref,
 ) {
-  const borderAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+ const { isDark } = useTheme();
+ const borderAnim = useRef(new Animated.Value(0)).current;
+ const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  const handleFocus = () => {
-    Animated.parallel([
-      Animated.timing(borderAnim, {
-        toValue: 1,
-        duration: 250,
-        useNativeDriver: false,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1.01,
-        useNativeDriver: true,
-        speed: 50,
-        bounciness: 4,
-      }),
-    ]).start();
-  };
+ const handleFocus = () => {
+ Animated.parallel([
+ Animated.timing(borderAnim, {
+ toValue: 1,
+ duration: 250,
+ useNativeDriver: false,
+ }),
+ Animated.spring(scaleAnim, {
+ toValue: 1.01,
+ useNativeDriver: true,
+ speed: 50,
+ bounciness: 4,
+ }),
+ ]).start();
+ };
 
-  const handleBlur = () => {
-    Animated.parallel([
-      Animated.timing(borderAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: false,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        useNativeDriver: true,
-        speed: 50,
-        bounciness: 4,
-      }),
-    ]).start();
-  };
+ const handleBlur = () => {
+ Animated.parallel([
+ Animated.timing(borderAnim, {
+ toValue: 0,
+ duration: 200,
+ useNativeDriver: false,
+ }),
+ Animated.spring(scaleAnim, {
+ toValue: 1,
+ useNativeDriver: true,
+ speed: 50,
+ bounciness: 4,
+ }),
+ ]).start();
+ };
 
-  const animatedBorderColor = borderAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [error ? "#EF4444" : "#E2E8F0", error ? "#EF4444" : "#4F46E5"],
-  });
+ const animatedBorderColor = borderAnim.interpolate({
+ inputRange: [0, 1],
+ outputRange: [error ?"#EF4444": isDark ? "#2A2A36" : "#E2E8F0", error ?"#EF4444":"#4F46E5"],
+ });
 
-  const animatedBgColor = borderAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["#FFFFFF", "#FFFFFF"],
-  });
+ const animatedBgColor = borderAnim.interpolate({
+ inputRange: [0, 1],
+ outputRange: [isDark ? "#1A1A22" : "#FFFFFF", isDark ? "#1A1A22" : "#FFFFFF"],
+ });
 
-  return (
-    <Animated.View
-      className="flex flex-col w-full"
-      style={{ transform: [{ scale: scaleAnim }] }}
-    >
-      {label && (
-        <Text
-          className={`text-[11px] ml-1 tracking-[1.5px] text-muted font-bold mb-2.5 uppercase ${className}`}
-        >
-          {label}
-        </Text>
-      )}
-      <Animated.View
-        className="flex-row items-center rounded-2xl"
-        style={[
-          {
-            paddingHorizontal: 16,
-            paddingVertical: 17,
-            borderWidth: 1.5,
-            borderColor: animatedBorderColor,
-            backgroundColor: animatedBgColor,
-          },
-          containerStyle,
-        ]}
-      >
-        {icon && <View className="mr-3 w-6 items-center">{icon}</View>}
-        <TextInput
-          ref={ref}
-          className="flex-1 text-secondary text-base font-medium"
-          placeholder={placeholder}
-          placeholderTextColor="#CBD5E1"
-          value={value}
-          onChangeText={onChangeText}
-          secureTextEntry={secureTextEntry}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          {...props}
-        />
-      </Animated.View>
-      {error ? (
-        <View className="flex-row items-center mt -2 ml-1">
-          <View className="w-4 h-4 bg-danger/10 rounded-full items-center justify-center mr-1.5">
-            <Text className="text-danger text-[9px] font-bold">!</Text>
-          </View>
-          <Text className="text-danger text-sm font-medium">{error}</Text>
-        </View>
-      ) : null}
-    </Animated.View>
-  );
+ return (
+ <Animated.View
+ className="flex flex-col w-full"
+ style={{ transform: [{ scale: scaleAnim }] }}
+ >
+ {label && (
+ <Text
+ className={`text-[11px] ml-1 tracking-[1.5px] text-muted font-bold mb-2.5 uppercase ${className}`}
+ >
+ {label}
+ </Text>
+ )}
+ <Animated.View
+ className="flex-row items-center rounded-2xl"
+ style={[
+ {
+ paddingHorizontal: 16,
+ paddingVertical: 17,
+ borderWidth: 1.5,
+ borderColor: animatedBorderColor,
+ backgroundColor: animatedBgColor,
+ },
+ containerStyle,
+ ]}
+ >
+ {icon && <View className="mr-3 w-6 items-center">{icon}</View>}
+ <TextInput
+ ref={ref}
+ className="flex-1 text-secondary dark:text-gray-100 text-base font-medium"
+ placeholder={placeholder}
+ placeholderTextColor={isDark ? "#4B5563" : "#CBD5E1"}
+ value={value}
+ onChangeText={onChangeText}
+ secureTextEntry={secureTextEntry}
+ onFocus={handleFocus}
+ onBlur={handleBlur}
+ {...props}
+ />
+ </Animated.View>
+ {error ? (
+ <View className="flex-row items-center mt -2 ml-1">
+ <View className="w-4 h-4 bg-danger/10 rounded-full items-center justify-center mr-1.5">
+ <Text className="text-danger text-[9px] font-bold">!</Text>
+ </View>
+ <Text className="text-danger text-sm font-medium">{error}</Text>
+ </View>
+ ) : null}
+ </Animated.View>
+ );
 });
 
 export default CustomInput;
