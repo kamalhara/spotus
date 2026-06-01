@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -87,6 +88,7 @@ export default function ChatMessages({
   onEditMessage,
 }) {
   const flatListRef = useRef(null);
+  const router = useRouter();
   const [reactionPicker, setReactionPicker] = useState(null);
   const swipeableRefs = useRef({});
 
@@ -263,23 +265,34 @@ export default function ChatMessages({
           {!isSentByMe && !isDirectMessage && (
             <View className="w-10 mr-2 flex justify-end pb-1">
               {showAvatarAndName ? (
-                item.profilePic ? (
-                  <Image
-                    source={{ uri: item.profilePic }}
-                    className="w-9 h-9 rounded-full border border-gray-100 dark:border-gray-800"
-                  />
-                ) : (
-                  <View
-                    className="w-9 h-9 rounded-full items-center justify-center"
-                    style={{
-                      backgroundColor: getUserColor(item.user),
-                    }}
-                  >
-                    <Text className="text-white text-[13px] font-bold">
-                      {item.user ? item.user.charAt(0).toUpperCase() : "?"}
-                    </Text>
-                  </View>
-                )
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    router.push({
+                      pathname: `/users/${item.senderId}`,
+                      params: { roomId: chatDocId }
+                    });
+                  }}
+                >
+                  {item.profilePic ? (
+                    <Image
+                      source={{ uri: item.profilePic }}
+                      className="w-9 h-9 rounded-full border border-gray-100 dark:border-gray-800"
+                    />
+                  ) : (
+                    <View
+                      className="w-9 h-9 rounded-full items-center justify-center"
+                      style={{
+                        backgroundColor: getUserColor(item.user),
+                      }}
+                    >
+                      <Text className="text-white text-[13px] font-bold">
+                        {item.user ? item.user.charAt(0).toUpperCase() : "?"}
+                      </Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
               ) : (
                 <View className="w-9 h-9" />
               )}
