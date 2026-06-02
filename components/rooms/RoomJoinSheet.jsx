@@ -34,7 +34,6 @@ const CATEGORY_ICONS = {
 
 const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
   const bottomSheetModalRef = useRef(null);
-  const router = useRouter();
   const { isDark } = useTheme();
   const [creator, setCreator] = useState(null);
 
@@ -154,7 +153,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
               </View>
               <View>
                 <Text className="text-secondary dark:text-gray-100 font-bold text-sm">
-                  0.5 mi
+                  {room?.distance !== undefined ? (room.distance / 1.60934).toFixed(1) : "?"} mi
                 </Text>
                 <Text className="text-muted text-[10px] font-bold uppercase tracking-wider">
                   Away

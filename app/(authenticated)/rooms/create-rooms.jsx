@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -41,19 +42,25 @@ export default function CreateRooms() {
   const [title, setTitle] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [description, setDescription] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [showOnMap, setShowOnMap] = useState(false);
   const selectedCategoryMeta = CATEGORIES.find(
     (item) => item.label === selectedCategory,
   );
-  const canCreateRoom = title.trim().length > 0 && !!selectedCategory;
+  const canCreateRoom = title.trim().length > 0 && !!selectedCategory && !isCreating;
 
   const handleCreateRoom = async () => {
     if (!title || !selectedCategory) return alert("Please fill all the fields");
     if (!user) return alert("User not loaded");
+    setIsCreating(true);
     try {
-      await createRoom(title, description, selectedCategory, user.id);
+      await createRoom(title, description, selectedCategory, user.id, showOnMap);
       router.push("/(tabs)/rooms_tab");
     } catch (err) {
       console.error("Error creating room:", err);
+      alert(err.message || "Failed to create room.");
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -210,12 +217,47 @@ export default function CreateRooms() {
                 </View>
               </View>
 
+              {/* Show on Map Toggle */}
+              <View className="mt-8 bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4 flex-row items-center justify-between">
+                <View className="flex-1 pr-4">
+                  <View className="flex-row items-center mb-1">
+                    <Ionicons name="map" size={16} color="#4F46E5" style={{ marginRight: 6 }} />
+                    <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
+                      Show Room on Map
+                    </Text>
+                  </View>
+                  <Text className="text-gray-400 dark:text-gray-500 text-xs leading-4">
+                    Allow nearby users to discover this room on the public map.
+                  </Text>
+                </View>
+                <Switch
+                  value={showOnMap}
+                  onValueChange={(val) => {
+                    if (val) {
+                      Alert.alert(
+                        "Show Room on Map?",
+                        "Displaying a room on the map makes it easier for nearby users to discover. Only enable this if you are comfortable with the room appearing on the public map.",
+                        [
+                          { text: "Cancel", style: "cancel", onPress: () => setShowOnMap(false) },
+                          { text: "Enable", style: "default", onPress: () => setShowOnMap(true) },
+                        ]
+                      );
+                    } else {
+                      setShowOnMap(false);
+                    }
+                  }}
+                  trackColor={{ false: isDark ? "#2A2A36" : "#E2E8F0", true: "#4F46E5" }}
+                  thumbColor={"#FFFFFF"}
+                />
+              </View>
+
               {/* Create Button */}
               <View className="flex-1 justify-end mt-10">
                 <CustomButton
                   title="Create Room"
                   onPress={handleCreateRoom}
                   disabled={!canCreateRoom}
+                  loading={isCreating}
                 />
               </View>
             </View>
