@@ -71,6 +71,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [locationError, setLocationError] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Entrance animations
   const fadeInHeader = useRef(new Animated.Value(0)).current;
@@ -140,7 +141,7 @@ export default function Home() {
       };
 
       loadRooms();
-    }, [distance]),
+    }, [distance, refreshTrigger]),
   );
 
   const nearbyRooms = rooms.filter(
@@ -159,8 +160,9 @@ export default function Home() {
     router.push("/profile");
   };
 
-  const handleNotificationPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  const handleRefreshPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setRefreshTrigger(prev => prev + 1);
   };
 
   return (
@@ -189,16 +191,14 @@ export default function Home() {
             <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
           </View>
           <TouchableOpacity
-            onPress={handleNotificationPress}
+            onPress={handleRefreshPress}
             className="w-12 h-12 bg-white dark:bg-[#1A1A22] rounded-full items-center justify-center border border-border-light dark:border-[#2A2A36]"
           >
             <Ionicons
-              name="notifications"
+              name={loading ? "refresh-circle" : "refresh"}
               size={20}
               color={isDark ? "#F8FAFC" : "#18181B"}
             />
-            {/* Optional Notification Dot */}
-            <View className="absolute top-3 right-3 w-2.5 h-2.5 bg-danger rounded-full border-2 border-white dark:border-[#1A1A22]" />
           </TouchableOpacity>
         </Animated.View>
 

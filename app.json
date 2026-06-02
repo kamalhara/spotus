@@ -48,7 +48,8 @@
       [
         "expo-location",
         {
-          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to find nearby spots and friends."
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to find nearby spots and friends.",
+          "locationWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to find nearby spots and friends."
         }
       ],
       [
