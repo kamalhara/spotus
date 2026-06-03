@@ -1,15 +1,47 @@
-import { useState } from"react";
+import { doc, updateDoc } from"firebase/firestore";
+import { useEffect, useState } from"react";
 import { ScrollView, Switch } from"react-native";
 import { SafeAreaView } from"react-native-safe-area-context";
 import ScreenHeader from"../../../components/ui/ScreenHeader";
 import SettingsRow from"../../../components/ui/SettingsRow";
 import SettingsSection from"../../../components/ui/SettingsSection";
+import { db } from"../../../config/firebase.config";
 import { useTheme } from"../../../context/ThemeContext";
+import useFirestoreUser from"../../../hook/useFireStoreUser";
 
 export default function Security() {
+ const { firestoreUser } = useFirestoreUser();
+
  const [appLockEnabled, setAppLockEnabled] = useState(false);
  const [loginAlertsEnabled, setLoginAlertsEnabled] = useState(true);
  const { isDark } = useTheme();
+
+ // Load saved settings on mount
+ useEffect(() => {
+ if (firestoreUser?.settings?.security) {
+ const s = firestoreUser.settings.security;
+ if (s.appLockEnabled !== undefined) setAppLockEnabled(s.appLockEnabled);
+ if (s.loginAlertsEnabled !== undefined) setLoginAlertsEnabled(s.loginAlertsEnabled);
+ }
+ }, [firestoreUser?.settings?.security]);
+
+ const persistSetting = async (key, value) => {
+ if (!firestoreUser?.id) return;
+ try {
+ const userRef = doc(db, "users", firestoreUser.id);
+ await updateDoc(userRef, {
+ [`settings.security.${key}`]: value,
+ });
+ } catch (err) {
+ console.error("Error saving security setting:", err);
+ }
+ };
+
+ const toggle = (key, currentValue, setter) => {
+ const newValue = !currentValue;
+ setter(newValue);
+ persistSetting(key, newValue);
+ };
 
  return (
  <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]"edges={["top"]}>
@@ -33,7 +65,7 @@ export default function Security() {
  rightComponent={
  <Switch
  value={appLockEnabled}
- onValueChange={setAppLockEnabled}
+ onValueChange={() => toggle("appLockEnabled", appLockEnabled, setAppLockEnabled)}
  trackColor={{ false: isDark ? "#23232E" : "#E5E7EB", true:"#4F46E5"}}
  thumbColor="#FFFFFF"
  />
@@ -56,7 +88,7 @@ export default function Security() {
  rightComponent={
  <Switch
  value={loginAlertsEnabled}
- onValueChange={setLoginAlertsEnabled}
+ onValueChange={() => toggle("loginAlertsEnabled", loginAlertsEnabled, setLoginAlertsEnabled)}
  trackColor={{ false: isDark ? "#23232E" : "#E5E7EB", true:"#4F46E5"}}
  thumbColor="#FFFFFF"
  />

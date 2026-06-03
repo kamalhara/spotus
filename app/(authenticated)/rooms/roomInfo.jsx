@@ -89,7 +89,7 @@ export default function RoomInfo() {
  trustMap[d.id] = d.data().messagesCount || 0;
  });
  setMembers(
- profiles.map((p) => ({ ...p, trustScore: trustMap[p.id] || 0 })),
+ profiles.map((p) => ({ ...p, trustScore: trustMap[p.id] || 0 })).filter(p => !user?.blockedUsers?.includes(p.id)),
  );
  }
  }
@@ -100,7 +100,7 @@ export default function RoomInfo() {
  }
  };
  fetchRoomAndMembers();
- }, [roomId]);
+ }, [roomId, user?.blockedUsers]);
 
  const handleProfilePress = (id) => {
  if (id === currentUserId) {
@@ -392,6 +392,9 @@ export default function RoomInfo() {
  <RoomOptionsModal
  showOptions={showOptions}
  setShowOptions={setShowOptions}
+ roomId={roomId}
+ currentUserId={currentUserId}
+ roomDoc={room}
  />
  )}
  </SafeAreaView>

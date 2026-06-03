@@ -127,7 +127,7 @@ export default function Home() {
           const data = await getNearbyRooms(distance * 1.60934);
           setRooms(data);
         } catch (error) {
-          console.log("Error loading rooms:", error);
+          console.error("Error loading rooms:", error);
           if (
             error.message.includes("permission denied") ||
             error.message.includes("Not authorized") ||
@@ -144,8 +144,9 @@ export default function Home() {
     }, [distance, refreshTrigger]),
   );
 
+  const blockedUsers = firestoreUser?.blockedUsers || [];
   const nearbyRooms = rooms.filter(
-    (r) => !r.participants?.includes(firestoreUser?.id),
+    (r) => !r.participants?.includes(firestoreUser?.id) && !blockedUsers.includes(r.createdBy),
   );
 
   const firstName = firestoreUser?.userName?.split("")[0] || "there";

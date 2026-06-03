@@ -62,11 +62,12 @@ export default function Chat() {
  where("participants","array-contains", currentUserId),
  );
  const unsub = onSnapshot(q, (snapshot) => {
- setRooms(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+ const blocked = firestoreUser?.blockedUsers || [];
+ setRooms(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })).filter(r => !blocked.includes(r.createdBy)));
  setRoomsLoading(false);
  });
  return unsub;
- }, [currentUserId]);
+ }, [currentUserId, firestoreUser?.blockedUsers]);
 
  // Fetch DM chats & resolve other user's profile
  // Fetch direct message threads and enrich them with participant profile data
@@ -103,12 +104,13 @@ export default function Chat() {
  }),
  );
 
- setChats(enriched);
+ const blocked = firestoreUser?.blockedUsers || [];
+ setChats(enriched.filter(c => !blocked.includes(c.otherUser?.id)));
  setChatsLoading(false);
  });
 
  return unsub;
- }, [currentUserId]);
+ }, [currentUserId, firestoreUser?.blockedUsers]);
 
  const unreadCount = chats.filter((chat) =>
  isChatUnseen(chat, currentUserId),

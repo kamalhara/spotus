@@ -2,6 +2,7 @@ import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
+import { doc, updateDoc } from "firebase/firestore";
 
 import { Redirect, useRouter } from "expo-router";
 import { useRef, useState } from "react";
@@ -20,6 +21,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BlockedUserModal from "../../../components/users/BlockedUserModal";
+import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 
@@ -107,7 +109,9 @@ export default function Profile() {
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef(null);
   const [showBlockedModal, setShowBlockedModal] = useState(false);
-  const [visibility, setVisibility] = useState("Public");
+  const [visibility, setVisibility] = useState(
+    firestoreUser?.settings?.privacy?.publicProfile === false ? "Private" : "Public"
+  );
   const { theme, setTheme, isDark } = useTheme();
 
   const toggleSearch = (active) => {
@@ -319,7 +323,7 @@ export default function Profile() {
                 icon="notifications-outline"
                 label="Notifications"
                 color="#8B5CF6"
-                switchComponent={true}
+                onPress={() => router.push("/profile/notifications")}
               />
             )}
             {filterMatch("Email Alerts") && (
@@ -327,7 +331,7 @@ export default function Profile() {
                 icon="at-outline"
                 label="Email Alerts"
                 color="#8B5CF6"
-                switchComponent={true}
+                onPress={() => router.push("/profile/notifications")}
               />
             )}
           </View>
@@ -460,7 +464,14 @@ export default function Profile() {
                     value={visibility === "Private"}
                     onValueChange={(val) => {
                       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      setVisibility(val ? "Private" : "Public");
+                      const newVis = val ? "Private" : "Public";
+                      setVisibility(newVis);
+                      if (firestoreUser?.id) {
+                        const userRef = doc(db, "users", firestoreUser.id);
+                        updateDoc(userRef, {
+                          "settings.privacy.publicProfile": !val,
+                        }).catch((err) => console.error("Error saving visibility:", err));
+                      }
                     }}
                     trackColor={{
                       false: isDark ? "#23232E" : "#CBD5E1",
@@ -486,7 +497,7 @@ export default function Profile() {
                 rightComponent={
                   <View className="flex-row items-center bg-gray-50 px-2 py-0.5 rounded-2xl border border-gray-100">
                     <Text className="text-[10px] font-bold mr-1 text-gray-300">
-                      10
+                      {firestoreUser?.blockedUsers?.length || 0}
                     </Text>
                     <Ionicons name="arrow-forward" size={20} color="#9CA3AF" />
                   </View>

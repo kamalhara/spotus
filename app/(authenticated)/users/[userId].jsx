@@ -2,7 +2,17 @@ import { Ionicons } from"@expo/vector-icons";
 import * as Haptics from"expo-haptics";
 import { Image } from"expo-image";
 import { useLocalSearchParams, useRouter } from"expo-router";
-import { doc, getDoc } from"firebase/firestore";
+import {
+  addDoc,
+  arrayUnion,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from"firebase/firestore";
 import { useEffect, useState } from"react";
 import {
  Alert,
@@ -53,6 +63,7 @@ export default function UserProfile() {
  }, []);
 
  const [vouchStatus, setVouchStatus] = useState(false);
+ const [vouchLoading, setVouchLoading] = useState(false);
  const hostedRooms = rooms.filter((r) => r.createdBy === userId).length;
  const joinedRooms = rooms.filter(
  (r) => r.participants?.includes(userId) && r.createdBy !== userId,
@@ -74,6 +85,13 @@ export default function UserProfile() {
  if (roomId && viewer?.id) {
  const roomTrust = await getRoomTrust(db, roomId, viewer.id);
  setViewerRoomTrust(roomTrust);
+ }
+
+ // Load existing vouch status
+ if (viewer?.id) {
+ const vouchRef = doc(db, "users", userId, "vouches", viewer.id);
+ const vouchSnap = await getDoc(vouchRef);
+ setVouchStatus(vouchSnap.exists());
  }
  } catch (err) {
  console.error("Error fetching profile data:", err);
@@ -116,18 +134,67 @@ export default function UserProfile() {
  router.back();
  };
 
+ const handleReport = async () => {
+ Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+ try {
+ await addDoc(collection(db, "reports"), {
+ type: "user",
+ reportedUserId: userId,
+ reporterId: viewer?.id,
+ reason: "Reported from user profile",
+ createdAt: serverTimestamp(),
+ });
+ Alert.alert("Report submitted", "Thanks for helping keep SpotUs safe.");
+ } catch (err) {
+ console.error("Error submitting report:", err);
+ Alert.alert("Error", "Could not submit report. Please try again.");
+ }
+ };
+
  const handleOptions = () => {
  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
  Alert.alert("","", [
- { text:"Report", style:"destructive"},
- { text:"Block", style:"destructive"},
+ { text:"Report", style:"destructive", onPress: handleReport },
+ { text:"Block", style:"destructive", onPress: handleBlock },
  { text:"Cancel", style:"cancel"},
  ]);
  };
 
- const handleVouch = () => {
+ const handleVouch = async () => {
+ if (!viewer?.id || vouchLoading) return;
  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
- setVouchStatus(!vouchStatus);
+ setVouchLoading(true);
+ try {
+ const vouchRef = doc(db, "users", userId, "vouches", viewer.id);
+ if (vouchStatus) {
+ // Un-vouch: remove the vouch doc and decrement reputation
+ await deleteDoc(vouchRef);
+ const targetRef = doc(db, "users", userId);
+ const snap = await getDoc(targetRef);
+ const currentRep = snap.data()?.globalReputation || 0;
+ if (currentRep > 0) {
+ await updateDoc(targetRef, { globalReputation: currentRep - 1 });
+ }
+ setVouchStatus(false);
+ } else {
+ // Vouch: create a vouch doc and increment reputation
+ await setDoc(vouchRef, {
+ voucherId: viewer.id,
+ voucherName: viewer.userName || "Unknown",
+ createdAt: serverTimestamp(),
+ });
+ const targetRef = doc(db, "users", userId);
+ const snap = await getDoc(targetRef);
+ const currentRep = snap.data()?.globalReputation || 0;
+ await updateDoc(targetRef, { globalReputation: currentRep + 1 });
+ setVouchStatus(true);
+ }
+ } catch (err) {
+ console.error("Error toggling vouch:", err);
+ Alert.alert("Error", "Could not update vouch. Please try again.");
+ } finally {
+ setVouchLoading(false);
+ }
  };
 
  const handleShare = async () => {
@@ -138,7 +205,7 @@ export default function UserProfile() {
  message: `Check out ${user?.userName}'s profile on SpotUs 👀\n${url}`,
  });
  } catch (error) {
- console.log("SpotUs share error:", error);
+ console.error("SpotUs share error:", error);
  }
  };
 
@@ -149,7 +216,23 @@ export default function UserProfile() {
 "You won't see each other anymore.",
  [
  { text:"Cancel", style:"cancel"},
- { text:"Block", style:"destructive"},
+ {
+ text:"Block",
+ style:"destructive",
+ onPress: async () => {
+ try {
+ const viewerRef = doc(db, "users", viewer.id);
+ await updateDoc(viewerRef, {
+ blockedUsers: arrayUnion(userId),
+ });
+ Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+ router.back();
+ } catch (err) {
+ console.error("Error blocking user:", err);
+ Alert.alert("Error", "Could not block user. Please try again.");
+ }
+ },
+ },
  ],
  );
  };

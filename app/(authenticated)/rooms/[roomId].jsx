@@ -73,13 +73,13 @@ export default function RoomChat() {
  orderBy("createdAt","asc"),
  );
  const unsub = onSnapshot(q, (snapshot) => {
- const msgs = snapshot.docs
- .map((doc) => ({ id: doc.id, ...doc.data() }))
- .filter((msg) => !msg.deletedFor?.includes(currentUserId));
- setMessages(msgs);
+  const msgs = snapshot.docs
+  .map((doc) => ({ id: doc.id, ...doc.data() }))
+  .filter((msg) => !msg.deletedFor?.includes(currentUserId) && !user?.blockedUsers?.includes(msg.senderId));
+  setMessages(msgs);
  });
  return unsub;
- }, [currentUserId, roomId]);
+ }, [currentUserId, roomId, user?.blockedUsers]);
 
  // Mark room messages as seen when entering
  useEffect(() => {

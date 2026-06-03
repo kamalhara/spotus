@@ -3,9 +3,19 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // NOTE: This app uses Clerk for authentication, NOT Firebase Auth.
+    // Because request.auth is always null, we cannot use it to gate access.
+    // For production, consider using Clerk's Firebase custom token integration
+    // or a backend (Cloud Functions) to mediate writes.
+
     // USERS
     match /users/{userId} {
       allow read, write: if true;
+
+      // VOUCHES SUBCOLLECTION
+      match /vouches/{voucherId} {
+        allow read, write: if true;
+      }
     }
 
     // ROOMS
@@ -23,7 +33,22 @@ service cloud.firestore {
       }
     }
 
-    // fallback
+    // CHATS (DMs)
+    match /chats/{chatId} {
+      allow read, write: if true;
+
+      match /messages/{messageId} {
+        allow read, write: if true;
+      }
+    }
+
+    // REPORTS — anyone can create, no one can read/update/delete from client
+    match /reports/{reportId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+
+    // Fallback — deny everything else
     match /{document=**} {
       allow read, write: if false;
     }
