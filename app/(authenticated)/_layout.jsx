@@ -73,6 +73,7 @@ export default function AuthenticatedLayout() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="profile/terms" options={{ headerShown: false }} />
+      <Stack.Screen name="feedback" options={{ headerShown: false }} />
     </Stack>
   );
 }

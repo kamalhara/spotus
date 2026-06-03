@@ -29,7 +29,6 @@ function UserSync() {
 }
 
 function ThemedApp() {
-
   return (
     <View style={{ flex: 1 }} className="bg-bg dark:bg-[#0F0F13]">
       <GestureHandlerRootView style={{ flex: 1 }}>

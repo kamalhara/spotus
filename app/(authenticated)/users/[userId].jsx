@@ -6,11 +6,9 @@ import {
   addDoc,
   arrayUnion,
   collection,
-  deleteDoc,
   doc,
   getDoc,
   serverTimestamp,
-  setDoc,
   updateDoc,
 } from"firebase/firestore";
 import { useEffect, useState } from"react";
@@ -62,8 +60,6 @@ export default function UserProfile() {
  loadRooms();
  }, []);
 
- const [vouchStatus, setVouchStatus] = useState(false);
- const [vouchLoading, setVouchLoading] = useState(false);
  const hostedRooms = rooms.filter((r) => r.createdBy === userId).length;
  const joinedRooms = rooms.filter(
  (r) => r.participants?.includes(userId) && r.createdBy !== userId,
@@ -85,13 +81,6 @@ export default function UserProfile() {
  if (roomId && viewer?.id) {
  const roomTrust = await getRoomTrust(db, roomId, viewer.id);
  setViewerRoomTrust(roomTrust);
- }
-
- // Load existing vouch status
- if (viewer?.id) {
- const vouchRef = doc(db, "users", userId, "vouches", viewer.id);
- const vouchSnap = await getDoc(vouchRef);
- setVouchStatus(vouchSnap.exists());
  }
  } catch (err) {
  console.error("Error fetching profile data:", err);
@@ -158,43 +147,6 @@ export default function UserProfile() {
  { text:"Block", style:"destructive", onPress: handleBlock },
  { text:"Cancel", style:"cancel"},
  ]);
- };
-
- const handleVouch = async () => {
- if (!viewer?.id || vouchLoading) return;
- Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
- setVouchLoading(true);
- try {
- const vouchRef = doc(db, "users", userId, "vouches", viewer.id);
- if (vouchStatus) {
- // Un-vouch: remove the vouch doc and decrement reputation
- await deleteDoc(vouchRef);
- const targetRef = doc(db, "users", userId);
- const snap = await getDoc(targetRef);
- const currentRep = snap.data()?.globalReputation || 0;
- if (currentRep > 0) {
- await updateDoc(targetRef, { globalReputation: currentRep - 1 });
- }
- setVouchStatus(false);
- } else {
- // Vouch: create a vouch doc and increment reputation
- await setDoc(vouchRef, {
- voucherId: viewer.id,
- voucherName: viewer.userName || "Unknown",
- createdAt: serverTimestamp(),
- });
- const targetRef = doc(db, "users", userId);
- const snap = await getDoc(targetRef);
- const currentRep = snap.data()?.globalReputation || 0;
- await updateDoc(targetRef, { globalReputation: currentRep + 1 });
- setVouchStatus(true);
- }
- } catch (err) {
- console.error("Error toggling vouch:", err);
- Alert.alert("Error", "Could not update vouch. Please try again.");
- } finally {
- setVouchLoading(false);
- }
  };
 
  const handleShare = async () => {
@@ -414,24 +366,9 @@ export default function UserProfile() {
  </TouchableOpacity>
 
  <TouchableOpacity
- onPress={handleVouch}
- activeOpacity={0.8}
- className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${vouchStatus ?"bg-pink-100 dark:bg-pink-900/30":"bg-pink-50 dark:bg-pink-900/10"} border border-pink-100 dark:border-pink-900/20`}
- >
- <Ionicons
- name={vouchStatus ?"heart":"heart-outline"}
- size={16}
- color="#EC4899"
- />
- <Text className="text-pink-500 font-semibold text-sm ml-1.5">
- {vouchStatus ?"Vouched":"Vouch"}
- </Text>
- </TouchableOpacity>
-
- <TouchableOpacity
  onPress={handleShare}
  activeOpacity={0.8}
- className="py-3.5 px-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] items-center justify-center"
+ className="flex-1 py-3.5 px-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] items-center justify-center"
  >
  <Ionicons name="share-outline"size={16} color="#6B7280"/>
  </TouchableOpacity>
@@ -486,21 +423,6 @@ export default function UserProfile() {
  </View>
 
  <View className="flex-row px-6 gap-2.5 mb-6">
- <TouchableOpacity
- onPress={handleVouch}
- activeOpacity={0.8}
- className={`flex-1 py-3.5 rounded-2xl flex-row items-center justify-center ${vouchStatus ?"bg-pink-100 dark:bg-pink-900/30":"bg-pink-50 dark:bg-pink-900/10"} border border-pink-100 dark:border-pink-900/20`}
- >
- <Ionicons
- name={vouchStatus ?"heart":"heart-outline"}
- size={16}
- color="#EC4899"
- />
- <Text className="text-pink-500 font-semibold text-sm ml-1.5">
- {vouchStatus ?"Vouched":"Vouch"}
- </Text>
- </TouchableOpacity>
-
  <TouchableOpacity
  onPress={handleShare}
  activeOpacity={0.8}

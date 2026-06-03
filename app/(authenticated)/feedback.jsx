@@ -38,7 +38,10 @@ export default function FeedbackScreen() {
 
   const handleSubmit = async () => {
     if (!selectedCategory) {
-      Alert.alert("Select a category", "Please choose a reason for your report.");
+      Alert.alert(
+        "Select a category",
+        "Please choose a reason for your report.",
+      );
       return;
     }
 
@@ -83,7 +86,11 @@ export default function FeedbackScreen() {
             onPress={() => router.back()}
             className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
           >
-            <Ionicons name="chevron-back" size={20} color={isDark ? "white" : "#18181B"} />
+            <Ionicons
+              name="chevron-back"
+              size={20}
+              color={isDark ? "white" : "#18181B"}
+            />
           </TouchableOpacity>
           <Text className="text-secondary dark:text-gray-100 text-lg font-extrabold">
             Report
@@ -93,7 +100,11 @@ export default function FeedbackScreen() {
 
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40, paddingTop: 20 }}
+          contentContainerStyle={{
+            paddingHorizontal: 24,
+            paddingBottom: 40,
+            paddingTop: 20,
+          }}
         >
           {/* Info banner */}
           <View className="bg-primary/5 dark:bg-primary/10 rounded-2xl p-4 mb-6 flex-row items-start">
@@ -105,14 +116,15 @@ export default function FeedbackScreen() {
                 Help us keep SpotUs safe
               </Text>
               <Text className="text-gray-500 dark:text-gray-400 text-xs leading-4">
-                Your report is confidential. We'll review it and take appropriate action.
+                Your report is confidential. We&apos;ll review it and take
+                appropriate action.
               </Text>
             </View>
           </View>
 
           {/* Category selection */}
           <Text className="text-secondary dark:text-gray-100 text-base font-extrabold mb-3 tracking-tight">
-            What's the issue?
+            What&apos;s the issue?
           </Text>
 
           <View className="mb-6">
@@ -135,7 +147,9 @@ export default function FeedbackScreen() {
                   <View
                     className="w-9 h-9 rounded-xl items-center justify-center mr-3"
                     style={{
-                      backgroundColor: isSelected ? "rgba(79, 70, 229, 0.1)" : "rgba(156, 163, 175, 0.1)",
+                      backgroundColor: isSelected
+                        ? "rgba(79, 70, 229, 0.1)"
+                        : "rgba(156, 163, 175, 0.1)",
                     }}
                   >
                     <Ionicons
@@ -186,9 +200,7 @@ export default function FeedbackScreen() {
             disabled={submitting || !selectedCategory}
             activeOpacity={0.8}
             className={`py-4 rounded-2xl flex-row items-center justify-center ${
-              selectedCategory
-                ? "bg-primary"
-                : "bg-gray-200 dark:bg-gray-800"
+              selectedCategory ? "bg-primary" : "bg-gray-200 dark:bg-gray-800"
             }`}
             style={
               selectedCategory
