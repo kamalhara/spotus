@@ -1,8 +1,9 @@
 import { ClerkLoaded, ClerkProvider, useUser } from "@clerk/expo";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
-import { View } from "react-native";
+import { Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "../global.css";
 import { ThemeProvider } from "../context/ThemeContext";
@@ -54,6 +55,13 @@ function ThemedApp() {
 }
 
 export default function RootLayout() {
+  useEffect(() => {
+    if (Platform.OS === "android") {
+      NavigationBar.setVisibilityAsync("hidden");
+      NavigationBar.setBehaviorAsync("overlay-swipe");
+    }
+  }, []);
+
   return (
     <ThemeProvider>
       <ThemedApp />

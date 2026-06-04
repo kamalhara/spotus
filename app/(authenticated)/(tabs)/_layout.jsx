@@ -22,6 +22,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import useUnreadCount from "../../../hook/useUnreadCount";
@@ -36,6 +37,7 @@ const TAB_BAR_HEIGHT = 65;
 
 const LiquidTabBar = ({ state, descriptors, navigation, unreadCount }) => {
   const { isDark } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const tabWidth = TAB_BAR_WIDTH / state.routes.length;
   const bubbleX = useSharedValue(state.index * tabWidth);
@@ -58,7 +60,7 @@ const LiquidTabBar = ({ state, descriptors, navigation, unreadCount }) => {
     <View
       style={{
         position: "absolute",
-        bottom: 20,
+        bottom: 20 + insets.bottom,
         left: TAB_BAR_MARGIN,
         right: TAB_BAR_MARGIN,
         height: TAB_BAR_HEIGHT,
