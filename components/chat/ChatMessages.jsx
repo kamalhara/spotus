@@ -271,7 +271,7 @@ export default function ChatMessages({
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                     router.push({
                       pathname: `/users/${item.senderId}`,
-                      params: { roomId: chatDocId }
+                      params: { roomId: chatDocId },
                     });
                   }}
                 >
@@ -526,7 +526,11 @@ export default function ChatMessages({
                 </View>
               </View>
             )}
-            {isTyping ? <TypingIndicator isDirectMessage={isDirectMessage} /> : <View className="h-2" />}
+            {isTyping ? (
+              <TypingIndicator isDirectMessage={isDirectMessage} />
+            ) : (
+              <View className="h-2" />
+            )}
           </View>
         }
       />

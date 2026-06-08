@@ -1,364 +1,368 @@
-import { Ionicons } from"@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from"expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
- addDoc,
- collection,
- doc,
- getDoc,
- onSnapshot,
- orderBy,
- query,
- serverTimestamp,
- setDoc,
-} from"firebase/firestore";
-import { useEffect, useMemo, useState } from"react";
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
+import { useEffect, useMemo, useState } from "react";
 import {
- Image,
- KeyboardAvoidingView,
- Platform,
- Text,
- TouchableOpacity,
- View,
-} from"react-native";
-import { SafeAreaView } from"react-native-safe-area-context";
-import ChatMessages from"../../../components/chat/ChatMessages";
-import MessageSender from"../../../components/chat/MessageSender";
-import UserOptionsModal from"../../../components/modals/userOptionsModal";
-import { db } from"../../../config/firebase.config";
-import useFirestoreUser from"../../../hook/useFireStoreUser";
-import usePresenceStatus from"../../../hook/usePresenceStatus";
-import useTypingIndicator from"../../../hook/useTypingIndicator";
-import { ChatSeen } from"../../../lib/chatSeen";
-import { sendPushNotification } from"../../../lib/notification";
-import { uploadToCloudinary } from"../../../lib/uploadCloudinary";
-import { useTheme } from"../../../context/ThemeContext";
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ChatMessages from "../../../components/chat/ChatMessages";
+import MessageSender from "../../../components/chat/MessageSender";
+import UserOptionsModal from "../../../components/modals/userOptionsModal";
+import { db } from "../../../config/firebase.config";
+import { useTheme } from "../../../context/ThemeContext";
+import useFirestoreUser from "../../../hook/useFireStoreUser";
+import usePresenceStatus from "../../../hook/usePresenceStatus";
+import useTypingIndicator from "../../../hook/useTypingIndicator";
+import { ChatSeen } from "../../../lib/chatSeen";
+import { sendPushNotification } from "../../../lib/notification";
+import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
 export default function ChatId() {
- const { isDark } = useTheme();
- const { chatId, userName, profilePic } = useLocalSearchParams();
- const router = useRouter();
- const { firestoreUser } = useFirestoreUser();
- const currentUserId = firestoreUser?.id;
- const [messages, setMessages] = useState([]);
- const [otherUser, setOtherUser] = useState(null);
- const [uploadingImageUri, setUploadingImageUri] = useState(null);
- const [replyTo, setReplyTo] = useState(null);
- const [editingMessage, setEditingMessage] = useState(null);
- const [chatDoc, setChatDoc] = useState(null);
- const [showOptions, setShowOptions] = useState(false);
+  const { isDark } = useTheme();
+  const { chatId, userName, profilePic } = useLocalSearchParams();
+  const router = useRouter();
+  const { firestoreUser } = useFirestoreUser();
+  const currentUserId = firestoreUser?.id;
+  const [messages, setMessages] = useState([]);
+  const [otherUser, setOtherUser] = useState(null);
+  const [uploadingImageUri, setUploadingImageUri] = useState(null);
+  const [replyTo, setReplyTo] = useState(null);
+  const [editingMessage, setEditingMessage] = useState(null);
+  const [chatDoc, setChatDoc] = useState(null);
+  const [showOptions, setShowOptions] = useState(false);
 
- // Deterministic chat doc ID so both users share the same conversation
- const chatDocId = useMemo(() => {
- if (!currentUserId || !chatId) return null;
- return [currentUserId, chatId].sort().join("_");
- }, [currentUserId, chatId]);
+  // Deterministic chat doc ID so both users share the same conversation
+  const chatDocId = useMemo(() => {
+    if (!currentUserId || !chatId) return null;
+    return [currentUserId, chatId].sort().join("_");
+  }, [currentUserId, chatId]);
 
- const isTyping = useTypingIndicator(chatDocId, currentUserId);
- const userStatus = usePresenceStatus(otherUser?.lastSeen);
+  const isTyping = useTypingIndicator(chatDocId, currentUserId);
+  const userStatus = usePresenceStatus(otherUser?.lastSeen);
 
- // Create or merge the chat document
- useEffect(() => {
- if (!chatDocId || !currentUserId || !chatId) return;
+  // Create or merge the chat document
+  useEffect(() => {
+    if (!chatDocId || !currentUserId || !chatId) return;
 
- const createChat = async () => {
- const ref = doc(db,"chats", chatDocId);
- const snap = await getDoc(ref);
+    const createChat = async () => {
+      const ref = doc(db, "chats", chatDocId);
+      const snap = await getDoc(ref);
 
- // ✅ only first time create
- if (!snap.exists()) {
- await setDoc(ref, {
- participants: [currentUserId, chatId],
- createdAt: serverTimestamp(),
- updatedAt: serverTimestamp(),
- lastMessage:"",
- lastMessageAt: null,
- });
- } else {
- // 🔄 only update activity
- await setDoc(
- ref,
- {
- updatedAt: serverTimestamp(),
- },
- { merge: true },
- );
- }
- };
+      // ✅ only first time create
+      if (!snap.exists()) {
+        await setDoc(ref, {
+          participants: [currentUserId, chatId],
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+          lastMessage: "",
+          lastMessageAt: null,
+        });
+      } else {
+        // 🔄 only update activity
+        await setDoc(
+          ref,
+          {
+            updatedAt: serverTimestamp(),
+          },
+          { merge: true },
+        );
+      }
+    };
 
- createChat();
- }, [chatDocId, currentUserId, chatId]);
+    createChat();
+  }, [chatDocId, currentUserId, chatId]);
 
- useEffect(() => {
- if (!chatId) return;
+  useEffect(() => {
+    if (!chatId) return;
 
- const unsub = onSnapshot(doc(db,"users", chatId), (snap) => {
- setOtherUser(snap.data());
- });
+    const unsub = onSnapshot(doc(db, "users", chatId), (snap) => {
+      setOtherUser(snap.data());
+    });
 
- return unsub;
- }, [chatId, currentUserId]);
+    return unsub;
+  }, [chatId, currentUserId]);
 
- // Listen to messages
- useEffect(() => {
- if (!chatDocId) return;
- const q = query(
- collection(db,"chats", chatDocId,"messages"),
- orderBy("createdAt","asc"),
- );
- const unsub = onSnapshot(q, (snapshot) => {
- const msgs = snapshot.docs
- .map((d) => ({ id: d.id, ...d.data() }))
- .filter((msg) => !msg.deletedFor?.includes(currentUserId));
- setMessages(msgs);
- });
- return unsub;
- }, [chatDocId, currentUserId]);
+  // Listen to messages
+  useEffect(() => {
+    if (!chatDocId) return;
+    const q = query(
+      collection(db, "chats", chatDocId, "messages"),
+      orderBy("createdAt", "asc"),
+    );
+    const unsub = onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((msg) => !msg.deletedFor?.includes(currentUserId));
+      setMessages(msgs);
+    });
+    return unsub;
+  }, [chatDocId, currentUserId]);
 
- // Listen to chat doc for mute status
- useEffect(() => {
- if (!chatDocId) return;
- const unsub = onSnapshot(doc(db,"chats", chatDocId), (snap) => {
- if (snap.exists()) setChatDoc(snap.data());
- });
- return unsub;
- }, [chatDocId]);
- useEffect(() => {
- if (!chatDocId || !currentUserId) return;
- ChatSeen(chatDocId, currentUserId);
- }, [chatDocId, currentUserId]);
+  // Listen to chat doc for mute status
+  useEffect(() => {
+    if (!chatDocId) return;
+    const unsub = onSnapshot(doc(db, "chats", chatDocId), (snap) => {
+      if (snap.exists()) setChatDoc(snap.data());
+    });
+    return unsub;
+  }, [chatDocId]);
+  useEffect(() => {
+    if (!chatDocId || !currentUserId) return;
+    ChatSeen(chatDocId, currentUserId);
+  }, [chatDocId, currentUserId]);
 
- const handleEditMessage = async (messageId, newText) => {
- if (!newText.trim() || !chatDocId) return;
- try {
- await setDoc(
- doc(db,"chats", chatDocId,"messages", messageId),
- { text: newText.trim(), isEdited: true },
- { merge: true },
- );
- setEditingMessage(null);
- } catch (err) {
- console.error("Error editing message:", err);
- }
- };
+  const handleEditMessage = async (messageId, newText) => {
+    if (!newText.trim() || !chatDocId) return;
+    try {
+      await setDoc(
+        doc(db, "chats", chatDocId, "messages", messageId),
+        { text: newText.trim(), isEdited: true },
+        { merge: true },
+      );
+      setEditingMessage(null);
+    } catch (err) {
+      console.error("Error editing message:", err);
+    }
+  };
 
- // Send a message
- const handleSend = async (text) => {
- if (!text.trim() || !chatDocId) return;
- try {
- await addDoc(collection(db,"chats", chatDocId,"messages"), {
- text: text.trim(),
- senderId: currentUserId,
- user: firestoreUser?.userName ||"Unknown",
- createdAt: serverTimestamp(),
- seenBy: [currentUserId],
- reactions: {},
- ...(replyTo
- ? {
- replyTo: {
- id: replyTo.id,
- text: replyTo.text ||"",
- user: replyTo.user ||"Unknown",
- imageUrl: replyTo.imageUrl || null,
- },
- }
- : {}),
- });
- setReplyTo(null);
- // Update the chat's last activity and message preview
- await setDoc(
- doc(db,"chats", chatDocId),
- {
- updatedAt: serverTimestamp(),
- lastMessage: text.trim(),
- lastMessageAt: serverTimestamp(),
- lastMessageSenderId: currentUserId,
- lastMessageSeenBy: [currentUserId],
- },
- { merge: true },
- );
- // Send push notification only if the other user hasn't muted the chat
- const isMutedByRecipient = chatDoc?.mutedBy?.includes(chatId);
- if (!isMutedByRecipient) {
- sendPushNotification(
- chatId,
- firestoreUser?.userName ||"New message",
- text.trim(),
- { screen:"dm", chatId, chatDocId },
- );
- }
- } catch (err) {
- console.error("Error sending DM:", err);
- }
- };
- const handleSendImage = async (uri) => {
- if (!uri) return;
- setUploadingImageUri(uri);
+  // Send a message
+  const handleSend = async (text) => {
+    if (!text.trim() || !chatDocId) return;
+    try {
+      await addDoc(collection(db, "chats", chatDocId, "messages"), {
+        text: text.trim(),
+        senderId: currentUserId,
+        user: firestoreUser?.userName || "Unknown",
+        createdAt: serverTimestamp(),
+        seenBy: [currentUserId],
+        reactions: {},
+        ...(replyTo
+          ? {
+              replyTo: {
+                id: replyTo.id,
+                text: replyTo.text || "",
+                user: replyTo.user || "Unknown",
+                imageUrl: replyTo.imageUrl || null,
+              },
+            }
+          : {}),
+      });
+      setReplyTo(null);
+      // Update the chat's last activity and message preview
+      await setDoc(
+        doc(db, "chats", chatDocId),
+        {
+          updatedAt: serverTimestamp(),
+          lastMessage: text.trim(),
+          lastMessageAt: serverTimestamp(),
+          lastMessageSenderId: currentUserId,
+          lastMessageSeenBy: [currentUserId],
+        },
+        { merge: true },
+      );
+      // Send push notification only if the other user hasn't muted the chat
+      const isMutedByRecipient = chatDoc?.mutedBy?.includes(chatId);
+      if (!isMutedByRecipient) {
+        sendPushNotification(
+          chatId,
+          firestoreUser?.userName || "New message",
+          text.trim(),
+          { screen: "dm", chatId, chatDocId },
+        );
+      }
+    } catch (err) {
+      console.error("Error sending DM:", err);
+    }
+  };
+  const handleSendImage = async (uri) => {
+    if (!uri) return;
+    setUploadingImageUri(uri);
 
- try {
- const imageUrl = await uploadToCloudinary(uri);
- if (!imageUrl) {
- setUploadingImageUri(null);
- return;
- }
+    try {
+      const imageUrl = await uploadToCloudinary(uri);
+      if (!imageUrl) {
+        setUploadingImageUri(null);
+        return;
+      }
 
- await addDoc(collection(db,"chats", chatDocId,"messages"), {
- type:"image",
- imageUrl,
- senderId: currentUserId,
- user: firestoreUser?.userName ||"Unknown",
- createdAt: serverTimestamp(),
- seenBy: [currentUserId],
- });
- await setDoc(
- doc(db,"chats", chatDocId),
- {
- updatedAt: serverTimestamp(),
- lastMessage:"📷 Photo",
- lastMessageAt: serverTimestamp(),
- lastMessageSenderId: currentUserId,
- lastMessageSeenBy: [currentUserId],
- },
- { merge: true },
- );
- // Send push notification only if the other user hasn't muted the chat
- const isMutedByRecipient = chatDoc?.mutedBy?.includes(chatId);
- if (!isMutedByRecipient) {
- sendPushNotification(
- chatId,
- firestoreUser?.userName ||"New message",
-"📷 Sent a photo",
- { screen:"dm", chatId, chatDocId },
- );
- }
- } catch (err) {
- console.error("Error sending Image", err);
- } finally {
- setUploadingImageUri(null);
- }
- };
+      await addDoc(collection(db, "chats", chatDocId, "messages"), {
+        type: "image",
+        imageUrl,
+        senderId: currentUserId,
+        user: firestoreUser?.userName || "Unknown",
+        createdAt: serverTimestamp(),
+        seenBy: [currentUserId],
+      });
+      await setDoc(
+        doc(db, "chats", chatDocId),
+        {
+          updatedAt: serverTimestamp(),
+          lastMessage: "📷 Photo",
+          lastMessageAt: serverTimestamp(),
+          lastMessageSenderId: currentUserId,
+          lastMessageSeenBy: [currentUserId],
+        },
+        { merge: true },
+      );
+      // Send push notification only if the other user hasn't muted the chat
+      const isMutedByRecipient = chatDoc?.mutedBy?.includes(chatId);
+      if (!isMutedByRecipient) {
+        sendPushNotification(
+          chatId,
+          firestoreUser?.userName || "New message",
+          "📷 Sent a photo",
+          { screen: "dm", chatId, chatDocId },
+        );
+      }
+    } catch (err) {
+      console.error("Error sending Image", err);
+    } finally {
+      setUploadingImageUri(null);
+    }
+  };
 
- return (
- <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]"edges={["top"]}>
- <KeyboardAvoidingView
- className="flex-1"
- behavior={Platform.OS ==="ios"?"padding": undefined}
- >
- {/* Header */}
- <View
- className="flex-row items-center justify-between px-5 py-3"
- style={{
- shadowColor:"#94A3B8",
- shadowOffset: { width: 0, height: 1 },
- shadowOpacity: 0.04,
- shadowRadius: 4,
- }}
- >
- <View className="flex-row items-center gap-3 flex-1 mr-2">
- <TouchableOpacity
- onPress={() => router.back()}
- className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#23232E] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
- >
- <Ionicons name="chevron-back"size={20} color={isDark ?"white":"#18181B"} />
- </TouchableOpacity>
- <TouchableOpacity
- className="flex-row items-center gap-3 flex-1"
- onPress={() =>
- router.push({
- pathname:"/(authenticated)/users/[userId]",
- params: { userId: chatId },
- })
- }
- >
- <Image
- source={{ uri: profilePic ||"https://picsum.photos/200"}}
- className="w-11 h-11 rounded-full bg-gray-100 dark:bg-gray-800"
- />
- <View className="flex-1">
- <Text
- className="text-secondary dark:text-gray-100 font-bold text-base"
- numberOfLines={1}
- ellipsizeMode="tail"
- >
- {userName}
- </Text>
- <View
- className="flex-row items-center mt-0.5"
- style={{ minHeight: 16 }}
- >
- {isTyping ? (
- <Text
- style={{
- color:"#4F46E5",
- fontSize: 12,
- fontWeight:"bold",
- }}
- >
- Typing...
- </Text>
- ) : (
- <>
- <View
- className={`w-1.5 h-1.5 ${
- userStatus ==="Active now"
- ?"bg-green-400"
- :"bg-gray-400"
- } rounded-full mr-1`}
- />
- <Text className="text-gray-400 text-xs">
- {userStatus}
- </Text>
- </>
- )}
- </View>
- </View>
- </TouchableOpacity>
- </View>
- <TouchableOpacity
- onPress={() => setShowOptions(true)}
- className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#23232E] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
- >
- <Ionicons name="ellipsis-horizontal"size={18} color="#9CA3AF"/>
- </TouchableOpacity>
- </View>
+  return (
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        {/* Header */}
+        <View
+          className="flex-row items-center justify-between px-5 py-3"
+          style={{
+            shadowColor: "#94A3B8",
+            shadowOffset: { width: 0, height: 1 },
+            shadowOpacity: 0.04,
+            shadowRadius: 4,
+          }}
+        >
+          <View className="flex-row items-center gap-3 flex-1 mr-2">
+            <TouchableOpacity
+              onPress={() => router.back()}
+              className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#23232E] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
+            >
+              <Ionicons
+                name="chevron-back"
+                size={20}
+                color={isDark ? "white" : "#18181B"}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              className="flex-row items-center gap-3 flex-1"
+              onPress={() =>
+                router.push({
+                  pathname: "/(authenticated)/users/[userId]",
+                  params: { userId: chatId },
+                })
+              }
+            >
+              <Image
+                source={{ uri: profilePic || "https://picsum.photos/200" }}
+                className="w-11 h-11 rounded-full bg-gray-100 dark:bg-gray-800"
+              />
+              <View className="flex-1">
+                <Text
+                  className="text-secondary dark:text-gray-100 font-bold text-base"
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {userName}
+                </Text>
+                <View
+                  className="flex-row items-center mt-0.5"
+                  style={{ minHeight: 16 }}
+                >
+                  {isTyping ? (
+                    <Text
+                      style={{
+                        color: "#4F46E5",
+                        fontSize: 12,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Typing...
+                    </Text>
+                  ) : (
+                    <>
+                      <View
+                        className={`w-1.5 h-1.5 ${
+                          userStatus === "Active now"
+                            ? "bg-green-400"
+                            : "bg-gray-400"
+                        } rounded-full mr-1`}
+                      />
+                      <Text className="text-gray-400 text-xs">
+                        {userStatus}
+                      </Text>
+                    </>
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            onPress={() => setShowOptions(true)}
+            className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#23232E] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
+          >
+            <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
+          </TouchableOpacity>
+        </View>
 
- {/* Messages */}
- <View className="flex-1">
- <ChatMessages
- messages={messages}
- currentUserId={currentUserId}
- chatDocId={chatDocId}
- uploadingImageUri={uploadingImageUri}
- collectionName="chats"
- onReply={(msg) => setReplyTo(msg)}
- onEditMessage={setEditingMessage}
- />
- </View>
+        {/* Messages */}
+        <View className="flex-1">
+          <ChatMessages
+            messages={messages}
+            currentUserId={currentUserId}
+            chatDocId={chatDocId}
+            uploadingImageUri={uploadingImageUri}
+            collectionName="chats"
+            onReply={(msg) => setReplyTo(msg)}
+            onEditMessage={setEditingMessage}
+          />
+        </View>
 
- {/* Input */}
- <View className="px-5 py-3 pb-5">
- <MessageSender
- handleSend={handleSend}
- chatId={chatDocId}
- currentUserId={currentUserId}
- handleSendImage={handleSendImage}
- replyTo={replyTo}
- onCancelReply={() => setReplyTo(null)}
- setReplyTo={setReplyTo}
- editingMessage={editingMessage}
- setEditingMessage={setEditingMessage}
- handleEditMessage={handleEditMessage}
- />
- </View>
- {showOptions && (
- <UserOptionsModal
- showOptions={showOptions}
- setShowOptions={setShowOptions}
- chatId={chatDocId}
- currentUserId={currentUserId}
- chatDoc={chatDoc}
- />
- )}
- </KeyboardAvoidingView>
- </SafeAreaView>
- );
+        {/* Input */}
+        <View className="px-5 py-3 pb-5">
+          <MessageSender
+            handleSend={handleSend}
+            chatId={chatDocId}
+            currentUserId={currentUserId}
+            handleSendImage={handleSendImage}
+            replyTo={replyTo}
+            onCancelReply={() => setReplyTo(null)}
+            setReplyTo={setReplyTo}
+            editingMessage={editingMessage}
+            setEditingMessage={setEditingMessage}
+            handleEditMessage={handleEditMessage}
+          />
+        </View>
+        {showOptions && (
+          <UserOptionsModal
+            showOptions={showOptions}
+            setShowOptions={setShowOptions}
+            chatId={chatDocId}
+            currentUserId={currentUserId}
+            chatDoc={chatDoc}
+          />
+        )}
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
 }
