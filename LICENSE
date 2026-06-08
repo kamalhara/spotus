@@ -1,7 +1,46 @@
-Copyright (c) 2026 Kamal Hara
+PROPRIETARY & CONFIDENTIAL LICENSE AGREEMENT
+===========================================
 
-All Rights Reserved
+Copyright (c) 2026 Kamal Hara. All Rights Reserved.
 
-This is unpublished proprietary source code.
-The copyright notice above does not evidence any actual or intended publication of such source code.
-No part of this codebase may be reproduced, published, distributed, displayed, performed, copied, or stored for public or private use in any information retrieval system without the prior written permission of the copyright owner.
+IMPORTANT—READ CAREFULLY: This Proprietary & Confidential License Agreement ("Agreement") is a legal agreement between you (an authorized developer, employee, or contractor) and Kamal Hara ("Licensor") for the proprietary software application "SpotUs" including source code, database structures, documentation, assets, and build configurations (collectively, the "Software").
+
+BY ACCESSING, DOWNLOADING, COPYING, OR USING THE SOFTWARE, YOU AGREE TO BE BOUND BY THE TERMS OF THIS AGREEMENT. IF YOU DO NOT AGREE TO THESE TERMS, DO NOT ACCESS OR USE THE SOFTWARE.
+
+1. OWNERSHIP & INTELLECTUAL PROPERTY
+------------------------------------
+The Software is licensed, not sold. Licensor retains all right, title, and interest in and to the Software, including, without limitation, all copyrights, patents, trade secrets, trademarks, and other intellectual property rights. You acquire no ownership rights in the Software under this Agreement.
+
+2. LICENSE GRANT
+----------------
+Subject to your strict compliance with the terms of this Agreement and any underlying employment or service contract with Licensor, Licensor hereby grants you a personal, non-exclusive, non-transferable, non-sublicensable, revocable, and limited license to access, run, modify, and build the Software solely for the purpose of development, debugging, and internal testing on behalf of the Licensor.
+
+3. RESTRICTIONS
+---------------
+Except as explicitly authorized in writing by Licensor, you shall not:
+(a) Redistribute, publish, sell, lease, sublicense, copy, or disclose the Software or any portion thereof to any third party.
+(b) Port, translate, decompile, reverse engineer, or disassemble the Software.
+(c) Remove, alter, or obscure any proprietary notices, labels, copyright notices, or trademarks on the Software.
+(d) Use the Software for any commercial purpose or build any derivative work for personal or external public use.
+
+4. CONFIDENTIALITY & TRADE SECRETS
+----------------------------------
+You acknowledge that the Software is proprietary, confidential, and contains valuable trade secrets of Licensor. You agree to:
+(a) Maintain the Software in strict confidence.
+(b) Implement reasonable security measures to prevent unauthorized access to the Software source files, API keys, credentials, and configuration files.
+(c) Promptly notify Licensor of any unauthorized access, leak, or disclosure of the Software.
+
+5. TERMINATION
+--------------
+This Agreement and your license to use the Software will terminate automatically and immediately upon:
+(a) The termination or expiration of your employment, contracting, or developer relationship with Licensor.
+(b) Any breach of this Agreement by you.
+Upon termination, you must immediately cease all access to the Software and permanently delete all copies of the Software in your possession or control.
+
+6. DISCLAIMER OF WARRANTY
+-------------------------
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+7. LIMITATION OF LIABILITY
+--------------------------
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL LICENSOR BE LIABLE FOR ANY CONSEQUENTIAL, INCIDENTAL, DIRECT, INDIRECT, SPECIAL, PUNITIVE, OR OTHER DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR OTHER PECUNIARY LOSS) ARISING OUT OF THIS AGREEMENT OR THE USE OF OR INABILITY TO USE THE SOFTWARE.
