@@ -1,4 +1,5 @@
 # SpotUs 💥
+
 > **PROPRIETARY & CONFIDENTIAL**  
 > This repository contains proprietary code for the **SpotUs** mobile application. Access is restricted to authorized team members only. Any distribution, reproduction, or disclosure without explicit permission is strictly prohibited.
 
@@ -36,6 +37,7 @@ Unlike conventional location-based chat apps that are plagued by cold-reach spam
 ### The DM Unlock Flow
 
 To message someone directly:
+
 1. A user joins a local room within their radius.
 2. The user participates in the public room chat. Every message sent increments their **Room Trust Score**.
 3. Once the user reaches a **Trust Score of 10** or more within that room, the system unlocks the ability to start a Direct Message (DM) thread with other members of that room.
@@ -110,7 +112,7 @@ spotus/
 ├── utils/                    # Global utility functions (clerk storage cache, etc.)
 ├── app.json                  # Expo configuration properties & plugins
 ├── eas.json                  # EAS Build definitions (development, apk, production)
-└── firestore.rules           # Cloud Firestore Security Rules
+└── firestore.rules           # Cloud Firestore Security Rule
 ```
 
 ---
@@ -120,10 +122,11 @@ spotus/
 ### Prerequisites
 
 Ensure your workstation has the following installed:
-* **Node.js** (v18.x or v20.x LTS recommended)
-* **watchman** (`brew install watchman` for macOS users)
-* **iOS Simulator** (via Xcode) and/or **Android Emulator** (via Android Studio)
-* **Expo Go** app installed on your physical test device
+
+- **Node.js** (v18.x or v20.x LTS recommended)
+- **watchman** (`brew install watchman` for macOS users)
+- **iOS Simulator** (via Xcode) and/or **Android Emulator** (via Android Studio)
+- **Expo Go** app installed on your physical test device
 
 ### SSH Git Clone
 
@@ -174,9 +177,9 @@ Run the development bundler:
 npm start
 ```
 
-* Press `i` to launch on the local iOS Simulator.
-* Press `a` to launch on the local Android Emulator.
-* Scan the console QR code to run on a physical test device via Expo Go.
+- Press `i` to launch on the local iOS Simulator.
+- Press `a` to launch on the local Android Emulator.
+- Scan the console QR code to run on a physical test device via Expo Go.
 
 ---
 
@@ -202,6 +205,7 @@ To maintain codebase sanity, follow these team practices:
 SpotUs uses **Clerk** for user authentication instead of Firebase Auth. Because of this, Firebase's `request.auth` remains `null` for client-side API requests.
 
 The firestore security configuration is located in [firestore.rules](file:///Users/kamalahara/code/spotus/firestore.rules).
+
 - **Client Access**: Read/write rules are set up to support real-time messaging updates direct from the client.
 - **Moderation**: The `/reports/{reportId}` rules are write-only (`allow create: if true; allow read, update, delete: if false`) to secure reporting logs from external inspects.
 
@@ -242,8 +246,8 @@ npx eas build --profile production --platform all
 
 ## ⚠️ Confidentiality & Compliance
 
-This software, its design, structure, and database schemas are the intellectual property of the project owners. 
+This software, its design, structure, and database schemas are the intellectual property of the project owners.
 
-* Access is granted solely under employment or contracting agreements.
-* Do not share source code, database structures, security configurations, API secrets, or certificates with third parties.
-* Violations of these conditions will result in immediate termination of access and possible legal action.
+- Access is granted solely under employment or contracting agreements.
+- Do not share source code, database structures, security configurations, API secrets, or certificates with third parties.
+- Violations of these conditions will result in immediate termination of access and possible legal action.
