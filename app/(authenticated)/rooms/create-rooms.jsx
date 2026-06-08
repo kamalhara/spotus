@@ -72,14 +72,18 @@ export default function CreateRooms() {
   };
 
   return (
-    <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1 px-5">
+    <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1 ">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 40, flexGrow: 1 }}
+          contentContainerStyle={{
+            paddingBottom: 40,
+            flexGrow: 1,
+            marginHorizontal: 20,
+          }}
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View className="flex-1">
