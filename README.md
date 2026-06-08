@@ -1,13 +1,12 @@
 # SpotUs 💥
+> **PROPRIETARY & CONFIDENTIAL**  
+> This repository contains proprietary code for the **SpotUs** mobile application. Access is restricted to authorized team members only. Any distribution, reproduction, or disclosure without explicit permission is strictly prohibited.
 
-[![React Native](https://img.shields.io/badge/React_Native-v0.81.5-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactnative.dev/)
-[![Expo](https://img.shields.io/badge/Expo-v54-000000?style=for-the-badge&logo=expo&logoColor=white)](https://expo.dev/)
-[![Firebase](https://img.shields.io/badge/Firebase-v12-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![Clerk](https://img.shields.io/badge/Clerk-v3-6C47FF?style=for-the-badge&logo=clerk&logoColor=white)](https://clerk.com/)
-[![NativeWind](https://img.shields.io/badge/NativeWind-v4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://www.nativewind.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-v5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+---
 
-**SpotUs** is a next-generation, location-based social discovery and real-time messaging application. Built on React Native and Expo, SpotUs bridges local community discovery with high-integrity social interaction. By leveraging real-time geographic queries, interest-based rooms, and an innovative reputation trust system, SpotUs ensures that local chats remain engaging, safe, and spam-free.
+## 📋 Project Summary
+
+SpotUs is an internal, location-based social discovery and real-time messaging application. Built on React Native and Expo, SpotUs bridges local community discovery with high-integrity social interaction. By leveraging real-time geographic queries, interest-based rooms, and an innovative reputation trust system, SpotUs ensures that local chats remain engaging, safe, and spam-free.
 
 ---
 
@@ -17,14 +16,16 @@
 - [Key Features](#-key-features)
 - [Tech Stack](#%EF%B8%8F-tech-stack)
 - [Directory Architecture](#-directory-architecture)
-- [Getting Started](#-getting-started)
+- [Developer Onboarding & Setup](#-developer-onboarding--setup)
   - [Prerequisites](#prerequisites)
-  - [Environment Variables](#environment-variables)
-  - [Local Installation](#local-installation)
-  - [Running the App](#running-the-app)
+  - [SSH Git Clone](#ssh-git-clone)
+  - [Environment Configuration](#environment-configuration)
+  - [Dependencies Installation](#dependencies-installation)
+  - [Local Development Server](#local-development-server)
+- [Internal Git & Development Flow](#-internal-git--development-flow)
 - [Firebase & Security Configuration](#-firebase--security-configuration)
-- [Build & Deployment (EAS)](#-build--deployment-eas)
-- [Private Repository & License](#-private-repository--license)
+- [EAS Build & Release Management](#-eas-build--release-management)
+- [Confidentiality & Compliance](#-confidentiality--compliance)
 
 ---
 
@@ -63,15 +64,16 @@ flowchart TD
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Tech Stack & Dependencies
 
-- **Core Framework**: React Native v0.81 & Expo v54 (Expo Router v6)
-- **Programming Language**: TypeScript / JavaScript (ESNext)
-- **Styling & UI**: NativeWind v4, Tailwind CSS, Reanimated v4, Lucide Icons
-- **Authentication**: Clerk Expo SDK (`@clerk/expo`)
-- **Backend Services**: Firebase Firestore v12
-- **Geo-Queries**: `geofire-common` (Geohashing queries)
-- **Media Uploads**: Cloudinary API
+- **Core SDK**: Expo SDK v54 (React Native 0.81.x)
+- **Routing**: Expo Router (v6/v7 compatible)
+- **Styling**: NativeWind v4, Tailwind CSS, Reanimated v4
+- **State & Logic**: Context APIs, Lucide Icons, Haptics
+- **Identity Provider**: Clerk SDK (`@clerk/expo`)
+- **Database Backend**: Firebase Firestore (Web SDK v12)
+- **Geo-indexing**: Geohashes via `geofire-common`
+- **File Uploads**: Cloudinary Image upload API
 - **Push Services**: Expo Notification SDK
 
 ---
@@ -113,107 +115,135 @@ spotus/
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Developer Onboarding & Setup
 
 ### Prerequisites
 
-Ensure you have the following installed on your machine:
-* [Node.js](https://nodejs.org/) (v18.x or v20.x recommended)
-* [git](https://git-scm.com/)
-* [Watchman](https://facebook.github.io/watchman/) (for macOS users)
-* iOS Simulator (Xcode) and/or Android Emulator (Android Studio)
-* [Expo Go](https://expo.dev/client) app installed on your physical device (optional, for rapid local preview)
+Ensure your workstation has the following installed:
+* **Node.js** (v18.x or v20.x LTS recommended)
+* **watchman** (`brew install watchman` for macOS users)
+* **iOS Simulator** (via Xcode) and/or **Android Emulator** (via Android Studio)
+* **Expo Go** app installed on your physical test device
 
-### Environment Variables
+### SSH Git Clone
 
-Create a `.env` file in the root directory and configure the following parameters:
-
-```env
-# Clerk Authentication Configuration
-EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-
-# Firebase SDK Configurations
-EXPO_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
-EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-EXPO_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
-EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-EXPO_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
-EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
-```
-
-### Local Installation
-
-Clone the repository and install all packages:
+Request repository access from the administrator, then clone using SSH:
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/spotus.git
+git clone git@github.com:spotus/spotus.git
 cd spotus
+```
 
-# Install dependencies (respecting locked versions)
+### Environment Configuration
+
+Copy the template below to create your local environment file. **Never commit `.env` or configuration secrets to the repository.**
+
+```bash
+touch .env
+```
+
+Add your development keys:
+
+```env
+# Clerk Authentication configuration
+EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+
+# Firebase Client SDK Configuration
+EXPO_PUBLIC_FIREBASE_API_KEY=AIzaSy...
+EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
+EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+EXPO_PUBLIC_FIREBASE_APP_ID=...
+EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=...
+```
+
+### Dependencies Installation
+
+Install dependencies based on the locked package manifests:
+
+```bash
 npm ci
 ```
 
-### Running the App
+### Local Development Server
 
-Start the Expo local development server:
+Run the development bundler:
 
 ```bash
 npm start
 ```
 
-Press **`i`** to launch the iOS Simulator, **`a`** to open the Android Emulator, or scan the QR code using your phone's camera / Expo Go app.
+* Press `i` to launch on the local iOS Simulator.
+* Press `a` to launch on the local Android Emulator.
+* Scan the console QR code to run on a physical test device via Expo Go.
+
+---
+
+## 🛠️ Internal Git & Development Flow
+
+To maintain codebase sanity, follow these team practices:
+
+1. **Branching Model**:
+   - Create feature branches off `main`: `feature/your-feature-name`
+   - Create fix branches: `bugfix/issue-description`
+2. **Secrets Management**:
+   - Do **NOT** commit credentials. Ensure `.env` is listed inside `.gitignore`.
+3. **Linting**:
+   - Before pushing commits, run the linter to verify formatting:
+     ```bash
+     npm run lint
+     ```
 
 ---
 
 ## 🔒 Firebase & Security Configuration
 
-SpotUs uses **Clerk** for all authentication processes. Because of this, Firebase's `request.auth` will verify as `null` by default on Firestore rule evaluations. 
+SpotUs uses **Clerk** for user authentication instead of Firebase Auth. Because of this, Firebase's `request.auth` remains `null` for client-side API requests.
 
-We configure Firestore Security Rules accordingly in [firestore.rules](file:///Users/kamalahara/code/spotus/firestore.rules). In a production release, consider configuring Clerk's Firebase JWT integration, or routing sensitive writes through an intermediary Cloud Function to secure updates.
-
-### Firestore Rules Overview:
-- **`users` / `rooms` / `chats`**: Allows client-side reads and writes to support real-time peer communication.
-- **`reports`**: Strictly client-write-only (`allow create: if true; allow read, update, delete: if false;`), preventing malicious users from accessing database logs.
+The firestore security configuration is located in [firestore.rules](file:///Users/kamalahara/code/spotus/firestore.rules).
+- **Client Access**: Read/write rules are set up to support real-time messaging updates direct from the client.
+- **Moderation**: The `/reports/{reportId}` rules are write-only (`allow create: if true; allow read, update, delete: if false`) to secure reporting logs from external inspects.
 
 ---
 
-## 📦 Build & Deployment (EAS)
+## 📦 EAS Build & Release Management
 
-SpotUs utilizes **Expo Application Services (EAS)** for generating build artifacts and deployment.
+We use **Expo Application Services (EAS)** to run builds and distribute internal testing versions.
 
-### EAS Configurations (`eas.json`)
+### Setting Up EAS locally
 
-Configure your environment credentials using the EAS CLI:
+1. Install EAS CLI: `npm install -g eas-cli`
+2. Log in using the team shared account credentials:
+   ```bash
+   npx eas-cli login
+   ```
+3. Link the app with the EAS project ID (from `app.json`):
+   ```bash
+   npx eas project:init
+   ```
+
+### Internal Release Builds
+
+Generate builds based on configurations defined in [eas.json](file:///Users/kamalahara/code/spotus/eas.json):
 
 ```bash
-# Log in to EAS
-npx eas-cli login
-
-# Initialize EAS project configuration
-npx eas project:init
-```
-
-### Build Commands
-
-Generate build bundles according to targets defined in `eas.json`:
-
-```bash
-# Build a local development bundle for simulator testing
+# Generate a local development client build (allows hot reloading on devices/simulators)
 npx eas build --profile development --platform all
 
-# Generate an Android APK installer
+# Generate an Android APK for sideloading/manual distributions
 npx eas build --profile apk --platform android
 
-# Create a production bundle (iOS TestFlight / Google Play Console)
+# Compile final production bundles
 npx eas build --profile production --platform all
 ```
 
 ---
 
-## 📄 Private Repository & License
+## ⚠️ Confidentiality & Compliance
 
-This is a **private repository**. All rights reserved. 
+This software, its design, structure, and database schemas are the intellectual property of the project owners. 
 
-No part of this codebase may be reproduced, distributed, or transmitted in any form or by any means, including photocopying, recording, or other electronic or mechanical methods, without the prior written permission of the copyright holder. Refer to the [LICENSE](file:///Users/kamalahara/code/spotus/LICENSE) file for legal details.
+* Access is granted solely under employment or contracting agreements.
+* Do not share source code, database structures, security configurations, API secrets, or certificates with third parties.
+* Violations of these conditions will result in immediate termination of access and possible legal action.
