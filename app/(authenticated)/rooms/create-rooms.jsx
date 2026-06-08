@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -11,7 +12,6 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -47,14 +47,21 @@ export default function CreateRooms() {
   const selectedCategoryMeta = CATEGORIES.find(
     (item) => item.label === selectedCategory,
   );
-  const canCreateRoom = title.trim().length > 0 && !!selectedCategory && !isCreating;
+  const canCreateRoom =
+    title.trim().length > 0 && !!selectedCategory && !isCreating;
 
   const handleCreateRoom = async () => {
     if (!title || !selectedCategory) return alert("Please fill all the fields");
     if (!user) return alert("User not loaded");
     setIsCreating(true);
     try {
-      await createRoom(title, description, selectedCategory, user.id, showOnMap);
+      await createRoom(
+        title,
+        description,
+        selectedCategory,
+        user.id,
+        showOnMap,
+      );
       router.push("/(tabs)/rooms_tab");
     } catch (err) {
       console.error("Error creating room:", err);
@@ -89,7 +96,11 @@ export default function CreateRooms() {
                     elevation: 1,
                   }}
                 >
-                  <Ionicons name="arrow-back" size={20} color="#18181B" />
+                  <Ionicons
+                    name="arrow-back"
+                    size={20}
+                    color={isDark ? "#E2E8F0" : "#18181B"}
+                  />
                 </TouchableOpacity>
               </View>
 
@@ -221,7 +232,12 @@ export default function CreateRooms() {
               <View className="mt-8 bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4 flex-row items-center justify-between">
                 <View className="flex-1 pr-4">
                   <View className="flex-row items-center mb-1">
-                    <Ionicons name="map" size={16} color="#4F46E5" style={{ marginRight: 6 }} />
+                    <Ionicons
+                      name="map"
+                      size={16}
+                      color="#4F46E5"
+                      style={{ marginRight: 6 }}
+                    />
                     <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
                       Show Room on Map
                     </Text>
@@ -238,15 +254,26 @@ export default function CreateRooms() {
                         "Show Room on Map?",
                         "Displaying a room on the map makes it easier for nearby users to discover. Only enable this if you are comfortable with the room appearing on the public map.",
                         [
-                          { text: "Cancel", style: "cancel", onPress: () => setShowOnMap(false) },
-                          { text: "Enable", style: "default", onPress: () => setShowOnMap(true) },
-                        ]
+                          {
+                            text: "Cancel",
+                            style: "cancel",
+                            onPress: () => setShowOnMap(false),
+                          },
+                          {
+                            text: "Enable",
+                            style: "default",
+                            onPress: () => setShowOnMap(true),
+                          },
+                        ],
                       );
                     } else {
                       setShowOnMap(false);
                     }
                   }}
-                  trackColor={{ false: isDark ? "#2A2A36" : "#E2E8F0", true: "#4F46E5" }}
+                  trackColor={{
+                    false: isDark ? "#2A2A36" : "#E2E8F0",
+                    true: "#4F46E5",
+                  }}
                   thumbColor={"#FFFFFF"}
                 />
               </View>

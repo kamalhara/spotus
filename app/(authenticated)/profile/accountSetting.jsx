@@ -2,7 +2,6 @@ import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
-import { doc, updateDoc } from "firebase/firestore";
 
 import { Redirect, useRouter } from "expo-router";
 import { useRef, useState } from "react";
@@ -21,7 +20,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BlockedUserModal from "../../../components/users/BlockedUserModal";
-import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 
@@ -110,7 +108,9 @@ export default function Profile() {
   const searchInputRef = useRef(null);
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [visibility, setVisibility] = useState(
-    firestoreUser?.settings?.privacy?.publicProfile === false ? "Private" : "Public"
+    firestoreUser?.settings?.privacy?.publicProfile === false
+      ? "Private"
+      : "Public",
   );
   const { theme, setTheme, isDark } = useTheme();
 
@@ -429,73 +429,20 @@ export default function Profile() {
             <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Privacy
             </Text>
-            {filterMatch("Profile Visibility") && (
-              <View className="px-5 py-4 flex-row items-center justify-between border-b border-gray-50">
-                <View className="flex-row items-center flex-1">
-                  <View
-                    className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
-                    style={{ backgroundColor: "#8B5CF612" }}
-                  >
-                    <Ionicons
-                      name="eye-off-outline"
-                      size={18}
-                      color="#8B5CF6"
-                    />
-                  </View>
-                  <View className="flex-1">
-                    <Text className="text-secondary dark:text-gray-100 font-semibold text-[15px]">
-                      Profile Visibility
-                    </Text>
-                    <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
-                      {visibility === "Public"
-                        ? "Anyone can view your profile"
-                        : "Only approved users can view"}
-                    </Text>
-                  </View>
-                </View>
 
-                <View className="flex-row items-center bg-gray-50 px-2 py-0.5 rounded-2xl border border-gray-100">
-                  <Text
-                    className={`text-[10px] font-bold ml-1 ${visibility === "Public" ? "text-primary" : "text-gray-300"}`}
-                  >
-                    Public
-                  </Text>
-                  <Switch
-                    value={visibility === "Private"}
-                    onValueChange={(val) => {
-                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                      const newVis = val ? "Private" : "Public";
-                      setVisibility(newVis);
-                      if (firestoreUser?.id) {
-                        const userRef = doc(db, "users", firestoreUser.id);
-                        updateDoc(userRef, {
-                          "settings.privacy.publicProfile": !val,
-                        }).catch((err) => console.error("Error saving visibility:", err));
-                      }
-                    }}
-                    trackColor={{
-                      false: isDark ? "#23232E" : "#CBD5E1",
-                      true: "#4F46E5",
-                    }}
-                    thumbColor="#fff"
-                    ios_backgroundColor="#CBD5E1"
-                    style={{ transform: [{ scale: 0.8 }] }}
-                  />
-                  <Text
-                    className={`text-[10px] font-bold mr-1 ${visibility === "Private" ? "text-primary" : "text-gray-300"}`}
-                  >
-                    Private
-                  </Text>
-                </View>
-              </View>
-            )}
             {filterMatch("Blocked Users") && (
               <MenuItem
                 icon="ban"
                 label="Blocked Users"
                 color="#8B5CF6"
                 rightComponent={
-                  <View className="flex-row items-center bg-gray-50 px-2 py-0.5 rounded-2xl border border-gray-100">
+                  <View
+                    className={`flex-row items-center px-2 py-0.5 rounded-2xl border ${
+                      isDark
+                        ? "dark:bg-[#1F1F29] border-[#2A2A36]"
+                        : "bg-gray-50 border-gray-100"
+                    }`}
+                  >
                     <Text className="text-[10px] font-bold mr-1 text-gray-300">
                       {firestoreUser?.blockedUsers?.length || 0}
                     </Text>
