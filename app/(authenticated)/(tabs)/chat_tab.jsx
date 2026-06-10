@@ -10,7 +10,15 @@ import {
   where,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
-import { Animated, FlatList, Text, TextInput, View } from "react-native";
+import {
+  Animated,
+  FlatList,
+  Keyboard,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatRow from "../../../components/chat/ChatList";
 import ChatListSkeleton from "../../../components/chat/ChatListSkeleton";
@@ -132,184 +140,211 @@ export default function Chat() {
   });
 
   return (
-    <SafeAreaView
-      className="flex-1 bg-bg dark:bg-[#0F0F13] px-6"
-      edges={["top"]}
-    >
-      {/* Header */}
-      <Animated.View
-        className="flex-row items-center justify-between mt-3 mb-6"
-        style={{ opacity: fadeIn }}
-      >
-        <View>
-          <Text className="text-secondary dark:text-gray-100 text-[26px] font-extrabold tracking-tight">
-            Messages
-          </Text>
-          <Text className="text-muted dark:text-gray-500 text-[13px] font-semibold mt-1">
-            {chats.length} DM{chats.length === 1 ? "" : "s"} · {rooms.length}
-            {""}
-            room{rooms.length === 1 ? "" : "s"}
-          </Text>
-        </View>
-        {unreadCount > 0 && (
-          <View className="bg-primary-surface dark:bg-primary-surface px-3 py-1.5 rounded-full">
-            <Text className="text-primary text-[12px] font-black">
-              {unreadCount} new
-            </Text>
-          </View>
-        )}
-      </Animated.View>
-
-      {/* Search Bar */}
-      <Animated.View
-        style={{
-          opacity: fadeIn,
-          transform: [{ translateY: slideUp }],
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          Keyboard.dismiss();
+          setSearchFocused(false);
         }}
+        accessible={false}
       >
-        <GlassContainer
-          borderRadius={30}
-          isInteractive={true}
-          fallbackClassName={`flex-row items-center bg-white dark:bg-[#1A1A22] px-4 py-3.5 mb-5 border ${
-            searchFocused
-              ? "border-primary/40"
-              : "border-border-light dark:border-[#2A2A36]"
-          }`}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 16,
-            paddingVertical: 14,
-            marginBottom: 20,
-          }}
-        >
-          <Ionicons
-            name="search"
-            size={18}
-            color={searchFocused ? "#4F46E5" : "#94A3B8"}
-          />
-          <TextInput
-            placeholder="Search messages..."
-            className="flex-1 ml-3 text-secondary dark:text-gray-100 text-[15px] font-medium"
-            placeholderTextColor="#94A3B8"
-            value={search}
-            onChangeText={setSearch}
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
-          />
-        </GlassContainer>
-      </Animated.View>
-
-      {/* Rooms horizontal scroll */}
-      <Animated.View
-        className="mb-5"
-        style={{
-          opacity: fadeIn,
-          transform: [{ translateY: slideUp }],
-        }}
-      >
-        <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
-            Active Rooms
-          </Text>
-          {rooms.length > 0 && (
-            <View className="ml-2 bg-primary-surface dark:bg-primary-surface px-2.5 py-1 rounded-full">
-              <Text className="text-primary text-[11px] font-black">
+        <View className="flex-1 px-6">
+          {/* Header */}
+          <Animated.View
+            className="flex-row items-center justify-between mt-3 mb-6"
+            style={{ opacity: fadeIn }}
+          >
+            <View>
+              <Text className="text-secondary dark:text-gray-100 text-[26px] font-extrabold tracking-tight">
+                Messages
+              </Text>
+              <Text className="text-muted dark:text-gray-500 text-[13px] font-semibold mt-1">
+                {chats.length} DM{chats.length === 1 ? "" : "s"} ·{" "}
                 {rooms.length}
+                {""}
+                room{rooms.length === 1 ? "" : "s"}
               </Text>
             </View>
-          )}
-        </View>
-        {!roomsLoading && rooms.length === 0 ? (
-          <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl px-4 py-3 flex-row items-center">
-            <View className="w-9 h-9 rounded-xl bg-surface-alt items-center justify-center mr-3">
-              <Ionicons name="people-outline" size={17} color="#94A3B8" />
+            {unreadCount > 0 && (
+              <View className="bg-primary-surface dark:bg-primary-surface px-3 py-1.5 rounded-full">
+                <Text className="text-primary text-[12px] font-black">
+                  {unreadCount} new
+                </Text>
+              </View>
+            )}
+          </Animated.View>
+
+          {/* Search Bar */}
+          <Animated.View
+            style={{
+              opacity: fadeIn,
+              transform: [{ translateY: slideUp }],
+            }}
+          >
+            <GlassContainer
+              borderRadius={30}
+              isInteractive={true}
+              fallbackClassName={`flex-row items-center bg-white dark:bg-[#1A1A22] px-4 py-3.5 mb-5 border ${
+                searchFocused
+                  ? "border-primary/40"
+                  : "border-border-light dark:border-[#2A2A36]"
+              }`}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: 16,
+                paddingVertical: 14,
+                marginBottom: 20,
+              }}
+            >
+              <Ionicons
+                name="search"
+                size={18}
+                color={searchFocused ? "#4F46E5" : "#94A3B8"}
+              />
+              <TextInput
+                placeholder="Search messages..."
+                className="flex-1 ml-3 text-secondary dark:text-gray-100 text-[15px] font-medium"
+                placeholderTextColor="#94A3B8"
+                value={search}
+                onChangeText={setSearch}
+                onFocus={() => setSearchFocused(true)}
+                onBlur={() => setSearchFocused(false)}
+              />
+            </GlassContainer>
+          </Animated.View>
+
+          {/* Rooms horizontal scroll */}
+          <Animated.View
+            className="mb-5"
+            style={{
+              opacity: fadeIn,
+              transform: [{ translateY: slideUp }],
+            }}
+          >
+            <View className="flex-row items-center justify-between mb-4">
+              <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
+                Active Rooms
+              </Text>
+              {rooms.length > 0 && (
+                <View className="ml-2 bg-primary-surface dark:bg-primary-surface px-2.5 py-1 rounded-full">
+                  <Text className="text-primary text-[11px] font-black">
+                    {rooms.length}
+                  </Text>
+                </View>
+              )}
             </View>
-            <Text className="text-gray-400 dark:text-gray-500 text-sm font-medium">
-              No active rooms
-            </Text>
-          </View>
-        ) : (
-          <RoomHorizontalList
-            rooms={rooms}
-            isLoading={roomsLoading}
-            onRoomPress={(room) => router.push(`/rooms/${room.id}`)}
-          />
-        )}
-      </Animated.View>
-
-      {/* Chat list */}
-      <View className="flex-1 mt-2">
-        <View className="flex-row items-center justify-between mb-4">
-          <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
-            Recent
-          </Text>
-          {chats.length > 0 && (
-            <Text className="text-muted dark:text-gray-500 text-[13px] font-medium">
-              {chats.length} conversations
-            </Text>
-          )}
-        </View>
-
-        {chatsLoading ? (
-          <FlatList
-            data={[1, 2, 3, 4]}
-            keyExtractor={(item) => `skel-${item}`}
-            renderItem={() => <ChatListSkeleton />}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 100 }}
-          />
-        ) : chats.length > 0 ? (
-          <FlatList
-            data={filteredChats}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <ChatRow
-                chat={item}
-                onPress={() =>
-                  router.push({
-                    pathname: `/dm/${item.otherUser?.id}`,
-                    params: {
-                      userName: item.otherUser?.userName,
-                      profilePic: item.otherUser?.profilePic,
-                    },
-                  })
-                }
+            {!roomsLoading && rooms.length === 0 ? (
+              <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl px-4 py-3 flex-row items-center">
+                <View className="w-9 h-9 rounded-xl bg-surface-alt items-center justify-center mr-3">
+                  <Ionicons name="people-outline" size={17} color="#94A3B8" />
+                </View>
+                <Text className="text-gray-400 dark:text-gray-500 text-sm font-medium">
+                  No active rooms
+                </Text>
+              </View>
+            ) : (
+              <RoomHorizontalList
+                rooms={rooms}
+                isLoading={roomsLoading}
+                onRoomPress={(room) => router.push(`/rooms/${room.id}`)}
               />
             )}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 100 }}
-            ListEmptyComponent={
-              <EmptyState
-                icon="search-outline"
-                title="No messages found"
-                description="Try a different name or clear the search field."
-              />
-            }
-          />
-        ) : (
-          <View className="flex-1 items-center justify-center pt-6">
-            <View className="w-16 h-16 bg-white dark:bg-[#1A1A22] rounded-3xl items-center justify-center mb-5 border border-gray-100 dark:border-[#2A2A36]">
-              <Ionicons name="chatbubble-outline" size={30} color="#4F46E5" />
-            </View>
-            <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
-              No conversations yet
-            </Text>
-            <Text className="text-gray-400 dark:text-gray-500 text-sm mt-1.5 text-center px-10 leading-5">
-              Build trust in rooms to unlock direct messages with other members.
-            </Text>
+          </Animated.View>
 
-            <View className="mt-6 bg-white dark:bg-[#1A1A22] rounded-2xl px-4 py-3.5 flex-row items-center border border-gray-100 dark:border-[#2A2A36]">
-              <View className="w-7 h-7 bg-indigo-50 rounded-lg items-center justify-center mr-3">
-                <Ionicons name="shield-checkmark" size={14} color="#4F46E5" />
-              </View>
-              <Text className="text-gray-500 dark:text-gray-400 text-[13px] font-medium flex-1">
-                10 room messages = DM access
+          {/* Chat list */}
+          <View className="flex-1 mt-2">
+            <View className="flex-row items-center justify-between mb-4">
+              <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
+                Recent
               </Text>
+              {chats.length > 0 && (
+                <Text className="text-muted dark:text-gray-500 text-[13px] font-medium">
+                  {chats.length} conversations
+                </Text>
+              )}
             </View>
+
+            {chatsLoading ? (
+              <FlatList
+                data={[1, 2, 3, 4]}
+                keyExtractor={(item) => `skel-${item}`}
+                renderItem={() => <ChatListSkeleton />}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                onScrollBeginDrag={() => {
+                  Keyboard.dismiss();
+                  setSearchFocused(false);
+                }}
+                contentContainerStyle={{ paddingBottom: 100 }}
+              />
+            ) : chats.length > 0 ? (
+              <FlatList
+                data={filteredChats}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <ChatRow
+                    chat={item}
+                    onPress={() =>
+                      router.push({
+                        pathname: `/dm/${item.otherUser?.id}`,
+                        params: {
+                          userName: item.otherUser?.userName,
+                          profilePic: item.otherUser?.profilePic,
+                        },
+                      })
+                    }
+                  />
+                )}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+                onScrollBeginDrag={() => {
+                  Keyboard.dismiss();
+                  setSearchFocused(false);
+                }}
+                contentContainerStyle={{ paddingBottom: 100 }}
+                ListEmptyComponent={
+                  <EmptyState
+                    icon="search-outline"
+                    title="No messages found"
+                    description="Try a different name or clear the search field."
+                  />
+                }
+              />
+            ) : (
+              <View className="flex-1 items-center justify-center pt-6">
+                <View className="w-16 h-16 bg-white dark:bg-[#1A1A22] rounded-3xl items-center justify-center mb-5 border border-gray-100 dark:border-[#2A2A36]">
+                  <Ionicons
+                    name="chatbubble-outline"
+                    size={30}
+                    color="#4F46E5"
+                  />
+                </View>
+                <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
+                  No conversations yet
+                </Text>
+                <Text className="text-gray-400 dark:text-gray-500 text-sm mt-1.5 text-center px-10 leading-5">
+                  Build trust in rooms to unlock direct messages with other
+                  members.
+                </Text>
+
+                <View className="mt-6 bg-white dark:bg-[#1A1A22] rounded-2xl px-4 py-3.5 flex-row items-center border border-gray-100 dark:border-[#2A2A36]">
+                  <View className="w-7 h-7 bg-indigo-50 rounded-lg items-center justify-center mr-3">
+                    <Ionicons
+                      name="shield-checkmark"
+                      size={14}
+                      color="#4F46E5"
+                    />
+                  </View>
+                  <Text className="text-gray-500 dark:text-gray-400 text-[13px] font-medium flex-1">
+                    10 room messages = DM access
+                  </Text>
+                </View>
+              </View>
+            )}
           </View>
-        )}
-      </View>
+        </View>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
