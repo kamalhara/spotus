@@ -2,7 +2,6 @@ import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
-
 import { Redirect, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
@@ -20,9 +19,20 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GlassButton from "../../../components/ui/GlassButton";
+import GlassContainer from "../../../components/ui/GlassContainer";
 import BlockedUserModal from "../../../components/users/BlockedUserModal";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  LinearTransition,
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+  interpolate,
+  Extrapolation,
+} from "react-native-reanimated";
 
 if (
   Platform.OS === "android" &&
@@ -115,9 +125,12 @@ export default function Profile() {
   );
   const { theme, setTheme, isDark } = useTheme();
 
+  const searchExpand = useSharedValue(0);
+
   const toggleSearch = (active) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    Keyboard.dismiss();
     setActiveSearch(active);
+    searchExpand.value = withTiming(active ? 1 : 0, { duration: 350 });
     if (!active) setSearchQuery("");
   };
 
@@ -163,8 +176,9 @@ export default function Profile() {
   return (
     <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1" edges={["top"]}>
       {/* Header */}
-      <View className="px-4 py-2 flex-row items-center justify-between min-h-[60px]">
-        <View className="flex flex-row items-center flex-1">
+      <View className="flex-row items-center justify-between px-6 pt-2 pb-4 h-16">
+        <View className="flex-row items-center flex-1 h-full relative">
+          {/* Back/Close Button */}
           <GlassButton
             onPress={() => {
               if (activeSearch) toggleSearch(false);
@@ -172,7 +186,7 @@ export default function Profile() {
             }}
             size={44}
             shape="circle"
-            style={{ marginRight: 8 }}
+            style={{ marginRight: 12 }}
           >
             <Ionicons
               name={activeSearch ? "close" : "chevron-back"}
@@ -180,46 +194,73 @@ export default function Profile() {
               color={isDark ? "#818CF8" : "#4F46E5"}
             />
           </GlassButton>
-          {!activeSearch ? (
-            <Text
-              className="text-secondary dark:text-gray-100 font-extrabold text-xl"
+
+          {/* Title (Fades out when search is active) */}
+          {!activeSearch && (
+            <Animated.Text
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(200)}
+              className="text-secondary dark:text-gray-100 font-extrabold text-xl flex-1"
               numberOfLines={1}
             >
               Settings
-            </Text>
-          ) : (
-            <View className="flex-1 flex-row items-center bg-gray-100/80 dark:bg-gray-800/80 rounded-2xl px-4 py-2.5 ml-2 border border-gray-200 dark:border-gray-700">
-              <Ionicons name="search" size={18} color="#9CA3AF" />
-              <TextInput
-                ref={searchInputRef}
-                autoFocus
-                className="flex-1 ml-3 text-secondary dark:text-gray-100 text-base font-semibold"
-                placeholder="Search settings..."
-                placeholderTextColor="#9CA3AF"
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={() => setSearchQuery("")}>
-                  <Ionicons name="close-circle" size={18} color="#9CA3AF" />
-                </TouchableOpacity>
-              )}
-            </View>
+            </Animated.Text>
           )}
-        </View>
-        {!activeSearch && (
-          <GlassButton
-            onPress={() => toggleSearch(true)}
-            size={44}
-            shape="circle"
+
+          {/* Expanding Search Bar */}
+          <Animated.View
+            layout={LinearTransition.duration(250)}
+            style={{
+              flex: activeSearch ? 1 : 0,
+              alignItems: "flex-end",
+              justifyContent: "center",
+              height: 44,
+            }}
           >
-            <Ionicons
-              name="search"
-              size={20}
-              color={isDark ? "#818CF8" : "#4F46E5"}
-            />
-          </GlassButton>
-        )}
+            {activeSearch ? (
+              <GlassContainer
+                borderRadius={22}
+                isInteractive={true}
+                fallbackClassName="bg-gray-100/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700"
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: 16,
+                  height: 44,
+                  width: "100%",
+                }}
+              >
+                <Ionicons name="search" size={18} color="#9CA3AF" />
+                <TextInput
+                  ref={searchInputRef}
+                  autoFocus
+                  className="flex-1 ml-3 text-secondary dark:text-gray-100 text-base font-semibold h-full"
+                  placeholder="Search settings..."
+                  placeholderTextColor="#9CA3AF"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                />
+                {searchQuery.length > 0 && (
+                  <TouchableOpacity onPress={() => setSearchQuery("")}>
+                    <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+                  </TouchableOpacity>
+                )}
+              </GlassContainer>
+            ) : (
+              <GlassButton
+                onPress={() => toggleSearch(true)}
+                size={44}
+                shape="circle"
+              >
+                <Ionicons
+                  name="search"
+                  size={20}
+                  color={isDark ? "#818CF8" : "#4F46E5"}
+                />
+              </GlassButton>
+            )}
+          </Animated.View>
+        </View>
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
