@@ -6,7 +6,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  ScrollView,
+  StyleSheet,
   Switch,
   Text,
   TouchableOpacity,
@@ -14,6 +14,13 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Animated, {
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  Extrapolation,
+} from "react-native-reanimated";
 import CustomButton from "../../../components/ui/CustomButton";
 import CustomInput from "../../../components/ui/CustomInput";
 import { useTheme } from "../../../context/ThemeContext";
@@ -34,6 +41,9 @@ const CATEGORIES = [
 
 const MAX_TITLE = 60;
 
+// Threshold at which the inline title scrolls out of view
+const TITLE_SCROLL_THRESHOLD = 70;
+
 export default function CreateRooms() {
   const router = useRouter();
   const { firestoreUser: user } = useFirestoreUser();
@@ -49,6 +59,60 @@ export default function CreateRooms() {
   );
   const canCreateRoom =
     title.trim().length > 0 && !!selectedCategory && !isCreating;
+
+  const scrollY = useSharedValue(0);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  // Animated style for the compact header title (fades + slides in)
+  const headerTitleStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollY.value,
+      [TITLE_SCROLL_THRESHOLD - 20, TITLE_SCROLL_THRESHOLD + 10],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
+    const translateY = interpolate(
+      scrollY.value,
+      [TITLE_SCROLL_THRESHOLD - 20, TITLE_SCROLL_THRESHOLD + 10],
+      [8, 0],
+      Extrapolation.CLAMP,
+    );
+    return {
+      opacity,
+      transform: [{ translateY }],
+    };
+  });
+
+  // Animated style for the header bottom border (appears on scroll)
+  const headerBorderStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollY.value,
+      [0, 30],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
+    return {
+      opacity,
+    };
+  });
+
+  // Animated style for the inline title (fades out as it scrolls away)
+  const inlineTitleStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(
+      scrollY.value,
+      [0, TITLE_SCROLL_THRESHOLD],
+      [1, 0],
+      Extrapolation.CLAMP,
+    );
+    return {
+      opacity,
+    };
+  });
 
   const handleCreateRoom = async () => {
     if (!title || !selectedCategory) return alert("Please fill all the fields");
@@ -72,51 +136,71 @@ export default function CreateRooms() {
   };
 
   return (
-    <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1 ">
+    <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1">
+      {/* Fixed Header */}
+      <View style={styles.fixedHeader}>
+        <View style={styles.headerContent}>
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
+            style={styles.backButton}
+          >
+            <Ionicons
+              name="arrow-back"
+              size={20}
+              color={isDark ? "#E2E8F0" : "#18181B"}
+            />
+          </TouchableOpacity>
+
+          <Animated.View style={[styles.headerTitleContainer, headerTitleStyle]}>
+            <Text
+              className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight"
+              numberOfLines={1}
+            >
+              Create a Room
+            </Text>
+          </Animated.View>
+
+          {/* Spacer to balance the back button */}
+          <View style={{ width: 40 }} />
+        </View>
+
+        {/* Animated border */}
+        <Animated.View
+          style={[
+            styles.headerBorder,
+            { backgroundColor: isDark ? "#2A2A36" : "#F1F5F9" },
+            headerBorderStyle,
+          ]}
+        />
+      </View>
+
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <ScrollView
+        <Animated.ScrollView
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
             paddingBottom: 40,
             flexGrow: 1,
-            marginHorizontal: 20,
+            paddingHorizontal: 20,
           }}
+          keyboardShouldPersistTaps="handled"
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View className="flex-1">
-              {/* Header */}
-              <View className="flex-row items-center py-4">
-                <TouchableOpacity
-                  onPress={() => router.back()}
-                  className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36] mr-3"
-                  style={{
-                    shadowColor: "#94A3B8",
-                    shadowOffset: { width: 0, height: 1 },
-                    shadowOpacity: 0.04,
-                    shadowRadius: 4,
-                    elevation: 1,
-                  }}
-                >
-                  <Ionicons
-                    name="arrow-back"
-                    size={20}
-                    color={isDark ? "#E2E8F0" : "#18181B"}
-                  />
-                </TouchableOpacity>
-              </View>
-
-              {/* Title */}
-              <View className="mt-4 mb-8">
+              {/* Inline Title — fades out on scroll */}
+              <Animated.View className="mt-4 mb-8" style={inlineTitleStyle}>
                 <Text className="text-secondary dark:text-gray-100 text-[28px] font-extrabold tracking-tight leading-[34px]">
                   Create a Room
                 </Text>
                 <Text className="text-gray-400 dark:text-gray-500 text-sm leading-5 mt-2">
                   Set a clear topic so people know what they are joining.
                 </Text>
-              </View>
+              </Animated.View>
 
               {/* Room Title Input */}
               <View className="mb-1">
@@ -293,8 +377,36 @@ export default function CreateRooms() {
               </View>
             </View>
           </TouchableWithoutFeedback>
-        </ScrollView>
+        </Animated.ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  fixedHeader: {
+    zIndex: 10,
+  },
+  headerContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  backButton: {
+    shadowColor: "#94A3B8",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  headerTitleContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerBorder: {
+    height: StyleSheet.hairlineWidth,
+    width: "100%",
+  },
+});
