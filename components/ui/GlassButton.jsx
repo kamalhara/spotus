@@ -16,8 +16,7 @@ try {
   isLiquidGlassAvailable = () => false;
 }
 
-const hasGlass =
-  Platform.OS === "ios" && GlassView && isLiquidGlassAvailable();
+const hasGlass = Platform.OS === "ios" && GlassView && isLiquidGlassAvailable();
 
 /**
  * A navigation-chrome button that renders with iOS 26 liquid glass
@@ -78,7 +77,10 @@ export default function GlassButton({
       <Pressable
         onPress={handlePress}
         disabled={disabled}
-        style={[{ width: shape === "pill" ? undefined : size, height: size }, style]}
+        style={[
+          { width: shape === "pill" ? undefined : size, height: size },
+          style,
+        ]}
       >
         <GlassView
           style={glassStyle}

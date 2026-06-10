@@ -22,11 +22,11 @@ import {
 } from "react-native";
 import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
-import GlassButton from "../../../components/ui/GlassButton";
 import ChatMessages from "../../../components/chat/ChatMessages";
 import MessageSender from "../../../components/chat/MessageSender";
 import RoomDetailsSheet from "../../../components/rooms/RoomDetailsSheet";
 import TrustInfoSheet from "../../../components/rooms/TrustInfoSheet";
+import GlassButton from "../../../components/ui/GlassButton";
 import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
@@ -280,7 +280,12 @@ export default function RoomChat() {
         <SafeAreaView edges={["top"]}>
           <View className="flex-row items-center justify-between px-5 py-3">
             <View className="flex-row items-center flex-1">
-              <GlassButton onPress={() => router.back()} size={40} shape="circle" style={{ marginRight: 12 }}>
+              <GlassButton
+                onPress={() => router.back()}
+                size={40}
+                shape="circle"
+                style={{ marginRight: 12 }}
+              >
                 <Ionicons
                   name="chevron-back"
                   size={20}
