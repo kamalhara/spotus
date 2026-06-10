@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import GlassContainer from "../../components/ui/GlassContainer";
 import { setTyping } from "../../lib/chatTyping";
 
 const MEDIA_OPTIONS = [
@@ -186,9 +187,12 @@ export default function MessageSender({
       {/* Media Menu Popup */}
       {showMediaMenu && (
         <View className="absolute bottom-[60px] left-0 right-0 z-10">
-          <View
-            className="bg-white dark:bg-[#1A1A22] rounded-2xl py-3 px-3 mx-1 border border-gray-100 dark:border-[#2A2A36]"
+          <GlassContainer
+            borderRadius={16}
+            fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
             style={{
+              padding: 12,
+              marginHorizontal: 4,
               shadowColor: "#94A3B8",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.08,
@@ -220,13 +224,18 @@ export default function MessageSender({
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
+          </GlassContainer>
         </View>
       )}
 
       {/* Edit Preview Banner */}
       {editingMessage && (
-        <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl px-4 py-3 mb-2 flex-row items-center">
+        <View className="mb-2">
+          <GlassContainer 
+            borderRadius={16}
+            fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+            style={{ paddingHorizontal: 16, paddingVertical: 12, flexDirection: 'row', alignItems: 'center' }}
+          >
           <View className="w-8 h-8 rounded-xl bg-primary/10 items-center justify-center mr-3">
             <Ionicons name="create-outline" size={15} color="#4F46E5" />
           </View>
@@ -248,12 +257,18 @@ export default function MessageSender({
           >
             <Ionicons name="close" size={16} color="#94A3B8" />
           </TouchableOpacity>
+          </GlassContainer>
         </View>
       )}
 
       {/* Reply Preview Banner */}
       {replyTo && (
-        <View className="bg-white dark:bg-[#1A1A22] border-l-4 border-l-primary border-y border-r border-border-light dark:border-y-[#2A2A36] dark:border-r-[#2A2A36] rounded-t-xl px-4 py-3 mb-2 flex-row items-center">
+        <View className="mb-2">
+          <GlassContainer 
+            borderRadius={16}
+            fallbackClassName="bg-white dark:bg-[#1A1A22] border-l-4 border-l-primary border-y border-r border-border-light dark:border-y-[#2A2A36] dark:border-r-[#2A2A36]"
+            style={{ paddingHorizontal: 16, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', borderLeftWidth: 4, borderLeftColor: '#4F46E5' }}
+          >
           <View className="mr-2">
             <Ionicons name="arrow-undo" size={16} color="#4F46E5" />
           </View>
@@ -275,11 +290,16 @@ export default function MessageSender({
           >
             <Ionicons name="close" size={16} color="#94A3B8" />
           </TouchableOpacity>
+          </GlassContainer>
         </View>
       )}
 
       {/* Input Bar */}
-      <View className="flex-row items-center w-full bg-white dark:bg-[#1A1A22] rounded-full p-1.5 border border-border dark:border-[#2A2A36]">
+      <GlassContainer 
+        borderRadius={30}
+        fallbackClassName="bg-white dark:bg-[#1A1A22] border border-border dark:border-[#2A2A36]"
+        style={{ padding: 6, flexDirection: 'row', alignItems: 'center', width: '100%' }}
+      >
         <TouchableOpacity
           className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-alt dark:bg-[#23232E] ml-0.5"
           onPress={toggleMediaMenu}
@@ -316,7 +336,7 @@ export default function MessageSender({
             color={isActive ? "white" : "#CBD5E1"}
           />
         </TouchableOpacity>
-      </View>
+      </GlassContainer>
     </View>
   );
 }

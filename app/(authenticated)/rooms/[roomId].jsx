@@ -27,6 +27,7 @@ import MessageSender from "../../../components/chat/MessageSender";
 import RoomDetailsSheet from "../../../components/rooms/RoomDetailsSheet";
 import TrustInfoSheet from "../../../components/rooms/TrustInfoSheet";
 import GlassButton from "../../../components/ui/GlassButton";
+import GlassContainer from "../../../components/ui/GlassContainer";
 import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
@@ -330,7 +331,11 @@ export default function RoomChat() {
           className="px-5 pt-3 pb-1"
           onPress={() => trustSheetRef.current?.present()}
         >
-          <View className="bg-white dark:bg-[#1A1A22] px-4 py-3 rounded-2xl border border-gray-100 dark:border-[#2A2A36]">
+          <GlassContainer 
+            borderRadius={16} 
+            fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+            style={{ paddingHorizontal: 16, paddingVertical: 12 }}
+          >
             <View className="flex-row items-center justify-between mb-2">
               <View className="flex-row items-center">
                 <Ionicons
@@ -359,7 +364,7 @@ export default function RoomChat() {
               borderRadius={2}
               animated={true}
             />
-          </View>
+          </GlassContainer>
         </TouchableOpacity>
       )}
 

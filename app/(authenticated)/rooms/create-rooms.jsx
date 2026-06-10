@@ -24,6 +24,7 @@ import Animated, {
 import CustomButton from "../../../components/ui/CustomButton";
 import CustomInput from "../../../components/ui/CustomInput";
 import GlassButton from "../../../components/ui/GlassButton";
+import GlassContainer from "../../../components/ui/GlassContainer";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { createRoom } from "../../../lib/createRoom";
@@ -274,7 +275,11 @@ export default function CreateRooms() {
                 <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
                   Preview
                 </Text>
-                <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4">
+                <GlassContainer 
+                  borderRadius={16} 
+                  fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+                  style={{ padding: 16 }}
+                >
                   <View className="flex-row items-center justify-between mb-3">
                     <View
                       className="px-3 py-1.5 rounded-xl flex-row items-center"
@@ -312,57 +317,63 @@ export default function CreateRooms() {
                   <Text className="text-gray-400 dark:text-gray-500 text-xs mt-2 leading-4">
                     This is how your room will appear in the list.
                   </Text>
-                </View>
+                </GlassContainer>
               </View>
 
               {/* Show on Map Toggle */}
-              <View className="mt-8 bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4 flex-row items-center justify-between">
-                <View className="flex-1 pr-4">
-                  <View className="flex-row items-center mb-1">
-                    <Ionicons
-                      name="map"
-                      size={16}
-                      color="#4F46E5"
-                      style={{ marginRight: 6 }}
-                    />
-                    <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
-                      Show Room on Map
+              <View className="mt-8">
+                <GlassContainer 
+                  borderRadius={16}
+                  fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+                  style={{ padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+                >
+                  <View className="flex-1 pr-4">
+                    <View className="flex-row items-center mb-1">
+                      <Ionicons
+                        name="map"
+                        size={16}
+                        color="#4F46E5"
+                        style={{ marginRight: 6 }}
+                      />
+                      <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
+                        Show Room on Map
+                      </Text>
+                    </View>
+                    <Text className="text-gray-400 dark:text-gray-500 text-xs leading-4">
+                      Allow nearby users to discover this room on the public map.
                     </Text>
                   </View>
-                  <Text className="text-gray-400 dark:text-gray-500 text-xs leading-4">
-                    Allow nearby users to discover this room on the public map.
-                  </Text>
-                </View>
-                <Switch
-                  value={showOnMap}
-                  onValueChange={(val) => {
-                    if (val) {
-                      Alert.alert(
-                        "Show Room on Map?",
-                        "Displaying a room on the map makes it easier for nearby users to discover. Only enable this if you are comfortable with the room appearing on the public map.",
-                        [
-                          {
-                            text: "Cancel",
-                            style: "cancel",
-                            onPress: () => setShowOnMap(false),
-                          },
-                          {
-                            text: "Enable",
-                            style: "default",
-                            onPress: () => setShowOnMap(true),
-                          },
-                        ],
-                      );
-                    } else {
-                      setShowOnMap(false);
-                    }
-                  }}
-                  trackColor={{
-                    false: isDark ? "#2A2A36" : "#E2E8F0",
-                    true: "#4F46E5",
-                  }}
-                  thumbColor={"#FFFFFF"}
-                />
+                  <Switch
+                    value={showOnMap}
+                    onValueChange={(val) => {
+                      if (val) {
+                        Alert.alert(
+                          "Show Room on Map?",
+                          "Displaying a room on the map makes it easier for nearby users to discover. Only enable this if you are comfortable with the room appearing on the public map.",
+                          [
+                            {
+                              text: "Cancel",
+                              style: "cancel",
+                              onPress: () => setShowOnMap(false),
+                            },
+                            {
+                              text: "Enable",
+                              style: "default",
+                              onPress: () => setShowOnMap(true),
+                            },
+                          ],
+                        );
+                      } else {
+                        setShowOnMap(false);
+                      }
+                    }}
+                    trackColor={{
+                      false: isDark ? "#2A2A36" : "#E2E8F0",
+                      true: "#4F46E5",
+                    }}
+                    thumbColor={"#FFFFFF"}
+                  />
+                </GlassContainer>
               </View>
 
               {/* Create Button */}
