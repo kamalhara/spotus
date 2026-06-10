@@ -19,6 +19,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import GlassButton from "../../../components/ui/GlassButton";
 import BlockedUserModal from "../../../components/users/BlockedUserModal";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
@@ -164,19 +165,21 @@ export default function Profile() {
       {/* Header */}
       <View className="px-4 py-2 flex-row items-center justify-between min-h-[60px]">
         <View className="flex flex-row items-center flex-1">
-          <TouchableOpacity
+          <GlassButton
             onPress={() => {
               if (activeSearch) toggleSearch(false);
               else router.back();
             }}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50 dark:bg-gray-800/50 mr-2"
+            size={44}
+            shape="circle"
+            style={{ marginRight: 8 }}
           >
             <Ionicons
-              name={activeSearch ? "close" : "arrow-back"}
+              name={activeSearch ? "close" : "chevron-back"}
               size={20}
               color={isDark ? "#818CF8" : "#4F46E5"}
             />
-          </TouchableOpacity>
+          </GlassButton>
           {!activeSearch ? (
             <Text
               className="text-secondary dark:text-gray-100 font-extrabold text-xl"
@@ -205,16 +208,17 @@ export default function Profile() {
           )}
         </View>
         {!activeSearch && (
-          <TouchableOpacity
+          <GlassButton
             onPress={() => toggleSearch(true)}
-            className="w-11 h-11 rounded-full flex items-center justify-center bg-gray-200/50 dark:bg-gray-800/50"
+            size={44}
+            shape="circle"
           >
             <Ionicons
               name="search"
               size={20}
               color={isDark ? "#818CF8" : "#4F46E5"}
             />
-          </TouchableOpacity>
+          </GlassButton>
         )}
       </View>
       <ScrollView

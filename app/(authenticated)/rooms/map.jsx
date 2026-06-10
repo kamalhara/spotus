@@ -14,6 +14,7 @@ import {
 import MapView from "react-native-map-clustering";
 import { Marker } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import GlassButton from "../../../components/ui/GlassButton";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
 import { db } from "../../../config/firebase.config";
@@ -388,59 +389,28 @@ export default function MapViewScreen() {
             pointerEvents="box-none"
           >
             <View className="px-5 py-2 flex-row justify-between items-center mt-2">
-              <TouchableOpacity
-                onPress={() => router.back()}
-                style={{
-                  width: 44,
-                  height: 44,
-                  backgroundColor: isDark
-                    ? "rgba(26,26,34,0.95)"
-                    : "rgba(255,255,255,0.95)",
-                  borderRadius: 22,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.15,
-                  shadowRadius: 4,
-                  elevation: 4,
-                }}
-              >
+              <GlassButton onPress={() => router.back()} size={44} shape="circle">
                 <Ionicons
-                  name="arrow-back"
+                  name="chevron-back"
                   size={20}
                   color={isDark ? "#F3F4F6" : "#18181B"}
                 />
-              </TouchableOpacity>
+              </GlassButton>
 
-              <View
-                style={{
-                  backgroundColor: isDark
-                    ? "rgba(26,26,34,0.95)"
-                    : "rgba(255,255,255,0.95)",
-                  paddingHorizontal: 16,
-                  paddingVertical: 10,
-                  borderRadius: 20,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.15,
-                  shadowRadius: 4,
-                  elevation: 4,
-                }}
-              >
-                <View className="w-2 h-2 rounded-full bg-primary mr-2" />
-                <Text
-                  style={{
-                    fontSize: 13,
-                    fontWeight: "900",
-                    color: isDark ? "#F3F4F6" : "#18181B",
-                  }}
-                >
-                  {rooms.length} {rooms.length === 1 ? "Room" : "Rooms"}
-                </Text>
-              </View>
+              <GlassButton shape="pill" size={40} haptic={false}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View className="w-2 h-2 rounded-full bg-primary mr-2" />
+                  <Text
+                    style={{
+                      fontSize: 13,
+                      fontWeight: "900",
+                      color: isDark ? "#F3F4F6" : "#18181B",
+                    }}
+                  >
+                    {rooms.length} {rooms.length === 1 ? "Room" : "Rooms"}
+                  </Text>
+                </View>
+              </GlassButton>
             </View>
           </SafeAreaView>
 

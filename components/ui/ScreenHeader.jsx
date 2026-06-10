@@ -3,6 +3,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
+import GlassButton from "./GlassButton";
 
 export default function ScreenHeader({
   title,
@@ -16,7 +17,6 @@ export default function ScreenHeader({
   const { isDark } = useTheme();
 
   const handleBack = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.back();
   };
 
@@ -25,17 +25,18 @@ export default function ScreenHeader({
       <View className="flex-row items-center justify-between min-h-[48px]">
         <View className="flex-row items-center flex-1">
           {showBack && (
-            <TouchableOpacity
+            <GlassButton
               onPress={handleBack}
-              activeOpacity={0.75}
-              className="w-11 h-11 rounded-full bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] items-center justify-center mr-3"
+              size={44}
+              shape="circle"
+              style={{ marginRight: 12 }}
             >
               <Ionicons
                 name="chevron-back"
                 size={21}
                 color={isDark ? "white" : "#18181B"}
               />
-            </TouchableOpacity>
+            </GlassButton>
           )}
           <View className="flex-1">
             <Text
@@ -56,13 +57,12 @@ export default function ScreenHeader({
         </View>
 
         {rightIcon || rightLabel ? (
-          <TouchableOpacity
+          <GlassButton
             onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               onRightPress?.();
             }}
-            activeOpacity={0.75}
-            className="min-w-11 h-11 rounded-2xl bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] items-center justify-center px-3"
+            size={44}
+            shape={rightLabel ? "pill" : "circle"}
           >
             {rightIcon ? (
               <Ionicons
@@ -75,7 +75,7 @@ export default function ScreenHeader({
                 {rightLabel}
               </Text>
             )}
-          </TouchableOpacity>
+          </GlassButton>
         ) : (
           <View className="w-11" />
         )}

@@ -7,7 +7,9 @@ import { Redirect, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import GlassButton from "../../../components/ui/GlassButton";
 import Skeleton from "../../../components/ui/Skeleton";
+import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 
@@ -56,6 +58,7 @@ export default function Profile() {
   const { signOut } = useAuth();
   const { firestoreUser, loading } = useFirestoreUser();
   const router = useRouter();
+  const { isDark } = useTheme();
 
   const [rooms, setRooms] = useState([]);
   useFocusEffect(
@@ -156,12 +159,11 @@ export default function Profile() {
                 style={{ width: "100%", height: "100%" }}
               />
             </View>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              className="absolute -bottom-1 -right-1 bg-primary w-10 h-10 rounded-full border-4 border-bg dark:border-[#0F0F13] items-center justify-center"
-            >
-              <Ionicons name="camera" size={16} color="white" />
-            </TouchableOpacity>
+            <View className="absolute -bottom-1 -right-1">
+              <GlassButton size={40} shape="circle">
+                <Ionicons name="camera" size={16} color={isDark ? "#818CF8" : "#4F46E5"} />
+              </GlassButton>
+            </View>
           </View>
 
           <Text className="text-secondary dark:text-gray-100 text-[26px] font-extrabold mt-4 tracking-tight">

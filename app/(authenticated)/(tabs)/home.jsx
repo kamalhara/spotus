@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import GlassButton from "../../../components/ui/GlassButton";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
@@ -191,16 +192,13 @@ export default function Home() {
             </Text>
             <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
           </View>
-          <TouchableOpacity
-            onPress={handleRefreshPress}
-            className="w-12 h-12 bg-white dark:bg-[#1A1A22] rounded-full items-center justify-center border border-border-light dark:border-[#2A2A36]"
-          >
+          <GlassButton onPress={handleRefreshPress} size={48} shape="circle">
             <Ionicons
               name={loading ? "refresh-circle" : "refresh"}
               size={20}
               color={isDark ? "#F8FAFC" : "#18181B"}
             />
-          </TouchableOpacity>
+          </GlassButton>
         </Animated.View>
 
         {/* Greeting + Distance */}
@@ -313,13 +311,16 @@ export default function Home() {
                 </View>
               )}
             </View>
-            <TouchableOpacity 
+            <GlassButton
               onPress={() => router.push({ pathname: '/rooms/map', params: { distance } })}
-              className="flex-row items-center bg-gray-100 dark:bg-[#1A1A22] border border-gray-200 dark:border-[#2A2A36] px-3 py-1.5 rounded-full"
+              shape="pill"
+              size={34}
             >
-              <Ionicons name="map" size={14} color={isDark ? "#E2E8F0" : "#4B5563"} style={{ marginRight: 4 }} />
-              <Text className="text-gray-600 dark:text-gray-300 text-xs font-bold">Map View</Text>
-            </TouchableOpacity>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Ionicons name="map" size={14} color={isDark ? "#E2E8F0" : "#4B5563"} style={{ marginRight: 4 }} />
+                <Text className="text-gray-600 dark:text-gray-300 text-xs font-bold">Map View</Text>
+              </View>
+            </GlassButton>
           </View>
         </View>
 

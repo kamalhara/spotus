@@ -16,6 +16,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomInput from "../../../components/ui/CustomInput";
+import GlassButton from "../../../components/ui/GlassButton";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
@@ -147,15 +148,15 @@ export default function Edit() {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View className="flex-1">
             <View className="w-full flex-row items-center justify-between mt-2 py-3">
-              <TouchableOpacity
+              <GlassButton
                 onPress={() => router.back()}
-                activeOpacity={0.75}
-                className="px-3 py-2 rounded-xl bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+                shape="pill"
+                size={40}
               >
                 <Text className="font-bold text-primary dark:text-primary-light">
                   Cancel
                 </Text>
-              </TouchableOpacity>
+              </GlassButton>
               <Text className="font-extrabold text-lg text-secondary dark:text-gray-100">
                 Edit Profile
               </Text>

@@ -23,6 +23,7 @@ import Animated, {
 } from "react-native-reanimated";
 import CustomButton from "../../../components/ui/CustomButton";
 import CustomInput from "../../../components/ui/CustomInput";
+import GlassButton from "../../../components/ui/GlassButton";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { createRoom } from "../../../lib/createRoom";
@@ -140,18 +141,16 @@ export default function CreateRooms() {
       {/* Fixed Header */}
       <View style={styles.fixedHeader}>
         <View style={styles.headerContent}>
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
-            style={styles.backButton}
-          >
+          {/* Glass Back Button */}
+          <GlassButton onPress={() => router.back()} size={40} shape="circle">
             <Ionicons
-              name="arrow-back"
+              name="chevron-back"
               size={20}
-              color={isDark ? "#E2E8F0" : "#18181B"}
+              color={isDark ? "#FFFFFF" : "#000000"}
             />
-          </TouchableOpacity>
+          </GlassButton>
 
+          {/* Animated compact title — slides in on scroll */}
           <Animated.View style={[styles.headerTitleContainer, headerTitleStyle]}>
             <Text
               className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight"
@@ -165,7 +164,7 @@ export default function CreateRooms() {
           <View style={{ width: 40 }} />
         </View>
 
-        {/* Animated border */}
+        {/* Animated border — fades in on scroll */}
         <Animated.View
           style={[
             styles.headerBorder,
@@ -392,13 +391,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 10,
-  },
-  backButton: {
-    shadowColor: "#94A3B8",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
   },
   headerTitleContainer: {
     flex: 1,

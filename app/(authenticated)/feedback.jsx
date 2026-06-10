@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import GlassButton from "../../components/ui/GlassButton";
 import { db } from "../../config/firebase.config";
 import { useTheme } from "../../context/ThemeContext";
 import useFirestoreUser from "../../hook/useFireStoreUser";
@@ -82,16 +83,13 @@ export default function FeedbackScreen() {
       >
         {/* Header */}
         <View className="flex-row items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-[#2A2A36]">
-          <TouchableOpacity
-            onPress={() => router.back()}
-            className="w-10 h-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
-          >
+          <GlassButton onPress={() => router.back()} size={40} shape="circle">
             <Ionicons
               name="chevron-back"
               size={20}
               color={isDark ? "white" : "#18181B"}
             />
-          </TouchableOpacity>
+          </GlassButton>
           <Text className="text-secondary dark:text-gray-100 text-lg font-extrabold">
             Report
           </Text>

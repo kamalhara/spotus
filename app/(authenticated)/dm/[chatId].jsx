@@ -21,6 +21,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import GlassButton from "../../../components/ui/GlassButton";
 import ChatMessages from "../../../components/chat/ChatMessages";
 import MessageSender from "../../../components/chat/MessageSender";
 import UserOptionsModal from "../../../components/modals/userOptionsModal";
@@ -254,16 +255,13 @@ export default function ChatId() {
           }}
         >
           <View className="flex-row items-center gap-3 flex-1 mr-2">
-            <TouchableOpacity
-              onPress={() => router.back()}
-              className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#23232E] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
-            >
+            <GlassButton onPress={() => router.back()} size={40} shape="circle">
               <Ionicons
                 name="chevron-back"
                 size={20}
                 color={isDark ? "white" : "#18181B"}
               />
-            </TouchableOpacity>
+            </GlassButton>
             <TouchableOpacity
               className="flex-row items-center gap-3 flex-1"
               onPress={() =>
@@ -317,12 +315,9 @@ export default function ChatId() {
               </View>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            onPress={() => setShowOptions(true)}
-            className="w-10 h-10 rounded-full bg-gray-50 dark:bg-[#23232E] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
-          >
+          <GlassButton onPress={() => setShowOptions(true)} size={40} shape="circle">
             <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
-          </TouchableOpacity>
+          </GlassButton>
         </View>
 
         {/* Messages */}

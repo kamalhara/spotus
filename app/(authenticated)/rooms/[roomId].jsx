@@ -22,6 +22,7 @@ import {
 } from "react-native";
 import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
+import GlassButton from "../../../components/ui/GlassButton";
 import ChatMessages from "../../../components/chat/ChatMessages";
 import MessageSender from "../../../components/chat/MessageSender";
 import RoomDetailsSheet from "../../../components/rooms/RoomDetailsSheet";
@@ -279,16 +280,13 @@ export default function RoomChat() {
         <SafeAreaView edges={["top"]}>
           <View className="flex-row items-center justify-between px-5 py-3">
             <View className="flex-row items-center flex-1">
-              <TouchableOpacity
-                onPress={() => router.back()}
-                className="w-10 h-10 bg-gray-50 dark:bg-[#23232E] rounded-2xl items-center justify-center mr-3 border border-gray-100 dark:border-[#2A2A36]"
-              >
+              <GlassButton onPress={() => router.back()} size={40} shape="circle" style={{ marginRight: 12 }}>
                 <Ionicons
                   name="chevron-back"
                   size={20}
                   color={isDark ? "white" : "#18181B"}
                 />
-              </TouchableOpacity>
+              </GlassButton>
 
               <View className="w-11 h-11 rounded-2xl bg-primary/10 items-center justify-center mr-3">
                 <Ionicons name={categoryIcon} size={18} color={categoryColor} />
@@ -314,12 +312,9 @@ export default function RoomChat() {
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity
-              onPress={handleInfoPress}
-              className="w-10 h-10 bg-gray-50 dark:bg-[#23232E] rounded-2xl items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
-            >
+            <GlassButton onPress={handleInfoPress} size={40} shape="circle">
               <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
-            </TouchableOpacity>
+            </GlassButton>
           </View>
         </SafeAreaView>
       </View>

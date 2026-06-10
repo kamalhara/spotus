@@ -11,6 +11,7 @@ import {
 import { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import GlassButton from "../../../components/ui/GlassButton";
 import RoomOptionsModal from "../../../components/rooms/roomOptionsModal";
 import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
@@ -136,24 +137,13 @@ export default function RoomInfo() {
   return (
     <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13] px-5">
       <View className="flex-row justify-between items-center py-4">
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="h-10 w-10 rounded-full bg-white dark:bg-[#1A1A22] items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
-          style={{
-            shadowColor: "#94A3B8",
-            shadowOffset: { width: 0, height: 1 },
-            shadowOpacity: 0.04,
-            shadowRadius: 4,
-            elevation: 1,
-          }}
-        >
+        <GlassButton onPress={() => router.back()} size={40} shape="circle">
           <Ionicons
-            name="arrow-back"
+            name="chevron-back"
             size={20}
             color={isDark ? "white" : "#18181B"}
-            className="dark:text-gray-100"
           />
-        </TouchableOpacity>
+        </GlassButton>
         <Text
           className="text-secondary dark:text-gray-100 text-xl font-bold"
           numberOfLines={1}
@@ -161,17 +151,13 @@ export default function RoomInfo() {
         >
           {showRoomTitle ? room?.title : "Room Info"}
         </Text>
-        <TouchableOpacity
-          onPress={() => setShowOptions(true)}
-          className="h-10 w-10 rounded-full items-center justify-center"
-        >
+        <GlassButton onPress={() => setShowOptions(true)} size={40} shape="circle">
           <Ionicons
             name="ellipsis-vertical"
             size={20}
             color={isDark ? "white" : "#18181B"}
-            className="dark:text-gray-100"
           />
-        </TouchableOpacity>
+        </GlassButton>
       </View>
 
       <ScrollView
