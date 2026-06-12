@@ -1,4 +1,3 @@
-import React from "react";
 import { Platform, StyleSheet, View } from "react-native";
 
 let GlassView, isLiquidGlassAvailable;
@@ -32,6 +31,7 @@ const hasGlass = Platform.OS === "ios" && GlassView && isLiquidGlassAvailable();
  */
 export default function GlassContainer({
   children,
+  className,
   style,
   fallbackClassName,
   glassEffectStyle = "regular",
@@ -61,7 +61,7 @@ export default function GlassContainer({
 
   return (
     <View
-      className={fallbackClassName || defaultFallback}
+      className={`${className} ${fallbackClassName || defaultFallback}`}
       style={[
         { borderRadius, overflow: "hidden" },
         styles.fallbackShadow,

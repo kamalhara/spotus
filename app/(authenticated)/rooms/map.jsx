@@ -8,19 +8,19 @@ import {
   FlatList,
   SafeAreaView,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
 import MapView from "react-native-map-clustering";
 import { Marker } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import GlassButton from "../../../components/ui/GlassButton";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
+import GlassButton from "../../../components/ui/GlassButton";
 import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
+
 import { getCurrentLocation } from "../../../lib/location";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.78; // Narrower to show adjacent cards
@@ -29,6 +29,8 @@ const ITEM_WIDTH = CARD_WIDTH + ITEM_MARGIN * 2;
 const SNAP_INTERVAL = ITEM_WIDTH;
 
 function EmptyRooms() {
+  const router = useRouter();
+  const { isDark } = useTheme();
   return (
     <View className="flex-1 items-center justify-center py-20 px-6">
       <View className="w-24 h-24 bg-info-surface rounded-full items-center justify-center mb-6">
@@ -37,10 +39,27 @@ function EmptyRooms() {
       <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight text-center mb-2.5">
         No rooms nearby
       </Text>
-      <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">
+      <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4 mb-10">
         Expand your search radius or be the first to start a conversation in
         your area.
       </Text>
+
+      <GlassButton
+        onPress={() => router.push("/rooms/create-rooms")}
+        shape="pill"
+        size="regular"
+      >
+        <View className="flex-row items-center justify-center gap-2 py-3.5 px-6">
+          <Ionicons
+            name="add-outline"
+            size={20}
+            color={isDark ? "#818CF8" : "#4F46E5"}
+          />
+          <Text className="text-primary dark:text-primary-light font-bold text-lg">
+            Create Room
+          </Text>
+        </View>
+      </GlassButton>
     </View>
   );
 }
@@ -286,6 +305,19 @@ export default function MapViewScreen() {
 
   return (
     <View className="flex-1 bg-bg dark:bg-[#0F0F13]">
+      <GlassButton
+        onPress={() => router.back()}
+        style={{ position: "absolute", top: 56, left: 16, zIndex: 10 }}
+        size={44}
+        shape="circle"
+      >
+        <Ionicons
+          name="chevron-back"
+          size={20}
+          color="white"
+          className="text-secondary dark:text-primary-light"
+        />
+      </GlassButton>
       {locationError ? (
         <LocationPermissionDenied />
       ) : rooms.length === 0 && !loading ? (
@@ -389,16 +421,8 @@ export default function MapViewScreen() {
             pointerEvents="box-none"
           >
             <View className="px-5 py-2 flex-row justify-between items-center mt-2">
-              <GlassButton onPress={() => router.back()} size={44} shape="circle">
-                <Ionicons
-                  name="chevron-back"
-                  size={20}
-                  color={isDark ? "#F3F4F6" : "#18181B"}
-                />
-              </GlassButton>
-
               <GlassButton shape="pill" size={40} haptic={false}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <View className="w-2 h-2 rounded-full bg-primary mr-2" />
                   <Text
                     style={{
@@ -410,6 +434,18 @@ export default function MapViewScreen() {
                     {rooms.length} {rooms.length === 1 ? "Room" : "Rooms"}
                   </Text>
                 </View>
+              </GlassButton>
+
+              <GlassButton
+                onPress={() => router.back()}
+                size={44}
+                shape="circle"
+              >
+                <Ionicons
+                  name="chevron-back"
+                  size={20}
+                  color={isDark ? "#F3F4F6" : "#18181B"}
+                />
               </GlassButton>
             </View>
           </SafeAreaView>
