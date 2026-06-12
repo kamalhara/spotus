@@ -7,7 +7,6 @@ import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Keyboard,
-  LayoutAnimation,
   Platform,
   ScrollView,
   Switch,
@@ -17,22 +16,19 @@ import {
   UIManager,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import GlassButton from "../../../components/ui/GlassButton";
-import GlassContainer from "../../../components/ui/GlassContainer";
-import BlockedUserModal from "../../../components/users/BlockedUserModal";
-import { useTheme } from "../../../context/ThemeContext";
-import useFirestoreUser from "../../../hook/useFireStoreUser";
 import Animated, {
   FadeIn,
   FadeOut,
   LinearTransition,
   useSharedValue,
   withTiming,
-  useAnimatedStyle,
-  interpolate,
-  Extrapolation,
 } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
+import GlassButton from "../../../components/ui/GlassButton";
+import GlassContainer from "../../../components/ui/GlassContainer";
+import BlockedUserModal from "../../../components/users/BlockedUserModal";
+import { useTheme } from "../../../context/ThemeContext";
+import useFirestoreUser from "../../../hook/useFireStoreUser";
 
 if (
   Platform.OS === "android" &&
@@ -179,21 +175,22 @@ export default function Profile() {
       <View className="flex-row items-center justify-between px-6 pt-2 pb-4 h-16">
         <View className="flex-row items-center flex-1 h-full relative">
           {/* Back/Close Button */}
-          <GlassButton
-            onPress={() => {
-              if (activeSearch) toggleSearch(false);
-              else router.back();
-            }}
-            size={44}
-            shape="circle"
-            style={{ marginRight: 12 }}
-          >
-            <Ionicons
-              name={activeSearch ? "close" : "chevron-back"}
-              size={20}
-              color={isDark ? "#818CF8" : "#4F46E5"}
-            />
-          </GlassButton>
+          {!activeSearch && (
+            <GlassButton
+              onPress={() => {
+                router.back();
+              }}
+              size={44}
+              shape="circle"
+              style={{ marginRight: 12 }}
+            >
+              <Ionicons
+                name="chevron-back"
+                size={20}
+                color={isDark ? "#818CF8" : "#4F46E5"}
+              />
+            </GlassButton>
+          )}
 
           {/* Title (Fades out when search is active) */}
           {!activeSearch && (
@@ -218,34 +215,51 @@ export default function Profile() {
             }}
           >
             {activeSearch ? (
-              <GlassContainer
-                borderRadius={22}
-                isInteractive={true}
-                fallbackClassName="bg-gray-100/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700"
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  paddingHorizontal: 16,
-                  height: 44,
-                  width: "100%",
-                }}
-              >
-                <Ionicons name="search" size={18} color="#9CA3AF" />
-                <TextInput
-                  ref={searchInputRef}
-                  autoFocus
-                  className="flex-1 ml-3 text-secondary dark:text-gray-100 text-base font-semibold h-full"
-                  placeholder="Search settings..."
-                  placeholderTextColor="#9CA3AF"
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                />
-                {searchQuery.length > 0 && (
-                  <TouchableOpacity onPress={() => setSearchQuery("")}>
-                    <Ionicons name="close-circle" size={18} color="#9CA3AF" />
-                  </TouchableOpacity>
-                )}
-              </GlassContainer>
+              <View className="flex-row items-center gap-2 flex-1 w-full">
+                <GlassContainer
+                  borderRadius={22}
+                  isInteractive={true}
+                  fallbackClassName="bg-gray-100/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700"
+                  style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    paddingHorizontal: 16,
+                    height: 44,
+                  }}
+                >
+                  <Ionicons
+                    name="search"
+                    size={18}
+                    color="#9CA3AF"
+                  />
+                  <TextInput
+                    ref={searchInputRef}
+                    autoFocus
+                    className="flex-1 ml-3 text-secondary dark:text-gray-100 text-base font-semibold h-full"
+                    placeholder="Search settings..."
+                    placeholderTextColor="#9CA3AF"
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                  />
+                  {searchQuery.length > 0 && (
+                    <TouchableOpacity onPress={() => setSearchQuery("")}>
+                      <Ionicons name="close-circle" size={18} color="#9CA3AF" />
+                    </TouchableOpacity>
+                  )}
+                </GlassContainer>
+                <GlassButton
+                  onPress={() => toggleSearch(false)}
+                  size={44}
+                  shape="circle"
+                >
+                  <Ionicons
+                    name="close"
+                    size={20}
+                    color={isDark ? "#818CF8" : "#4F46E5"}
+                  />
+                </GlassButton>
+              </View>
             ) : (
               <GlassButton
                 onPress={() => toggleSearch(true)}
