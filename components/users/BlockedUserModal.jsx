@@ -7,15 +7,20 @@ import {
   Alert,
   Image,
   Modal,
+  ScrollView,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import { db } from "../../config/firebase.config";
+import { useTheme } from "../../context/ThemeContext";
 import useFirestoreUser from "../../hook/useFireStoreUser";
+import GlassButton from "../ui/GlassButton";
+import GlassContainer from "../ui/GlassContainer";
 
 function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
   const { firestoreUser } = useFirestoreUser();
+  const { isDark } = useTheme();
   const [blockedProfiles, setBlockedProfiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [unblocking, setUnblocking] = useState(null);
@@ -89,61 +94,172 @@ function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
 
   return (
     <Modal visible={showBlockedModal} animationType="slide" transparent={true}>
-      <View className="flex-1 justify-center items-center bg-black/40">
-        <View className="bg-white dark:bg-[#1A1A22] w-11/12 rounded-2xl p-5 max-h-[70%]">
-          <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-secondary dark:text-gray-100 text-xl font-bold">
-              Blocked Users
-            </Text>
-            <TouchableOpacity onPress={() => setShowBlockedModal(false)}>
-              <Ionicons name="close" size={24} color="#9CA3AF" />
-            </TouchableOpacity>
+      <View className="flex-1 justify-end bg-black/50">
+        <GlassContainer
+          borderRadius={28}
+          className="max-h-[75%]"
+          style={{
+            marginHorizontal: 8,
+            marginBottom: 8,
+            paddingTop: 12,
+            paddingBottom: 24,
+          }}
+        >
+          {/* Drag Handle */}
+          <View className="items-center mb-4">
+            <View
+              className="bg-gray-300 dark:bg-gray-600 rounded-full"
+              style={{ width: 36, height: 4 }}
+            />
           </View>
 
+          {/* Header */}
+          <View className="flex-row items-center justify-between px-5 mb-5">
+            <View className="flex-row items-center">
+              <View
+                className="items-center justify-center mr-3"
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: 12,
+                  backgroundColor: isDark
+                    ? "rgba(239,68,68,0.12)"
+                    : "rgba(239,68,68,0.08)",
+                }}
+              >
+                <Ionicons name="ban" size={18} color="#EF4444" />
+              </View>
+              <View>
+                <Text className="text-secondary dark:text-gray-100 text-lg font-extrabold tracking-tight">
+                  Blocked Users
+                </Text>
+                <Text className="text-gray-400 dark:text-gray-500 text-xs font-medium mt-0.5">
+                  {blockedProfiles.length}{" "}
+                  {blockedProfiles.length === 1 ? "user" : "users"} blocked
+                </Text>
+              </View>
+            </View>
+            <GlassButton
+              onPress={() => setShowBlockedModal(false)}
+              size={36}
+              shape="circle"
+            >
+              <Ionicons
+                name="close"
+                size={18}
+                color={isDark ? "#F3F4F6" : "#6B7280"}
+              />
+            </GlassButton>
+          </View>
+
+          {/* Divider */}
+          <View className="h-px bg-gray-100 dark:bg-[#2A2A36] mx-5 mb-2" />
+
           {loading ? (
-            <View className="py-8 items-center">
+            <View className="py-16 items-center">
               <ActivityIndicator size="large" color="#4F46E5" />
+              <Text className="text-gray-400 dark:text-gray-500 text-sm font-medium mt-4">
+                Loading…
+              </Text>
             </View>
           ) : blockedProfiles.length === 0 ? (
-            <View className="py-8 items-center">
-              <Ionicons
-                name="checkmark-circle-outline"
-                size={40}
-                color="#10B981"
-              />
-              <Text className="text-gray-400 dark:text-gray-500 text-sm font-medium mt-3">
-                No blocked users
+            <View className="py-14 items-center px-8">
+              <View
+                className="items-center justify-center mb-5"
+                style={{
+                  width: 72,
+                  height: 72,
+                  borderRadius: 36,
+                  backgroundColor: isDark
+                    ? "rgba(16,185,129,0.1)"
+                    : "rgba(16,185,129,0.08)",
+                }}
+              >
+                <Ionicons
+                  name="checkmark-circle"
+                  size={36}
+                  color="#10B981"
+                />
+              </View>
+              <Text className="text-secondary dark:text-gray-100 text-base font-bold mb-1.5">
+                All clear!
+              </Text>
+              <Text className="text-gray-400 dark:text-gray-500 text-sm font-medium text-center leading-5">
+                You haven't blocked anyone. Blocked users won't be able to see
+                your profile or message you.
               </Text>
             </View>
           ) : (
-            <View className="mb-4">
-              {blockedProfiles.map((user) => (
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 8 }}
+            >
+              {blockedProfiles.map((user, index) => (
                 <View
                   key={user.id}
-                  className="flex-row items-center p-3 border-b border-gray-100 dark:border-[#2A2A36]"
+                  className="flex-row items-center rounded-2xl p-3 mb-2"
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.04)"
+                      : "rgba(0,0,0,0.02)",
+                  }}
                 >
-                  <Image
-                    source={{
-                      uri: user.profilePic || "https://picsum.photos/200",
+                  <View
+                    className="overflow-hidden mr-3"
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 22,
+                      backgroundColor: isDark ? "#2A2A36" : "#F3F4F6",
                     }}
-                    className="w-10 h-10 rounded-full mr-3 bg-gray-200 dark:bg-gray-800"
-                  />
-                  <View className="flex-1">
-                    <Text className="text-secondary dark:text-gray-100 text-base font-semibold">
+                  >
+                    <Image
+                      source={{
+                        uri: user.profilePic || "https://picsum.photos/200",
+                      }}
+                      style={{ width: 44, height: 44 }}
+                    />
+                  </View>
+                  <View className="flex-1 mr-3">
+                    <Text
+                      className="text-secondary dark:text-gray-100 text-[15px] font-bold"
+                      numberOfLines={1}
+                    >
                       {user.userName || "User"}
                     </Text>
                   </View>
                   <TouchableOpacity
                     onPress={() => handleUnblock(user)}
                     disabled={unblocking === user.id}
-                    className="flex-row items-center bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-500/20 px-3 py-1.5 rounded-xl"
+                    activeOpacity={0.7}
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      backgroundColor: isDark
+                        ? "rgba(239,68,68,0.12)"
+                        : "rgba(239,68,68,0.06)",
+                      borderWidth: 1,
+                      borderColor: isDark
+                        ? "rgba(239,68,68,0.2)"
+                        : "rgba(239,68,68,0.12)",
+                      paddingHorizontal: 14,
+                      paddingVertical: 8,
+                      borderRadius: 20,
+                    }}
                   >
                     {unblocking === user.id ? (
                       <ActivityIndicator size="small" color="#EF4444" />
                     ) : (
                       <>
-                        <Ionicons name="ban" size={14} color="#EF4444" />
-                        <Text className="text-red-500 text-xs font-semibold ml-1.5">
+                        <Ionicons name="ban" size={13} color="#EF4444" />
+                        <Text
+                          style={{
+                            color: "#EF4444",
+                            fontSize: 13,
+                            fontWeight: "700",
+                            marginLeft: 5,
+                          }}
+                        >
                           Unblock
                         </Text>
                       </>
@@ -151,9 +267,9 @@ function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
                   </TouchableOpacity>
                 </View>
               ))}
-            </View>
+            </ScrollView>
           )}
-        </View>
+        </GlassContainer>
       </View>
     </Modal>
   );

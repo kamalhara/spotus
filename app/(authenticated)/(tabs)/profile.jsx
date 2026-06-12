@@ -161,7 +161,11 @@ export default function Profile() {
             </View>
             <View className="absolute -bottom-1 -right-1">
               <GlassButton size={40} shape="circle">
-                <Ionicons name="camera" size={16} color={isDark ? "#818CF8" : "#4F46E5"} />
+                <Ionicons
+                  name="camera"
+                  size={16}
+                  color={isDark ? "#818CF8" : "#4F46E5"}
+                />
               </GlassButton>
             </View>
           </View>
