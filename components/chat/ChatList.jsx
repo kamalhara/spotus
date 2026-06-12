@@ -13,10 +13,13 @@ import {
   View,
 } from "react-native";
 import { db } from "../../config/firebase.config";
+import { useTheme } from "../../context/ThemeContext";
 import useFirestoreUser from "../../hook/useFireStoreUser";
 import usePresenceStatus from "../../hook/usePresenceStatus";
 import useTypingIndicator from "../../hook/useTypingIndicator";
 import { isChatUnseen } from "../../lib/chatSeen";
+import GlassButton from "../ui/GlassButton";
+import GlassContainer from "../ui/GlassContainer";
 
 function formatTime(timestamp) {
   if (!timestamp) return "";
@@ -67,6 +70,7 @@ export default function ChatRow({ chat, onPress }) {
 
   const isUnread = isChatUnseen(chat, currentUserId);
   const isOnline = userStatus === "Active now";
+  const { isDark } = useTheme();
   const [showOptions, setShowOptions] = useState(false);
   const [isMuted, setIsMuted] = useState(
     chat?.mutedBy?.includes(currentUserId) || false,
@@ -255,38 +259,78 @@ export default function ChatRow({ chat, onPress }) {
         onRequestClose={() => setShowOptions(false)}
       >
         <Pressable
-          className="flex-1 bg-black/30"
+          className="flex-1 bg-black/50"
           onPress={() => setShowOptions(false)}
         >
-          <View className="flex-1 justify-end pb-12 px-5">
+          <View className="flex-1 justify-end pb-3 px-2">
             <Pressable>
-              <View
-                className="bg-white dark:bg-[#1A1A22] rounded-2xl overflow-hidden"
+              <GlassContainer
+                borderRadius={28}
                 style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: -4 },
-                  shadowOpacity: 0.15,
-                  shadowRadius: 20,
-                  elevation: 20,
+                  paddingTop: 12,
+                  paddingBottom: 8,
                 }}
               >
-                {/* Header */}
-                <View className="flex-row items-center p-4 border-b border-gray-100 dark:border-gray-800">
-                  <Image
-                    source={{
-                      uri: otherUser?.profilePic || "https://picsum.photos/200",
-                    }}
-                    className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800"
+                {/* Drag Handle */}
+                <View className="items-center mb-4">
+                  <View
+                    className="bg-gray-300 dark:bg-gray-600 rounded-full"
+                    style={{ width: 36, height: 4 }}
                   />
-                  <View className="ml-3 flex-1">
-                    <Text className="text-secondary dark:text-gray-100 font-bold text-[15px]">
+                </View>
+
+                {/* Header */}
+                <View className="flex-row items-center px-5 mb-4">
+                  <View
+                    className="overflow-hidden"
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 18,
+                      backgroundColor: isDark ? "#2A2A36" : "#F3F4F6",
+                    }}
+                  >
+                    <Image
+                      source={{
+                        uri:
+                          otherUser?.profilePic || "https://picsum.photos/200",
+                      }}
+                      style={{ width: 48, height: 48 }}
+                    />
+                  </View>
+                  <View className="ml-3.5 flex-1">
+                    <Text className="text-secondary dark:text-gray-100 font-extrabold text-[17px] tracking-tight">
                       {otherUser?.userName || "User"}
                     </Text>
-                    <Text className="text-gray-400 dark:text-gray-500 text-xs mt-0.5">
-                      {userStatus}
-                    </Text>
+                    <View className="flex-row items-center mt-1">
+                      <View
+                        className="rounded-full mr-1.5"
+                        style={{
+                          width: 7,
+                          height: 7,
+                          backgroundColor: isOnline ? "#10B981" : "#9CA3AF",
+                        }}
+                      />
+                      <Text className="text-gray-400 dark:text-gray-500 text-xs font-semibold">
+                        {userStatus}
+                      </Text>
+                    </View>
                   </View>
+                  <GlassButton
+                    onPress={() => setShowOptions(false)}
+                    size={36}
+                    shape="circle"
+                  >
+                    <Ionicons
+                      name="close"
+                      size={18}
+                      color={isDark ? "#F3F4F6" : "#6B7280"}
+                    />
+                  </GlassButton>
                 </View>
+
+                {/* Divider */}
+                <View className="h-px bg-gray-100 dark:bg-[#2A2A36] mx-5 mb-1" />
 
                 {/* Options */}
                 {OPTIONS.map((option, index) => (
@@ -297,17 +341,25 @@ export default function ChatRow({ chat, onPress }) {
                       option.onPress();
                     }}
                     activeOpacity={0.6}
-                    className={`flex-row items-center px-5 py-3.5 ${
-                      index < OPTIONS.length - 1
-                        ? "border-b border-gray-50 dark:border-gray-800"
-                        : ""
-                    }`}
+                    className="flex-row items-center mx-3 px-3 py-3.5 rounded-2xl"
+                    style={{
+                      backgroundColor: "transparent",
+                    }}
                   >
                     <View
-                      className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
+                      className="items-center justify-center mr-3.5"
                       style={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: 12,
                         backgroundColor:
-                          option.color === "#EF4444" ? "#FEF2F2" : "#F3F4F6",
+                          option.color === "#EF4444"
+                            ? isDark
+                              ? "rgba(239,68,68,0.12)"
+                              : "rgba(239,68,68,0.08)"
+                            : isDark
+                              ? "rgba(107,114,128,0.12)"
+                              : "rgba(107,114,128,0.08)",
                       }}
                     >
                       <Ionicons
@@ -317,7 +369,7 @@ export default function ChatRow({ chat, onPress }) {
                       />
                     </View>
                     <Text
-                      className="text-[15px] font-semibold flex-1"
+                      className="text-[15px] font-bold flex-1"
                       style={{ color: option.color }}
                     >
                       {option.label}
@@ -325,29 +377,34 @@ export default function ChatRow({ chat, onPress }) {
                     <Ionicons
                       name="chevron-forward"
                       size={16}
-                      color="#D1D5DB"
+                      color={isDark ? "#4B5563" : "#D1D5DB"}
                     />
                   </TouchableOpacity>
                 ))}
-              </View>
+              </GlassContainer>
 
               {/* Cancel Button */}
-              <TouchableOpacity
-                onPress={() => setShowOptions(false)}
-                activeOpacity={0.7}
-                className="bg-white dark:bg-[#1A1A22] rounded-2xl mt-2 py-4 items-center"
+              <GlassContainer
+                borderRadius={20}
                 style={{
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.08,
-                  shadowRadius: 8,
-                  elevation: 4,
+                  marginTop: 8,
+                  paddingVertical: 15,
+                  alignItems: "center",
                 }}
               >
-                <Text className="text-primary font-bold text-[15px]">
-                  Cancel
-                </Text>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => setShowOptions(false)}
+                  activeOpacity={0.7}
+                  className="items-center w-full"
+                >
+                  <Text
+                    className="font-bold text-[16px]"
+                    style={{ color: isDark ? "#818CF8" : "#4F46E5" }}
+                  >
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+              </GlassContainer>
             </Pressable>
           </View>
         </Pressable>
