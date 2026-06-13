@@ -114,11 +114,7 @@ export default function Profile() {
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef(null);
   const [showBlockedModal, setShowBlockedModal] = useState(false);
-  const [visibility, setVisibility] = useState(
-    firestoreUser?.settings?.privacy?.publicProfile === false
-      ? "Private"
-      : "Public",
-  );
+
   const { theme, setTheme, isDark } = useTheme();
 
   const searchExpand = useSharedValue(0);
@@ -228,11 +224,7 @@ export default function Profile() {
                     height: 44,
                   }}
                 >
-                  <Ionicons
-                    name="search"
-                    size={18}
-                    color="#9CA3AF"
-                  />
+                  <Ionicons name="search" size={18} color="#9CA3AF" />
                   <TextInput
                     ref={searchInputRef}
                     autoFocus
