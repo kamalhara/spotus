@@ -175,24 +175,24 @@ function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
                     : "rgba(16,185,129,0.08)",
                 }}
               >
-                <Ionicons
-                  name="checkmark-circle"
-                  size={36}
-                  color="#10B981"
-                />
+                <Ionicons name="checkmark-circle" size={36} color="#10B981" />
               </View>
               <Text className="text-secondary dark:text-gray-100 text-base font-bold mb-1.5">
                 All clear!
               </Text>
               <Text className="text-gray-400 dark:text-gray-500 text-sm font-medium text-center leading-5">
-                You haven't blocked anyone. Blocked users won't be able to see
-                your profile or message you.
+                You haven&apos;t blocked anyone. Blocked users won&apos;t be
+                able to see your profile or message you.
               </Text>
             </View>
           ) : (
             <ScrollView
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 8, paddingBottom: 8 }}
+              contentContainerStyle={{
+                paddingHorizontal: 16,
+                paddingTop: 8,
+                paddingBottom: 8,
+              }}
             >
               {blockedProfiles.map((user, index) => (
                 <View
