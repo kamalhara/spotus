@@ -16,6 +16,7 @@ import { Swipeable } from "react-native-gesture-handler";
 import { useChatActions } from "../../hook/useChatActions";
 import useTypingIndicator from "../../hook/useTypingIndicator";
 import { toggleReaction } from "../../lib/reactions";
+import ImageViewer from "../ui/ImageViewer";
 import ReactionPicker from "./ReactionPicker";
 import TypingIndicator from "./TypingIndicator";
 
@@ -90,6 +91,7 @@ export default function ChatMessages({
   const flatListRef = useRef(null);
   const router = useRouter();
   const [reactionPicker, setReactionPicker] = useState(null);
+  const [viewerImage, setViewerImage] = useState(null);
   const swipeableRefs = useRef({});
 
   const isTyping = useTypingIndicator(chatDocId, currentUserId);
@@ -393,14 +395,26 @@ export default function ChatMessages({
                 )}
 
                 {item.imageUrl ? (
-                  <Image
-                    source={{ uri: item.imageUrl }}
-                    className={`w-56 h-56 ${
-                      isSentByMe
-                        ? "rounded-2xl rounded-br-sm"
-                        : "rounded-2xl rounded-bl-sm"
-                    }`}
-                  />
+                  <TouchableOpacity
+                    activeOpacity={0.85}
+                    onPress={() => {
+                      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      setViewerImage({
+                        uri: item.imageUrl,
+                        sender: item.user || "Unknown",
+                        timestamp: item.createdAt,
+                      });
+                    }}
+                  >
+                    <Image
+                      source={{ uri: item.imageUrl }}
+                      className={`w-56 h-56 ${
+                        isSentByMe
+                          ? "rounded-2xl rounded-br-sm"
+                          : "rounded-2xl rounded-bl-sm"
+                      }`}
+                    />
+                  </TouchableOpacity>
                 ) : (
                   <Text
                     className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary dark:text-gray-100"}`}
@@ -569,6 +583,27 @@ export default function ChatMessages({
           onUnsend(reactionPicker?.message);
           setReactionPicker(null);
         }}
+      />
+      <ImageViewer
+        visible={!!viewerImage}
+        imageUrl={viewerImage?.uri}
+        senderName={viewerImage?.sender}
+        timestamp={
+          viewerImage?.timestamp
+            ? (() => {
+                const d = viewerImage.timestamp.toDate
+                  ? viewerImage.timestamp.toDate()
+                  : new Date(viewerImage.timestamp);
+                return d.toLocaleString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                });
+              })()
+            : undefined
+        }
+        onClose={() => setViewerImage(null)}
       />
     </View>
   );
