@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import GlassContainer from "./GlassContainer";
 
 export default function CustomButton({
   title,
@@ -113,30 +114,32 @@ export default function CustomButton({
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-      <TouchableOpacity
-        onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        disabled={disabled || loading}
-        activeOpacity={0.85}
-        className={`w-full flex-row justify-center items-center ${getSizeStyles()} ${getButtonStyles()} ${className}`}
-      >
-        {loading ? (
-          <ActivityIndicator
-            color={type === "primary" ? "white" : "#4F46E5"}
-            size="small"
-          />
-        ) : (
-          <View className="flex-row items-center justify-center">
-            {icon && <View className="mr-2.5">{icon}</View>}
-            <Text
-              className={`font-bold text-center tracking-tight ${getTextSize()} ${getTextStyles()}`}
-            >
-              {title}
-            </Text>
-          </View>
-        )}
-      </TouchableOpacity>
+      <GlassContainer>
+        <TouchableOpacity
+          onPress={handlePress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          disabled={disabled || loading}
+          activeOpacity={0.85}
+          className={`w-full flex-row justify-center items-center ${getSizeStyles()} ${getButtonStyles()} ${className}`}
+        >
+          {loading ? (
+            <ActivityIndicator
+              color={type === "primary" ? "white" : "#4F46E5"}
+              size="small"
+            />
+          ) : (
+            <View className="flex-row items-center justify-center">
+              {icon && <View className="mr-2.5">{icon}</View>}
+              <Text
+                className={`font-bold text-center tracking-tight ${getTextSize()} ${getTextStyles()}`}
+              >
+                {title}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+      </GlassContainer>
     </Animated.View>
   );
 }
