@@ -19,6 +19,7 @@ import CustomInput from "../../../components/ui/CustomInput";
 import GlassButton from "../../../components/ui/GlassButton";
 import GlassContainer from "../../../components/ui/GlassContainer";
 import { db } from "../../../config/firebase.config";
+import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
@@ -46,6 +47,7 @@ export default function Edit() {
   const [isLocating, setIsLocating] = useState(false);
   const [newImageUri, setNewImageUri] = useState(null);
 
+  const { isDark } = useTheme();
   useEffect(() => {
     if (user) {
       setUserName(user.userName || "");
@@ -191,12 +193,19 @@ export default function Edit() {
                       resizeMode="cover"
                     />
                   </View>
-                  <TouchableOpacity
-                    onPress={handlePickImage}
-                    className="absolute bottom-1 right-1 w-10 h-10 rounded-full bg-primary border-4 border-white dark:border-[#1A1A22] items-center justify-center"
-                  >
-                    <Ionicons name="camera" size={16} color="#FFFFFF" />
-                  </TouchableOpacity>
+                  <View className="absolute -bottom-1 -right-1">
+                    <GlassButton
+                      size={40}
+                      shape="circle"
+                      onPress={handlePickImage}
+                    >
+                      <Ionicons
+                        name="camera"
+                        size={16}
+                        color={isDark ? "#818CF8" : "#4F46E5"}
+                      />
+                    </GlassButton>
+                  </View>
                 </View>
                 <Text className="font-bold text-primary dark:text-primary-light mt-4">
                   Edit Picture

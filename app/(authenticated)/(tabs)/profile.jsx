@@ -7,7 +7,6 @@ import { Redirect, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import GlassButton from "../../../components/ui/GlassButton";
 import Skeleton from "../../../components/ui/Skeleton";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
@@ -158,15 +157,6 @@ export default function Profile() {
                 transition={500}
                 style={{ width: "100%", height: "100%" }}
               />
-            </View>
-            <View className="absolute -bottom-1 -right-1">
-              <GlassButton size={40} shape="circle">
-                <Ionicons
-                  name="camera"
-                  size={16}
-                  color={isDark ? "#818CF8" : "#4F46E5"}
-                />
-              </GlassButton>
             </View>
           </View>
 
