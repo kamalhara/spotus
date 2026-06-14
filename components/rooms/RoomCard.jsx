@@ -95,7 +95,7 @@ export default function RoomCard({
       </View>
 
       {/* Title */}
-      <Text className="text-secondary dark:text-gray-100 text-[19px] font-extrabold tracking-tight mb-1.5 leading-6">
+      <Text className="text-secondary dark:text-gray-100 text-[19px] font-display font-extrabold tracking-tight mb-1.5 leading-6">
         {room.title}
       </Text>
 
@@ -128,7 +128,7 @@ export default function RoomCard({
                 className="w-7 h-7 rounded-full border-2 border-white dark:border-[#1A1A22] items-center justify-center"
                 style={{ backgroundColor: AVATAR_COLORS[i] }}
               >
-                <Text className="text-white text-[9px] font-black">
+                <Text className="text-white text-[9px] font-display font-black">
                   {String.fromCharCode(65 + i)}
                 </Text>
               </View>

@@ -90,7 +90,7 @@ export default function FeedbackScreen() {
               color={isDark ? "white" : "#18181B"}
             />
           </GlassButton>
-          <Text className="text-secondary dark:text-gray-100 text-lg font-extrabold">
+          <Text className="text-secondary dark:text-gray-100 text-lg font-display font-extrabold">
             Report
           </Text>
           <View className="w-10" />
@@ -121,7 +121,7 @@ export default function FeedbackScreen() {
           </View>
 
           {/* Category selection */}
-          <Text className="text-secondary dark:text-gray-100 text-base font-extrabold mb-3 tracking-tight">
+          <Text className="text-secondary dark:text-gray-100 text-base font-display font-extrabold mb-3 tracking-tight">
             What&apos;s the issue?
           </Text>
 
@@ -176,7 +176,7 @@ export default function FeedbackScreen() {
           </View>
 
           {/* Description */}
-          <Text className="text-secondary dark:text-gray-100 text-base font-extrabold mb-3 tracking-tight">
+          <Text className="text-secondary dark:text-gray-100 text-base font-display font-extrabold mb-3 tracking-tight">
             Additional details (optional)
           </Text>
           <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4 mb-8">

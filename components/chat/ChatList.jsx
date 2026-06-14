@@ -205,7 +205,7 @@ export default function ChatRow({ chat, onPress }) {
         <View className="flex-1 ml-4 justify-center">
           <View className="flex-row justify-between items-center mb-1">
             <Text
-              className={`text-secondary dark:text-gray-100 ${isUnread ? "font-black" : "font-bold"} text-[16px] tracking-tight flex-1 mr-3`}
+              className={`text-secondary dark:text-gray-100 ${isUnread ? "font-display font-black" : "font-bold"} text-[16px] tracking-tight flex-1 mr-3`}
               numberOfLines={1}
             >
               {otherUser?.userName || "User"}
@@ -242,7 +242,7 @@ export default function ChatRow({ chat, onPress }) {
             )}
             {isUnread && (
               <View className="bg-primary h-5 min-w-[20px] rounded-full px-1.5 items-center justify-center ml-2">
-                <Text className="text-white text-[11px] font-black">
+                <Text className="text-white text-[11px] font-display font-black">
                   {chat?.unreadCount || ""}
                 </Text>
               </View>
@@ -291,7 +291,7 @@ export default function ChatRow({ chat, onPress }) {
                     />
                   </View>
                   <View className="ml-3.5 flex-1">
-                    <Text className="text-secondary dark:text-gray-100 font-extrabold text-[17px] tracking-tight">
+                    <Text className="text-secondary dark:text-gray-100 font-display font-extrabold text-[17px] tracking-tight">
                       {otherUser?.userName || "User"}
                     </Text>
                     <View className="flex-row items-center mt-1">

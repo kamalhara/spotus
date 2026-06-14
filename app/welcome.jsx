@@ -56,7 +56,7 @@ export default function Welcome() {
  {/* Brand */}
  <View className="mt-6 px-8">
  <View className="flex-row items-center">
- <Text className="text-secondary dark:text-gray-100 text-2xl font-extrabold tracking-tight">
+ <Text className="text-secondary dark:text-gray-100 text-2xl font-display font-extrabold tracking-tight">
  Spot Us
  </Text>
  <View className="w-2 h-2 rounded-full bg-primary ml-1.5 -mt-3"/>
@@ -88,7 +88,7 @@ export default function Welcome() {
  }}
  >
  <View className="bg-surface-alt dark:bg-[#1A1A22] px-8 pt-10 pb-14 rounded-t-[36px]">
- <Text className="text-secondary dark:text-gray-100 text-[36px] font-extrabold leading-[42px] tracking-tight">
+ <Text className="text-secondary dark:text-gray-100 text-[36px] font-display font-extrabold leading-[42px] tracking-tight">
  Find People {"\n"}
  <Text className="text-primary">Nearby</Text>
  </Text>

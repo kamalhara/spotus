@@ -73,7 +73,7 @@ export function RoomHorizontalItem({ room, onPress }) {
               backgroundColor: categoryColor,
             }}
           >
-            <Text className="text-white text-xl font-extrabold">
+            <Text className="text-white text-xl font-display font-extrabold">
               {room?.title?.charAt(0).toUpperCase()}
             </Text>
           </View>

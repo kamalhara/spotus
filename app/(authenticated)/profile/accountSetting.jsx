@@ -193,7 +193,7 @@ export default function Profile() {
             <Animated.Text
               entering={FadeIn.duration(200)}
               exiting={FadeOut.duration(200)}
-              className="text-secondary dark:text-gray-100 font-extrabold text-xl flex-1"
+              className="text-secondary dark:text-gray-100 font-display font-extrabold text-xl flex-1"
               numberOfLines={1}
             >
               Settings
@@ -313,7 +313,7 @@ export default function Profile() {
           </View>
           <View className="flex-1 ml-4">
             <Text
-              className="text-secondary dark:text-gray-100 text-[22px] font-extrabold tracking-tight"
+              className="text-secondary dark:text-gray-100 text-[22px] font-display font-extrabold tracking-tight"
               numberOfLines={1}
             >
               {firestoreUser?.userName || "User"}

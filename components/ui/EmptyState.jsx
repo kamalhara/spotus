@@ -14,7 +14,7 @@ export default function EmptyState({
  <View className="w-20 h-20 rounded-full bg-primary-surface dark:bg-primary-surface items-center justify-center mb-5">
  <Ionicons name={icon} size={32} color="#4F46E5"/>
  </View>
- <Text className="text-secondary dark:text-gray-100 text-xl font-extrabold tracking-tight text-center">
+ <Text className="text-secondary dark:text-gray-100 text-xl font-display font-extrabold tracking-tight text-center">
  {title}
  </Text>
  {description ? (

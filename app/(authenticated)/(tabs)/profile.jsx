@@ -170,7 +170,7 @@ export default function Profile() {
             </View>
           </View>
 
-          <Text className="text-secondary dark:text-gray-100 text-[26px] font-extrabold mt-4 tracking-tight">
+          <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold mt-4 tracking-tight">
             {firestoreUser?.userName || "User"}
           </Text>
 
@@ -189,7 +189,7 @@ export default function Profile() {
             <View className="w-10 h-10 rounded-full bg-primary-surface dark:bg-primary-surface items-center justify-center mb-2">
               <Ionicons name="chatbubbles" size={18} color="#4F46E5" />
             </View>
-            <Text className="text-[20px] font-extrabold text-secondary dark:text-white">
+            <Text className="text-[20px] font-display font-extrabold text-secondary dark:text-white">
               {createdRooms}
             </Text>
             <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">
@@ -201,7 +201,7 @@ export default function Profile() {
             <View className="w-10 h-10 rounded-full bg-info-surface dark:bg-info-surface items-center justify-center mb-2">
               <Ionicons name="people" size={18} color="#3B82F6" />
             </View>
-            <Text className="text-[20px] font-extrabold text-secondary dark:text-white">
+            <Text className="text-[20px] font-display font-extrabold text-secondary dark:text-white">
               {joinedRooms}
             </Text>
             <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">
@@ -213,7 +213,7 @@ export default function Profile() {
             <View className="w-10 h-10 rounded-full bg-success-surface dark:bg-success-surface items-center justify-center mb-2">
               <Ionicons name="star" size={18} color="#10B981" />
             </View>
-            <Text className="text-[20px] font-extrabold text-secondary dark:text-white">
+            <Text className="text-[20px] font-display font-extrabold text-secondary dark:text-white">
               {firestoreUser?.globalReputation ?? 0}
             </Text>
             <Text className="text-muted dark:text-gray-500 text-[12px] font-semibold mt-0.5">

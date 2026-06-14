@@ -19,7 +19,7 @@ export default function About() {
             <Ionicons name="navigate" size={28} color="white" />
           </View>
           <View className="flex-row items-center">
-            <Text className="text-secondary dark:text-gray-100 text-2xl font-extrabold tracking-tight">
+            <Text className="text-secondary dark:text-gray-100 text-2xl font-display font-extrabold tracking-tight">
               Spot Us
             </Text>
             <View className="w-2 h-2 rounded-full bg-primary ml-1.5 -mt-3" />
@@ -31,7 +31,7 @@ export default function About() {
 
         <View className="flex-row gap-3 mb-4">
           <View className="flex-1 bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4">
-            <Text className="text-primary dark:text-primary-light text-xl font-extrabold">
+            <Text className="text-primary dark:text-primary-light text-xl font-display font-extrabold">
               1.0.0
             </Text>
             <Text className="text-gray-400 dark:text-gray-500 text-xs mt-1">
@@ -39,7 +39,7 @@ export default function About() {
             </Text>
           </View>
           <View className="flex-1 bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4">
-            <Text className="text-secondary dark:text-gray-100 text-xl font-extrabold">
+            <Text className="text-secondary dark:text-gray-100 text-xl font-display font-extrabold">
               Expo
             </Text>
             <Text className="text-gray-400 dark:text-gray-500 text-xs mt-1">

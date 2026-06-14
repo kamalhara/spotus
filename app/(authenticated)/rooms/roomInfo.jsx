@@ -200,7 +200,7 @@ export default function RoomInfo() {
                       color={`#4F46E5`}
                       style={{ marginRight: 6 }}
                     />
-                    <Text className="text-primary font-black text-[10px] uppercase tracking-[1.5px]">
+                    <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
                       {room?.category || "Discovery Circle"}
                     </Text>
                   </View>
@@ -217,14 +217,14 @@ export default function RoomInfo() {
                 >
                   <View className="flex-row items-center px-3.5 py-2">
                     <Ionicons name="location-sharp" size={12} color="#4F46E5" />
-                    <Text className="text-primary font-black text-[10px] ml-1">
+                    <Text className="text-primary font-display font-black text-[10px] ml-1">
                       {room?.location || "0.4km away"}
                     </Text>
                   </View>
                 </GlassContainer>
               </View>
 
-              <Text className="text-secondary dark:text-gray-100 text-3xl font-black leading-tight tracking-tighter">
+              <Text className="text-secondary dark:text-gray-100 text-3xl font-display font-black leading-tight tracking-tighter">
                 {room?.title}
               </Text>
             </View>
@@ -243,7 +243,7 @@ export default function RoomInfo() {
             {/* Members Section */}
             <View>
               <View className="flex-row justify-between items-center mb-5">
-                <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight">
+                <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight">
                   Members
                 </Text>
                 <GlassContainer
@@ -256,7 +256,7 @@ export default function RoomInfo() {
                   fallbackClassName="bg-gray-100 dark:bg-[#23232E]"
                 >
                   <View className="px-3.5 py-1.5">
-                    <Text className="text-muted font-black text-[10px] uppercase tracking-[1.5px]">
+                    <Text className="text-muted font-display font-black text-[10px] uppercase tracking-[1.5px]">
                       {room?.participants?.length || 0} Total
                     </Text>
                   </View>
@@ -290,7 +290,7 @@ export default function RoomInfo() {
                             className="w-11 h-11 rounded-xl mr-3.5 border-2 border-gray-50 dark:border-gray-700"
                           />
                           <View>
-                            <Text className="text-secondary dark:text-gray-100 font-black text-sm tracking-tight">
+                            <Text className="text-secondary dark:text-gray-100 font-display font-black text-sm tracking-tight">
                               {member.userName || "Unknown Member"}
                             </Text>
                             <View className="flex-row items-center mt-2 gap-2">
@@ -301,7 +301,7 @@ export default function RoomInfo() {
                                     size={10}
                                     color="#10B981"
                                   />
-                                  <Text className="text-success font-black text-[8px] uppercase tracking-widest ml-1">
+                                  <Text className="text-success font-display font-black text-[8px] uppercase tracking-widest ml-1">
                                     Trust{""}
                                     {Math.min(member.trustScore * 10, 100)}%
                                   </Text>
@@ -314,7 +314,7 @@ export default function RoomInfo() {
                                     size={10}
                                     color="#F59E0B"
                                   />
-                                  <Text className="text-warning font-black text-[8px] uppercase tracking-widest ml-1">
+                                  <Text className="text-warning font-display font-black text-[8px] uppercase tracking-widest ml-1">
                                     Creator
                                   </Text>
                                 </View>
@@ -324,7 +324,7 @@ export default function RoomInfo() {
                         </View>
                         {member.id === currentUserId && (
                           <View className="bg-primary/10 px-2.5 py-1.5 rounded-xl">
-                            <Text className="text-primary font-black text-[9px] uppercase tracking-widest">
+                            <Text className="text-primary font-display font-black text-[9px] uppercase tracking-widest">
                               You
                             </Text>
                           </View>
@@ -379,7 +379,7 @@ export default function RoomInfo() {
 
         {/* Room Rules Section */}
         <View className="bg-bg dark:bg-[#0F0F13] my-10 px-4">
-          <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight mb-4">
+          <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight mb-4">
             Room Rules
           </Text>
 

@@ -35,7 +35,7 @@ function EmptyRooms() {
       <View className="w-24 h-24 bg-info-surface rounded-full items-center justify-center mb-6">
         <Ionicons name="compass" size={40} color="#3B82F6" />
       </View>
-      <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight text-center mb-2.5">
+      <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight text-center mb-2.5">
         No rooms nearby
       </Text>
       <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">
@@ -52,7 +52,7 @@ function LocationPermissionDenied() {
       <View className="w-24 h-24 bg-red-50 dark:bg-red-900/20 rounded-full items-center justify-center mb-6">
         <Ionicons name="location-outline" size={40} color="#EF4444" />
       </View>
-      <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight text-center mb-2.5">
+      <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight text-center mb-2.5">
         Location Required
       </Text>
       <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">
@@ -187,7 +187,7 @@ export default function Home() {
             />
           </TouchableOpacity>
           <View className="flex-row items-center">
-            <Text className="text-secondary dark:text-gray-100 tracking-tighter text-[22px] font-black">
+            <Text className="text-secondary dark:text-gray-100 tracking-tighter text-[22px] font-display font-black">
               Spot Us
             </Text>
             <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
@@ -212,7 +212,7 @@ export default function Home() {
           <Text className="text-muted text-sm font-bold uppercase tracking-[1.5px]">
             {getGreeting()}
           </Text>
-          <Text className="text-secondary dark:text-gray-100 text-[28px] font-black tracking-tight mt-1">
+          <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-black tracking-tight mt-1">
             {firstName} 👋
           </Text>
         </Animated.View>
@@ -236,7 +236,7 @@ export default function Home() {
                 </Text>
               </View>
               <View className="bg-primary px-3 py-1.5 rounded-xl">
-                <Text className="text-white text-sm font-black">
+                <Text className="text-white text-sm font-display font-black">
                   {distance} mi
                 </Text>
               </View>
@@ -283,7 +283,7 @@ export default function Home() {
               <Ionicons name="add" size={26} color="white" />
             </View>
             <View className="flex-1">
-              <Text className="text-white font-black text-lg tracking-tight">
+              <Text className="text-white font-display font-black text-lg tracking-tight">
                 Create a Room
               </Text>
               <Text className="text-white/80 text-[13px] font-semibold mt-0.5">
@@ -300,12 +300,12 @@ export default function Home() {
         <View className="mt-8 mb-2">
           <View className="flex flex-row justify-between items-center">
             <View className="flex-row items-center gap-2.5">
-              <Text className="text-secondary dark:text-gray-100 text-[22px] font-extrabold tracking-tight">
+              <Text className="text-secondary dark:text-gray-100 text-[22px] font-display font-extrabold tracking-tight">
                 Nearby Rooms
               </Text>
               {nearbyRooms.length > 0 && (
                 <View className="bg-primary-surface px-2.5 py-1 rounded-full">
-                  <Text className="text-primary text-[12px] font-black">
+                  <Text className="text-primary text-[12px] font-display font-black">
                     {nearbyRooms.length}
                   </Text>
                 </View>

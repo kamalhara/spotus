@@ -120,7 +120,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
                   {room?.category || "General"}
                 </Text>
               </View>
-              <Text className="text-secondary dark:text-gray-100 text-3xl font-black leading-tight tracking-tight">
+              <Text className="text-secondary dark:text-gray-100 text-3xl font-display font-black leading-tight tracking-tight">
                 {room?.title}
               </Text>
             </View>
@@ -186,7 +186,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
               </View>
               <View className="bg-warning-surface dark:bg-warning-surface px-2.5 py-1.5 rounded-full flex-row items-center">
                 <Ionicons name="star" size={10} color="#F59E0B" />
-                <Text className="text-warning font-black text-[9px] uppercase tracking-widest ml-1">
+                <Text className="text-warning font-display font-black text-[9px] uppercase tracking-widest ml-1">
                   Creator
                 </Text>
               </View>

@@ -154,7 +154,7 @@ export default function Edit() {
                   Cancel
                 </Text>
               </GlassButton>
-              <Text className="font-extrabold text-[17px] text-secondary dark:text-gray-100">
+              <Text className="font-display font-extrabold text-[17px] text-secondary dark:text-gray-100">
                 Edit Profile
               </Text>
 
@@ -252,7 +252,7 @@ export default function Edit() {
 
               <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl p-4 mt-6">
                 <View className="w-full flex flex-row items-center justify-between">
-                  <Text className="text-secondary dark:text-gray-100 text-lg font-extrabold">
+                  <Text className="text-secondary dark:text-gray-100 text-lg font-display font-extrabold">
                     Manage Interests
                   </Text>
                   <View className="bg-primary-surface dark:bg-primary-surface px-2.5 py-1 rounded-lg">

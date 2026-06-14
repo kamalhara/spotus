@@ -62,7 +62,7 @@ export default function RoomsScreen() {
  <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13] px-6">
  {/* Header */}
  <View className="flex-row items-center justify-between mt-3 mb-5">
- <Text className="text-secondary dark:text-gray-100 text-[26px] font-extrabold tracking-tight">
+ <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold tracking-tight">
  My Rooms
  </Text>
  <TouchableOpacity
@@ -92,14 +92,14 @@ export default function RoomsScreen() {
  renderSectionHeader={({ section }) => (
  <View className="bg-bg dark:bg-[#0F0F13] pt-6 pb-4">
  <View className="flex-row items-center gap-2">
- <Text className="text-secondary dark:text-gray-100 text-[18px] font-extrabold">
+ <Text className="text-secondary dark:text-gray-100 text-[18px] font-display font-extrabold">
  {section.title}
  </Text>
  <View
  className={`px-2.5 py-1 rounded-full ${section.count > 0 ?"bg-primary-surface dark:bg-primary-surface":"bg-gray-100 dark:bg-gray-800"}`}
  >
  <Text
- className={`text-[12px] font-black ${section.count > 0 ?"text-primary":"text-gray-500 dark:text-gray-400"}`}
+ className={`text-[12px] font-display font-black ${section.count > 0 ?"text-primary":"text-gray-500 dark:text-gray-400"}`}
  >
  {section.count}
  </Text>

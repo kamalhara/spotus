@@ -130,7 +130,7 @@ function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
                 <Ionicons name="ban" size={18} color="#EF4444" />
               </View>
               <View>
-                <Text className="text-secondary dark:text-gray-100 text-lg font-extrabold tracking-tight">
+                <Text className="text-secondary dark:text-gray-100 text-lg font-display font-extrabold tracking-tight">
                   Blocked Users
                 </Text>
                 <Text className="text-gray-400 dark:text-gray-500 text-xs font-medium mt-0.5">

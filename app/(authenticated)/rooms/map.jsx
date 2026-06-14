@@ -36,7 +36,7 @@ function EmptyRooms() {
       <View className="w-24 h-24 bg-info-surface rounded-full items-center justify-center mb-6">
         <Ionicons name="compass" size={40} color="#3B82F6" />
       </View>
-      <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight text-center mb-2.5">
+      <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight text-center mb-2.5">
         No rooms nearby
       </Text>
       <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4 mb-10">
@@ -70,7 +70,7 @@ function LocationPermissionDenied() {
       <View className="w-24 h-24 bg-red-50 dark:bg-red-900/20 rounded-full items-center justify-center mb-6">
         <Ionicons name="location-outline" size={40} color="#EF4444" />
       </View>
-      <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight text-center mb-2.5">
+      <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight text-center mb-2.5">
         Location Required
       </Text>
       <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">

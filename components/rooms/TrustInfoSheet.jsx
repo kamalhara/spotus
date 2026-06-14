@@ -157,11 +157,11 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  color="#4F46E5"
  style={{ marginRight: 6 }}
  />
- <Text className="text-primary font-black text-[10px] uppercase tracking-[1.5px]">
+ <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
  Trust System
  </Text>
  </View>
- <Text className="text-secondary dark:text-gray-100 text-2xl font-black leading-tight tracking-tighter">
+ <Text className="text-secondary dark:text-gray-100 text-2xl font-display font-black leading-tight tracking-tighter">
  How Trust Works
  </Text>
  </View>
@@ -195,11 +195,11 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  />
  </View>
  <View>
- <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-black uppercase tracking-[1.5px]">
+ <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-display font-black uppercase tracking-[1.5px]">
  Your Trust Level
  </Text>
  <Text
- className="text-base font-black tracking-tight"
+ className="text-base font-display font-black tracking-tight"
  style={{ color: trustColor }}
  >
  {trustLabel}
@@ -211,7 +211,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  style={{ backgroundColor: trustColor +"18"}}
  >
  <Text
- className="font-black text-sm"
+ className="font-display font-black text-sm"
  style={{ color: trustColor }}
  >
  {clampedTrust}/10
@@ -240,7 +240,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
 
  {/* How It Works Section */}
  <View className="mb-6">
- <Text className="text-secondary dark:text-gray-100 text-lg font-black tracking-tight mb-4">
+ <Text className="text-secondary dark:text-gray-100 text-lg font-display font-black tracking-tight mb-4">
  How It Works
  </Text>
 
@@ -250,7 +250,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  <Ionicons name={step.icon} size={18} color="#4F46E5"/>
  </View>
  <View className="flex-1">
- <Text className="text-secondary dark:text-gray-100 text-sm font-black tracking-tight">
+ <Text className="text-secondary dark:text-gray-100 text-sm font-display font-black tracking-tight">
  {step.title}
  </Text>
  <Text className="text-gray-400 dark:text-gray-500 text-xs font-medium leading-[18px] mt-1">
@@ -282,7 +282,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  color="#4F46E5"
  style={{ marginRight: 6 }}
  />
- <Text className="text-secondary dark:text-gray-100 font-black text-sm tracking-tight">
+ <Text className="text-secondary dark:text-gray-100 font-display font-black text-sm tracking-tight">
  Why Trust Matters
  </Text>
  </View>

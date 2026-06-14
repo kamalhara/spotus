@@ -40,7 +40,7 @@ export default function ScreenHeader({
           )}
           <View className="flex-1">
             <Text
-              className="text-secondary dark:text-gray-100 text-xl font-extrabold tracking-tight"
+              className="text-secondary dark:text-gray-100 text-xl font-display font-extrabold tracking-tight"
               numberOfLines={1}
             >
               {title}

@@ -328,7 +328,7 @@ export default function UserProfile() {
             <View className="absolute bottom-0 right-0 w-7 h-7 bg-green-400 rounded-full border-[4px] border-bg dark:border-[#0F0F13]" />
           </View>
 
-          <Text className="text-secondary dark:text-gray-100 text-[24px] font-extrabold mt-4 tracking-tight">
+          <Text className="text-secondary dark:text-gray-100 text-[24px] font-display font-extrabold mt-4 tracking-tight">
             {user?.userName || "User"}
           </Text>
           {user?.bio ? (
@@ -463,7 +463,7 @@ export default function UserProfile() {
               <View className="w-9 h-9 bg-primary/10 rounded-xl items-center justify-center mb-2">
                 <Ionicons name="mic-outline" size={16} color="#4F46E5" />
               </View>
-              <Text className="text-[20px] font-extrabold text-primary">
+              <Text className="text-[20px] font-display font-extrabold text-primary">
                 {hostedRooms}
               </Text>
               <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider mt-0.5">
@@ -475,7 +475,7 @@ export default function UserProfile() {
               <View className="w-9 h-9 bg-blue-50 dark:bg-blue-900/20 rounded-xl items-center justify-center mb-2">
                 <Ionicons name="enter-outline" size={16} color="#3B82F6" />
               </View>
-              <Text className="text-[20px] font-extrabold text-secondary dark:text-gray-100">
+              <Text className="text-[20px] font-display font-extrabold text-secondary dark:text-gray-100">
                 {joinedRooms}
               </Text>
               <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider mt-0.5">
@@ -487,7 +487,7 @@ export default function UserProfile() {
               <View className="w-9 h-9 bg-green-50 dark:bg-green-900/20 rounded-xl items-center justify-center mb-2">
                 <Ionicons name="star-outline" size={16} color="#10B981" />
               </View>
-              <Text className="text-[20px] font-extrabold text-green-500">
+              <Text className="text-[20px] font-display font-extrabold text-green-500">
                 {user?.globalReputation ?? 0}
               </Text>
               <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider mt-0.5">

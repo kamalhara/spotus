@@ -45,7 +45,7 @@ export default function ChangePassword() {
  >
  <Ionicons name="arrow-back"size={20} color={isDark ?"#818CF8":"#4F46E5"} />
  </TouchableOpacity>
- <Text className="text-secondary dark:text-gray-100 font-extrabold text-xl">
+ <Text className="text-secondary dark:text-gray-100 font-display font-extrabold text-xl">
  Change Password
  </Text>
  </View>

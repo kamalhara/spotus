@@ -116,12 +116,12 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                   color="#4F46E5"
                   style={{ marginRight: 6 }}
                 />
-                <Text className="text-primary font-black text-[10px] uppercase tracking-[1.5px]">
+                <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
                   {room?.category || "Discovery Circle"}
                 </Text>
               </View>
             </GlassContainer>
-            <Text className="text-secondary dark:text-gray-100 text-3xl font-black leading-tight tracking-tighter">
+            <Text className="text-secondary dark:text-gray-100 text-3xl font-display font-black leading-tight tracking-tighter">
               {room?.title}
             </Text>
           </View>
@@ -146,7 +146,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
         {/* Members Section */}
         <View>
           <View className="flex-row justify-between items-center mb-5">
-            <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight">
+            <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight">
               Members
             </Text>
             <GlassContainer
@@ -159,7 +159,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
               fallbackClassName="bg-surface-alt dark:bg-[#23232E]"
             >
               <View className="px-3.5 py-1.5">
-                <Text className="text-muted font-black text-[10px] uppercase tracking-[1.5px]">
+                <Text className="text-muted font-display font-black text-[10px] uppercase tracking-[1.5px]">
                   {room?.participants?.length || 0} Total
                 </Text>
               </View>
@@ -183,7 +183,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                       className="w-12 h-12 rounded-full mr-3.5 border-2 border-gray-50 dark:border-gray-700"
                     />
                     <View>
-                      <Text className="text-secondary dark:text-gray-100 font-black text-sm tracking-tight">
+                      <Text className="text-secondary dark:text-gray-100 font-display font-black text-sm tracking-tight">
                         {member.userName || "Unknown Member"}
                       </Text>
                       <View className="flex-row items-center mt-2 gap-2">
@@ -194,7 +194,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                               size={10}
                               color="#10B981"
                             />
-                            <Text className="text-success font-black text-[9px] uppercase tracking-widest ml-1">
+                            <Text className="text-success font-display font-black text-[9px] uppercase tracking-widest ml-1">
                               Trust {Math.min(member.trustScore * 10, 100)}%
                             </Text>
                           </View>
@@ -202,7 +202,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                         {member.id === room.createdBy && (
                           <View className="bg-warning-surface dark:bg-warning-surface px-2.5 py-1 rounded-full flex-row items-center">
                             <Ionicons name="star" size={10} color="#F59E0B" />
-                            <Text className="text-warning font-black text-[9px] uppercase tracking-widest ml-1">
+                            <Text className="text-warning font-display font-black text-[9px] uppercase tracking-widest ml-1">
                               Creator
                             </Text>
                           </View>
@@ -212,7 +212,7 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
                   </View>
                   {member.id === currentUserId && (
                     <View className="bg-primary/10 px-2.5 py-1.5 rounded-xl">
-                      <Text className="text-primary font-black text-[9px] uppercase tracking-widest">
+                      <Text className="text-primary font-display font-black text-[9px] uppercase tracking-widest">
                         You
                       </Text>
                     </View>

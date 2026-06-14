@@ -139,7 +139,7 @@ export default function RoomOptionsModal({
                 activeOpacity={0.7}
                 className="py-4 items-center justify-center"
               >
-                <Text className="text-secondary dark:text-gray-100 font-extrabold text-[16px]">
+                <Text className="text-secondary dark:text-gray-100 font-display font-extrabold text-[16px]">
                   Cancel
                 </Text>
               </TouchableOpacity>

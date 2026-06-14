@@ -304,7 +304,7 @@ export default function RoomChat() {
                 activeOpacity={0.7}
               >
                 <Text
-                  className="text-secondary dark:text-gray-100 text-base font-extrabold"
+                  className="text-secondary dark:text-gray-100 text-base font-display font-extrabold"
                   numberOfLines={1}
                 >
                   {room?.title || "Loading..."}

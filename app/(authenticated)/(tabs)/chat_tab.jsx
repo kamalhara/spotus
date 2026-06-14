@@ -155,7 +155,7 @@ export default function Chat() {
             style={{ opacity: fadeIn }}
           >
             <View>
-              <Text className="text-secondary dark:text-gray-100 text-[26px] font-extrabold tracking-tight">
+              <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold tracking-tight">
                 Messages
               </Text>
               <Text className="text-muted dark:text-gray-500 text-[13px] font-semibold mt-1">
@@ -167,7 +167,7 @@ export default function Chat() {
             </View>
             {unreadCount > 0 && (
               <View className="bg-primary-surface dark:bg-primary-surface px-3 py-1.5 rounded-full">
-                <Text className="text-primary text-[12px] font-black">
+                <Text className="text-primary text-[12px] font-display font-black">
                   {unreadCount} new
                 </Text>
               </View>
@@ -228,7 +228,7 @@ export default function Chat() {
               </Text>
               {rooms.length > 0 && (
                 <View className="ml-2 bg-primary-surface dark:bg-primary-surface px-2.5 py-1 rounded-full">
-                  <Text className="text-primary text-[11px] font-black">
+                  <Text className="text-primary text-[11px] font-display font-black">
                     {rooms.length}
                   </Text>
                 </View>

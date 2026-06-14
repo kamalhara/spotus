@@ -194,7 +194,7 @@ export default function CreateRooms() {
             <View className="flex-1">
               {/* Inline Title — fades out on scroll */}
               <Animated.View className="mt-4 mb-8" style={inlineTitleStyle}>
-                <Text className="text-secondary dark:text-gray-100 text-[28px] font-extrabold tracking-tight leading-[34px]">
+                <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-extrabold tracking-tight leading-[34px]">
                   Create a Room
                 </Text>
                 <Text className="text-gray-400 dark:text-gray-500 text-sm leading-5 mt-2">
@@ -305,7 +305,7 @@ export default function CreateRooms() {
                     </View>
                   </View>
                   <Text
-                    className={`text-lg font-extrabold tracking-tight ${
+                    className={`text-lg font-display font-extrabold tracking-tight ${
                       title
                         ? "text-secondary dark:text-gray-100"
                         : "text-gray-300 dark:text-gray-600"
