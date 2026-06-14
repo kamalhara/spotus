@@ -79,20 +79,20 @@ const CustomInput = forwardRef(function CustomInput(
           {
             borderWidth: 1.5,
             borderColor: animatedBorderColor,
-            borderRadius: 24,
+            borderRadius: 30,
           },
           containerStyle,
         ]}
       >
         <GlassContainer
-          borderRadius={22}
+          borderRadius={28}
           isInteractive={true}
-          fallbackClassName="bg-gray-100/80 dark:bg-gray-800/80"
+          fallbackClassName="bg-white dark:bg-[#1A1A22]"
           style={{
             flexDirection: "row",
             alignItems: "center",
             paddingHorizontal: 16,
-            minHeight: 56,
+            paddingVertical: 14,
             backgroundColor: isDark
               ? "rgba(255, 255, 255, 0.03)"
               : "rgba(255, 255, 255, 0.4)",
