@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomInput from "../../../components/ui/CustomInput";
 import GlassButton from "../../../components/ui/GlassButton";
+import GlassContainer from "../../../components/ui/GlassContainer";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
@@ -148,30 +149,31 @@ export default function Edit() {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View className="flex-1">
             <View className="w-full flex-row items-center justify-between mt-2 py-3">
-              <GlassButton
-                onPress={() => router.back()}
-                shape="pill"
-                size={40}
-              >
+              <GlassButton onPress={() => router.back()} shape="pill" size={40}>
                 <Text className="font-bold text-primary dark:text-primary-light">
                   Cancel
                 </Text>
               </GlassButton>
-              <Text className="font-extrabold text-lg text-secondary dark:text-gray-100">
+              <Text className="font-extrabold text-[17px] text-secondary dark:text-gray-100">
                 Edit Profile
               </Text>
-              <TouchableOpacity
-                onPress={handleSaveProfile}
-                disabled={isSaving}
-                activeOpacity={0.75}
-                className="min-w-16 px-3 py-2 rounded-xl bg-primary items-center"
-              >
-                {isSaving ? (
-                  <ActivityIndicator color="#FFFFFF" size="small" />
-                ) : (
-                  <Text className="font-bold text-white">Save</Text>
-                )}
-              </TouchableOpacity>
+
+              <GlassContainer isInteractive={true}>
+                <TouchableOpacity
+                  onPress={handleSaveProfile}
+                  disabled={isSaving}
+                  activeOpacity={0.75}
+                  className="px-4 py-2 rounded-full bg-primary flex-row items-center justify-center min-w-[70px]"
+                >
+                  {isSaving ? (
+                    <ActivityIndicator color="#FFFFFF" size="small" />
+                  ) : (
+                    <Text className="font-bold text-white text-[15px]">
+                      Save
+                    </Text>
+                  )}
+                </TouchableOpacity>
+              </GlassContainer>
             </View>
 
             <View className="w-full mt-8">
@@ -207,7 +209,6 @@ export default function Edit() {
                   placeholder="Enter full name"
                   value={userName}
                   onChangeText={setUserName}
-                  containerStyle={{ paddingVertical: 10 }}
                 />
 
                 <CustomInput
@@ -215,7 +216,9 @@ export default function Edit() {
                   placeholder="Add a bio"
                   value={bio}
                   onChangeText={setBio}
-                  containerStyle={{ paddingVertical: 30 }}
+                  multiline={true}
+                  numberOfLines={3}
+                  style={{ height: 80, textAlignVertical: "top" }}
                 />
                 <View>
                   <CustomInput
@@ -223,7 +226,6 @@ export default function Edit() {
                     placeholder="Add Location"
                     value={currentLocation}
                     onChangeText={setCurrentLocation}
-                    containerStyle={{ paddingVertical: 12 }}
                     icon={
                       <Ionicons name="location" size={18} color="#9CA3AF" />
                     }
@@ -231,15 +233,15 @@ export default function Edit() {
                   <TouchableOpacity
                     onPress={handleGetLocation}
                     disabled={isLocating}
-                    className="w-full bg-primary flex-row items-center justify-center rounded-2xl p-3.5 mt-3"
+                    className="w-full bg-primary/10 dark:bg-primary/20 flex-row items-center justify-center rounded-xl p-3 mt-3"
                     activeOpacity={0.75}
                   >
                     {isLocating ? (
-                      <ActivityIndicator color="#ffffff" size="small" />
+                      <ActivityIndicator color="#4F46E5" size="small" />
                     ) : (
                       <>
-                        <Ionicons name="location" size={18} color="#fff" />
-                        <Text className="text-white font-bold ml-2">
+                        <Ionicons name="location" size={18} color="#4F46E5" />
+                        <Text className="text-primary dark:text-primary-light font-bold ml-2">
                           Use Current Location
                         </Text>
                       </>
