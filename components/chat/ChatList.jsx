@@ -271,14 +271,6 @@ export default function ChatRow({ chat, onPress }) {
                   paddingBottom: 8,
                 }}
               >
-                {/* Drag Handle */}
-                <View className="items-center mb-4">
-                  <View
-                    className="bg-gray-300 dark:bg-gray-600 rounded-full"
-                    style={{ width: 36, height: 4 }}
-                  />
-                </View>
-
                 {/* Header */}
                 <View className="flex-row items-center px-5 mb-4">
                   <View
