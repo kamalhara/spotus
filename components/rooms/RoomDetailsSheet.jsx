@@ -13,6 +13,7 @@ import {
   useRef,
 } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
+import GlassContainer from "../ui/GlassContainer";
 import { useTheme } from "../../context/ThemeContext";
 
 const CATEGORY_ICONS = {
@@ -97,27 +98,49 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
         {/* Header section */}
         <View className="flex-row justify-between items-start mb-6">
           <View className="flex-1 mr-4">
-            <View className="bg-surface-alt dark:bg-[#23232E] self-start px-3.5 py-2 rounded-xl mb-4 flex-row items-center">
-              <Ionicons
-                name={categoryIcon}
-                size={12}
-                color="#4F46E5"
-                style={{ marginRight: 6 }}
-              />
-              <Text className="text-primary font-black text-[10px] uppercase tracking-[1.5px]">
-                {room?.category || "Discovery Circle"}
-              </Text>
-            </View>
+            <GlassContainer
+              borderRadius={12}
+              style={{
+                backgroundColor: isDark
+                  ? "rgba(79, 70, 229, 0.15)"
+                  : "rgba(79, 70, 229, 0.08)",
+                marginBottom: 16,
+                alignSelf: "flex-start",
+              }}
+              fallbackClassName="bg-indigo-50 dark:bg-[#23232E]"
+            >
+              <View className="px-3.5 py-2 flex-row items-center">
+                <Ionicons
+                  name={categoryIcon}
+                  size={12}
+                  color="#4F46E5"
+                  style={{ marginRight: 6 }}
+                />
+                <Text className="text-primary font-black text-[10px] uppercase tracking-[1.5px]">
+                  {room?.category || "Discovery Circle"}
+                </Text>
+              </View>
+            </GlassContainer>
             <Text className="text-secondary dark:text-gray-100 text-3xl font-black leading-tight tracking-tighter">
               {room?.title}
             </Text>
           </View>
-          <TouchableOpacity
-            onPress={handleDismiss}
-            className="w-10 h-10 bg-surface-alt dark:bg-[#23232E] rounded-2xl items-center justify-center"
+          <GlassContainer
+            borderRadius={16}
+            style={{
+              backgroundColor: isDark
+                ? "rgba(255, 255, 255, 0.05)"
+                : "rgba(0, 0, 0, 0.03)",
+            }}
+            fallbackClassName="bg-surface-alt dark:bg-[#23232E]"
           >
-            <Ionicons name="close" size={18} color="#94A3B8" />
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleDismiss}
+              className="w-10 h-10 items-center justify-center"
+            >
+              <Ionicons name="close" size={18} color="#94A3B8" />
+            </TouchableOpacity>
+          </GlassContainer>
         </View>
 
         {/* Members Section */}
@@ -126,11 +149,21 @@ const RoomDetailsSheet = forwardRef(({ room, members, currentUserId }, ref) => {
             <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight">
               Members
             </Text>
-            <View className="bg-surface-alt dark:bg-[#23232E] px-3.5 py-1.5 rounded-xl">
-              <Text className="text-muted font-black text-[10px] uppercase tracking-[1.5px]">
-                {room?.participants?.length || 0} Total
-              </Text>
-            </View>
+            <GlassContainer
+              borderRadius={12}
+              style={{
+                backgroundColor: isDark
+                  ? "rgba(255, 255, 255, 0.05)"
+                  : "rgba(0, 0, 0, 0.03)",
+              }}
+              fallbackClassName="bg-surface-alt dark:bg-[#23232E]"
+            >
+              <View className="px-3.5 py-1.5">
+                <Text className="text-muted font-black text-[10px] uppercase tracking-[1.5px]">
+                  {room?.participants?.length || 0} Total
+                </Text>
+              </View>
+            </GlassContainer>
           </View>
 
           <View className="flex flex-col gap-3">

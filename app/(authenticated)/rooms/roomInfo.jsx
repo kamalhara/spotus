@@ -11,8 +11,9 @@ import {
 import { useEffect, useState } from "react";
 import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import GlassButton from "../../../components/ui/GlassButton";
 import RoomOptionsModal from "../../../components/rooms/roomOptionsModal";
+import GlassButton from "../../../components/ui/GlassButton";
+import GlassContainer from "../../../components/ui/GlassContainer";
 import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
@@ -151,7 +152,11 @@ export default function RoomInfo() {
         >
           {showRoomTitle ? room?.title : "Room Info"}
         </Text>
-        <GlassButton onPress={() => setShowOptions(true)} size={40} shape="circle">
+        <GlassButton
+          onPress={() => setShowOptions(true)}
+          size={40}
+          shape="circle"
+        >
           <Ionicons
             name="ellipsis-vertical"
             size={20}
@@ -179,23 +184,44 @@ export default function RoomInfo() {
             {/* Header section */}
             <View className="mb-6 mt-4">
               <View className="flex-row items-center justify-between mb-3">
-                <View className="bg-surface-alt dark:bg-[#23232E] self-start px-3.5 py-2 rounded-xl flex-row items-center">
-                  <Ionicons
-                    name={categoryIcon}
-                    size={12}
-                    color={`#4F46E5`}
-                    style={{ marginRight: 6 }}
-                  />
-                  <Text className="text-primary font-black text-[10px] uppercase tracking-[1.5px]">
-                    {room?.category || "Discovery Circle"}
-                  </Text>
-                </View>
-                <View className="flex-row items-center">
-                  <Ionicons name="location-sharp" size={12} color="#4F46E5" />
-                  <Text className="text-primary font-black text-[10px]">
-                    {room?.location || "0.4km away"}
-                  </Text>
-                </View>
+                <GlassContainer
+                  borderRadius={12}
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(79, 70, 229, 0.15)"
+                      : "rgba(79, 70, 229, 0.08)",
+                  }}
+                  fallbackClassName="bg-indigo-50 dark:bg-[#23232E]"
+                >
+                  <View className="px-3.5 py-2 flex-row items-center">
+                    <Ionicons
+                      name={categoryIcon}
+                      size={12}
+                      color={`#4F46E5`}
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text className="text-primary font-black text-[10px] uppercase tracking-[1.5px]">
+                      {room?.category || "Discovery Circle"}
+                    </Text>
+                  </View>
+                </GlassContainer>
+
+                <GlassContainer
+                  borderRadius={12}
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(79, 70, 229, 0.15)"
+                      : "rgba(79, 70, 229, 0.08)",
+                  }}
+                  fallbackClassName="bg-indigo-50 dark:bg-[#23232E]"
+                >
+                  <View className="flex-row items-center px-3.5 py-2">
+                    <Ionicons name="location-sharp" size={12} color="#4F46E5" />
+                    <Text className="text-primary font-black text-[10px] ml-1">
+                      {room?.location || "0.4km away"}
+                    </Text>
+                  </View>
+                </GlassContainer>
               </View>
 
               <Text className="text-secondary dark:text-gray-100 text-3xl font-black leading-tight tracking-tighter">
@@ -220,11 +246,21 @@ export default function RoomInfo() {
                 <Text className="text-secondary dark:text-gray-100 text-xl font-black tracking-tight">
                   Members
                 </Text>
-                <View className="bg-surface-alt dark:bg-[#23232E] px-3.5 py-1.5 rounded-xl">
-                  <Text className="text-muted font-black text-[10px] uppercase tracking-[1.5px]">
-                    {room?.participants?.length || 0} Total
-                  </Text>
-                </View>
+                <GlassContainer
+                  borderRadius={12}
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(255, 255, 255, 0.05)"
+                      : "rgba(0, 0, 0, 0.03)",
+                  }}
+                  fallbackClassName="bg-gray-100 dark:bg-[#23232E]"
+                >
+                  <View className="px-3.5 py-1.5">
+                    <Text className="text-muted font-black text-[10px] uppercase tracking-[1.5px]">
+                      {room?.participants?.length || 0} Total
+                    </Text>
+                  </View>
+                </GlassContainer>
               </View>
 
               <View className="flex flex-col gap-3">
@@ -377,16 +413,28 @@ export default function RoomInfo() {
             ))}
           </View>
         </View>
-        <TouchableOpacity
-          onPress={handleLeaveRoom}
-          activeOpacity={0.7}
-          className="mx-6 mt-7 bg-red-50 dark:bg-red-900/20 py-4 rounded-2xl border border-red-100 dark:border-red-900/30 flex-row items-center justify-center gap-2"
+        <GlassContainer
+          borderRadius={16}
+          style={{
+            backgroundColor: isDark
+              ? "rgba(239, 68, 68, 0.15)"
+              : "rgba(239, 68, 68, 0.05)",
+            marginHorizontal: 24,
+            marginTop: 28,
+          }}
+          fallbackClassName="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30"
         >
-          <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-          <Text className="text-red-500 font-semibold text-[15px]">
-            Leave Room
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleLeaveRoom}
+            activeOpacity={0.7}
+            className="py-4 flex-row items-center justify-center gap-2"
+          >
+            <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+            <Text className="text-red-500 font-semibold text-[15px]">
+              Leave Room
+            </Text>
+          </TouchableOpacity>
+        </GlassContainer>
       </ScrollView>
       {showOptions && (
         <RoomOptionsModal
