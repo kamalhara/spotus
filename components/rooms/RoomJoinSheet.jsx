@@ -164,7 +164,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
               </View>
               <View>
                 <Text className="text-secondary dark:text-gray-100 font-bold text-sm">
-                  {room?.distance !== undefined ? (room.distance / 1.60934).toFixed(1) : "?"} mi
+                  {room?.distance !== undefined ? room.distance.toFixed(1) : "?"} km
                 </Text>
                 <Text className="text-muted text-[10px] font-bold uppercase tracking-wider">
                   Away

@@ -180,8 +180,8 @@ export default function Home() {
   const loadRooms = useCallback(async () => {
     setLocationError(false);
     try {
-      // slider is in miles, getNearbyRooms expects km
-      const data = await getNearbyRooms(searchDistance * 1.60934);
+      // slider is in km, getNearbyRooms expects km
+      const data = await getNearbyRooms(searchDistance);
       setRooms(data);
     } catch (error) {
       console.error("Error loading rooms:", error);
@@ -273,7 +273,7 @@ export default function Home() {
             </View>
             <View className="bg-primary px-3 py-1.5 rounded-xl">
               <Text className="text-white text-sm font-display font-black">
-                {displayDistance} mi
+                {displayDistance} km
               </Text>
             </View>
           </View>
@@ -289,7 +289,7 @@ export default function Home() {
                 position: "absolute",
                 top: -36,
                 left:
-                  ((displayDistance - 1) / 24) * (sliderWidth.current - 28) +
+                  ((displayDistance - 1) / 39) * (sliderWidth.current - 28) +
                   14 -
                   22,
                 opacity: tooltipOpacity,
@@ -337,7 +337,7 @@ export default function Home() {
             <Slider
               style={{ width: "100%", height: 40 }}
               minimumValue={1}
-              maximumValue={25}
+              maximumValue={40}
               step={1}
               value={displayDistance}
               onSlidingStart={() => {
@@ -351,7 +351,7 @@ export default function Home() {
               onValueChange={(val) => {
                 const rounded = Math.round(val);
                 const left =
-                  ((rounded - 1) / 24) * (sliderWidth.current - 28) + 14 - 22;
+                  ((rounded - 1) / 39) * (sliderWidth.current - 28) + 14 - 22;
                 tooltipContainerRef.current?.setNativeProps({
                   style: { left },
                 });
@@ -374,8 +374,8 @@ export default function Home() {
             />
           </View>
           <View className="flex flex-row justify-between mt-1">
-            <Text className="text-muted text-xs font-semibold">1 mile</Text>
-            <Text className="text-muted text-xs font-semibold">25 miles</Text>
+            <Text className="text-muted text-xs font-semibold">1 km</Text>
+            <Text className="text-muted text-xs font-semibold">40 km</Text>
           </View>
         </View>
       </Animated.View>

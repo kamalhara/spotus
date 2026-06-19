@@ -112,7 +112,7 @@ export default function RoomCard({
               style={{ marginRight: 2, marginTop: -1 }}
             />
             <Text className="text-gray-400 text-xs font-medium">
-              {(room.distance / 1.60934).toFixed(1)} mi
+              {room.distance.toFixed(1)} km
             </Text>
           </>
         )}

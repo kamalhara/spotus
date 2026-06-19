@@ -227,8 +227,8 @@ export default function MapViewScreen() {
             longitudeDelta: 0.05,
           });
 
-          const radiusMiles = distance ? parseFloat(distance) : 5;
-          const allRooms = await getNearbyRooms(radiusMiles * 1.60934);
+          const radiusKm = distance ? parseFloat(distance) : 5;
+          const allRooms = await getNearbyRooms(radiusKm);
 
           const mapRooms = allRooms.filter(
             (r) =>
