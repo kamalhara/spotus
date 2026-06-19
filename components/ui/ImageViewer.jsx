@@ -1,6 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useRef, useState } from "react";
 import {
+  ActivityIndicator,
+  Alert,
   Animated,
   Dimensions,
   Image,
@@ -11,6 +13,8 @@ import {
   Text,
   View,
 } from "react-native";
+import * as FileSystem from "expo-file-system/legacy";
+import * as Sharing from "expo-sharing";
 import GlassButton from "./GlassButton";
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
@@ -35,6 +39,29 @@ export default function ImageViewer({
   const lastTapTime = useRef(0);
 
   const [isZoomed, setIsZoomed] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+
+  const handleShare = async () => {
+    if (!imageUrl) return;
+    try {
+      setIsSharing(true);
+
+      const fileUri = `${FileSystem.cacheDirectory}shared_image_${Date.now()}.jpg`;
+      const downloadRes = await FileSystem.downloadAsync(imageUrl, fileUri);
+
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        await Sharing.shareAsync(downloadRes.uri);
+      } else {
+        Alert.alert("Error", "Sharing is not available on your device");
+      }
+    } catch (error) {
+      console.error("Error sharing image:", error);
+      Alert.alert("Error", "Failed to share the image.");
+    } finally {
+      setIsSharing(false);
+    }
+  };
 
   const resetPosition = useCallback(() => {
     lastScale.current = 1;
@@ -231,6 +258,16 @@ export default function ImageViewer({
               {timestamp && <Text style={styles.timestamp}>{timestamp}</Text>}
             </View>
           )}
+
+          <GlassButton onPress={handleShare} disabled={isSharing}>
+            <View style={styles.closeButtonInner}>
+              {isSharing ? (
+                <ActivityIndicator color="#fff" size="small" />
+              ) : (
+                <Ionicons name="share-outline" size={20} color="#fff" />
+              )}
+            </View>
+          </GlassButton>
         </Animated.View>
 
         {/* Image */}
