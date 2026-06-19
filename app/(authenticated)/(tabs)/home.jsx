@@ -15,10 +15,10 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import GlassButton from "../../../components/ui/GlassButton";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
+import GlassButton from "../../../components/ui/GlassButton";
 import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
@@ -58,7 +58,8 @@ function LocationPermissionDenied() {
         Location Required
       </Text>
       <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">
-        We need your location to find rooms near you. Please enable it in your device settings.
+        We need your location to find rooms near you. Please enable it in your
+        device settings.
       </Text>
     </View>
   );
@@ -109,6 +110,9 @@ export default function Home() {
   const tooltipContainerRef = useRef(null);
   const tooltipTextRef = useRef(null);
   const isSlidingRef = useRef(false);
+  const [ctaHidden, setCtaHidden] = useState(false);
+  const ctaBottomY = useRef(0);
+  const scrollOffsetY = useRef(0);
   const router = useRouter();
   const { isDark } = useTheme();
   const { firestoreUser } = useFirestoreUser();
@@ -208,7 +212,9 @@ export default function Home() {
 
   const blockedUsers = firestoreUser?.blockedUsers || [];
   const nearbyRooms = rooms.filter(
-    (r) => !r.participants?.includes(firestoreUser?.id) && !blockedUsers.includes(r.createdBy),
+    (r) =>
+      !r.participants?.includes(firestoreUser?.id) &&
+      !blockedUsers.includes(r.createdBy),
   );
 
   const firstName = firestoreUser?.userName?.split("")[0] || "there";
@@ -225,7 +231,7 @@ export default function Home() {
 
   const handleRefreshPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setRefreshTrigger(prev => prev + 1);
+    setRefreshTrigger((prev) => prev + 1);
   };
 
   // ── Everything above the room list, rendered as list header ────────
@@ -272,49 +278,64 @@ export default function Home() {
             </View>
           </View>
           <View
-            onLayout={(e) => { sliderWidth.current = e.nativeEvent.layout.width; }}
-            style={{ overflow: 'visible' }}
+            onLayout={(e) => {
+              sliderWidth.current = e.nativeEvent.layout.width;
+            }}
+            style={{ overflow: "visible" }}
           >
             <Animated.View
               ref={tooltipContainerRef}
               style={{
-                position: 'absolute',
+                position: "absolute",
                 top: -36,
-                left: ((displayDistance - 1) / 24) * (sliderWidth.current - 28) + 14 - 22,
+                left:
+                  ((displayDistance - 1) / 24) * (sliderWidth.current - 28) +
+                  14 -
+                  22,
                 opacity: tooltipOpacity,
                 zIndex: 10,
               }}
               pointerEvents="none"
             >
-              <View style={{
-                backgroundColor: isDark ? '#818CF8' : '#4F46E5',
-                paddingHorizontal: 10,
-                paddingVertical: 5,
-                borderRadius: 10,
-                alignItems: 'center',
-                minWidth: 44,
-              }}>
+              <View
+                style={{
+                  backgroundColor: isDark ? "#818CF8" : "#4F46E5",
+                  paddingHorizontal: 10,
+                  paddingVertical: 5,
+                  borderRadius: 10,
+                  alignItems: "center",
+                  minWidth: 44,
+                }}
+              >
                 <TextInput
                   ref={tooltipTextRef}
                   editable={false}
                   defaultValue={String(displayDistance)}
-                  style={{ color: '#fff', fontSize: 13, fontWeight: '800', padding: 0, textAlign: 'center' }}
+                  style={{
+                    color: "#fff",
+                    fontSize: 13,
+                    fontWeight: "800",
+                    padding: 0,
+                    textAlign: "center",
+                  }}
                 />
               </View>
-              <View style={{
-                width: 0,
-                height: 0,
-                borderLeftWidth: 6,
-                borderRightWidth: 6,
-                borderTopWidth: 6,
-                borderLeftColor: 'transparent',
-                borderRightColor: 'transparent',
-                borderTopColor: isDark ? '#818CF8' : '#4F46E5',
-                alignSelf: 'center',
-              }} />
+              <View
+                style={{
+                  width: 0,
+                  height: 0,
+                  borderLeftWidth: 6,
+                  borderRightWidth: 6,
+                  borderTopWidth: 6,
+                  borderLeftColor: "transparent",
+                  borderRightColor: "transparent",
+                  borderTopColor: isDark ? "#818CF8" : "#4F46E5",
+                  alignSelf: "center",
+                }}
+              />
             </Animated.View>
             <Slider
-              style={{ width: '100%', height: 40 }}
+              style={{ width: "100%", height: 40 }}
               minimumValue={1}
               maximumValue={25}
               step={1}
@@ -329,9 +350,14 @@ export default function Home() {
               }}
               onValueChange={(val) => {
                 const rounded = Math.round(val);
-                const left = ((rounded - 1) / 24) * (sliderWidth.current - 28) + 14 - 22;
-                tooltipContainerRef.current?.setNativeProps({ style: { left } });
-                tooltipTextRef.current?.setNativeProps({ text: String(rounded) });
+                const left =
+                  ((rounded - 1) / 24) * (sliderWidth.current - 28) + 14 - 22;
+                tooltipContainerRef.current?.setNativeProps({
+                  style: { left },
+                });
+                tooltipTextRef.current?.setNativeProps({
+                  text: String(rounded),
+                });
               }}
               onSlidingComplete={(val) => {
                 isSlidingRef.current = false;
@@ -343,8 +369,8 @@ export default function Home() {
                 setDisplayDistance(Math.round(val));
               }}
               minimumTrackTintColor="#4F46E5"
-              maximumTrackTintColor={isDark ? '#2A2A36' : '#E2E8F0'}
-              thumbTintColor={isDark ? '#818CF8' : '#4F46E5'}
+              maximumTrackTintColor={isDark ? "#2A2A36" : "#E2E8F0"}
+              thumbTintColor={isDark ? "#818CF8" : "#4F46E5"}
             />
           </View>
           <View className="flex flex-row justify-between mt-1">
@@ -357,6 +383,10 @@ export default function Home() {
       {/* Create Room CTA */}
       <Animated.View
         className="mt-7"
+        onLayout={(e) => {
+          ctaBottomY.current =
+            e.nativeEvent.layout.y + e.nativeEvent.layout.height;
+        }}
         style={{
           opacity: fadeInContent,
           transform: [{ translateY: slideUpContent }],
@@ -407,13 +437,25 @@ export default function Home() {
             )}
           </View>
           <GlassButton
-            onPress={() => router.push({ pathname: '/rooms/map', params: { distance: displayDistance } })}
+            onPress={() =>
+              router.push({
+                pathname: "/rooms/map",
+                params: { distance: displayDistance },
+              })
+            }
             shape="pill"
             size={34}
           >
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Ionicons name="map" size={14} color={isDark ? "#E2E8F0" : "#4B5563"} style={{ marginRight: 4 }} />
-              <Text className="text-gray-600 dark:text-gray-300 text-xs font-bold">Map View</Text>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <Ionicons
+                name="map"
+                size={14}
+                color={isDark ? "#E2E8F0" : "#4B5563"}
+                style={{ marginRight: 4 }}
+              />
+              <Text className="text-gray-600 dark:text-gray-300 text-xs font-bold">
+                Map View
+              </Text>
             </View>
           </GlassButton>
         </View>
@@ -422,7 +464,13 @@ export default function Home() {
   );
 
   // ── Build the list data ────────────────────────────────────────────
-  const listData = loading ? [{ _skeleton: true, id: "s1" }, { _skeleton: true, id: "s2" }, { _skeleton: true, id: "s3" }] : nearbyRooms;
+  const listData = loading
+    ? [
+        { _skeleton: true, id: "s1" },
+        { _skeleton: true, id: "s2" },
+        { _skeleton: true, id: "s3" },
+      ]
+    : nearbyRooms;
 
   return (
     <>
@@ -449,11 +497,23 @@ export default function Home() {
             </Text>
             <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
           </View>
-          <GlassButton onPress={handleRefreshPress} size={48} shape="circle">
+          <GlassButton
+            onPress={ctaHidden ? handleCreateRoom : handleRefreshPress}
+            size={48}
+            shape="circle"
+          >
             <Ionicons
-              name={loading ? "refresh-circle" : "refresh"}
-              size={20}
-              color={isDark ? "#F8FAFC" : "#18181B"}
+              name={ctaHidden ? "add" : loading ? "refresh-circle" : "refresh"}
+              size={ctaHidden ? 24 : 20}
+              color={
+                ctaHidden
+                  ? isDark
+                    ? "#C7D2FE"
+                    : "#4F46E5"
+                  : isDark
+                    ? "#F8FAFC"
+                    : "#18181B"
+              }
             />
           </GlassButton>
         </Animated.View>
@@ -476,11 +536,20 @@ export default function Home() {
                 </AnimatedRoomItem>
               )
             }
-            keyExtractor={(item, index) => (item._skeleton ? `skel-${index}` : item.id)}
+            keyExtractor={(item, index) =>
+              item._skeleton ? `skel-${index}` : item.id
+            }
             ListHeaderComponent={ListHeader}
             contentContainerStyle={{ paddingBottom: 100, paddingTop: 4 }}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={loading ? null : <EmptyRooms />}
+            onScroll={(e) => {
+              const offset = e.nativeEvent.contentOffset.y;
+              scrollOffsetY.current = offset;
+              const hidden = offset > ctaBottomY.current;
+              if (hidden !== ctaHidden) setCtaHidden(hidden);
+            }}
+            scrollEventThrottle={16}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
