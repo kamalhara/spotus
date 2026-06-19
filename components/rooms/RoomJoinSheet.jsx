@@ -19,6 +19,7 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 import { db } from "../../config/firebase.config";
 import { useTheme } from "../../context/ThemeContext";
 import CustomButton from "../ui/CustomButton";
+import GlassContainer from "../ui/GlassContainer";
 
 const CATEGORY_ICONS = {
   Music: "musical-notes",
@@ -75,6 +76,19 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
     [],
   );
 
+  const renderBackground = useCallback(
+    (props) => (
+      <View style={props.style} pointerEvents="none">
+        <GlassContainer
+          style={{ flex: 1 }}
+          borderRadius={32}
+          glassEffectStyle="regular"
+        />
+      </View>
+    ),
+    []
+  );
+
   const handleDismiss = () => {
     bottomSheetModalRef.current?.dismiss();
   };
@@ -98,10 +112,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
         height: 4,
         borderRadius: 2,
       }}
-      backgroundStyle={{
-        borderRadius: 32,
-        backgroundColor: isDark ? "#1A1A22" : "#FFFFFF",
-      }}
+      backgroundComponent={renderBackground}
       enableDynamicSizing={false}
     >
       <BottomSheetView className="px-8 pt-4 pb-12">
