@@ -14,6 +14,7 @@ import {
 import { Text, TouchableOpacity, View } from"react-native";
 import * as Progress from"react-native-progress";
 import { useTheme } from"../../context/ThemeContext";
+import GlassContainer from "../ui/GlassContainer";
 
 const TRUST_TIERS = [
  {
@@ -97,6 +98,19 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  [],
  );
 
+ const renderBackground = useCallback(
+   (props) => (
+     <View style={props.style} pointerEvents="none">
+       <GlassContainer
+         style={{ flex: 1 }}
+         borderRadius={32}
+         glassEffectStyle="regular"
+       />
+     </View>
+   ),
+   []
+ );
+
  const handleDismiss = () => {
  bottomSheetModalRef.current?.dismiss();
  };
@@ -134,7 +148,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  height: 4,
  borderRadius: 2,
  }}
- backgroundStyle={{ borderRadius: 32, backgroundColor: isDark ?"#1A1A22":"#FFFFFF"}}
+ backgroundComponent={renderBackground}
  enableDynamicSizing={false}
  >
  <BottomSheetScrollView
