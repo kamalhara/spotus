@@ -8,7 +8,9 @@ import {
   Animated,
   FlatList,
   Image,
+  RefreshControl,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -62,14 +64,58 @@ function LocationPermissionDenied() {
   );
 }
 
+// ── Animated room card wrapper for staggered fade-in ─────────────────
+function AnimatedRoomItem({ children, index }) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(24)).current;
+
+  useEffect(() => {
+    const delay = Math.min(index * 80, 400); // cap at 400ms total stagger
+    const timer = setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 350,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [fadeAnim, slideAnim, index]);
+
+  return (
+    <Animated.View
+      style={{
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }],
+      }}
+    >
+      {children}
+    </Animated.View>
+  );
+}
+
 export default function Home() {
-  const [distance, setDistance] = useState(5);
+  const [displayDistance, setDisplayDistance] = useState(5);
+  const [searchDistance, setSearchDistance] = useState(5);
+  const debounceTimer = useRef(null);
+  const sliderWidth = useRef(0);
+  const tooltipOpacity = useRef(new Animated.Value(0)).current;
+  const tooltipContainerRef = useRef(null);
+  const tooltipTextRef = useRef(null);
+  const isSlidingRef = useRef(false);
   const router = useRouter();
   const { isDark } = useTheme();
   const { firestoreUser } = useFirestoreUser();
 
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -118,32 +164,47 @@ export default function Home() {
     router.push(`/rooms/${selectedRoom.id}`);
   };
 
+  // Debounce: when displayDistance changes, wait 600ms then commit to searchDistance
+  useEffect(() => {
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      setSearchDistance(displayDistance);
+    }, 300);
+    return () => clearTimeout(debounceTimer.current);
+  }, [displayDistance]);
+
+  const loadRooms = useCallback(async () => {
+    setLocationError(false);
+    try {
+      // slider is in miles, getNearbyRooms expects km
+      const data = await getNearbyRooms(searchDistance * 1.60934);
+      setRooms(data);
+    } catch (error) {
+      console.error("Error loading rooms:", error);
+      if (
+        error.message.includes("permission denied") ||
+        error.message.includes("Not authorized") ||
+        error.message.includes("Location permission")
+      ) {
+        setLocationError(true);
+      }
+    }
+  }, [searchDistance]);
+
   useFocusEffect(
     useCallback(() => {
-      const loadRooms = async () => {
-        setLoading(true);
-        setLocationError(false);
-        try {
-          // slider is in miles, getNearbyRooms expects km
-          const data = await getNearbyRooms(distance * 1.60934);
-          setRooms(data);
-        } catch (error) {
-          console.error("Error loading rooms:", error);
-          if (
-            error.message.includes("permission denied") ||
-            error.message.includes("Not authorized") ||
-            error.message.includes("Location permission")
-          ) {
-            setLocationError(true);
-          }
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      loadRooms();
-    }, [distance, refreshTrigger]),
+      setLoading(true);
+      loadRooms().finally(() => setLoading(false));
+    }, [loadRooms, refreshTrigger]),
   );
+
+  // Pull-to-refresh handler
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    await loadRooms();
+    setRefreshing(false);
+  }, [loadRooms]);
 
   const blockedUsers = firestoreUser?.blockedUsers || [];
   const nearbyRooms = rooms.filter(
@@ -167,10 +228,206 @@ export default function Home() {
     setRefreshTrigger(prev => prev + 1);
   };
 
+  // ── Everything above the room list, rendered as list header ────────
+  const ListHeader = () => (
+    <>
+      {/* Greeting + Distance */}
+      <Animated.View
+        className="mt-5 mb-1"
+        style={{
+          opacity: fadeInContent,
+          transform: [{ translateY: slideUpContent }],
+        }}
+      >
+        <Text className="text-muted text-sm font-bold uppercase tracking-[1.5px]">
+          {getGreeting()}
+        </Text>
+        <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-black tracking-tight mt-1">
+          {firstName} 👋
+        </Text>
+      </Animated.View>
+
+      {/* Slider Card — elevated */}
+      <Animated.View
+        className="mt-6"
+        style={{
+          opacity: fadeInContent,
+          transform: [{ translateY: slideUpContent }],
+        }}
+      >
+        <View className="bg-white dark:bg-[#1A1A22] rounded-3xl px-6 py-5 border border-border-light dark:border-[#2A2A36]">
+          <View className="flex-row items-center justify-between mb-3">
+            <View className="flex-row items-center">
+              <View className="w-7 h-7 bg-primary/10 rounded-lg items-center justify-center mr-2.5">
+                <Ionicons name="locate" size={14} color="#4F46E5" />
+              </View>
+              <Text className="text-secondary dark:text-gray-100 text-sm font-bold">
+                Search Radius
+              </Text>
+            </View>
+            <View className="bg-primary px-3 py-1.5 rounded-xl">
+              <Text className="text-white text-sm font-display font-black">
+                {displayDistance} mi
+              </Text>
+            </View>
+          </View>
+          <View
+            onLayout={(e) => { sliderWidth.current = e.nativeEvent.layout.width; }}
+            style={{ overflow: 'visible' }}
+          >
+            <Animated.View
+              ref={tooltipContainerRef}
+              style={{
+                position: 'absolute',
+                top: -36,
+                left: ((displayDistance - 1) / 24) * (sliderWidth.current - 28) + 14 - 22,
+                opacity: tooltipOpacity,
+                zIndex: 10,
+              }}
+              pointerEvents="none"
+            >
+              <View style={{
+                backgroundColor: isDark ? '#818CF8' : '#4F46E5',
+                paddingHorizontal: 10,
+                paddingVertical: 5,
+                borderRadius: 10,
+                alignItems: 'center',
+                minWidth: 44,
+              }}>
+                <TextInput
+                  ref={tooltipTextRef}
+                  editable={false}
+                  defaultValue={String(displayDistance)}
+                  style={{ color: '#fff', fontSize: 13, fontWeight: '800', padding: 0, textAlign: 'center' }}
+                />
+              </View>
+              <View style={{
+                width: 0,
+                height: 0,
+                borderLeftWidth: 6,
+                borderRightWidth: 6,
+                borderTopWidth: 6,
+                borderLeftColor: 'transparent',
+                borderRightColor: 'transparent',
+                borderTopColor: isDark ? '#818CF8' : '#4F46E5',
+                alignSelf: 'center',
+              }} />
+            </Animated.View>
+            <Slider
+              style={{ width: '100%', height: 40 }}
+              minimumValue={1}
+              maximumValue={25}
+              step={1}
+              value={displayDistance}
+              onSlidingStart={() => {
+                isSlidingRef.current = true;
+                Animated.timing(tooltipOpacity, {
+                  toValue: 1,
+                  duration: 150,
+                  useNativeDriver: true,
+                }).start();
+              }}
+              onValueChange={(val) => {
+                const rounded = Math.round(val);
+                const left = ((rounded - 1) / 24) * (sliderWidth.current - 28) + 14 - 22;
+                tooltipContainerRef.current?.setNativeProps({ style: { left } });
+                tooltipTextRef.current?.setNativeProps({ text: String(rounded) });
+              }}
+              onSlidingComplete={(val) => {
+                isSlidingRef.current = false;
+                Animated.timing(tooltipOpacity, {
+                  toValue: 0,
+                  duration: 200,
+                  useNativeDriver: true,
+                }).start();
+                setDisplayDistance(Math.round(val));
+              }}
+              minimumTrackTintColor="#4F46E5"
+              maximumTrackTintColor={isDark ? '#2A2A36' : '#E2E8F0'}
+              thumbTintColor={isDark ? '#818CF8' : '#4F46E5'}
+            />
+          </View>
+          <View className="flex flex-row justify-between mt-1">
+            <Text className="text-muted text-xs font-semibold">1 mile</Text>
+            <Text className="text-muted text-xs font-semibold">25 miles</Text>
+          </View>
+        </View>
+      </Animated.View>
+
+      {/* Create Room CTA */}
+      <Animated.View
+        className="mt-7"
+        style={{
+          opacity: fadeInContent,
+          transform: [{ translateY: slideUpContent }],
+        }}
+      >
+        <TouchableOpacity
+          onPress={handleCreateRoom}
+          activeOpacity={0.9}
+          className="bg-primary py-5 px-6 rounded-3xl flex-row items-center"
+          style={{
+            shadowColor: "#4F46E5",
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.2,
+            shadowRadius: 12,
+            elevation: 4,
+          }}
+        >
+          <View className="w-12 h-12 bg-white/20 rounded-full items-center justify-center mr-4">
+            <Ionicons name="add" size={26} color="white" />
+          </View>
+          <View className="flex-1">
+            <Text className="text-white font-display font-black text-lg tracking-tight">
+              Create a Room
+            </Text>
+            <Text className="text-white/80 text-[13px] font-semibold mt-0.5">
+              Start a conversation nearby
+            </Text>
+          </View>
+          <View className="w-8 h-8 bg-white/20 rounded-full items-center justify-center">
+            <Ionicons name="chevron-forward" size={18} color="white" />
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Nearby Rooms Section Header */}
+      <View className="mt-8 mb-2">
+        <View className="flex flex-row justify-between items-center">
+          <View className="flex-row items-center gap-2.5">
+            <Text className="text-secondary dark:text-gray-100 text-[22px] font-display font-extrabold tracking-tight">
+              Nearby Rooms
+            </Text>
+            {nearbyRooms.length > 0 && (
+              <View className="bg-primary-surface px-2.5 py-1 rounded-full">
+                <Text className="text-primary text-[12px] font-display font-black">
+                  {nearbyRooms.length}
+                </Text>
+              </View>
+            )}
+          </View>
+          <GlassButton
+            onPress={() => router.push({ pathname: '/rooms/map', params: { distance: displayDistance } })}
+            shape="pill"
+            size={34}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Ionicons name="map" size={14} color={isDark ? "#E2E8F0" : "#4B5563"} style={{ marginRight: 4 }} />
+              <Text className="text-gray-600 dark:text-gray-300 text-xs font-bold">Map View</Text>
+            </View>
+          </GlassButton>
+        </View>
+      </View>
+    </>
+  );
+
+  // ── Build the list data ────────────────────────────────────────────
+  const listData = loading ? [{ _skeleton: true, id: "s1" }, { _skeleton: true, id: "s2" }, { _skeleton: true, id: "s3" }] : nearbyRooms;
+
   return (
     <>
       <SafeAreaView className="bg-bg dark:bg-[#0F0F13] h-screen px-6">
-        {/* Header */}
+        {/* Header — stays pinned */}
         <Animated.View
           className="flex flex-row justify-between items-center my-3"
           style={{ opacity: fadeInHeader }}
@@ -201,148 +458,37 @@ export default function Home() {
           </GlassButton>
         </Animated.View>
 
-        {/* Greeting + Distance */}
-        <Animated.View
-          className="mt-5 mb-1"
-          style={{
-            opacity: fadeInContent,
-            transform: [{ translateY: slideUpContent }],
-          }}
-        >
-          <Text className="text-muted text-sm font-bold uppercase tracking-[1.5px]">
-            {getGreeting()}
-          </Text>
-          <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-black tracking-tight mt-1">
-            {firstName} 👋
-          </Text>
-        </Animated.View>
-
-        {/* Slider Card — elevated */}
-        <Animated.View
-          className="mt-6"
-          style={{
-            opacity: fadeInContent,
-            transform: [{ translateY: slideUpContent }],
-          }}
-        >
-          <View className="bg-white dark:bg-[#1A1A22] rounded-3xl px-6 py-5 border border-border-light dark:border-[#2A2A36]">
-            <View className="flex-row items-center justify-between mb-3">
-              <View className="flex-row items-center">
-                <View className="w-7 h-7 bg-primary/10 rounded-lg items-center justify-center mr-2.5">
-                  <Ionicons name="locate" size={14} color="#4F46E5" />
-                </View>
-                <Text className="text-secondary dark:text-gray-100 text-sm font-bold">
-                  Search Radius
-                </Text>
-              </View>
-              <View className="bg-primary px-3 py-1.5 rounded-xl">
-                <Text className="text-white text-sm font-display font-black">
-                  {distance} mi
-                </Text>
-              </View>
-            </View>
-            <Slider
-              style={{ width: "100%", height: 40 }}
-              minimumValue={1}
-              maximumValue={25}
-              step={1}
-              value={distance}
-              onValueChange={setDistance}
-              minimumTrackTintColor="#4F46E5"
-              maximumTrackTintColor={isDark ? "#2A2A36" : "#E2E8F0"}
-              thumbTintColor={isDark ? "#818CF8" : "#4F46E5"}
-            />
-            <View className="flex flex-row justify-between mt-1">
-              <Text className="text-muted text-xs font-semibold">1 mile</Text>
-              <Text className="text-muted text-xs font-semibold">25 miles</Text>
-            </View>
-          </View>
-        </Animated.View>
-
-        {/* Create Room CTA */}
-        <Animated.View
-          className="mt-7"
-          style={{
-            opacity: fadeInContent,
-            transform: [{ translateY: slideUpContent }],
-          }}
-        >
-          <TouchableOpacity
-            onPress={handleCreateRoom}
-            activeOpacity={0.9}
-            className="bg-primary py-5 px-6 rounded-3xl flex-row items-center"
-            style={{
-              shadowColor: "#4F46E5",
-              shadowOffset: { width: 0, height: 8 },
-              shadowOpacity: 0.2,
-              shadowRadius: 12,
-              elevation: 4,
-            }}
-          >
-            <View className="w-12 h-12 bg-white/20 rounded-full items-center justify-center mr-4">
-              <Ionicons name="add" size={26} color="white" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-white font-display font-black text-lg tracking-tight">
-                Create a Room
-              </Text>
-              <Text className="text-white/80 text-[13px] font-semibold mt-0.5">
-                Start a conversation nearby
-              </Text>
-            </View>
-            <View className="w-8 h-8 bg-white/20 rounded-full items-center justify-center">
-              <Ionicons name="chevron-forward" size={18} color="white" />
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
-
-        {/* Nearby Rooms Section */}
-        <View className="mt-8 mb-2">
-          <View className="flex flex-row justify-between items-center">
-            <View className="flex-row items-center gap-2.5">
-              <Text className="text-secondary dark:text-gray-100 text-[22px] font-display font-extrabold tracking-tight">
-                Nearby Rooms
-              </Text>
-              {nearbyRooms.length > 0 && (
-                <View className="bg-primary-surface px-2.5 py-1 rounded-full">
-                  <Text className="text-primary text-[12px] font-display font-black">
-                    {nearbyRooms.length}
-                  </Text>
-                </View>
-              )}
-            </View>
-            <GlassButton
-              onPress={() => router.push({ pathname: '/rooms/map', params: { distance } })}
-              shape="pill"
-              size={34}
-            >
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Ionicons name="map" size={14} color={isDark ? "#E2E8F0" : "#4B5563"} style={{ marginRight: 4 }} />
-                <Text className="text-gray-600 dark:text-gray-300 text-xs font-bold">Map View</Text>
-              </View>
-            </GlassButton>
-          </View>
-        </View>
-
+        {/* Scrollable content — greeting, slider, CTA, and rooms all scroll together */}
         {locationError ? (
           <LocationPermissionDenied />
         ) : (
           <FlatList
-            data={loading ? [1, 2, 3] : nearbyRooms}
-            renderItem={({ item }) =>
-              loading ? (
+            data={listData}
+            renderItem={({ item, index }) =>
+              item._skeleton ? (
                 <RoomCardSkeleton />
               ) : (
-                <RoomCard
-                  room={item}
-                  onPress={() => handlePresentModalPress(item)}
-                />
+                <AnimatedRoomItem index={index}>
+                  <RoomCard
+                    room={item}
+                    onPress={() => handlePresentModalPress(item)}
+                  />
+                </AnimatedRoomItem>
               )
             }
-            keyExtractor={(item, index) => (loading ? `skel-${index}` : item.id)}
-            contentContainerStyle={{ paddingBottom: 100, paddingTop: 8 }}
+            keyExtractor={(item, index) => (item._skeleton ? `skel-${index}` : item.id)}
+            ListHeaderComponent={ListHeader}
+            contentContainerStyle={{ paddingBottom: 100, paddingTop: 4 }}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={loading ? null : <EmptyRooms />}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                tintColor={isDark ? "#818CF8" : "#4F46E5"}
+                colors={["#4F46E5"]}
+              />
+            }
           />
         )}
       </SafeAreaView>
