@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Dimensions,
   FlatList,
+  Linking,
   SafeAreaView,
   Text,
   View,
@@ -73,10 +74,18 @@ function LocationPermissionDenied() {
       <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight text-center mb-2.5">
         Location Required
       </Text>
-      <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">
+      <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4 mb-6">
         We need your location to find rooms near you. Please enable it in your
         device settings.
       </Text>
+      <GlassButton onPress={() => Linking.openSettings()} shape="pill" size="regular">
+        <View className="flex-row items-center justify-center gap-2 py-3 px-6">
+          <Ionicons name="settings-outline" size={18} color="#4F46E5" />
+          <Text className="text-primary dark:text-primary-light font-bold text-[15px]">
+            Open Settings
+          </Text>
+        </View>
+      </GlassButton>
     </View>
   );
 }

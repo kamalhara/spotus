@@ -8,6 +8,7 @@ import {
   Animated,
   FlatList,
   Image,
+  Linking,
   RefreshControl,
   Text,
   TextInput,
@@ -57,10 +58,16 @@ function LocationPermissionDenied() {
       <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight text-center mb-2.5">
         Location Required
       </Text>
-      <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">
+      <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4 mb-6">
         We need your location to find rooms near you. Please enable it in your
         device settings.
       </Text>
+      <TouchableOpacity
+        onPress={() => Linking.openSettings()}
+        className="bg-primary px-6 py-3.5 rounded-full"
+      >
+        <Text className="text-white font-bold text-[15px]">Open Settings</Text>
+      </TouchableOpacity>
     </View>
   );
 }

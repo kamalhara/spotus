@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   Image,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   Text,
   TouchableOpacity,
@@ -140,14 +142,18 @@ export default function Edit() {
   };
   return (
     <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          paddingBottom: 32,
-          paddingHorizontal: 20,
-        }}
-        showsVerticalScrollIndicator={false}
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }} 
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            paddingBottom: 32,
+            paddingHorizontal: 20,
+          }}
+          showsVerticalScrollIndicator={false}
+        >
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <View className="flex-1">
             <View className="w-full flex-row items-center justify-between mt-2 py-3">
@@ -327,7 +333,8 @@ export default function Edit() {
             </TouchableOpacity>
           </View>
         </TouchableWithoutFeedback>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
