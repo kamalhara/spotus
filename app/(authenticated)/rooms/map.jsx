@@ -211,6 +211,7 @@ export default function MapViewScreen() {
   const [locationError, setLocationError] = useState(false);
   const [rooms, setRooms] = useState([]);
   const [region, setRegion] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [selectedRoomToJoin, setSelectedRoomToJoin] = useState(null);
 
@@ -220,6 +221,10 @@ export default function MapViewScreen() {
         try {
           setLoading(true);
           const userLoc = await getCurrentLocation();
+          setUserLocation({
+            latitude: userLoc.latitude,
+            longitude: userLoc.longitude,
+          });
           setRegion({
             latitude: userLoc.latitude,
             longitude: userLoc.longitude,
@@ -321,6 +326,20 @@ export default function MapViewScreen() {
             clusterColor="#4F46E5"
             mapPadding={{ top: insets.top, bottom: 200, left: 0, right: 0 }}
           >
+            {userLocation && (
+              <Marker
+                coordinate={userLocation}
+                tracksViewChanges={false}
+                style={{ zIndex: 20 }}
+              >
+                <View className="items-center justify-center">
+                  <View className="w-10 h-10 bg-primary/20 rounded-full items-center justify-center">
+                    <View className="w-5 h-5 bg-primary rounded-full border-[2.5px] border-white dark:border-[#1A1A22]" />
+                  </View>
+                </View>
+              </Marker>
+            )}
+
             {rooms.map((room, index) => {
               const categoryColor = CATEGORY_COLORS[room.category] || "#4F46E5";
               const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
