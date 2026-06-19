@@ -172,28 +172,16 @@ export default function ImageViewer({
   ).current;
 
   const handleClose = useCallback(() => {
-    Animated.parallel([
-      Animated.timing(backdropOpacity, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: SCREEN_H * 0.4,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scale, {
-        toValue: 0.8,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
+    Animated.timing(backdropOpacity, {
+      toValue: 0,
+      duration: 250,
+      useNativeDriver: true,
+    }).start(() => {
       resetPosition();
       backdropOpacity.setValue(0);
       onClose?.();
     });
-  }, [backdropOpacity, translateY, scale, resetPosition, onClose]);
+  }, [backdropOpacity, resetPosition, onClose]);
 
   const handleShow = useCallback(() => {
     resetPosition();
@@ -250,6 +238,7 @@ export default function ImageViewer({
           style={[
             styles.imageContainer,
             {
+              opacity: backdropOpacity,
               transform: [{ translateX }, { translateY }, { scale }],
             },
           ]}
