@@ -305,19 +305,6 @@ export default function MapViewScreen() {
 
   return (
     <View className="flex-1 bg-bg dark:bg-[#0F0F13]">
-      <GlassButton
-        onPress={() => router.back()}
-        style={{ position: "absolute", top: 56, left: 16, zIndex: 10 }}
-        size={44}
-        shape="circle"
-      >
-        <Ionicons
-          name="chevron-back"
-          size={20}
-          color="white"
-          className="text-secondary dark:text-primary-light"
-        />
-      </GlassButton>
       {locationError ? (
         <LocationPermissionDenied />
       ) : rooms.length === 0 && !loading ? (
@@ -421,7 +408,23 @@ export default function MapViewScreen() {
             pointerEvents="box-none"
           >
             <View className="px-5 py-2 flex-row justify-between items-center mt-2">
-              <GlassButton shape="pill" size={40} haptic={false}>
+              <GlassButton
+                onPress={() => router.back()}
+                size={44}
+                shape="circle"
+              >
+                <Ionicons
+                  name="chevron-back"
+                  size={20}
+                  color={isDark ? "#F3F4F6" : "#18181B"}
+                />
+              </GlassButton>
+              <GlassButton
+                shape="pill"
+                size={40}
+                haptic={false}
+                isInteractive={false}
+              >
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                   <View className="w-2 h-2 rounded-full bg-primary mr-2" />
                   <Text
@@ -434,18 +437,6 @@ export default function MapViewScreen() {
                     {rooms.length} {rooms.length === 1 ? "Room" : "Rooms"}
                   </Text>
                 </View>
-              </GlassButton>
-
-              <GlassButton
-                onPress={() => router.back()}
-                size={44}
-                shape="circle"
-              >
-                <Ionicons
-                  name="chevron-back"
-                  size={20}
-                  color={isDark ? "#F3F4F6" : "#18181B"}
-                />
               </GlassButton>
             </View>
           </SafeAreaView>
