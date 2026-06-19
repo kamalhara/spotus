@@ -330,6 +330,7 @@ export default function MapViewScreen() {
               <Marker
                 coordinate={userLocation}
                 tracksViewChanges={false}
+                cluster={false}
                 style={{ zIndex: 20 }}
               >
                 <View className="items-center justify-center">
