@@ -1,5 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
-
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
 import { SectionList, Text, View } from "react-native";
@@ -7,7 +5,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import EmptyState from "../../../components/ui/EmptyState";
-import GlassButton from "../../../components/ui/GlassButton";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 
@@ -67,15 +64,8 @@ export default function RoomsScreen() {
         <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold tracking-tight">
           My Rooms
         </Text>
-
-        <GlassButton
-          onPress={() => router.push("/rooms/create-rooms")}
-          shape="circle"
-          size={40}
-          tintColor="#4f46e5"
-        >
-          <Ionicons name="add" size={20} color="white" />
-        </GlassButton>
+        {/* Spacer — button is now the shared FloatingGlassButton */}
+        <View style={{ width: 44 }} />
       </View>
 
       <SectionList

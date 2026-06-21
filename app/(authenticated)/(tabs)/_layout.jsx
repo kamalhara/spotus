@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { Tabs } from "expo-router";
+import { Tabs, usePathname } from "expo-router";
 import {
   Badge,
   Icon,
@@ -23,6 +23,11 @@ import Animated, {
   withSpring,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import FloatingGlassButton from "../../../components/ui/FloatingGlassButton";
+import {
+  FloatingButtonProvider,
+  useFloatingButton,
+} from "../../../context/FloatingButtonContext";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import useUnreadCount from "../../../hook/useUnreadCount";
@@ -261,56 +266,88 @@ const AnimatedTabButton = ({ children, onPress, accessibilityState }) => {
   );
 };
 
-export default function TabsLayout() {
+// ── Resolve active tab name from pathname ─────────────────────────────────
+function getActiveTab(pathname) {
+  // pathname is e.g. "/(authenticated)/(tabs)/home" or "/home"
+  const segments = pathname.split("/").filter(Boolean);
+  const lastSegment = segments[segments.length - 1];
+  // Handle tab names directly
+  if (["home", "rooms_tab", "chat_tab", "profile"].includes(lastSegment)) {
+    return lastSegment;
+  }
+  return "home"; // default
+}
+
+// ── Inner layout that can access the floating button context ──────────────
+function TabsLayoutInner() {
   const { firestoreUser } = useFirestoreUser();
   const { isDark } = useTheme();
   const unreadCount = useUnreadCount(firestoreUser?.id);
-  return Platform.OS === "android" ? (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-      }}
-      tabBar={(props) => <LiquidTabBar {...props} unreadCount={unreadCount} />}
-    >
-      <Tabs.Screen name="home" options={{ title: "Home" }} />
-      <Tabs.Screen name="rooms_tab" options={{ title: "Rooms" }} />
-      <Tabs.Screen name="chat_tab" options={{ title: "Chat" }} />
-      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
-    </Tabs>
-  ) : (
-    <NativeTabs>
-      <NativeTabs.Trigger name="home">
-        <Label>Home</Label>
-        <Icon
-          selectedColor={isDark ? "#818CF8" : "#4F46E5"}
-          sf={{ default: "house", selected: "house.fill" }}
-        />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="rooms_tab">
-        <Label>Rooms</Label>
-        <Icon
-          selectedColor={isDark ? "#818CF8" : "#4F46E5"}
-          sf={{ default: "person.2", selected: "person.2.fill" }}
-        />
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="chat_tab">
-        <Label>Chat</Label>
-        <Icon
-          selectedColor={isDark ? "#818CF8" : "#4F46E5"}
-          sf={{ default: "message", selected: "message.fill" }}
-        />
-        {unreadCount > 0 && <Badge>{unreadCount}</Badge>}
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="profile">
-        <Label>Profile</Label>
-        <Icon
-          selectedColor={isDark ? "#818CF8" : "#4F46E5"}
-          sf={{
-            default: "person.crop.circle",
-            selected: "person.crop.circle.fill",
+  const pathname = usePathname();
+  const activeTab = getActiveTab(pathname);
+  const { override } = useFloatingButton();
+
+  return (
+    <View style={{ flex: 1 }}>
+      {Platform.OS === "android" ? (
+        <Tabs
+          screenOptions={{
+            headerShown: false,
           }}
-        />
-      </NativeTabs.Trigger>
-    </NativeTabs>
+          tabBar={(props) => <LiquidTabBar {...props} unreadCount={unreadCount} />}
+        >
+          <Tabs.Screen name="home" options={{ title: "Home" }} />
+          <Tabs.Screen name="rooms_tab" options={{ title: "Rooms" }} />
+          <Tabs.Screen name="chat_tab" options={{ title: "Chat" }} />
+          <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+        </Tabs>
+      ) : (
+        <NativeTabs>
+          <NativeTabs.Trigger name="home">
+            <Label>Home</Label>
+            <Icon
+              selectedColor={isDark ? "#818CF8" : "#4F46E5"}
+              sf={{ default: "house", selected: "house.fill" }}
+            />
+          </NativeTabs.Trigger>
+          <NativeTabs.Trigger name="rooms_tab">
+            <Label>Rooms</Label>
+            <Icon
+              selectedColor={isDark ? "#818CF8" : "#4F46E5"}
+              sf={{ default: "person.2", selected: "person.2.fill" }}
+            />
+          </NativeTabs.Trigger>
+          <NativeTabs.Trigger name="chat_tab">
+            <Label>Chat</Label>
+            <Icon
+              selectedColor={isDark ? "#818CF8" : "#4F46E5"}
+              sf={{ default: "message", selected: "message.fill" }}
+            />
+            {unreadCount > 0 && <Badge>{unreadCount}</Badge>}
+          </NativeTabs.Trigger>
+          <NativeTabs.Trigger name="profile">
+            <Label>Profile</Label>
+            <Icon
+              selectedColor={isDark ? "#818CF8" : "#4F46E5"}
+              sf={{
+                default: "person.crop.circle",
+                selected: "person.crop.circle.fill",
+              }}
+            />
+          </NativeTabs.Trigger>
+        </NativeTabs>
+      )}
+
+      {/* Persistent morphing glass button — floats above all tabs */}
+      <FloatingGlassButton activeTab={activeTab} override={override} />
+    </View>
+  );
+}
+
+export default function TabsLayout() {
+  return (
+    <FloatingButtonProvider>
+      <TabsLayoutInner />
+    </FloatingButtonProvider>
   );
 }

@@ -21,6 +21,7 @@ import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
 import GlassButton from "../../../components/ui/GlassButton";
 import { db } from "../../../config/firebase.config";
+import { useFloatingButton } from "../../../context/FloatingButtonContext";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
@@ -123,6 +124,8 @@ export default function Home() {
   const router = useRouter();
   const { isDark } = useTheme();
   const { firestoreUser } = useFirestoreUser();
+  const { setFloatingButtonOverride, clearFloatingButtonOverride } =
+    useFloatingButton();
 
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -240,6 +243,34 @@ export default function Home() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setRefreshTrigger((prev) => prev + 1);
   };
+
+  // ── Drive the shared floating button based on scroll position ──────
+  useEffect(() => {
+    if (ctaHidden) {
+      setFloatingButtonOverride({
+        icon: "add",
+        iconSize: 22,
+        tintColor: "#4F46E5",
+        iconColor: "white",
+        onPress: handleCreateRoom,
+      });
+    } else {
+      setFloatingButtonOverride({
+        icon: loading ? "refresh-circle" : "refresh",
+        iconSize: 20,
+        tintColor: null,
+        iconColor: isDark ? "#F8FAFC" : "#18181B",
+        onPress: handleRefreshPress,
+      });
+    }
+  }, [ctaHidden, loading, isDark]);
+
+  // Clear override when leaving this tab
+  useFocusEffect(
+    useCallback(() => {
+      return () => clearFloatingButtonOverride();
+    }, [clearFloatingButtonOverride]),
+  );
 
   // ── Everything above the room list, rendered as list header ────────
   const ListHeader = () => (
@@ -504,26 +535,8 @@ export default function Home() {
             </Text>
             <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
           </View>
-          <GlassButton
-            onPress={ctaHidden ? handleCreateRoom : handleRefreshPress}
-            size={48}
-            shape="circle"
-            tintColor={ctaHidden && "#4F46E5"}
-          >
-            <Ionicons
-              name={ctaHidden ? "add" : loading ? "refresh-circle" : "refresh"}
-              size={ctaHidden ? 24 : 20}
-              color={
-                ctaHidden
-                  ? isDark
-                    ? "#C7D2FE"
-                    : "#4F46E5"
-                  : isDark
-                    ? "#F8FAFC"
-                    : "#18181B"
-              }
-            />
-          </GlassButton>
+          {/* Spacer to preserve layout — button is now the shared FloatingGlassButton */}
+          <View style={{ width: 48 }} />
         </Animated.View>
 
         {/* Scrollable content — greeting, slider, CTA, and rooms all scroll together */}
