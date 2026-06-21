@@ -508,6 +508,7 @@ export default function Home() {
             onPress={ctaHidden ? handleCreateRoom : handleRefreshPress}
             size={48}
             shape="circle"
+            tintColor={ctaHidden && "#4F46E5"}
           >
             <Ionicons
               name={ctaHidden ? "add" : loading ? "refresh-circle" : "refresh"}

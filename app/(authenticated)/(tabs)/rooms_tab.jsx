@@ -67,10 +67,7 @@ export default function RoomsScreen() {
         <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold tracking-tight">
           My Rooms
         </Text>
-        {/* <TouchableOpacity
-          onPress={() => router.push("/rooms/create-rooms")}
-          className="w-10 h-10 bg-primary rounded-full items-center justify-center"
-        > */}
+
         <GlassButton
           onPress={() => router.push("/rooms/create-rooms")}
           shape="circle"
