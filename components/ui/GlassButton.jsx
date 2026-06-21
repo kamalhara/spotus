@@ -37,6 +37,7 @@ const hasGlass = Platform.OS === "ios" && GlassView && isLiquidGlassAvailable();
  *   - className      NativeWind class for the fallback View
  *   - isInteractive  enable liquid-glass drag effect (default true)
  *   - haptic         enable haptic feedback (default true)
+ *   - tintColor      color tint for the liquid glass effect (iOS 26+)
  */
 export default function GlassButton({
   onPress,
@@ -48,6 +49,7 @@ export default function GlassButton({
   isInteractive = true,
   haptic = true,
   disabled = false,
+  tintColor,
 }) {
   const handlePress = () => {
     if (disabled) return;
@@ -86,6 +88,7 @@ export default function GlassButton({
           style={glassStyle}
           glassEffectStyle="regular"
           isInteractive={isInteractive}
+          tintColor={tintColor}
         >
           {children}
         </GlassView>
@@ -105,6 +108,7 @@ export default function GlassButton({
           height: size,
           borderRadius,
           ...(shape === "pill" && { paddingHorizontal: 14, minWidth: size }),
+          ...(tintColor && { backgroundColor: tintColor }),
         },
         styles.fallbackShadow,
         style,
