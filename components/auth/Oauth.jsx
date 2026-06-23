@@ -77,27 +77,30 @@ export default function Oauth() {
     strategy: "oauth_apple",
   });
 
-  const handleOAuth = useCallback(async (strategy) => {
-    try {
-      const flow =
-        strategy === "oauth_google"
-          ? googleAuthFlow
-          : strategy === "oauth_facebook"
-            ? facebookAuthFlow
-            : appleAuthFlow;
+  const handleOAuth = useCallback(
+    async (strategy) => {
+      try {
+        const flow =
+          strategy === "oauth_google"
+            ? googleAuthFlow
+            : strategy === "oauth_facebook"
+              ? facebookAuthFlow
+              : appleAuthFlow;
 
-      const { createdSessionId, setActive } = await flow({
-        redirectUrl: Linking.createURL("/(auth)/login", { scheme: "spotus" }),
-      });
+        const { createdSessionId, setActive } = await flow({
+          redirectUrl: Linking.createURL("/(auth)/login", { scheme: "spotus" }),
+        });
 
-      if (createdSessionId) {
-        await setActive({ session: createdSessionId });
-        router.push("/");
+        if (createdSessionId) {
+          await setActive({ session: createdSessionId });
+          router.push("/");
+        }
+      } catch (err) {
+        console.error("OAuth error", err);
       }
-    } catch (err) {
-      console.error("OAuth error", err);
-    }
-  }, []);
+    },
+    [appleAuthFlow, facebookAuthFlow, googleAuthFlow, router],
+  );
 
   const GoogleIcon = (
     <Svg width="22" height="22" viewBox="0 0 48 48">

@@ -209,7 +209,7 @@ export default function Home() {
     useCallback(() => {
       setLoading(true);
       loadRooms().finally(() => setLoading(false));
-    }, [loadRooms, refreshTrigger]),
+    }, [loadRooms]),
   );
 
   // Pull-to-refresh handler
@@ -229,20 +229,20 @@ export default function Home() {
 
   const firstName = firestoreUser?.userName?.split("")[0] || "there";
 
-  const handleCreateRoom = () => {
+  const handleCreateRoom = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push("/rooms/create-rooms");
-  };
+  }, [router]);
 
   const handleProfilePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push("/profile");
   };
 
-  const handleRefreshPress = () => {
+  const handleRefreshPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setRefreshTrigger((prev) => prev + 1);
-  };
+  }, []);
 
   // ── Drive the shared floating button based on scroll position ──────
   useEffect(() => {
@@ -263,7 +263,7 @@ export default function Home() {
         onPress: handleRefreshPress,
       });
     }
-  }, [ctaHidden, loading, isDark]);
+  }, [ctaHidden, loading, isDark, handleCreateRoom, handleRefreshPress, setFloatingButtonOverride]);
 
   // Clear override when leaving this tab
   useFocusEffect(

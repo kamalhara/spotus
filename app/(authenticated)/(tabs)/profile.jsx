@@ -57,7 +57,7 @@ export default function Profile() {
   const { signOut } = useAuth();
   const { firestoreUser, loading } = useFirestoreUser();
   const router = useRouter();
-  const { isDark } = useTheme();
+  useTheme();
 
   const [rooms, setRooms] = useState([]);
   useFocusEffect(

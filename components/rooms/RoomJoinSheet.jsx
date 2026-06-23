@@ -4,7 +4,7 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { useRouter } from "expo-router";
+
 import { doc, getDoc } from "firebase/firestore";
 import {
   forwardRef,
@@ -35,7 +35,7 @@ const CATEGORY_ICONS = {
 
 const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
   const bottomSheetModalRef = useRef(null);
-  const { isDark } = useTheme();
+
   const [creator, setCreator] = useState(null);
 
   // Fetch room creator profile

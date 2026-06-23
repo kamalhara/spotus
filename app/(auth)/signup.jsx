@@ -49,7 +49,7 @@ export default function SignUp() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeIn, slideUp]);
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;

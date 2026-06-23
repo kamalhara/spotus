@@ -47,7 +47,7 @@ export default function Login() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeIn, slideUp]);
 
   const onSignInPress = async () => {
     if (!isLoaded) return;

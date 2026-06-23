@@ -53,7 +53,7 @@ const LiquidTabBar = ({ state, descriptors, navigation, unreadCount }) => {
       stiffness: 120,
       mass: 0.8,
     });
-  }, [state.index]);
+  }, [state.index, bubbleX, tabWidth]);
 
   const bubbleStyle = useAnimatedStyle(() => {
     return {
@@ -186,7 +186,7 @@ const AnimatedIcon = ({
       damping: 14,
       stiffness: 150,
     });
-  }, [isFocused]);
+  }, [isFocused, scale]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const s = interpolate(scale.value, [0, 1], [1, 1.1]);
@@ -232,39 +232,7 @@ const AnimatedIcon = ({
   );
 };
 
-const AnimatedTabButton = ({ children, onPress, accessibilityState }) => {
-  const focused = accessibilityState?.selected ?? false;
-  const scale = useRef(new Animated.Value(1)).current;
 
-  useEffect(() => {
-    Animated.spring(scale, {
-      toValue: focused ? 1.08 : 1, // Subtle scale
-      friction: 6,
-      tension: 40, // More snappy, less bouncy
-      useNativeDriver: true,
-    }).start();
-  }, [focused, scale]);
-
-  return (
-    <TouchableWithoutFeedback
-      onPress={(e) => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        if (onPress) onPress(e);
-      }}
-    >
-      <Animated.View
-        style={{
-          flex: 1,
-          alignItems: "center",
-          justifyContent: "center",
-          transform: [{ scale }],
-        }}
-      >
-        {children}
-      </Animated.View>
-    </TouchableWithoutFeedback>
-  );
-};
 
 // ── Resolve active tab name from pathname ─────────────────────────────────
 function getActiveTab(pathname) {

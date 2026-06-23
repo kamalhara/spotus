@@ -44,7 +44,7 @@ export default function Welcome() {
         }),
       ]),
     ]).start();
-  }, []);
+  }, [fadeInContent, fadeInHero, scaleHero, slideUpContent]);
 
   if (isLoaded && isSignedIn) {
     return <Redirect href="/(authenticated)/(tabs)/home" />;

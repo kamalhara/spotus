@@ -16,43 +16,7 @@ import * as Progress from"react-native-progress";
 import { useTheme } from"../../context/ThemeContext";
 import GlassContainer from "../ui/GlassContainer";
 
-const TRUST_TIERS = [
- {
- range:"0 – 2",
- label:"New Member",
- icon:"alert-circle",
- color:"#EF4444",
- bgColor:"rgba(239,68,68,0.08)",
- description:
-"You just joined. Keep chatting to build trust with the group.",
- },
- {
- range:"3 – 6",
- label:"Getting Known",
- icon:"people",
- color:"#F59E0B",
- bgColor:"rgba(245,158,11,0.08)",
- description:
-"You're becoming a familiar face. Members are starting to recognise you.",
- },
- {
- range:"7 – 9",
- label:"Trusted",
- icon:"shield-checkmark",
- color:"#10B981",
- bgColor:"rgba(16,185,129,0.08)",
- description:"Almost there! You're a trusted member of this room.",
- },
- {
- range:"10",
- label:"Full Trust",
- icon:"ribbon",
- color:"#6366F1",
- bgColor:"rgba(99,102,241,0.08)",
- description:
-"You've unlocked full trust — you can now send direct messages to anyone in this room.",
- },
-];
+
 
 const HOW_IT_WORKS_STEPS = [
  {
@@ -134,7 +98,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  const clampedTrust = Math.min(trust, 10);
 
  // Determine which tier the user is currently in
- const activeTierIndex = trust < 3 ? 0 : trust < 7 ? 1 : trust < 10 ? 2 : 3;
+
 
  return (
  <BottomSheetModal
