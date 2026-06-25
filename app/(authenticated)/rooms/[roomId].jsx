@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   addDoc,
@@ -327,7 +327,7 @@ export default function RoomChat() {
           >
             <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons name="ghost" size={16} color="#A855F7" />
+                <MaterialCommunityIcons name="ghost" size={18} color="#A855F7" />
                 <Text className="text-purple-600 dark:text-purple-300 text-sm font-bold ml-2">
                   Ghost Mode Active
                 </Text>

@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -361,7 +361,7 @@ export default function CreateRooms() {
                     </View>
                     {!showOnMap && (
                       <View className="w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-500/10 items-center justify-center">
-                        <Ionicons name="ghost" size={14} color="#A855F7" />
+                        <MaterialCommunityIcons name="ghost" size={16} color="#A855F7" />
                       </View>
                     )}
                   </View>
@@ -395,12 +395,11 @@ export default function CreateRooms() {
                 >
                   <View className="flex-1 pr-4">
                     <View className="flex-row items-center mb-1">
-                      <Ionicons
-                        name={showOnMap ? "globe-outline" : "ghost-outline"}
-                        size={16}
-                        color={showOnMap ? "#10B981" : "#A855F7"}
-                        style={{ marginRight: 6 }}
-                      />
+                      {showOnMap ? (
+                        <Ionicons name="globe-outline" size={16} color="#10B981" style={{ marginRight: 6 }} />
+                      ) : (
+                        <MaterialCommunityIcons name="ghost-outline" size={18} color="#A855F7" style={{ marginRight: 6 }} />
+                      )}
                       <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
                         {showOnMap ? "Public Event" : "Ghost Mode"}
                       </Text>

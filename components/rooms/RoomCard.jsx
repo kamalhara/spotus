@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
 import GlassContainer from "../ui/GlassContainer";
@@ -50,6 +50,28 @@ export default function RoomCard({
 
   const buttonText = isDiscovery ? "Join" : "Enter";
 
+  const getExpiryText = () => {
+    if (!room.expiresAt) return "Active Event";
+    
+    // Handle both Firestore Timestamp objects and raw JS Dates
+    const expiresMs = room.expiresAt.seconds 
+      ? room.expiresAt.seconds * 1000 
+      : (room.expiresAt instanceof Date ? room.expiresAt.getTime() : room.expiresAt);
+      
+    if (!expiresMs) return "Active Event";
+    
+    const now = Date.now();
+    const diffMs = expiresMs - now;
+    
+    if (diffMs <= 0) return "Expired";
+    
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    if (diffHours > 0) return `Expires in ${diffHours}h`;
+    
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    return `Expires in ${diffMins}m`;
+  };
+
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
       toValue: 0.98,
@@ -75,22 +97,33 @@ export default function RoomCard({
       />
       {/* Category — colored per type */}
       <View className="flex-row justify-between items-center mb-3">
-        <View
-          className="flex-row items-center px-3 py-1.5 rounded-lg"
-          style={{ backgroundColor: `${categoryColor}10` }}
-        >
-          <Ionicons
-            name={categoryIcon}
-            size={11}
-            color={categoryColor}
-            style={{ marginRight: 5 }}
-          />
-          <Text
-            className="font-semibold text-[11px]"
-            style={{ color: categoryColor }}
+        <View className="flex-row items-center gap-2">
+          <View
+            className="flex-row items-center px-3 py-1.5 rounded-lg"
+            style={{ backgroundColor: `${categoryColor}10` }}
           >
-            {room.category}
-          </Text>
+            <Ionicons
+              name={categoryIcon}
+              size={11}
+              color={categoryColor}
+              style={{ marginRight: 5 }}
+            />
+            <Text
+              className="font-semibold text-[11px]"
+              style={{ color: categoryColor }}
+            >
+              {room.category}
+            </Text>
+          </View>
+          
+          {room.visibility === "ghost" && (
+            <View className="flex-row items-center px-2 py-1.5 rounded-lg bg-purple-50 dark:bg-purple-500/10 border border-purple-100 dark:border-purple-500/20">
+              <MaterialCommunityIcons name="ghost" size={12} color="#A855F7" style={{ marginRight: 4 }} />
+              <Text className="font-semibold text-[10px] text-purple-600 dark:text-purple-400">
+                Ghost Mode
+              </Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -100,8 +133,12 @@ export default function RoomCard({
       </Text>
 
       <View className="flex-row items-center mb-4">
-        <View className="w-1.5 h-1.5 rounded-full bg-green-400 mr-1.5" />
-        <Text className="text-gray-400 text-xs">Active now</Text>
+        {getExpiryText() === "Expired" ? (
+          <View className="w-1.5 h-1.5 rounded-full bg-red-400 mr-1.5" />
+        ) : (
+          <View className="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5" />
+        )}
+        <Text className="text-gray-400 text-xs font-semibold">{getExpiryText()}</Text>
         {room.distance !== undefined && (
           <>
             <Text className="text-gray-300 dark:text-gray-600 mx-2">•</Text>
@@ -135,8 +172,7 @@ export default function RoomCard({
             ))}
           </View>
           <Text className="text-muted dark:text-gray-500 text-[13px] font-semibold">
-            {room.participants?.length || 1}
-            {room.participants?.length > 3 ? "+" : ""} members
+            🔥 {room.participantCount || room.participants?.length || 1} chatting now
           </Text>
         </View>
         <View className="bg-primary px-5 py-2.5 rounded-full">
