@@ -361,7 +361,11 @@ export default function CreateRooms() {
                     </View>
                     {!showOnMap && (
                       <View className="w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-500/10 items-center justify-center">
-                        <MaterialCommunityIcons name="ghost" size={16} color="#A855F7" />
+                        <MaterialCommunityIcons
+                          name="ghost"
+                          size={16}
+                          color="#A855F7"
+                        />
                       </View>
                     )}
                   </View>
@@ -395,48 +399,31 @@ export default function CreateRooms() {
                 >
                   <View className="flex-1 pr-4">
                     <View className="flex-row items-center mb-1">
-                      {showOnMap ? (
-                        <Ionicons name="globe-outline" size={16} color="#10B981" style={{ marginRight: 6 }} />
-                      ) : (
-                        <MaterialCommunityIcons name="ghost-outline" size={18} color="#A855F7" style={{ marginRight: 6 }} />
-                      )}
+                      <MaterialCommunityIcons
+                        name="ghost-outline"
+                        size={18}
+                        color="#A855F7"
+                        style={{ marginRight: 6 }}
+                      />
                       <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
-                        {showOnMap ? "Public Event" : "Ghost Mode"}
+                        Ghost Mode
                       </Text>
                     </View>
-                    <Text className="text-gray-400 dark:text-gray-500 text-xs leading-4">
-                      {showOnMap
-                        ? "Visible on the map. Anyone nearby can join the room."
-                        : "Hidden from the map. People can only join via direct link."}
+                    <Text className="text-gray-400 dark:text-gray-500 text-xs leading-4 pr-2">
+                      If off, the room is public and shown to all users. Hidden from the map when on.
                     </Text>
                   </View>
                   <Switch
-                    value={showOnMap}
+                    value={!showOnMap}
                     onValueChange={(val) => {
-                      if (!val) {
-                        Alert.alert(
-                          "Enable Ghost Mode?",
-                          "This room will not appear on the map. You will need to share the invite link for people to join.",
-                          [
-                            {
-                              text: "Cancel",
-                              style: "cancel",
-                              onPress: () => setShowOnMap(true),
-                            },
-                            {
-                              text: "Enable",
-                              style: "default",
-                              onPress: () => setShowOnMap(false),
-                            },
-                          ],
-                        );
-                      } else {
-                        setShowOnMap(true);
-                      }
+                      import("expo-haptics").then((Haptics) => {
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                      });
+                      setShowOnMap(!val);
                     }}
                     trackColor={{
                       false: isDark ? "#2A2A36" : "#E2E8F0",
-                      true: "#10B981",
+                      true: "#A855F7",
                     }}
                     thumbColor={"#FFFFFF"}
                   />
