@@ -2,7 +2,13 @@ import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Platform, Pressable, StyleSheet, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import Animated, {
   interpolateColor,
   runOnJS,
@@ -79,13 +85,8 @@ export default function FloatingGlassButton({ activeTab, override }) {
   const tintColor = override?.tintColor ?? tabConfig.tintColor;
   const iconColor =
     override?.iconColor ??
-    (tintColor
-      ? "white"
-      : isDark
-        ? "#F8FAFC"
-        : "#18181B");
-  const onPress =
-    override?.onPress ?? tabConfig.getAction(router);
+    (tintColor ? "white" : isDark ? "#F8FAFC" : "#18181B");
+  const onPress = override?.onPress ?? tabConfig.getAction(router);
 
   // Track the previous icon for animation trigger
   const prevIconRef = useRef(icon);
@@ -97,9 +98,7 @@ export default function FloatingGlassButton({ activeTab, override }) {
 
   // Tint color interpolation (drives a state update for the native prop)
   const tintProgress = useSharedValue(tintColor ? 1 : 0);
-  const [resolvedTint, setResolvedTint] = useState(
-    tintColor || "transparent",
-  );
+  const [resolvedTint, setResolvedTint] = useState(tintColor || "transparent");
 
   const animatedTint = useDerivedValue(() =>
     interpolateColor(
@@ -185,7 +184,9 @@ export default function FloatingGlassButton({ activeTab, override }) {
             }}
             glassEffectStyle="regular"
             isInteractive
-            tintColor={resolvedTint !== "transparent" ? resolvedTint : undefined}
+            tintColor={
+              resolvedTint !== "transparent" ? resolvedTint : undefined
+            }
           >
             {iconContent}
           </GlassView>
@@ -197,25 +198,21 @@ export default function FloatingGlassButton({ activeTab, override }) {
   // Fallback for Android / older iOS
   return (
     <View style={positionStyle}>
-      <TouchableOpacity
-        onPress={handlePress}
-        activeOpacity={0.75}
-        style={[
-          {
+      <TouchableOpacity onPress={handlePress} activeOpacity={0.75}>
+        <GlassView
+          style={{
             width: BUTTON_SIZE,
             height: BUTTON_SIZE,
             borderRadius,
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor:
-              resolvedTint !== "transparent" ? resolvedTint : isDark ? "#1A1A22" : "#FFFFFF",
-            borderWidth: resolvedTint !== "transparent" ? 0 : 1,
-            borderColor: isDark ? "#2A2A36" : "#F3F4F6",
-          },
-          styles.fallbackShadow,
-        ]}
-      >
-        {iconContent}
+          }}
+          glassEffectStyle="regular"
+          isInteractive
+          tintColor={resolvedTint !== "transparent" ? resolvedTint : undefined}
+        >
+          {iconContent}
+        </GlassView>
       </TouchableOpacity>
     </View>
   );
@@ -223,7 +220,6 @@ export default function FloatingGlassButton({ activeTab, override }) {
 
 const styles = StyleSheet.create({
   fallbackShadow: {
-    shadowColor: "#94A3B8",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 4,
