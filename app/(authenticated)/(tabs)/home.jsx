@@ -19,6 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
+import JoinByCodeSheet from "../../../components/rooms/JoinByCodeSheet";
 import GlassButton from "../../../components/ui/GlassButton";
 import { db } from "../../../config/firebase.config";
 import { useFloatingButton } from "../../../context/FloatingButtonContext";
@@ -161,8 +162,9 @@ export default function Home() {
     ]).start();
   }, [fadeInHeader, fadeInContent, slideUpContent]);
 
-  // Sheet Ref
+  // Sheet Refs
   const bottomSheetModalRef = useRef(null);
+  const joinSheetRef = useRef(null);
 
   const handlePresentModalPress = useCallback((room) => {
     setSelectedRoom(room);
@@ -459,6 +461,26 @@ export default function Home() {
         </TouchableOpacity>
       </Animated.View>
 
+      {/* Join via Invite Code */}
+      <Animated.View
+        className="mt-3"
+        style={{
+          opacity: fadeInContent,
+          transform: [{ translateY: slideUpContent }],
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => joinSheetRef.current?.present()}
+          activeOpacity={0.8}
+          className="flex-row items-center justify-center py-3.5 bg-purple-50 dark:bg-purple-900/20 rounded-2xl border border-purple-100 dark:border-purple-800/30"
+        >
+          <Ionicons name="key-outline" size={16} color="#A855F7" style={{ marginRight: 6 }} />
+          <Text className="text-purple-600 dark:text-purple-400 font-semibold text-[13px]">
+            Got an Invite Code?
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
+
       {/* Nearby Rooms Section Header */}
       <View className="mt-8 mb-2">
         <View className="flex flex-row justify-between items-center">
@@ -587,6 +609,12 @@ export default function Home() {
         ref={bottomSheetModalRef}
         room={selectedRoom}
         onConfirm={handleJoinRoom}
+      />
+
+      <JoinByCodeSheet
+        ref={joinSheetRef}
+        currentUserId={firestoreUser?.id}
+        onJoinSuccess={(id) => router.push(`/rooms/${id}`)}
       />
     </>
   );
