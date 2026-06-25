@@ -63,7 +63,7 @@ export default function Profile() {
   useFocusEffect(
     useCallback(() => {
       const loadRooms = async () => {
-        const data = await getRooms();
+        const data = await getRooms(firestoreUser?.id);
         setRooms(data);
       };
       loadRooms();

@@ -242,7 +242,7 @@ export default function MapViewScreen() {
           });
 
           const radiusKm = distance ? parseFloat(distance) : 5;
-          const allRooms = await getNearbyRooms(radiusKm);
+          const allRooms = await getNearbyRooms(radiusKm, firestoreUser?.id);
 
           const mapRooms = allRooms.filter(
             (r) =>

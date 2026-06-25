@@ -193,7 +193,7 @@ export default function Home() {
     setLocationError(false);
     try {
       // slider is in km, getNearbyRooms expects km
-      const data = await getNearbyRooms(searchDistance);
+      const data = await getNearbyRooms(searchDistance, firestoreUser?.id);
       setRooms(data);
     } catch (error) {
       console.error("Error loading rooms:", error);

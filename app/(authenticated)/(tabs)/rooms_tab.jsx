@@ -18,7 +18,7 @@ export default function RoomsScreen() {
     useCallback(() => {
       const loadRooms = async () => {
         setLoading(true);
-        const data = await getRooms();
+        const data = await getRooms(firestoreUser?.id);
         setRooms(data);
         setLoading(false);
       };

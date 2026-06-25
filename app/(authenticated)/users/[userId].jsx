@@ -53,7 +53,7 @@ export default function UserProfile() {
   useEffect(() => {
     const loadRooms = async () => {
       try {
-        const data = await getRooms();
+        const data = await getRooms(viewer?.id);
         if (data) setRooms(data);
       } catch (error) {
         console.error("Failed to load rooms", error);
