@@ -205,7 +205,7 @@ export default function Home() {
         setLocationError(true);
       }
     }
-  }, [searchDistance]);
+  }, [searchDistance, locationError, firestoreUser?.id]);
 
   useFocusEffect(
     useCallback(() => {

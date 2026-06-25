@@ -59,8 +59,8 @@ export default function UserProfile() {
         console.error("Failed to load rooms", error);
       }
     };
-    loadRooms();
-  }, []);
+    if (viewer?.id) loadRooms();
+  }, [viewer?.id]);
 
   const hostedRooms = rooms.filter((r) => r.createdBy === userId).length;
   const joinedRooms = rooms.filter(

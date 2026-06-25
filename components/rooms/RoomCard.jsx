@@ -2,6 +2,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
 import GlassContainer from "../ui/GlassContainer";
+import ParticipantAvatar from "./ParticipantAvatar";
 
 const CATEGORY_ICONS = {
   Music: "musical-notes",
@@ -159,7 +160,15 @@ export default function RoomCard({
       <View className="flex-row justify-between items-center pt-4 mt-1 border-t border-border-light dark:border-[#2A2A36]">
         <View className="flex-row items-center">
           <View className="flex-row -space-x-2 mr-3">
-            {[0, 1, 2].map((i) => (
+            {(room.participants || []).slice(0, 3).map((participantId, i) => (
+              <ParticipantAvatar 
+                key={participantId} 
+                userId={participantId} 
+                size={28} 
+                index={i} 
+              />
+            ))}
+            {(!room.participants || room.participants.length === 0) && [0, 1, 2].map((i) => (
               <View
                 key={i}
                 className="w-7 h-7 rounded-full border-2 border-white dark:border-[#1A1A22] items-center justify-center"

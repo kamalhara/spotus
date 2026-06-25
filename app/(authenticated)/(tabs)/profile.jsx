@@ -66,8 +66,10 @@ export default function Profile() {
         const data = await getRooms(firestoreUser?.id);
         setRooms(data);
       };
-      loadRooms();
-    }, []),
+      if (firestoreUser?.id) {
+        loadRooms();
+      }
+    }, [firestoreUser?.id]),
   );
 
   if (loading) {

@@ -23,8 +23,10 @@ export default function RoomsScreen() {
         setLoading(false);
       };
 
-      loadRooms();
-    }, []),
+      if (firestoreUser?.id) {
+        loadRooms();
+      }
+    }, [firestoreUser?.id]),
   );
 
   const myCreatedRooms = rooms.filter((r) => r.createdBy === firestoreUser?.id);
