@@ -165,13 +165,6 @@ export default function Chat() {
                 room{rooms.length === 1 ? "" : "s"}
               </Text>
             </View>
-            {unreadCount > 0 && (
-              <View className="bg-primary-surface dark:bg-primary-surface px-3 py-1.5 rounded-full">
-                <Text className="text-primary text-[12px] font-display font-black">
-                  {unreadCount} new
-                </Text>
-              </View>
-            )}
           </Animated.View>
 
           {/* Search Bar */}
