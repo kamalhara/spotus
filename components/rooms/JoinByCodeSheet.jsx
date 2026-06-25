@@ -13,7 +13,13 @@ import {
   useRef,
   useState,
 } from "react";
-import { Keyboard, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  Keyboard,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { joinRoomByCode } from "../../lib/joinRoom";
 import CustomButton from "../ui/CustomButton";
 import GlassContainer from "../ui/GlassContainer";
