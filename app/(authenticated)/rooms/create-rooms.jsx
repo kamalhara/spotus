@@ -43,6 +43,13 @@ const CATEGORIES = [
 
 const MAX_TITLE = 60;
 
+const DURATIONS = [
+  { label: "1 Hour", value: 1 },
+  { label: "3 Hours", value: 3 },
+  { label: "12 Hours", value: 12 },
+  { label: "24 Hours", value: 24 },
+];
+
 // Threshold at which the inline title scrolls out of view
 const TITLE_SCROLL_THRESHOLD = 70;
 
@@ -54,8 +61,9 @@ export default function CreateRooms() {
   const [title, setTitle] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [description, setDescription] = useState("");
+  const [duration, setDuration] = useState(3); // Default 3 hours
   const [isCreating, setIsCreating] = useState(false);
-  const [showOnMap, setShowOnMap] = useState(false);
+  const [showOnMap, setShowOnMap] = useState(true); // Default to Public
   const selectedCategoryMeta = CATEGORIES.find(
     (item) => item.label === selectedCategory,
   );
@@ -121,14 +129,15 @@ export default function CreateRooms() {
     if (!user) return alert("User not loaded");
     setIsCreating(true);
     try {
-      await createRoom(
+      const { roomId } = await createRoom(
         title,
         description,
         selectedCategory,
         user.id,
         showOnMap,
+        duration,
       );
-      router.push("/(tabs)/rooms_tab");
+      router.replace(`/rooms/${roomId}`);
     } catch (err) {
       console.error("Error creating room:", err);
       alert(err.message || "Failed to create room.");
@@ -159,7 +168,7 @@ export default function CreateRooms() {
               className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight"
               numberOfLines={1}
             >
-              Create a Room
+              Drop a Room
             </Text>
           </Animated.View>
 
@@ -197,10 +206,10 @@ export default function CreateRooms() {
               {/* Inline Title — fades out on scroll */}
               <Animated.View className="mt-4 mb-8" style={inlineTitleStyle}>
                 <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-extrabold tracking-tight leading-[34px]">
-                  Create a Room
+                  Drop a Room
                 </Text>
                 <Text className="text-gray-400 dark:text-gray-500 text-sm leading-5 mt-2">
-                  Set a clear topic so people know what they are joining.
+                  Set a clear topic for your event.
                 </Text>
               </Animated.View>
 
@@ -226,6 +235,39 @@ export default function CreateRooms() {
                   value={description}
                   onChangeText={(text) => setDescription(text)}
                 />
+              </View>
+
+              {/* Duration Picker */}
+              <View className="mt-5">
+                <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
+                  Duration (Expires in)
+                </Text>
+                <View className="flex-row flex-wrap gap-2.5">
+                  {DURATIONS.map(({ label, value }) => {
+                    const selected = duration === value;
+                    return (
+                      <TouchableOpacity
+                        key={value}
+                        onPress={() => setDuration(value)}
+                        className={`px-4 py-2.5 rounded-xl border ${
+                          selected
+                            ? "bg-primary border-primary"
+                            : "bg-white dark:bg-[#1A1A22] border-gray-100 dark:border-[#2A2A36]"
+                        }`}
+                      >
+                        <Text
+                          className={`text-sm font-medium ${
+                            selected
+                              ? "text-white"
+                              : "text-secondary dark:text-gray-100"
+                          }`}
+                        >
+                          {label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
               </View>
 
               {/* Categories — each with its own color */}
@@ -283,28 +325,45 @@ export default function CreateRooms() {
                   style={{ padding: 16 }}
                 >
                   <View className="flex-row items-center justify-between mb-3">
-                    <View
-                      className="px-3 py-1.5 rounded-xl flex-row items-center"
-                      style={{
-                        backgroundColor: selectedCategoryMeta
-                          ? `${selectedCategoryMeta.color}12`
-                          : "#F1F5F9",
-                      }}
-                    >
-                      <Ionicons
-                        name={selectedCategoryMeta?.icon || "grid-outline"}
-                        size={13}
-                        color={selectedCategoryMeta?.color || "#94A3B8"}
-                      />
-                      <Text
-                        className="text-xs font-bold ml-1.5"
+                    <View className="flex-row items-center gap-2">
+                      <View
+                        className="px-3 py-1.5 rounded-xl flex-row items-center"
                         style={{
-                          color: selectedCategoryMeta?.color || "#94A3B8",
+                          backgroundColor: selectedCategoryMeta
+                            ? `${selectedCategoryMeta.color}12`
+                            : "#F1F5F9",
                         }}
                       >
-                        {selectedCategory || "Choose category"}
-                      </Text>
+                        <Ionicons
+                          name={selectedCategoryMeta?.icon || "grid-outline"}
+                          size={13}
+                          color={selectedCategoryMeta?.color || "#94A3B8"}
+                        />
+                        <Text
+                          className="text-xs font-bold ml-1.5"
+                          style={{
+                            color: selectedCategoryMeta?.color || "#94A3B8",
+                          }}
+                        >
+                          {selectedCategory || "Choose category"}
+                        </Text>
+                      </View>
+                      <View className="px-3 py-1.5 rounded-xl flex-row items-center bg-gray-100 dark:bg-[#2A2A36]">
+                        <Ionicons
+                          name="time-outline"
+                          size={13}
+                          color="#6B7280"
+                        />
+                        <Text className="text-xs font-bold ml-1.5 text-gray-500 dark:text-gray-400">
+                          {duration}h
+                        </Text>
+                      </View>
                     </View>
+                    {!showOnMap && (
+                      <View className="w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-500/10 items-center justify-center">
+                        <Ionicons name="ghost" size={14} color="#A855F7" />
+                      </View>
+                    )}
                   </View>
                   <Text
                     className={`text-lg font-display font-extrabold tracking-tight ${
@@ -322,7 +381,7 @@ export default function CreateRooms() {
                 </GlassContainer>
               </View>
 
-              {/* Show on Map Toggle */}
+              {/* Visibility Toggle */}
               <View className="mt-8">
                 <GlassContainer
                   borderRadius={16}
@@ -337,47 +396,48 @@ export default function CreateRooms() {
                   <View className="flex-1 pr-4">
                     <View className="flex-row items-center mb-1">
                       <Ionicons
-                        name="map"
+                        name={showOnMap ? "globe-outline" : "ghost-outline"}
                         size={16}
-                        color="#4F46E5"
+                        color={showOnMap ? "#10B981" : "#A855F7"}
                         style={{ marginRight: 6 }}
                       />
                       <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
-                        Show Room on Map
+                        {showOnMap ? "Public Event" : "Ghost Mode"}
                       </Text>
                     </View>
                     <Text className="text-gray-400 dark:text-gray-500 text-xs leading-4">
-                      Allow nearby users to discover this room on the public
-                      map.
+                      {showOnMap
+                        ? "Visible on the map. Anyone nearby can join the room."
+                        : "Hidden from the map. People can only join via direct link."}
                     </Text>
                   </View>
                   <Switch
                     value={showOnMap}
                     onValueChange={(val) => {
-                      if (val) {
+                      if (!val) {
                         Alert.alert(
-                          "Show Room on Map?",
-                          "Displaying a room on the map makes it easier for nearby users to discover. Only enable this if you are comfortable with the room appearing on the public map.",
+                          "Enable Ghost Mode?",
+                          "This room will not appear on the map. You will need to share the invite link for people to join.",
                           [
                             {
                               text: "Cancel",
                               style: "cancel",
-                              onPress: () => setShowOnMap(false),
+                              onPress: () => setShowOnMap(true),
                             },
                             {
                               text: "Enable",
                               style: "default",
-                              onPress: () => setShowOnMap(true),
+                              onPress: () => setShowOnMap(false),
                             },
                           ],
                         );
                       } else {
-                        setShowOnMap(false);
+                        setShowOnMap(true);
                       }
                     }}
                     trackColor={{
                       false: isDark ? "#2A2A36" : "#E2E8F0",
-                      true: "#4F46E5",
+                      true: "#10B981",
                     }}
                     thumbColor={"#FFFFFF"}
                   />
