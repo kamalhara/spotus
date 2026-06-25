@@ -11,6 +11,7 @@ import { useFonts } from "expo-font";
 import * as NavigationBar from "expo-navigation-bar";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -61,6 +62,7 @@ function ThemedApp() {
           </ClerkLoaded>
         </ClerkProvider>
       </GestureHandlerRootView>
+      <StatusBar style="auto" />
     </View>
   );
 }
@@ -82,6 +84,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (Platform.OS === "android") {
+      NavigationBar.setPositionAsync("absolute");
+      NavigationBar.setBackgroundColorAsync("#ffffff00");
       NavigationBar.setVisibilityAsync("hidden");
       NavigationBar.setBehaviorAsync("overlay-swipe");
     }

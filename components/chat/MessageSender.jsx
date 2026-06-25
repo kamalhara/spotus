@@ -323,6 +323,7 @@ export default function MessageSender({
           className="flex-1 px-3.5 text-[15px] text-secondary dark:text-gray-100 font-medium h-11"
           returnKeyType="send"
           onSubmitEditing={onSend}
+          underlineColorAndroid="transparent"
         />
 
         <TouchableOpacity

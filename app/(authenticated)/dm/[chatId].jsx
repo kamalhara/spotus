@@ -252,6 +252,7 @@ export default function ChatId() {
             shadowOffset: { width: 0, height: 1 },
             shadowOpacity: 0.04,
             shadowRadius: 4,
+            elevation: 1,
           }}
         >
           <View className="flex-row items-center gap-3 flex-1 mr-2">

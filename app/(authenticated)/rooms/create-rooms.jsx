@@ -13,14 +13,14 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import Animated, {
+  Extrapolation,
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  Extrapolation,
 } from "react-native-reanimated";
+import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../../components/ui/CustomButton";
 import CustomInput from "../../../components/ui/CustomInput";
 import GlassButton from "../../../components/ui/GlassButton";
@@ -152,7 +152,9 @@ export default function CreateRooms() {
           </GlassButton>
 
           {/* Animated compact title — slides in on scroll */}
-          <Animated.View style={[styles.headerTitleContainer, headerTitleStyle]}>
+          <Animated.View
+            style={[styles.headerTitleContainer, headerTitleStyle]}
+          >
             <Text
               className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight"
               numberOfLines={1}
@@ -275,8 +277,8 @@ export default function CreateRooms() {
                 <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
                   Preview
                 </Text>
-                <GlassContainer 
-                  borderRadius={16} 
+                <GlassContainer
+                  borderRadius={16}
                   fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
                   style={{ padding: 16 }}
                 >
@@ -322,10 +324,15 @@ export default function CreateRooms() {
 
               {/* Show on Map Toggle */}
               <View className="mt-8">
-                <GlassContainer 
+                <GlassContainer
                   borderRadius={16}
                   fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
-                  style={{ padding: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}
+                  style={{
+                    padding: 16,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
                 >
                   <View className="flex-1 pr-4">
                     <View className="flex-row items-center mb-1">
@@ -340,7 +347,8 @@ export default function CreateRooms() {
                       </Text>
                     </View>
                     <Text className="text-gray-400 dark:text-gray-500 text-xs leading-4">
-                      Allow nearby users to discover this room on the public map.
+                      Allow nearby users to discover this room on the public
+                      map.
                     </Text>
                   </View>
                   <Switch

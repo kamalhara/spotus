@@ -73,11 +73,11 @@ const LiquidTabBar = ({ state, descriptors, navigation, unreadCount }) => {
           ? "rgba(24, 24, 27, 0.85)"
           : "rgba(255, 255, 255, 0.85)",
         borderRadius: 40,
-        elevation: 15,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.25,
         shadowRadius: 15,
+        elevation: 15,
         flexDirection: "row",
         alignItems: "center",
       }}
