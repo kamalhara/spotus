@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
+  BottomSheetTextInput,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
@@ -16,7 +17,6 @@ import {
 import {
   Keyboard,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -100,6 +100,8 @@ const JoinByCodeSheet = forwardRef(({ currentUserId, onJoinSuccess }, ref) => {
       snapPoints={snapPoints}
       backdropComponent={renderBackdrop}
       backgroundComponent={renderBackground}
+      keyboardBehavior="interactive"
+      keyboardBlurBehavior="restore"
       handleIndicatorStyle={{
         backgroundColor: "#E2E8F0",
         width: 40,
@@ -137,7 +139,7 @@ const JoinByCodeSheet = forwardRef(({ currentUserId, onJoinSuccess }, ref) => {
                 color="#94A3B8"
                 style={{ marginRight: 12 }}
               />
-              <TextInput
+              <BottomSheetTextInput
                 value={code}
                 onChangeText={(text) => {
                   setCode(text.toUpperCase());
