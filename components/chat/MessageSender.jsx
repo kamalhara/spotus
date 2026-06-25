@@ -231,32 +231,37 @@ export default function MessageSender({
       {/* Edit Preview Banner */}
       {editingMessage && (
         <View className="mb-2">
-          <GlassContainer 
+          <GlassContainer
             borderRadius={16}
             fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
-            style={{ paddingHorizontal: 16, paddingVertical: 12, flexDirection: 'row', alignItems: 'center' }}
+            style={{
+              paddingHorizontal: 16,
+              paddingVertical: 12,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
           >
-          <View className="w-8 h-8 rounded-xl bg-primary/10 items-center justify-center mr-3">
-            <Ionicons name="create-outline" size={15} color="#4F46E5" />
-          </View>
-          <View className="flex-1">
-            <Text className="text-primary text-xs font-bold">
-              Editing message
-            </Text>
-            <Text
-              className="text-gray-400 dark:text-gray-500 text-xs mt-0.5"
-              numberOfLines={1}
+            <View className="w-8 h-8 rounded-xl bg-primary/10 items-center justify-center mr-3">
+              <Ionicons name="create-outline" size={15} color="#4F46E5" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-primary text-xs font-bold">
+                Editing message
+              </Text>
+              <Text
+                className="text-gray-400 dark:text-gray-500 text-xs mt-0.5"
+                numberOfLines={1}
+              >
+                {editingMessage.text}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={handleCancelEdit}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              className="w-8 h-8 rounded-xl bg-surface-alt dark:bg-[#23232E] items-center justify-center"
             >
-              {editingMessage.text}
-            </Text>
-          </View>
-          <TouchableOpacity
-            onPress={handleCancelEdit}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            className="w-8 h-8 rounded-xl bg-surface-alt dark:bg-[#23232E] items-center justify-center"
-          >
-            <Ionicons name="close" size={16} color="#94A3B8" />
-          </TouchableOpacity>
+              <Ionicons name="close" size={16} color="#94A3B8" />
+            </TouchableOpacity>
           </GlassContainer>
         </View>
       )}
@@ -264,41 +269,53 @@ export default function MessageSender({
       {/* Reply Preview Banner */}
       {replyTo && (
         <View className="mb-2">
-          <GlassContainer 
+          <GlassContainer
             borderRadius={16}
             fallbackClassName="bg-white dark:bg-[#1A1A22] border-l-4 border-l-primary border-y border-r border-border-light dark:border-y-[#2A2A36] dark:border-r-[#2A2A36]"
-            style={{ paddingHorizontal: 16, paddingVertical: 12, flexDirection: 'row', alignItems: 'center', borderLeftWidth: 4, borderLeftColor: '#4F46E5' }}
+            style={{
+              paddingHorizontal: 16,
+              paddingVertical: 12,
+              flexDirection: "row",
+              alignItems: "center",
+              borderLeftWidth: 4,
+              borderLeftColor: "#4F46E5",
+            }}
           >
-          <View className="mr-2">
-            <Ionicons name="arrow-undo" size={16} color="#4F46E5" />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text className="text-[11px] font-bold text-primary mb-0.5">
-              {replyTo.user || "Unknown"}
-            </Text>
-            <Text
-              numberOfLines={1}
-              className="text-[13px] text-muted dark:text-gray-400"
+            <View className="mr-2">
+              <Ionicons name="arrow-undo" size={16} color="#4F46E5" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text className="text-[11px] font-bold text-primary mb-0.5">
+                {replyTo.user || "Unknown"}
+              </Text>
+              <Text
+                numberOfLines={1}
+                className="text-[13px] text-muted dark:text-gray-400"
+              >
+                {replyTo.imageUrl ? "📷 Photo" : replyTo.text}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={onCancelReply}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              className="w-7 h-7 rounded-full bg-surface-alt dark:bg-[#23232E] items-center justify-center"
             >
-              {replyTo.imageUrl ? "📷 Photo" : replyTo.text}
-            </Text>
-          </View>
-          <TouchableOpacity
-            onPress={onCancelReply}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            className="w-7 h-7 rounded-full bg-surface-alt dark:bg-[#23232E] items-center justify-center"
-          >
-            <Ionicons name="close" size={16} color="#94A3B8" />
-          </TouchableOpacity>
+              <Ionicons name="close" size={16} color="#94A3B8" />
+            </TouchableOpacity>
           </GlassContainer>
         </View>
       )}
 
       {/* Input Bar */}
-      <GlassContainer 
+      <GlassContainer
         borderRadius={30}
         fallbackClassName="bg-white dark:bg-[#1A1A22] border border-border dark:border-[#2A2A36]"
-        style={{ padding: 6, flexDirection: 'row', alignItems: 'center', width: '100%' }}
+        style={{
+          padding: 6,
+          flexDirection: "row",
+          alignItems: "center",
+          width: "100%",
+        }}
       >
         <TouchableOpacity
           className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-alt dark:bg-[#23232E] ml-0.5"
@@ -320,7 +337,7 @@ export default function MessageSender({
           }}
           placeholder="Type a message..."
           placeholderTextColor="#CBD5E1"
-          className="flex-1 px-3.5 text-[15px] text-secondary dark:text-gray-100 font-medium h-11"
+          className="flex-1 px-3.5 text-[15px] text-secondary dark:text-gray-100 tracking-tight h-11"
           returnKeyType="send"
           onSubmitEditing={onSend}
           underlineColorAndroid="transparent"
