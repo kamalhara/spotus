@@ -5,7 +5,6 @@ import {
   collection,
   doc,
   getDoc,
-  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -16,16 +15,15 @@ import { useEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
+  Share,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
-import * as Progress from "react-native-progress";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChatMessages from "../../../components/chat/ChatMessages";
 import MessageSender from "../../../components/chat/MessageSender";
 import RoomDetailsSheet from "../../../components/rooms/RoomDetailsSheet";
-import TrustInfoSheet from "../../../components/rooms/TrustInfoSheet";
 import GlassButton from "../../../components/ui/GlassButton";
 import GlassContainer from "../../../components/ui/GlassContainer";
 import { db } from "../../../config/firebase.config";
@@ -33,7 +31,6 @@ import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { RoomSeen } from "../../../lib/chatSeen";
 import { sendPushNotification } from "../../../lib/notification";
-import { updateTrustOnMessage } from "../../../lib/trust";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
 const CATEGORY_ICONS = {
@@ -64,16 +61,15 @@ export default function RoomChat() {
 
   const [room, setRoom] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [trust, setTrust] = useState(0);
   const [members, setMembers] = useState([]);
   const [uploadingImageUri, setUploadingImageUri] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
+  const [showGhostBanner, setShowGhostBanner] = useState(true);
 
   const { firestoreUser: user } = useFirestoreUser();
   const currentUserId = user?.id;
   const detailsSheetRef = useRef(null);
-  const trustSheetRef = useRef(null);
 
   const { roomId } = useLocalSearchParams();
 
@@ -113,18 +109,6 @@ export default function RoomChat() {
     loadRoom();
   }, [roomId]);
 
-  // Listen to the viewer's specific trust level/message count in this room
-  useEffect(() => {
-    if (!roomId || !currentUserId) return;
-    const unsub = onSnapshot(
-      doc(db, "rooms", roomId, "trust", currentUserId),
-      (snap) => {
-        if (snap.exists()) setTrust(snap.data().messagesCount || 0);
-      },
-    );
-    return unsub;
-  }, [roomId, currentUserId]);
-
   // Fetch profiles and trust scores for all members in the room
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -136,16 +120,7 @@ export default function RoomChat() {
           if (userDoc.exists())
             profiles.push({ id: userDoc.id, ...userDoc.data() });
         }
-        const trustSnap = await getDocs(
-          collection(db, "rooms", roomId, "trust"),
-        );
-        const trustMap = {};
-        trustSnap.forEach((d) => {
-          trustMap[d.id] = d.data().messagesCount || 0;
-        });
-        setMembers(
-          profiles.map((p) => ({ ...p, trustScore: trustMap[p.id] || 0 })),
-        );
+        setMembers(profiles);
       } catch (error) {
         console.error("Error fetching member data:", error);
       }
@@ -198,8 +173,6 @@ export default function RoomChat() {
         lastMessageSenderId: currentUserId,
         lastMessageSeenBy: [currentUserId],
       });
-
-      await updateTrustOnMessage(db, roomId, currentUserId, trimmedText);
 
       // Notify all other room participants
       const otherParticipants = (room?.participants || []).filter(
@@ -263,12 +236,22 @@ export default function RoomChat() {
       setUploadingImageUri(null);
     }
   };
-  const trustColor = trust < 3 ? "#EF4444" : trust < 7 ? "#F59E0B" : "#10B981";
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
   const categoryColor = CATEGORY_COLORS[room?.category] || "#0F0F13";
 
   const handleInfoPress = () => {
     router.push(`/rooms/roomInfo?roomId=${roomId}`);
+  };
+
+  const handleShare = async () => {
+    try {
+      const inviteLink = `spotus.app/join/${room?.inviteCode}`;
+      await Share.share({
+        message: `Join my event: ${room?.title} on SpotUs! Use invite code ${room?.inviteCode} or tap here: ${inviteLink}`,
+      });
+    } catch (error) {
+      console.error("Error sharing room:", error);
+    }
   };
 
   return (
@@ -318,52 +301,55 @@ export default function RoomChat() {
               </TouchableOpacity>
             </View>
 
-            <GlassButton onPress={handleInfoPress} size={40} shape="circle">
-              <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
-            </GlassButton>
+            <View className="flex-row items-center">
+              <GlassButton onPress={handleShare} size={40} shape="circle" style={{ marginRight: 8 }}>
+                <Ionicons name="share-outline" size={18} color="#9CA3AF" />
+              </GlassButton>
+              <GlassButton onPress={handleInfoPress} size={40} shape="circle">
+                <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
+              </GlassButton>
+            </View>
           </View>
         </SafeAreaView>
       </View>
 
-      {/* Trust Meter — compact */}
-      {trust < 10 && (
+      {/* Ghost Mode Banner */}
+      {room?.visibility === "ghost" && showGhostBanner && (
         <TouchableOpacity
           className="px-5 pt-3 pb-1"
-          onPress={() => trustSheetRef.current?.present()}
+          onPress={handleShare}
+          activeOpacity={0.8}
         >
           <GlassContainer 
             borderRadius={16} 
-            fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
-            style={{ paddingHorizontal: 16, paddingVertical: 12 }}
+            fallbackClassName="bg-purple-50 dark:bg-[#2A1635] border border-purple-200 dark:border-[#4B2261]"
+            style={{ paddingHorizontal: 16, paddingVertical: 12, backgroundColor: isDark ? "#2A1635" : "#FAF5FF" }}
           >
-            <View className="flex-row items-center justify-between mb-2">
+            <View className="flex-row items-center justify-between">
               <View className="flex-row items-center">
-                <Ionicons
-                  name="shield-checkmark-outline"
-                  size={14}
-                  color={trustColor}
-                />
-                <Text className="text-gray-500 text-xs font-medium ml-1.5">
-                  Trust
+                <Ionicons name="ghost" size={16} color="#A855F7" />
+                <Text className="text-purple-600 dark:text-purple-300 text-sm font-bold ml-2">
+                  Ghost Mode Active
                 </Text>
               </View>
-              <Text
-                className="text-xs font-semibold"
-                style={{ color: trustColor }}
-              >
-                {trust}/10
-              </Text>
+              <View className="flex-row items-center">
+                <View className="bg-purple-600 px-3 py-1.5 rounded-full mr-2">
+                  <Text className="text-white text-[11px] font-bold">Invite Friends</Text>
+                </View>
+                <TouchableOpacity
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    setShowGhostBanner(false);
+                  }}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons name="close" size={18} color="#A855F7" />
+                </TouchableOpacity>
+              </View>
             </View>
-            <Progress.Bar
-              progress={trust / 10}
-              width={null}
-              color={trustColor}
-              unfilledColor="#F3F4F6"
-              borderWidth={0}
-              height={4}
-              borderRadius={2}
-              animated={true}
-            />
+            <Text className="text-purple-500 dark:text-purple-400 text-[11px] mt-1.5 pr-6">
+              This room is hidden from the map. Share the link to invite people!
+            </Text>
           </GlassContainer>
         </TouchableOpacity>
       )}
@@ -401,8 +387,6 @@ export default function RoomChat() {
         members={members}
         currentUserId={currentUserId}
       />
-
-      <TrustInfoSheet ref={trustSheetRef} trust={trust} />
     </KeyboardAvoidingView>
   );
 }
