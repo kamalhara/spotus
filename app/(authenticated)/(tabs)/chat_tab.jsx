@@ -129,7 +129,15 @@ export default function Chat() {
     isChatUnseen(chat, currentUserId),
   ).length;
 
-  const filteredChats = chats.filter((chat) => {
+  const activeChats = chats.filter(
+    (c) => c.status === "accepted" || !c.status || (c.status === "pending" && c.senderId === currentUserId)
+  );
+
+  const pendingReceivedChats = chats.filter(
+    (c) => c.status === "pending" && c.senderId !== currentUserId
+  );
+
+  const filteredChats = activeChats.filter((chat) => {
     const matchesSearch =
       search === "" ||
       chat.otherUser?.userName?.toLowerCase().includes(search.toLowerCase());
@@ -247,13 +255,36 @@ export default function Chat() {
 
           {/* Chat list */}
           <View className="flex-1 mt-2">
+            {pendingReceivedChats.length > 0 && (
+              <View className="mb-6">
+                <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight mb-4">
+                  Message Requests
+                </Text>
+                {pendingReceivedChats.map((item) => (
+                  <ChatRow
+                    key={item.id}
+                    chat={item}
+                    onPress={() =>
+                      router.push({
+                        pathname: `/dm/${item.otherUser?.id}`,
+                        params: {
+                          userName: item.otherUser?.userName,
+                          profilePic: item.otherUser?.profilePic,
+                        },
+                      })
+                    }
+                  />
+                ))}
+              </View>
+            )}
+
             <View className="flex-row items-center justify-between mb-4">
               <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
                 Recent
               </Text>
-              {chats.length > 0 && (
+              {activeChats.length > 0 && (
                 <Text className="text-muted dark:text-gray-500 text-[13px] font-medium">
-                  {chats.length} conversations
+                  {activeChats.length} conversations
                 </Text>
               )}
             </View>
@@ -271,7 +302,7 @@ export default function Chat() {
                 }}
                 contentContainerStyle={{ paddingBottom: 100 }}
               />
-            ) : chats.length > 0 ? (
+            ) : activeChats.length > 0 ? (
               <FlatList
                 data={filteredChats}
                 keyExtractor={(item) => item.id}

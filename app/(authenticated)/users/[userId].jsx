@@ -8,10 +8,12 @@ import {
   collection,
   doc,
   getDoc,
+  onSnapshot,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -20,7 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import * as Progress from "react-native-progress";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 import GlassButton from "../../../components/ui/GlassButton";
 import Skeleton from "../../../components/ui/Skeleton";
@@ -28,7 +30,6 @@ import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
-import { canSendDM, getRoomTrust } from "../../../lib/trust";
 
 const dateFormater = (timestamp) => {
   const date = new Date(timestamp * 1000);
@@ -40,12 +41,12 @@ const dateFormater = (timestamp) => {
 
 export default function UserProfile() {
   const { isDark } = useTheme();
-  const { userId, roomId } = useLocalSearchParams();
+  const { userId } = useLocalSearchParams();
   const router = useRouter();
   const { firestoreUser: viewer } = useFirestoreUser();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [viewerRoomTrust, setViewerRoomTrust] = useState(0);
+  const [chatDoc, setChatDoc] = useState(null);
 
   const [rooms, setRooms] = useState([]);
 
@@ -66,6 +67,10 @@ export default function UserProfile() {
     (r) => r.participants?.includes(userId) && r.createdBy !== userId,
   ).length;
 
+  const activeHostedEvents = rooms.filter(
+    (r) => r.createdBy === userId && r.visibility !== "ghost"
+  );
+
   // Fetch the viewed user's profile and check trust context for DM access
   useEffect(() => {
     if (!userId) return;
@@ -78,11 +83,6 @@ export default function UserProfile() {
         if (userSnap.exists()) {
           setUser({ id: userSnap.id, ...userSnap.data() });
         }
-
-        if (roomId && viewer?.id) {
-          const roomTrust = await getRoomTrust(db, roomId, viewer.id);
-          setViewerRoomTrust(roomTrust);
-        }
       } catch (err) {
         console.error("Error fetching profile data:", err);
       } finally {
@@ -91,32 +91,70 @@ export default function UserProfile() {
     };
 
     fetchProfileData();
-  }, [userId, roomId, viewer?.id]);
+  }, [userId, viewer?.id]);
 
-  // If no roomId is provided (e.g. came from DMs), the user already has access
-  const hasDMAccess = !roomId || canSendDM(viewerRoomTrust);
-  const trustProgress = Math.min(viewerRoomTrust / 10, 1);
-  const trustColor =
-    viewerRoomTrust < 3
-      ? "#EF4444"
-      : viewerRoomTrust < 7
-        ? "#F59E0B"
-        : "#10B981";
+  const chatDocId = useMemo(() => {
+    if (!viewer?.id || !userId) return null;
+    return [viewer.id, userId].sort().join("_");
+  }, [viewer?.id, userId]);
 
-  const handleMessage = () => {
-    if (!hasDMAccess) {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-      Alert.alert(
-        "DMs locked",
-        `Send ${10 - viewerRoomTrust} more messages in the room to unlock.`,
-      );
-      return;
-    }
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    router.push({
-      pathname: `/dm/${user.id}`,
-      params: { userName: user?.userName, profilePic: user?.profilePic },
+  useEffect(() => {
+    if (!chatDocId) return;
+    const unsub = onSnapshot(doc(db, "chats", chatDocId), (snap) => {
+      if (snap.exists()) setChatDoc(snap.data());
+      else setChatDoc(null);
     });
+    return unsub;
+  }, [chatDocId]);
+
+  // Message request status logic
+  let messageButtonState = "none";
+  let messageButtonText = "Request to Message";
+
+  if (chatDoc?.status === "accepted" || (chatDoc && !chatDoc.status)) {
+    messageButtonState = "accepted";
+    messageButtonText = "Message";
+  } else if (chatDoc?.status === "pending") {
+    if (chatDoc.senderId === viewer?.id) {
+      messageButtonState = "pending_sent";
+      messageButtonText = "Request Sent";
+    } else {
+      messageButtonState = "pending_received";
+      messageButtonText = "Accept Request";
+    }
+  }
+
+  const handleMessageAction = async () => {
+    if (!viewer?.id || !userId) return;
+
+    if (messageButtonState === "accepted") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      router.push({
+        pathname: `/dm/${user.id}`,
+        params: { userName: user?.userName, profilePic: user?.profilePic },
+      });
+    } else if (messageButtonState === "none") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      await setDoc(doc(db, "chats", chatDocId), {
+        participants: [viewer.id, userId],
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        status: "pending",
+        senderId: viewer.id,
+        lastMessage: "Message request sent",
+        lastMessageAt: serverTimestamp(),
+      });
+    } else if (messageButtonState === "pending_received") {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      await updateDoc(doc(db, "chats", chatDocId), {
+        status: "accepted",
+        updatedAt: serverTimestamp(),
+      });
+      router.push({
+        pathname: `/dm/${user.id}`,
+        params: { userName: user?.userName, profilePic: user?.profilePic },
+      });
+    }
   };
 
   const handleBack = () => {
@@ -347,105 +385,44 @@ export default function UserProfile() {
           )}
         </View>
 
-        {/* Action Buttons — context-aware */}
-        {roomId ? (
-          <>
-            {/* === ROOM CONTEXT === */}
-            <View className="flex-row px-6 gap-2.5 mb-6">
-              <TouchableOpacity
-                onPress={handleMessage}
-                activeOpacity={0.8}
-                className={`flex-[2] py-3.5 rounded-2xl flex-row items-center justify-center ${
-                  hasDMAccess ? "bg-primary" : "bg-gray-100 dark:bg-gray-800"
-                }`}
-              >
-                <Ionicons
-                  name={hasDMAccess ? "send" : "lock-closed-outline"}
-                  size={16}
-                  color={hasDMAccess ? "white" : "#9CA3AF"}
-                />
-                <Text
-                  className={`font-semibold text-sm ml-2 ${
-                    hasDMAccess
-                      ? "text-white"
-                      : "text-gray-400 dark:text-gray-500"
-                  }`}
-                >
-                  {hasDMAccess ? "Message" : "Locked"}
-                </Text>
-              </TouchableOpacity>
+        {/* Action Buttons */}
+        <View className="flex-row px-6 gap-2.5 mb-6">
+          <TouchableOpacity
+            onPress={handleMessageAction}
+            activeOpacity={0.8}
+            className={`flex-[2] py-3.5 rounded-2xl flex-row items-center justify-center ${
+              messageButtonState === "pending_sent" ? "bg-gray-100 dark:bg-gray-800" : "bg-primary"
+            }`}
+            disabled={messageButtonState === "pending_sent"}
+          >
+            <Ionicons
+              name={
+                messageButtonState === "accepted" ? "chatbubble" : 
+                messageButtonState === "pending_sent" ? "time-outline" : 
+                messageButtonState === "pending_received" ? "checkmark-circle" : "send"
+              }
+              size={16}
+              color={messageButtonState === "pending_sent" ? "#9CA3AF" : "white"}
+            />
+            <Text
+              className={`font-semibold text-sm ml-2 ${
+                messageButtonState === "pending_sent"
+                  ? "text-gray-400 dark:text-gray-500"
+                  : "text-white"
+              }`}
+            >
+              {messageButtonText}
+            </Text>
+          </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={handleShare}
-                activeOpacity={0.8}
-                className="flex-1 py-3.5 px-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] items-center justify-center"
-              >
-                <Ionicons name="share-outline" size={16} color="#6B7280" />
-              </TouchableOpacity>
-            </View>
-
-            {/* Trust progress — room context only */}
-            {!hasDMAccess && (
-              <View className="px-6 mb-6">
-                <View className="bg-white dark:bg-[#1A1A22] rounded-2xl px-4 py-4 border border-gray-100 dark:border-[#2A2A36]">
-                  <View className="flex-row items-center justify-between mb-2.5">
-                    <Text className="text-gray-500 dark:text-gray-400 text-xs font-medium">
-                      Room trust
-                    </Text>
-                    <Text
-                      className="text-xs font-bold"
-                      style={{ color: trustColor }}
-                    >
-                      {viewerRoomTrust}/10
-                    </Text>
-                  </View>
-                  <Progress.Bar
-                    progress={trustProgress}
-                    width={null}
-                    color={trustColor}
-                    unfilledColor="#F3F4F6"
-                    borderWidth={0}
-                    height={5}
-                    borderRadius={3}
-                    animated={true}
-                  />
-                  <Text className="text-gray-400 dark:text-gray-500 text-[11px] mt-2">
-                    {10 - viewerRoomTrust} more messages to unlock DMs
-                  </Text>
-                </View>
-              </View>
-            )}
-          </>
-        ) : (
-          <>
-            {/* === DM CONTEXT === */}
-            <View className="px-6 mb-6">
-              <TouchableOpacity
-                onPress={handleMessage}
-                activeOpacity={0.8}
-                className="py-4 rounded-2xl bg-primary flex-row items-center justify-center"
-              >
-                <Ionicons name="chatbubble" size={16} color="white" />
-                <Text className="text-white font-semibold text-sm ml-2">
-                  Continue Chat
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <View className="flex-row px-6 gap-2.5 mb-6">
-              <TouchableOpacity
-                onPress={handleShare}
-                activeOpacity={0.8}
-                className="flex-1 py-3.5 rounded-2xl bg-gray-50 dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] flex-row items-center justify-center"
-              >
-                <Ionicons name="share-outline" size={16} color="#6B7280" />
-                <Text className="text-gray-500 dark:text-gray-400 font-semibold text-sm ml-1.5">
-                  Share
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </>
-        )}
+          <TouchableOpacity
+            onPress={handleShare}
+            activeOpacity={0.8}
+            className="flex-1 py-3.5 px-4 rounded-2xl bg-gray-50 dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] items-center justify-center"
+          >
+            <Ionicons name="share-outline" size={16} color="#6B7280" />
+          </TouchableOpacity>
+        </View>
 
         {/* Stats — with icons */}
         <View className="mx-6 mb-6">
@@ -467,7 +444,7 @@ export default function UserProfile() {
                 {hostedRooms}
               </Text>
               <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider mt-0.5">
-                Hosted
+                Events Hosted
               </Text>
             </View>
             <View className="w-px bg-gray-100 dark:bg-[#2A2A36] my-4" />
@@ -479,7 +456,7 @@ export default function UserProfile() {
                 {joinedRooms}
               </Text>
               <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider mt-0.5">
-                Joined
+                Events Joined
               </Text>
             </View>
             <View className="w-px bg-gray-100 dark:bg-[#2A2A36] my-4" />
@@ -496,6 +473,38 @@ export default function UserProfile() {
             </View>
           </View>
         </View>
+
+        {/* Active Events Hosted */}
+        {activeHostedEvents.length > 0 && (
+          <View className="px-6 mb-5">
+            <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight mb-3">
+              Currently Hosting
+            </Text>
+            {activeHostedEvents.map((event) => (
+              <TouchableOpacity
+                key={event.id}
+                activeOpacity={0.8}
+                onPress={() => router.push(`/rooms/${event.id}`)}
+                className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl p-4 mb-3 flex-row items-center justify-between shadow-sm shadow-black/5"
+              >
+                <View className="flex-row items-center flex-1">
+                  <View className="w-10 h-10 bg-primary/10 rounded-xl items-center justify-center mr-3">
+                    <Ionicons name={event.icon || "radio"} size={20} color="#4F46E5" />
+                  </View>
+                  <View className="flex-1 pr-2">
+                    <Text className="text-secondary dark:text-gray-100 font-bold text-[15px]" numberOfLines={1}>
+                      {event.name || "Live Event"}
+                    </Text>
+                    <Text className="text-gray-500 dark:text-gray-400 text-xs mt-0.5" numberOfLines={1}>
+                      {event.participants?.length || 1} tuning in
+                    </Text>
+                  </View>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
 
         {/* Bio Section */}
         <View className="px-6 mb-5">

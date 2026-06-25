@@ -3,6 +3,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   onSnapshot,
@@ -10,6 +11,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -334,21 +336,62 @@ export default function ChatId() {
           />
         </View>
 
-        {/* Input */}
-        <View className="px-5 py-3 pb-5">
-          <MessageSender
-            handleSend={handleSend}
-            chatId={chatDocId}
-            currentUserId={currentUserId}
-            handleSendImage={handleSendImage}
-            replyTo={replyTo}
-            onCancelReply={() => setReplyTo(null)}
-            setReplyTo={setReplyTo}
-            editingMessage={editingMessage}
-            setEditingMessage={setEditingMessage}
-            handleEditMessage={handleEditMessage}
-          />
-        </View>
+        {/* Input or Pending State */}
+        {chatDoc?.status === "pending" ? (
+          <View className="px-5 py-6">
+            {chatDoc.senderId === currentUserId ? (
+              <View className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-5 items-center">
+                <Ionicons name="time-outline" size={24} color="#9CA3AF" />
+                <Text className="text-gray-500 dark:text-gray-400 font-medium text-center mt-2">
+                  Waiting for {otherUser?.userName || "user"} to accept your request.
+                </Text>
+              </View>
+            ) : (
+              <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-3xl p-5 shadow-sm shadow-black/5">
+                <Text className="text-secondary dark:text-gray-100 font-bold text-center mb-1">
+                  Message Request
+                </Text>
+                <Text className="text-gray-500 dark:text-gray-400 text-sm text-center mb-5">
+                  {otherUser?.userName || "This user"} wants to chat with you.
+                </Text>
+                <View className="flex-row gap-3">
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await deleteDoc(doc(db, "chats", chatDocId));
+                      router.replace("/home");
+                    }}
+                    className="flex-1 py-3.5 bg-gray-100 dark:bg-gray-800 rounded-2xl items-center"
+                  >
+                    <Text className="text-gray-600 dark:text-gray-300 font-bold">Decline</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await updateDoc(doc(db, "chats", chatDocId), { status: "accepted", updatedAt: serverTimestamp() });
+                    }}
+                    className="flex-1 py-3.5 bg-primary rounded-2xl items-center"
+                  >
+                    <Text className="text-white font-bold">Accept</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </View>
+        ) : (
+          <View className="px-5 py-3 pb-5">
+            <MessageSender
+              handleSend={handleSend}
+              chatId={chatDocId}
+              currentUserId={currentUserId}
+              handleSendImage={handleSendImage}
+              replyTo={replyTo}
+              onCancelReply={() => setReplyTo(null)}
+              setReplyTo={setReplyTo}
+              editingMessage={editingMessage}
+              setEditingMessage={setEditingMessage}
+              handleEditMessage={handleEditMessage}
+            />
+          </View>
+        )}
         {showOptions && (
           <UserOptionsModal
             showOptions={showOptions}
