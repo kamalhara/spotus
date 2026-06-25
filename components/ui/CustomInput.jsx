@@ -1,5 +1,6 @@
+import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
 import { forwardRef, useRef } from "react";
-import { Animated, Text, TextInput, View } from "react-native";
+import { Animated, Platform, Text, TextInput, View } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import GlassContainer from "./GlassContainer";
 
@@ -21,6 +22,9 @@ const CustomInput = forwardRef(function CustomInput(
   const { isDark } = useTheme();
   const borderAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const hasGlass =
+    Platform.OS === "ios" && GlassView && isLiquidGlassAvailable();
 
   const handleFocus = () => {
     Animated.parallel([
@@ -84,21 +88,36 @@ const CustomInput = forwardRef(function CustomInput(
           containerStyle,
         ]}
       >
-        <GlassContainer
-          borderRadius={28}
-          isInteractive={true}
-          fallbackClassName="bg-white dark:bg-[#1A1A22]"
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 16,
-            paddingVertical: 14,
-            backgroundColor: isDark
-              ? "rgba(255, 255, 255, 0.03)"
-              : "rgba(255, 255, 255, 0.4)",
-          }}
-        >
-          {icon && <View className="mr-3 w-6 items-center">{icon}</View>}
+        {hasGlass ? (
+          <GlassContainer
+            borderRadius={28}
+            isInteractive={true}
+            fallbackClassName="bg-white dark:bg-[#1A1A22]"
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 16,
+              paddingVertical: 14,
+              backgroundColor: isDark
+                ? "rgba(255, 255, 255, 0.03)"
+                : "rgba(255, 255, 255, 0.4)",
+            }}
+          >
+            {icon && <View className="mr-3 w-6 items-center">{icon}</View>}
+            <TextInput
+              ref={ref}
+              className="flex-1 text-secondary dark:text-gray-100 text-base font-medium h-full"
+              placeholder={placeholder}
+              placeholderTextColor={isDark ? "#4B5563" : "#CBD5E1"}
+              value={value}
+              onChangeText={onChangeText}
+              secureTextEntry={secureTextEntry}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              {...props}
+            />
+          </GlassContainer>
+        ) : (
           <TextInput
             ref={ref}
             className="flex-1 text-secondary dark:text-gray-100 text-base font-medium h-full"
@@ -111,7 +130,7 @@ const CustomInput = forwardRef(function CustomInput(
             onBlur={handleBlur}
             {...props}
           />
-        </GlassContainer>
+        )}
       </Animated.View>
       {error ? (
         <View className="flex-row items-center mt-2 ml-1">
