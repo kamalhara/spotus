@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import { useChatActions } from "../../hook/useChatActions";
-import useTypingIndicator from "../../hook/useTypingIndicator";
 import { toggleReaction } from "../../lib/reactions";
 import ImageViewer from "../ui/ImageViewer";
 import ReactionPicker from "./ReactionPicker";
@@ -90,6 +89,7 @@ export default function ChatMessages({
   isHost,
   onKickUser,
   onPinMessage,
+  isTyping = false,
 }) {
   const flatListRef = useRef(null);
   const router = useRouter();
@@ -98,8 +98,6 @@ export default function ChatMessages({
   const [reactionPicker, setReactionPicker] = useState(null);
   const [viewerImage, setViewerImage] = useState(null);
   const swipeableRefs = useRef({});
-
-  const isTyping = useTypingIndicator(chatDocId, currentUserId);
   const { onCopy, onDeleteForMe, onUnsend } = useChatActions(
     collectionName,
     chatDocId,
@@ -241,9 +239,10 @@ export default function ChatMessages({
 
   const isEmojiOnly = (text) => {
     if (!text) return false;
-    const noSpaces = text.replace(/\s+/g, '');
+    const noSpaces = text.replace(/\s+/g, "");
     if (noSpaces.length === 0 || noSpaces.length > 6) return false;
-    const emojiRegex = /^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F900}-\u{1F9FF}\u{1F018}-\u{1F270}\u{238C}-\u{2454}\u{20D0}-\u{20FF}]+$/u;
+    const emojiRegex =
+      /^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F900}-\u{1F9FF}\u{1F018}-\u{1F270}\u{238C}-\u{2454}\u{20D0}-\u{20FF}]+$/u;
     return emojiRegex.test(noSpaces);
   };
 
@@ -280,7 +279,7 @@ export default function ChatMessages({
           </View>
         )}
         <View
-          className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-0.5"} px-2`}
+          className={`w-full flex-row ${isSentByMe ? "justify-end" : "justify-start"} ${addTopMargin ? "mt-3" : "mt-2"} px-2`}
         >
           {!isSentByMe && !isDirectMessage && (
             <View className="w-10 mr-2 flex justify-end pb-1">
@@ -450,7 +449,7 @@ export default function ChatMessages({
                     item.imageUrl
                       ? "absolute bottom-2 right-2 bg-black/30 px-2 py-0.5 rounded-full border border-white/10"
                       : isEmojiOnly(item.text)
-                        ? "absolute -bottom-3 right-0 bg-white/80 dark:bg-black/80 px-1.5 py-0.5 rounded-full"
+                        ? "absolute bottom-1.5 right-2.5 bg-white/80 dark:bg-black/80 px-1.5 py-0.5 rounded-full"
                         : "absolute bottom-1.5 right-2.5"
                   } flex-row items-center`}
                 >

@@ -1,7 +1,6 @@
-import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { Image, Text, View } from "react-native";
-import { db } from "../../config/firebase.config";
+import { fetchUserBatch } from "../../lib/userCache";
 
 export default function ParticipantAvatar({ userId, size = 28, index = 0 }) {
   const [imageUrl, setImageUrl] = useState(null);
@@ -20,9 +19,8 @@ export default function ParticipantAvatar({ userId, size = 28, index = 0 }) {
     let isMounted = true;
     const fetchUser = async () => {
       try {
-        const userDoc = await getDoc(doc(db, "users", userId));
-        if (userDoc.exists() && isMounted) {
-          const data = userDoc.data();
+        const data = await fetchUserBatch(userId);
+        if (data && isMounted) {
           const avatarUrl = data.profilePic || data.imageUrl;
           const name = data.userName || data.fullName;
           

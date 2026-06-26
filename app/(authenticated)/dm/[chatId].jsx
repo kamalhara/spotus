@@ -31,7 +31,6 @@ import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import usePresenceStatus from "../../../hook/usePresenceStatus";
-import useTypingIndicator from "../../../hook/useTypingIndicator";
 import { ChatSeen } from "../../../lib/chatSeen";
 import { sendPushNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
@@ -56,7 +55,16 @@ export default function ChatId() {
     return [currentUserId, chatId].sort().join("_");
   }, [currentUserId, chatId]);
 
-  const isTyping = useTypingIndicator(chatDocId, currentUserId);
+  let isTyping = false;
+  if (chatDoc?.typing && currentUserId) {
+    for (const [key, val] of Object.entries(chatDoc.typing)) {
+      if (key !== currentUserId && val) {
+        isTyping = true;
+        break;
+      }
+    }
+  }
+
   const userStatus = usePresenceStatus(otherUser?.lastSeen);
 
   // Create or merge the chat document
@@ -127,8 +135,8 @@ export default function ChatId() {
   }, [chatDocId]);
   useEffect(() => {
     if (!chatDocId || !currentUserId) return;
-    ChatSeen(chatDocId, currentUserId);
-  }, [chatDocId, currentUserId]);
+    ChatSeen(chatDocId, currentUserId, messages, chatDoc);
+  }, [chatDocId, currentUserId, messages, chatDoc]);
 
   const handleEditMessage = async (messageId, newText) => {
     if (!newText.trim() || !chatDocId) return;
@@ -333,6 +341,7 @@ export default function ChatId() {
             collectionName="chats"
             onReply={(msg) => setReplyTo(msg)}
             onEditMessage={setEditingMessage}
+            isTyping={isTyping}
           />
         </View>
 

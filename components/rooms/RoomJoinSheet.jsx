@@ -21,17 +21,7 @@ import { db } from "../../config/firebase.config";
 import CustomButton from "../ui/CustomButton";
 import GlassContainer from "../ui/GlassContainer";
 
-const CATEGORY_ICONS = {
-  Music: "musical-notes",
-  Coffee: "cafe",
-  Art: "color-palette",
-  Books: "book",
-  Tech: "code-slash",
-  Food: "restaurant",
-  Fashion: "shirt",
-  Sports: "football",
-  "Local Events": "calendar",
-};
+import { CATEGORY_ICONS } from "../../constants/categories";
 
 const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
   const bottomSheetModalRef = useRef(null);

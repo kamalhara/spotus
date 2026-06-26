@@ -30,7 +30,7 @@ import {
 } from "../../../context/FloatingButtonContext";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
-import useUnreadCount from "../../../hook/useUnreadCount";
+import { ChatProvider, useChats } from "../../../context/ChatContext";
 
 // ---------------------------------------------------------------------------
 // Liquid Glass Tab Bar (Android)
@@ -250,7 +250,7 @@ function getActiveTab(pathname) {
 function TabsLayoutInner() {
   const { firestoreUser } = useFirestoreUser();
   const { isDark } = useTheme();
-  const unreadCount = useUnreadCount(firestoreUser?.id);
+  const { unreadCount } = useChats();
   const pathname = usePathname();
   const activeTab = getActiveTab(pathname);
   const { override } = useFloatingButton();
@@ -315,7 +315,9 @@ function TabsLayoutInner() {
 export default function TabsLayout() {
   return (
     <FloatingButtonProvider>
-      <TabsLayoutInner />
+      <ChatProvider>
+        <TabsLayoutInner />
+      </ChatProvider>
     </FloatingButtonProvider>
   );
 }

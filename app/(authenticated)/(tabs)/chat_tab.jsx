@@ -28,6 +28,7 @@ import GlassContainer from "../../../components/ui/GlassContainer";
 import { db } from "../../../config/firebase.config";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { isChatUnseen } from "../../../lib/chatSeen";
+import { useChats } from "../../../context/ChatContext";
 
 export default function Chat() {
   const { firestoreUser } = useFirestoreUser();
@@ -36,8 +37,7 @@ export default function Chat() {
 
   const [rooms, setRooms] = useState([]);
   const [roomsLoading, setRoomsLoading] = useState(true);
-  const [chats, setChats] = useState([]);
-  const [chatsLoading, setChatsLoading] = useState(true);
+  const { chats, loading: chatsLoading } = useChats();
   const [search, setSearch] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
   const [activeFilter] = useState("all");
@@ -82,48 +82,7 @@ export default function Chat() {
     return unsub;
   }, [currentUserId, firestoreUser?.blockedUsers]);
 
-  // Fetch DM chats & resolve other user's profile
-  // Fetch direct message threads and enrich them with participant profile data
-  useEffect(() => {
-    if (!currentUserId) return;
 
-    const q = query(
-      collection(db, "chats"),
-      where("participants", "array-contains", currentUserId),
-    );
-
-    const unsub = onSnapshot(q, async (snap) => {
-      const chatDocs = snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      }));
-
-      const enriched = await Promise.all(
-        chatDocs.map(async (chat) => {
-          const otherUserId = chat.participants?.find(
-            (id) => id !== currentUserId,
-          );
-
-          if (!otherUserId) return { ...chat, otherUser: null };
-
-          const userSnap = await getDoc(doc(db, "users", otherUserId));
-
-          return {
-            ...chat,
-            otherUser: userSnap.exists()
-              ? { id: userSnap.id, ...userSnap.data() }
-              : null,
-          };
-        }),
-      );
-
-      const blocked = firestoreUser?.blockedUsers || [];
-      setChats(enriched.filter((c) => !blocked.includes(c.otherUser?.id)));
-      setChatsLoading(false);
-    });
-
-    return unsub;
-  }, [currentUserId, firestoreUser?.blockedUsers]);
 
   const unreadCount = chats.filter((chat) =>
     isChatUnseen(chat, currentUserId),

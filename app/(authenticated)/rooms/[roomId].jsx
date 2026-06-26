@@ -37,28 +37,7 @@ import { RoomSeen } from "../../../lib/chatSeen";
 import { sendPushNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
-const CATEGORY_ICONS = {
-  Music: "musical-notes",
-  Coffee: "cafe",
-  Art: "color-palette",
-  Books: "book",
-  Tech: "code-slash",
-  Food: "restaurant",
-  Fashion: "shirt",
-  Sports: "football",
-  "Local Events": "calendar",
-};
-const CATEGORY_COLORS = {
-  Music: "#8B5CF6",
-  Coffee: "#D97706",
-  Art: "#EC4899",
-  Books: "#FF8566",
-  Tech: "#3B82F6",
-  Food: "#EF4444",
-  Fashion: "#F59E0B",
-  Sports: "#10B981",
-  "Local Events": "#14B8A6",
-};
+import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 export default function RoomChat() {
   const { isDark } = useTheme();
   const router = useRouter();
@@ -101,8 +80,8 @@ export default function RoomChat() {
   // Mark room messages as seen when entering
   useEffect(() => {
     if (!roomId || !currentUserId) return;
-    RoomSeen(roomId, currentUserId);
-  }, [roomId, currentUserId]);
+    RoomSeen(roomId, currentUserId, messages, room);
+  }, [roomId, currentUserId, messages, room]);
 
   // Load the room details in real-time
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { deleteDoc, doc, setDoc } from "firebase/firestore";
-import { useRef, useState } from "react";
+import React, { memo, useRef, useState } from "react";
 import {
   Alert,
   Animated,
@@ -16,7 +16,6 @@ import { db } from "../../config/firebase.config";
 import { useTheme } from "../../context/ThemeContext";
 import useFirestoreUser from "../../hook/useFireStoreUser";
 import usePresenceStatus from "../../hook/usePresenceStatus";
-import useTypingIndicator from "../../hook/useTypingIndicator";
 import { isChatUnseen } from "../../lib/chatSeen";
 import GlassButton from "../ui/GlassButton";
 import GlassContainer from "../ui/GlassContainer";
@@ -36,7 +35,7 @@ function formatTime(timestamp) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-export default function ChatRow({ chat, onPress }) {
+const ChatRow = memo(function ChatRow({ chat, onPress }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const otherUser = chat?.otherUser;
   const lastMsg = chat?.lastMessage;
@@ -65,7 +64,17 @@ export default function ChatRow({ chat, onPress }) {
 
   const { firestoreUser } = useFirestoreUser();
   const currentUserId = firestoreUser?.id;
-  const isTyping = useTypingIndicator(chat.id, currentUserId);
+  
+  let isTyping = false;
+  if (chat?.typing && currentUserId) {
+    for (const [key, val] of Object.entries(chat.typing)) {
+      if (key !== currentUserId && val) {
+        isTyping = true;
+        break;
+      }
+    }
+  }
+
   const userStatus = usePresenceStatus(otherUser?.lastSeen);
 
   const isUnread = isChatUnseen(chat, currentUserId);
@@ -241,11 +250,7 @@ export default function ChatRow({ chat, onPress }) {
               </Text>
             )}
             {isUnread && (
-              <View className="bg-primary h-5 min-w-[20px] rounded-full px-1.5 items-center justify-center ml-2">
-                <Text className="text-white text-[11px] font-display font-black">
-                  {chat?.unreadCount || ""}
-                </Text>
-              </View>
+              <View className="bg-primary h-3 w-3 rounded-full ml-2" />
             )}
           </View>
         </View>
@@ -403,4 +408,6 @@ export default function ChatRow({ chat, onPress }) {
       </Modal>
     </Animated.View>
   );
-}
+});
+
+export default ChatRow;

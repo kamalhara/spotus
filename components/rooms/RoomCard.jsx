@@ -1,33 +1,10 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRef } from "react";
+import React, { memo, useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
 import ParticipantAvatar from "./ParticipantAvatar";
+import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
 
-const CATEGORY_ICONS = {
-  Music: "musical-notes",
-  Coffee: "cafe",
-  Art: "color-palette",
-  Books: "book",
-  Tech: "code-slash",
-  Food: "restaurant",
-  Fashion: "shirt",
-  Sports: "football",
-  "Local Events": "calendar",
-};
-
-const CATEGORY_COLORS = {
-  Music: "#8B5CF6",
-  Coffee: "#D97706",
-  Art: "#EC4899",
-  Books: "#FF8566",
-  Tech: "#3B82F6",
-  Food: "#EF4444",
-  Fashion: "#F59E0B",
-  Sports: "#10B981",
-  "Local Events": "#14B8A6",
-};
-
-export default function RoomCard({
+const RoomCard = memo(function RoomCard({
   room,
   onPress,
   variant = "discovery",
@@ -244,4 +221,6 @@ export default function RoomCard({
       </TouchableOpacity>
     </Animated.View>
   );
-}
+});
+
+export default RoomCard;
