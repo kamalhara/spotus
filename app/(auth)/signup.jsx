@@ -56,9 +56,9 @@ export default function SignUp() {
     setLoading(true);
     setError("");
 
-    const nameParts = name.trim().split("");
-    const firstName = nameParts[0];
-    const lastName = nameParts.length > 1 ? nameParts.slice(1).join("") : "";
+    const nameParts = name.trim().split(/\s+/);
+    const firstName = nameParts[0] || "";
+    const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
 
     try {
       await signUp.create({ emailAddress, password, firstName, lastName });
@@ -93,15 +93,15 @@ export default function SignUp() {
 
   if (!isLoaded) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-bg dark:bg-[#0F0F13]">
-        <ActivityIndicator size="large" color="#4F46E5" />
+      <SafeAreaView className="flex-1 justify-center items-center bg-bg dark:bg-[#111113]">
+        <ActivityIndicator size="large" color="#FF6B47" />
       </SafeAreaView>
     );
   }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1 px-8">
+      <SafeAreaView className="bg-bg dark:bg-[#111113] flex-1 px-8">
         <View className="flex-row items-center mt-4">
           <GlassButton
             onPress={() =>
@@ -109,7 +109,7 @@ export default function SignUp() {
                 ? setPendingVerification(false)
                 : router.back()
             }
-            className="w-10 h-10 bg-gray-50 dark:bg-[#1A1A22] rounded-full items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
+            className="w-10 h-10 bg-gray-50 dark:bg-[#1C1C20] rounded-full items-center justify-center border border-gray-100 dark:border-[#2C2C30]"
           >
             <Ionicons
               name="arrow-back"

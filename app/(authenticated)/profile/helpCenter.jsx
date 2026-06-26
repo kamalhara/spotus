@@ -26,7 +26,7 @@ const FAQS = [
 
 export default function HelpCenter() {
  return (
- <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]"edges={["top"]}>
+ <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]"edges={["top"]}>
  <ScreenHeader title="Help Center"subtitle="Common questions"/>
 
  <ScrollView
@@ -45,7 +45,7 @@ export default function HelpCenter() {
  ))}
  </SettingsSection>
 
- <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-5 mt-4">
+ <View className="bg-white dark:bg-[#1C1C20] rounded-2xl border border-gray-100 dark:border-[#2C2C30] p-5 mt-4">
  <Text className="text-secondary dark:text-gray-100 text-base font-display font-extrabold">
  Support
  </Text>

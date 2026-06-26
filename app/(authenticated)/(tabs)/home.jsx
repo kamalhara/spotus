@@ -27,25 +27,17 @@ import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
 
-function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h >= 12 && h < 17) return "Good afternoon";
-  return "Good evening";
-}
-
 function EmptyRooms() {
   return (
-    <View className="items-center justify-center py-20 px-6">
-      <View className="w-24 h-24 bg-info-surface rounded-full items-center justify-center mb-6">
-        <Ionicons name="compass" size={40} color="#3B82F6" />
+    <View className="items-center justify-center py-16 px-6">
+      <View className="w-16 h-16 bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl items-center justify-center mb-5">
+        <Ionicons name="radio-outline" size={28} color="#FF6B47" />
       </View>
-      <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight text-center mb-2.5">
-        No rooms nearby
+      <Text className="text-secondary dark:text-gray-100 text-xl font-display font-extrabold tracking-tight text-center mb-2.5">
+        Nothing nearby
       </Text>
       <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">
-        Expand your search radius or be the first to start a conversation in
-        your area.
+        Widen your radius or start a room — someone might be looking for the same thing.
       </Text>
     </View>
   );
@@ -74,42 +66,6 @@ function LocationPermissionDenied() {
   );
 }
 
-// ── Animated room card wrapper for staggered fade-in ─────────────────
-function AnimatedRoomItem({ children, index }) {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(24)).current;
-
-  useEffect(() => {
-    const delay = Math.min(index * 80, 400); // cap at 400ms total stagger
-    const timer = setTimeout(() => {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 1,
-          duration: 350,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 350,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    }, delay);
-    return () => clearTimeout(timer);
-  }, [fadeAnim, slideAnim, index]);
-
-  return (
-    <Animated.View
-      style={{
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-      }}
-    >
-      {children}
-    </Animated.View>
-  );
-}
-
 export default function Home() {
   const [displayDistance, setDisplayDistance] = useState(5);
   const [searchDistance, setSearchDistance] = useState(5);
@@ -133,7 +89,6 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Entrance animations
   const fadeInHeader = useRef(new Animated.Value(0)).current;
@@ -180,7 +135,7 @@ export default function Home() {
     router.push(`/rooms/${selectedRoom.id}`);
   };
 
-  // Debounce: when displayDistance changes, wait 600ms then commit to searchDistance
+  // Debounce: when displayDistance changes, wait 300ms then commit to searchDistance
   useEffect(() => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => {
@@ -205,7 +160,7 @@ export default function Home() {
         setLocationError(true);
       }
     }
-  }, [searchDistance, locationError, firestoreUser?.id]);
+  }, [searchDistance, firestoreUser?.id]);
 
   useFocusEffect(
     useCallback(() => {
@@ -229,8 +184,6 @@ export default function Home() {
       !blockedUsers.includes(r.createdBy),
   );
 
-  const firstName = firestoreUser?.userName?.split("")[0] || "there";
-
   const handleCreateRoom = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     router.push("/rooms/create-rooms");
@@ -243,8 +196,8 @@ export default function Home() {
 
   const handleRefreshPress = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setRefreshTrigger((prev) => prev + 1);
-  }, []);
+    onRefresh();
+  }, [onRefresh]);
 
   // ── Drive the shared floating button based on scroll position ──────
   useEffect(() => {
@@ -252,7 +205,7 @@ export default function Home() {
       setFloatingButtonOverride({
         icon: "add",
         iconSize: 22,
-        tintColor: "#4F46E5",
+        tintColor: "#FF6B47",
         iconColor: "white",
         onPress: handleCreateRoom,
       });
@@ -261,7 +214,7 @@ export default function Home() {
         icon: loading ? "refresh-circle" : "refresh",
         iconSize: 20,
         tintColor: null,
-        iconColor: isDark ? "#F8FAFC" : "#18181B",
+        iconColor: isDark ? "#F5F5F5" : "#18181B",
         onPress: handleRefreshPress,
       });
     }
@@ -284,7 +237,7 @@ export default function Home() {
   // ── Everything above the room list, rendered as list header ────────
   const ListHeader = () => (
     <>
-      {/* Greeting + Distance */}
+      {/* Dynamic context header */}
       <Animated.View
         className="mt-5 mb-1"
         style={{
@@ -292,11 +245,12 @@ export default function Home() {
           transform: [{ translateY: slideUpContent }],
         }}
       >
-        <Text className="text-muted text-sm font-bold uppercase tracking-[1.5px]">
-          {getGreeting()}
-        </Text>
-        <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-black tracking-tight mt-1">
-          {firstName} 👋
+        <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-extrabold tracking-tight">
+          {loading
+            ? "Looking nearby"
+            : nearbyRooms.length > 0
+              ? `${nearbyRooms.length} room${nearbyRooms.length === 1 ? "" : "s"} nearby`
+              : "Quiet for now"}
         </Text>
       </Animated.View>
 
@@ -308,14 +262,14 @@ export default function Home() {
           transform: [{ translateY: slideUpContent }],
         }}
       >
-        <View className="bg-white dark:bg-[#1A1A22] rounded-3xl px-6 py-5 border border-border-light dark:border-[#2A2A36]">
+        <View className="bg-white dark:bg-[#1C1C20] rounded-3xl px-6 py-5 border border-border-light dark:border-[#2C2C30]">
           <View className="flex-row items-center justify-between mb-3">
             <View className="flex-row items-center">
               <View className="w-7 h-7 bg-primary/10 rounded-lg items-center justify-center mr-2.5">
-                <Ionicons name="locate" size={14} color="#4F46E5" />
+                <Ionicons name="locate" size={14} color="#FF6B47" />
               </View>
               <Text className="text-secondary dark:text-gray-100 text-sm font-bold">
-                Search Radius
+                How far?
               </Text>
             </View>
             <View className="bg-primary px-3 py-1.5 rounded-xl">
@@ -346,7 +300,7 @@ export default function Home() {
             >
               <View
                 style={{
-                  backgroundColor: isDark ? "#818CF8" : "#4F46E5",
+                  backgroundColor: isDark ? "#FFAB99" : "#FF6B47",
                   paddingHorizontal: 10,
                   paddingVertical: 5,
                   borderRadius: 10,
@@ -376,7 +330,7 @@ export default function Home() {
                   borderTopWidth: 6,
                   borderLeftColor: "transparent",
                   borderRightColor: "transparent",
-                  borderTopColor: isDark ? "#818CF8" : "#4F46E5",
+                  borderTopColor: isDark ? "#FFAB99" : "#FF6B47",
                   alignSelf: "center",
                 }}
               />
@@ -415,9 +369,9 @@ export default function Home() {
                 }).start();
                 setDisplayDistance(Math.round(val));
               }}
-              minimumTrackTintColor="#4F46E5"
-              maximumTrackTintColor={isDark ? "#2A2A36" : "#E2E8F0"}
-              thumbTintColor={isDark ? "#818CF8" : "#4F46E5"}
+              minimumTrackTintColor="#FF6B47"
+              maximumTrackTintColor={isDark ? "#2C2C30" : "#E8E6E1"}
+              thumbTintColor={isDark ? "#FFAB99" : "#FF6B47"}
             />
           </View>
           <View className="flex flex-row justify-between mt-1">
@@ -444,26 +398,23 @@ export default function Home() {
           activeOpacity={0.9}
           className="bg-primary py-5 px-6 rounded-3xl flex-row items-center"
           style={{
-            shadowColor: "#4F46E5",
+            shadowColor: "#FF6B47",
             shadowOffset: { width: 0, height: 8 },
             shadowOpacity: 0.2,
             shadowRadius: 12,
             elevation: 4,
           }}
         >
-          <View className="w-12 h-12 bg-white/20 rounded-full items-center justify-center mr-4">
-            <Ionicons name="add" size={26} color="white" />
+          <View className="w-11 h-11 bg-white/20 rounded-xl items-center justify-center mr-4">
+            <Ionicons name="add" size={24} color="white" />
           </View>
           <View className="flex-1">
-            <Text className="text-white font-display font-black text-lg tracking-tight">
-              Create a Room
+            <Text className="text-white font-display font-extrabold text-lg tracking-tight">
+              Create a room
             </Text>
-            <Text className="text-white/80 text-[13px] font-semibold mt-0.5">
-              Start a conversation nearby
+            <Text className="text-white/70 text-[13px] font-semibold mt-0.5">
+              Hang out with people nearby
             </Text>
-          </View>
-          <View className="w-8 h-8 bg-white/20 rounded-full items-center justify-center">
-            <Ionicons name="chevron-forward" size={18} color="white" />
           </View>
         </TouchableOpacity>
       </Animated.View>
@@ -479,16 +430,16 @@ export default function Home() {
         <TouchableOpacity
           onPress={() => joinSheetRef.current?.present()}
           activeOpacity={0.8}
-          className="flex-row items-center justify-center py-3.5 bg-purple-50 dark:bg-purple-900/20 rounded-2xl border border-purple-100 dark:border-purple-800/30"
+          className="flex-row items-center justify-center py-3.5 bg-white dark:bg-[#1C1C20] rounded-2xl border border-border-light dark:border-[#2C2C30]"
         >
           <Ionicons
             name="key-outline"
             size={16}
-            color="#A855F7"
+            color="#FF6B47"
             style={{ marginRight: 6 }}
           />
-          <Text className="text-purple-600 dark:text-purple-400 font-semibold text-[13px]">
-            Got an Invite Code?
+          <Text className="text-secondary dark:text-gray-200 font-semibold text-[13px]">
+            Have an invite code?
           </Text>
         </TouchableOpacity>
       </Animated.View>
@@ -498,7 +449,7 @@ export default function Home() {
         <View className="flex flex-row justify-between items-center">
           <View className="flex-row items-center gap-2.5">
             <Text className="text-secondary dark:text-gray-100 text-[22px] font-display font-extrabold tracking-tight">
-              Nearby Rooms
+              Nearby
             </Text>
             {nearbyRooms.length > 0 && (
               <View className="bg-primary-surface px-2.5 py-1 rounded-full">
@@ -546,7 +497,7 @@ export default function Home() {
 
   return (
     <>
-      <SafeAreaView className="bg-bg dark:bg-[#0F0F13] h-screen px-6">
+      <SafeAreaView className="bg-bg dark:bg-[#111113] h-screen px-6">
         {/* Header — stays pinned */}
         <Animated.View
           className="flex flex-row justify-between items-center my-3"
@@ -579,16 +530,14 @@ export default function Home() {
         ) : (
           <FlatList
             data={listData}
-            renderItem={({ item, index }) =>
+            renderItem={({ item }) =>
               item._skeleton ? (
                 <RoomCardSkeleton />
               ) : (
-                <AnimatedRoomItem index={index}>
-                  <RoomCard
-                    room={item}
-                    onPress={() => handlePresentModalPress(item)}
-                  />
-                </AnimatedRoomItem>
+                <RoomCard
+                  room={item}
+                  onPress={() => handlePresentModalPress(item)}
+                />
               )
             }
             keyExtractor={(item, index) =>
@@ -609,8 +558,8 @@ export default function Home() {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                tintColor={isDark ? "#818CF8" : "#4F46E5"}
-                colors={["#4F46E5"]}
+                tintColor={isDark ? "#FFAB99" : "#FF6B47"}
+                colors={["#FF6B47"]}
               />
             }
           />

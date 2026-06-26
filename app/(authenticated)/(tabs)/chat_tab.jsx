@@ -151,7 +151,7 @@ export default function Chat() {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
       <TouchableWithoutFeedback
         onPress={() => {
           Keyboard.dismiss();
@@ -188,10 +188,10 @@ export default function Chat() {
             <GlassContainer
               borderRadius={30}
               isInteractive={true}
-              fallbackClassName={`flex-row items-center bg-white dark:bg-[#1A1A22] px-4 py-3.5 mb-5 border ${
+              fallbackClassName={`flex-row items-center bg-white dark:bg-[#1C1C20] px-4 py-3.5 mb-5 border ${
                 searchFocused
                   ? "border-primary/40"
-                  : "border-border-light dark:border-[#2A2A36]"
+                  : "border-border-light dark:border-[#2C2C30]"
               }`}
               style={{
                 flexDirection: "row",
@@ -204,7 +204,7 @@ export default function Chat() {
               <Ionicons
                 name="search"
                 size={18}
-                color={searchFocused ? "#4F46E5" : "#94A3B8"}
+                color={searchFocused ? "#FF6B47" : "#94A3B8"}
               />
               <TextInput
                 placeholder="Search messages..."
@@ -239,7 +239,7 @@ export default function Chat() {
               )}
             </View>
             {!roomsLoading && rooms.length === 0 ? (
-              <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl px-4 py-3 flex-row items-center">
+              <View className="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl px-4 py-3 flex-row items-center">
                 <View className="w-9 h-9 rounded-xl bg-surface-alt items-center justify-center mr-3">
                   <Ionicons name="people-outline" size={17} color="#94A3B8" />
                 </View>
@@ -340,18 +340,18 @@ export default function Chat() {
               />
             ) : (
               <View className="flex-1 items-center justify-center pt-6">
-                <View className="w-16 h-16 bg-white dark:bg-[#1A1A22] rounded-3xl items-center justify-center mb-5 border border-gray-100 dark:border-[#2A2A36]">
+                <View className="w-16 h-16 bg-white dark:bg-[#1C1C20] rounded-3xl items-center justify-center mb-5 border border-gray-100 dark:border-[#2C2C30]">
                   <Ionicons
                     name="chatbubble-outline"
                     size={30}
-                    color="#4F46E5"
+                    color="#FF6B47"
                   />
                 </View>
                 <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
-                  No conversations yet
+                  It&apos;s quiet in here...
                 </Text>
-                <Text className="text-gray-400 dark:text-gray-500 text-sm mt-1.5 text-center px-10 leading-5">
-                  Get chatting with other members in rooms.
+                <Text className="text-muted text-sm mt-1.5 text-center px-10 leading-5">
+                  Join a room and say hi to someone
                 </Text>
               </View>
             )}

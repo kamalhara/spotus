@@ -257,7 +257,7 @@ export default function ForgotPassword() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1">
+      <SafeAreaView className="bg-bg dark:bg-[#111113] flex-1">
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           className="flex-1 px-8"
@@ -266,7 +266,7 @@ export default function ForgotPassword() {
           <View className="flex-row items-center mt-4">
             <GlassButton
               onPress={() => router.back()}
-              className="w-10 h-10 bg-gray-50 dark:bg-[#1A1A22] rounded-full items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
+              className="w-10 h-10 bg-gray-50 dark:bg-[#1C1C20] rounded-full items-center justify-center border border-gray-100 dark:border-[#2C2C30]"
             >
               <Ionicons
                 name="arrow-back"
@@ -349,7 +349,7 @@ export default function ForgotPassword() {
               ) : (
                 <>
                   {/* Locked email display */}
-                  <View className="bg-gray-50 dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl px-4 py-3 flex-row items-center">
+                  <View className="bg-gray-50 dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl px-4 py-3 flex-row items-center">
                     <View className="w-6 items-center mr-3">
                       <Ionicons name="mail-outline" size={18} color="#9CA3AF" />
                     </View>
@@ -365,7 +365,7 @@ export default function ForgotPassword() {
                       onPress={handleUseDifferentEmail}
                       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
-                      <Ionicons name="pencil" size={16} color="#4F46E5" />
+                      <Ionicons name="pencil" size={16} color="#FF6B47" />
                     </TouchableOpacity>
                   </View>
 
@@ -502,7 +502,7 @@ export default function ForgotPassword() {
                   className="py-3 items-center"
                 >
                   {sendingCode ? (
-                    <ActivityIndicator size="small" color="#4F46E5" />
+                    <ActivityIndicator size="small" color="#FF6B47" />
                   ) : (
                     <Text
                       className={`text-sm font-medium ${resendCooldown > 0 ? "text-gray-300" : "text-primary"}`}

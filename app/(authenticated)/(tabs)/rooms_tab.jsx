@@ -43,7 +43,7 @@ export default function RoomsScreen() {
       data: loading ? [1, 2] : myCreatedRooms,
       isEmpty: !loading && myCreatedRooms.length === 0,
       emptyIcon: "add-circle-outline",
-      emptyText: "You haven't created any rooms yet.",
+      emptyText: "No rooms yet\u2014start something?",
       emptyAction: "Create room",
       emptyRoute: "/rooms/create-rooms",
     },
@@ -53,14 +53,14 @@ export default function RoomsScreen() {
       data: loading ? [1, 2, 3] : myJoinedRooms,
       isEmpty: !loading && myJoinedRooms.length === 0,
       emptyIcon: "compass-outline",
-      emptyText: "You haven't joined any rooms.",
+      emptyText: "You're missing out. Go find a conversation.",
       emptyAction: "Explore rooms",
       emptyRoute: "/home",
     },
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13] px-6">
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113] px-6">
       {/* Header */}
       <View className="flex-row items-center justify-between mt-3 mb-5">
         <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold tracking-tight">
@@ -87,7 +87,7 @@ export default function RoomsScreen() {
           )
         }
         renderSectionHeader={({ section }) => (
-          <View className="bg-bg dark:bg-[#0F0F13] pt-6 pb-4">
+          <View className="bg-bg dark:bg-[#111113] pt-6 pb-4">
             <View className="flex-row items-center gap-2">
               <Text className="text-secondary dark:text-gray-100 text-[18px] font-display font-extrabold">
                 {section.title}
@@ -103,7 +103,7 @@ export default function RoomsScreen() {
               </View>
             </View>
             {section.isEmpty && (
-              <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] mt-3">
+              <View className="bg-white dark:bg-[#1C1C20] rounded-2xl border border-gray-100 dark:border-[#2C2C30] mt-3">
                 <EmptyState
                   icon={section.emptyIcon}
                   title={section.emptyText}

@@ -91,7 +91,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]">
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
@@ -99,16 +99,16 @@ export default function OnboardingScreen() {
         <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24 }}>
           <View className="mt-8 mb-10">
             <Text className="text-3xl font-bold text-secondary dark:text-white mb-2">
-              Complete Your Profile
+              Before you dive in...
             </Text>
             <Text className="text-base text-muted">
-              Let others know who you are before you join the chat.
+              Pick a name and pic so people know it&apos;s you.
             </Text>
           </View>
 
           <View className="items-center mb-10">
             <TouchableOpacity onPress={pickImage} className="relative">
-              <View className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20 items-center justify-center bg-gray-100 dark:bg-gray-800">
+              <View className="w-32 h-32 rounded-2xl overflow-hidden border-4 border-primary/20 items-center justify-center bg-gray-100 dark:bg-gray-800">
                 {imageUri ? (
                   <Image
                     source={{ uri: imageUri }}
@@ -122,7 +122,7 @@ export default function OnboardingScreen() {
                   />
                 )}
               </View>
-              <View className="absolute bottom-0 right-0 bg-primary w-10 h-10 rounded-full items-center justify-center border-4 border-bg dark:border-[#0F0F13]">
+              <View className="absolute bottom-0 right-0 bg-primary w-10 h-10 rounded-full items-center justify-center border-4 border-bg dark:border-[#111113]">
                 <Ionicons name="camera" size={18} color="white" />
               </View>
             </TouchableOpacity>
@@ -155,7 +155,7 @@ export default function OnboardingScreen() {
 
           <View className="mt-auto pt-8">
             <CustomButton
-              title="Finish Setup"
+              title="I'm ready"
               onPress={handleComplete}
               loading={isLoading}
             />

@@ -6,7 +6,7 @@ export default function SettingsRow({
  icon,
  title,
  description,
- color ="#4F46E5",
+ color ="#FF6B47",
  rightText,
  rightComponent,
  onPress,

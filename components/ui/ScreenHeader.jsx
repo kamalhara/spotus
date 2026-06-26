@@ -68,7 +68,7 @@ export default function ScreenHeader({
               <Ionicons
                 name={rightIcon}
                 size={19}
-                color={isDark ? "#818CF8" : "#4F46E5"}
+                color={isDark ? "#FFAB99" : "#FF6B47"}
               />
             ) : (
               <Text className="text-primary dark:text-primary-light text-sm font-bold">

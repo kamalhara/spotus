@@ -29,7 +29,7 @@ const INTERESTS = [
   { label: "Music", icon: "musical-notes", color: "#8B5CF6" },
   { label: "Coffee", icon: "cafe", color: "#D97706" },
   { label: "Art", icon: "color-palette", color: "#EC4899" },
-  { label: "Books", icon: "book", color: "#6366F1" },
+  { label: "Books", icon: "book", color: "#FF8566" },
   { label: "Tech", icon: "code-slash", color: "#3B82F6" },
   { label: "Food", icon: "restaurant", color: "#EF4444" },
   { label: "Fashion", icon: "shirt", color: "#F59E0B" },
@@ -141,7 +141,7 @@ export default function Edit() {
     }
   };
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
       <KeyboardAvoidingView 
         style={{ flex: 1 }} 
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -185,9 +185,9 @@ export default function Edit() {
             </View>
 
             <View className="w-full mt-8">
-              <View className="w-full bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl p-5 items-center">
+              <View className="w-full bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl p-5 items-center">
                 <View className="relative">
-                  <View className="rounded-full border-4 border-gray-50 dark:border-[#23232E] w-32 h-32 bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                  <View className="rounded-full border-4 border-gray-50 dark:border-[#242428] w-32 h-32 bg-gray-100 dark:bg-gray-800 overflow-hidden">
                     <Image
                       source={{
                         uri:
@@ -208,7 +208,7 @@ export default function Edit() {
                       <Ionicons
                         name="camera"
                         size={16}
-                        color={isDark ? "#818CF8" : "#4F46E5"}
+                        color={isDark ? "#FFAB99" : "#FF6B47"}
                       />
                     </GlassButton>
                   </View>
@@ -218,7 +218,7 @@ export default function Edit() {
                 </Text>
               </View>
 
-              <View className="mt-6 bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl p-4 gap-4">
+              <View className="mt-6 bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl p-4 gap-4">
                 <CustomInput
                   label="Full name"
                   placeholder="Enter full name"
@@ -252,10 +252,10 @@ export default function Edit() {
                     activeOpacity={0.75}
                   >
                     {isLocating ? (
-                      <ActivityIndicator color="#4F46E5" size="small" />
+                      <ActivityIndicator color="#FF6B47" size="small" />
                     ) : (
                       <>
-                        <Ionicons name="location" size={18} color="#4F46E5" />
+                        <Ionicons name="location" size={18} color="#FF6B47" />
                         <Text className="text-primary dark:text-primary-light font-bold ml-2">
                           Use Current Location
                         </Text>
@@ -265,7 +265,7 @@ export default function Edit() {
                 </View>
               </View>
 
-              <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl p-4 mt-6">
+              <View className="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl p-4 mt-6">
                 <View className="w-full flex flex-row items-center justify-between">
                   <Text className="text-secondary dark:text-gray-100 text-lg font-display font-extrabold">
                     Manage Interests
@@ -293,7 +293,7 @@ export default function Edit() {
                         className={`flex-row items-center gap-2 px-3 py-2 rounded-xl border ${
                           isSelected
                             ? "border-transparent"
-                            : "bg-white dark:bg-[#1A1A22] border-gray-100 dark:border-[#2A2A36]"
+                            : "bg-white dark:bg-[#1C1C20] border-gray-100 dark:border-[#2C2C30]"
                         }`}
                         style={
                           isSelected

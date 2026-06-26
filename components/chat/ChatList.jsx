@@ -184,7 +184,7 @@ export default function ChatRow({ chat, onPress }) {
         className={`flex-row items-center px-4 py-4 border rounded-[24px] mb-3 ${
           isUnread
             ? "border-primary/20 bg-primary/5 dark:bg-primary/10"
-            : "border-gray-100 dark:border-[#2A2A36] bg-white dark:bg-[#1A1A22]"
+            : "border-gray-100 dark:border-[#2C2C30] bg-white dark:bg-[#1C1C20]"
         }`}
       >
         <View className="relative">
@@ -192,13 +192,13 @@ export default function ChatRow({ chat, onPress }) {
             source={{
               uri: otherUser?.profilePic || "https://picsum.photos/200",
             }}
-            className="rounded-[20px] bg-gray-100 dark:bg-gray-800 border-2 border-white dark:border-[#1A1A22]"
+            className="rounded-[20px] bg-gray-100 dark:bg-gray-800 border-2 border-white dark:border-[#1C1C20]"
             style={{ width: 58, height: 58 }}
           />
           <View
             className={`absolute -bottom-0.5 -right-0.5 w-4 h-4 ${
               isOnline ? "bg-[#10B981]" : "bg-gray-300"
-            } rounded-full border-[2.5px] border-white dark:border-[#1A1A22] z-10`}
+            } rounded-full border-[2.5px] border-white dark:border-[#1C1C20] z-10`}
           />
         </View>
 
@@ -279,7 +279,7 @@ export default function ChatRow({ chat, onPress }) {
                       width: 48,
                       height: 48,
                       borderRadius: 18,
-                      backgroundColor: isDark ? "#2A2A36" : "#F3F4F6",
+                      backgroundColor: isDark ? "#2C2C30" : "#F3F4F6",
                     }}
                   >
                     <Image
@@ -322,7 +322,7 @@ export default function ChatRow({ chat, onPress }) {
                 </View>
 
                 {/* Divider */}
-                <View className="h-px bg-gray-100 dark:bg-[#2A2A36] mx-5 mb-1" />
+                <View className="h-px bg-gray-100 dark:bg-[#2C2C30] mx-5 mb-1" />
 
                 {/* Options */}
                 {OPTIONS.map((option, index) => (
@@ -391,7 +391,7 @@ export default function ChatRow({ chat, onPress }) {
                 >
                   <Text
                     className="font-bold text-[16px]"
-                    style={{ color: isDark ? "#818CF8" : "#4F46E5" }}
+                    style={{ color: isDark ? "#FFAB99" : "#FF6B47" }}
                   >
                     Cancel
                   </Text>

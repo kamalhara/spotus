@@ -121,7 +121,7 @@ const JoinByCodeSheet = forwardRef(({ currentUserId, onJoinSuccess }, ref) => {
           </View>
           <TouchableOpacity
             onPress={() => bottomSheetModalRef.current?.dismiss()}
-            className="w-10 h-10 bg-surface-alt dark:bg-[#23232E] rounded-2xl items-center justify-center"
+            className="w-10 h-10 bg-surface-alt dark:bg-[#242428] rounded-2xl items-center justify-center"
           >
             <Ionicons name="close" size={18} color="#94A3B8" />
           </TouchableOpacity>
@@ -130,7 +130,7 @@ const JoinByCodeSheet = forwardRef(({ currentUserId, onJoinSuccess }, ref) => {
         <View className="mb-6">
           <GlassContainer
             borderRadius={16}
-            fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+            fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
           >
             <View className="flex-row items-center px-4 py-2 h-[60px]">
               <Ionicons

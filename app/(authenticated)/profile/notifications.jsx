@@ -53,13 +53,13 @@ export default function Notifications() {
  <Switch
  value={value}
  onValueChange={() => toggle(key, value, setter)}
- trackColor={{ false: isDark ? "#23232E" : "#E5E7EB", true:"#4F46E5"}}
+ trackColor={{ false: isDark ? "#242428" : "#E5E7EB", true:"#FF6B47"}}
  thumbColor="#FFFFFF"
  />
  );
 
  return (
- <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]"edges={["top"]}>
+ <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]"edges={["top"]}>
  <ScreenHeader title="Notifications"subtitle="Messages and rooms"/>
 
  <ScrollView

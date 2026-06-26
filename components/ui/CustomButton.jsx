@@ -125,7 +125,7 @@ export default function CustomButton({
         >
           {loading ? (
             <ActivityIndicator
-              color={type === "primary" ? "white" : "#4F46E5"}
+              color={type === "primary" ? "white" : "#FF6B47"}
               size="small"
             />
           ) : (

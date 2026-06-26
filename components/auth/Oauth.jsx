@@ -46,7 +46,7 @@ function OAuthButton({ onPress, icon, label }) {
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <GlassContainer isInteractive={true}>
         <TouchableOpacity
-          className="flex-row items-center justify-center py-[17px] px-6 rounded-[18px] border-[1.5px] border-border dark:border-[#2A2A36] bg-white dark:bg-[#1A1A22] active:opacity-70"
+          className="flex-row items-center justify-center py-[17px] px-6 rounded-[18px] border-[1.5px] border-border dark:border-[#2C2C30] bg-white dark:bg-[#1C1C20] active:opacity-70"
           onPress={onPress}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}

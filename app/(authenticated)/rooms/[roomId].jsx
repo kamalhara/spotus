@@ -52,7 +52,7 @@ const CATEGORY_COLORS = {
   Music: "#8B5CF6",
   Coffee: "#D97706",
   Art: "#EC4899",
-  Books: "#6366F1",
+  Books: "#FF8566",
   Tech: "#3B82F6",
   Food: "#EF4444",
   Fashion: "#F59E0B",
@@ -285,7 +285,7 @@ export default function RoomChat() {
 
   const isHost = room?.createdBy === currentUserId;
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
-  const categoryColor = CATEGORY_COLORS[room?.category] || "#0F0F13";
+  const categoryColor = CATEGORY_COLORS[room?.category] || "#111113";
 
   const handleInfoPress = () => {
     router.push(`/rooms/roomInfo?roomId=${roomId}`);
@@ -313,11 +313,11 @@ export default function RoomChat() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-bg dark:bg-[#0F0F13]"
+      className="flex-1 bg-bg dark:bg-[#111113]"
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       {/* Header */}
-      <View className="bg-white dark:bg-[#1A1A22] z-10 border-b border-gray-100 dark:border-[#2A2A36]">
+      <View className="bg-white dark:bg-[#1C1C20] z-10 border-b border-gray-100 dark:border-[#2C2C30]">
         <SafeAreaView edges={["top"]}>
           <View className="flex-row items-center justify-between px-5 py-3">
             <View className="flex-row items-center flex-1">
@@ -405,7 +405,7 @@ export default function RoomChat() {
               <TouchableOpacity
                  onPress={handleCopyCode}
                  activeOpacity={0.7}
-                 className="bg-white dark:bg-[#1A1A22] border border-purple-100 dark:border-purple-800/50 px-4 py-2.5 rounded-xl flex-row items-center mr-3"
+                 className="bg-white dark:bg-[#1C1C20] border border-purple-100 dark:border-purple-800/50 px-4 py-2.5 rounded-xl flex-row items-center mr-3"
               >
                 <Text className="text-purple-700 dark:text-purple-300 font-display font-black tracking-[3px] text-[17px] mr-2">
                   {copied ? "COPIED" : room?.inviteCode}
@@ -476,7 +476,7 @@ export default function RoomChat() {
         />
       </View>
 
-      <View className="px-5 py-3 flex items-center pb-6 bg-bg dark:bg-[#0F0F13] border-t border-gray-100 dark:border-[#2A2A36]">
+      <View className="px-5 py-3 flex items-center pb-6 bg-bg dark:bg-[#111113] border-t border-gray-100 dark:border-[#2C2C30]">
         <MessageSender
           handleSend={handleSend}
           chatId={roomId}

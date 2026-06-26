@@ -49,7 +49,7 @@ export default function TypingIndicator({ isDirectMessage }) {
         </View>
       )}
       <View
-        className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl rounded-bl-sm px-4 py-3 items-center justify-center flex-row"
+        className="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl rounded-bl-sm px-4 py-3 items-center justify-center flex-row"
         style={{
           shadowColor: "#94A3B8",
           shadowOffset: { width: 0, height: 1 },

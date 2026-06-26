@@ -57,7 +57,7 @@ export default function GlassContainer({
   }
 
   const defaultFallback =
-    "bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]";
+    "bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]";
 
   return (
     <View
@@ -75,7 +75,7 @@ export default function GlassContainer({
 
 const styles = StyleSheet.create({
   fallbackShadow: {
-    shadowColor: "#94A3B8",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 4,

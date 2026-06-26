@@ -32,7 +32,7 @@ const CATEGORIES = [
   { label: "Music", icon: "musical-notes", color: "#8B5CF6" },
   { label: "Coffee", icon: "cafe", color: "#D97706" },
   { label: "Art", icon: "color-palette", color: "#EC4899" },
-  { label: "Books", icon: "book", color: "#6366F1" },
+  { label: "Books", icon: "book", color: "#FF8566" },
   { label: "Tech", icon: "code-slash", color: "#3B82F6" },
   { label: "Food", icon: "restaurant", color: "#EF4444" },
   { label: "Fashion", icon: "shirt", color: "#F59E0B" },
@@ -146,7 +146,7 @@ export default function CreateRooms() {
   };
 
   return (
-    <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1">
+    <SafeAreaView className="bg-bg dark:bg-[#111113] flex-1">
       {/* Fixed Header */}
       <View style={styles.fixedHeader}>
         <View style={styles.headerContent}>
@@ -179,7 +179,7 @@ export default function CreateRooms() {
         <Animated.View
           style={[
             styles.headerBorder,
-            { backgroundColor: isDark ? "#2A2A36" : "#F1F5F9" },
+            { backgroundColor: isDark ? "#2C2C30" : "#F1F5F9" },
             headerBorderStyle,
           ]}
         />
@@ -205,10 +205,10 @@ export default function CreateRooms() {
               {/* Inline Title — fades out on scroll */}
               <Animated.View className="mt-4 mb-8" style={inlineTitleStyle}>
                 <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-extrabold tracking-tight leading-[34px]">
-                  Drop a Room
+                  What&apos;s happening?
                 </Text>
-                <Text className="text-gray-400 dark:text-gray-500 text-sm leading-5 mt-2">
-                  Set a clear topic for your event.
+                <Text className="text-muted text-sm leading-5 mt-2">
+                  Give it a name and let people find you.
                 </Text>
               </Animated.View>
 
@@ -216,7 +216,7 @@ export default function CreateRooms() {
               <View className="mb-1">
                 <CustomInput
                   label="Room Title"
-                  placeholder="e.g. Saturday coffee and vinyl"
+                  placeholder="e.g. Saturday park hangs"
                   value={title}
                   onChangeText={(text) => {
                     if (text.length <= MAX_TITLE) setTitle(text);
@@ -230,7 +230,7 @@ export default function CreateRooms() {
               <View>
                 <CustomInput
                   label="Description (Optional)"
-                  placeholder="Add a short description"
+                  placeholder="Tell people what to expect"
                   value={description}
                   onChangeText={(text) => setDescription(text)}
                 />
@@ -251,7 +251,7 @@ export default function CreateRooms() {
                         className={`px-4 py-2.5 rounded-xl border ${
                           selected
                             ? "bg-primary border-primary"
-                            : "bg-white dark:bg-[#1A1A22] border-gray-100 dark:border-[#2A2A36]"
+                            : "bg-white dark:bg-[#1C1C20] border-gray-100 dark:border-[#2C2C30]"
                         }`}
                       >
                         <Text
@@ -285,7 +285,7 @@ export default function CreateRooms() {
                         className={`px-3.5 py-2.5 rounded-xl flex-row items-center gap-2 border ${
                           selected
                             ? "border-transparent"
-                            : "bg-white dark:bg-[#1A1A22] border-gray-100 dark:border-[#2A2A36]"
+                            : "bg-white dark:bg-[#1C1C20] border-gray-100 dark:border-[#2C2C30]"
                         }`}
                         style={
                           selected
@@ -320,7 +320,7 @@ export default function CreateRooms() {
                 </Text>
                 <GlassContainer
                   borderRadius={16}
-                  fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+                  fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
                   style={{ padding: 16 }}
                 >
                   <View className="flex-row items-center justify-between mb-3">
@@ -347,7 +347,7 @@ export default function CreateRooms() {
                           {selectedCategory || "Choose category"}
                         </Text>
                       </View>
-                      <View className="px-3 py-1.5 rounded-xl flex-row items-center bg-gray-100 dark:bg-[#2A2A36]">
+                      <View className="px-3 py-1.5 rounded-xl flex-row items-center bg-gray-100 dark:bg-[#2C2C30]">
                         <Ionicons
                           name="time-outline"
                           size={13}
@@ -388,7 +388,7 @@ export default function CreateRooms() {
               <View className="mt-8">
                 <GlassContainer
                   borderRadius={16}
-                  fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+                  fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
                   style={{
                     padding: 16,
                     flexDirection: "row",
@@ -422,7 +422,7 @@ export default function CreateRooms() {
                       setShowOnMap(!val);
                     }}
                     trackColor={{
-                      false: isDark ? "#2A2A36" : "#E2E8F0",
+                      false: isDark ? "#2C2C30" : "#E2E8F0",
                       true: "#A855F7",
                     }}
                     thumbColor={"#FFFFFF"}
@@ -433,7 +433,7 @@ export default function CreateRooms() {
               {/* Create Button */}
               <View className="flex-1 justify-end mt-10">
                 <CustomButton
-                  title="Create Room"
+                  title="Let's go"
                   onPress={handleCreateRoom}
                   disabled={!canCreateRoom}
                   loading={isCreating}

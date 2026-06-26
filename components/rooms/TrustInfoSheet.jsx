@@ -86,7 +86,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  ?"#F59E0B"
  : trust < 10
  ?"#10B981"
- :"#6366F1";
+ :"#FF8566";
  const trustLabel =
  trust < 3
  ?"New Member"
@@ -132,7 +132,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  <Ionicons
  name="shield-checkmark"
  size={12}
- color="#4F46E5"
+ color="#FF6B47"
  style={{ marginRight: 6 }}
  />
  <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
@@ -145,7 +145,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  </View>
  <TouchableOpacity
  onPress={handleDismiss}
- className="w-10 h-10 bg-surface-alt dark:bg-[#23232E] rounded-2xl items-center justify-center"
+ className="w-10 h-10 bg-surface-alt dark:bg-[#242428] rounded-2xl items-center justify-center"
  >
  <Ionicons name="close"size={18} color="#94A3B8"/>
  </TouchableOpacity>
@@ -225,7 +225,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  {HOW_IT_WORKS_STEPS.map((step, index) => (
  <View key={index} className="flex-row items-start mb-3">
  <View className="w-10 h-10 rounded-full bg-primary-surface dark:bg-primary-surface items-center justify-center mr-3.5 mt-0.5">
- <Ionicons name={step.icon} size={18} color="#4F46E5"/>
+ <Ionicons name={step.icon} size={18} color="#FF6B47"/>
  </View>
  <View className="flex-1">
  <Text className="text-secondary dark:text-gray-100 text-sm font-display font-black tracking-tight">
@@ -237,7 +237,7 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  </View>
  {index < HOW_IT_WORKS_STEPS.length - 1 && (
  <View
- className="absolute left-[19px] top-[44px] w-[2px] h-3 bg-border-light dark:bg-[#2A2A36]"
+ className="absolute left-[19px] top-[44px] w-[2px] h-3 bg-border-light dark:bg-[#2C2C30]"
  />
  )}
  </View>
@@ -248,16 +248,16 @@ const TrustInfoSheet = forwardRef(({ trust = 0 }, ref) => {
  <View
  className="rounded-2xl p-4 mt-4"
  style={{
- backgroundColor: isDark ?"#23232E":"#F8FAFC",
+ backgroundColor: isDark ?"#242428":"#F5F5F5",
  borderWidth: 1,
- borderColor: isDark ?"#2A2A36":"#F1F5F9",
+ borderColor: isDark ?"#2C2C30":"#F1F5F9",
  }}
  >
  <View className="flex-row items-center mb-2">
  <Ionicons
  name="heart"
  size={14}
- color="#4F46E5"
+ color="#FF6B47"
  style={{ marginRight: 6 }}
  />
  <Text className="text-secondary dark:text-gray-100 font-display font-black text-sm tracking-tight">

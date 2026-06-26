@@ -17,7 +17,7 @@ import {
 } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { db } from "../../config/firebase.config";
-import { useTheme } from "../../context/ThemeContext";
+
 import CustomButton from "../ui/CustomButton";
 import GlassContainer from "../ui/GlassContainer";
 
@@ -120,11 +120,11 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
           {/* Header */}
           <View className="flex-row justify-between items-start mb-6">
             <View className="flex-1 mr-4">
-              <View className="bg-surface-alt dark:bg-[#23232E] self-start px-3.5 py-2 rounded-xl mb-4 flex-row items-center">
+              <View className="bg-surface-alt dark:bg-[#242428] self-start px-3.5 py-2 rounded-xl mb-4 flex-row items-center">
                 <Ionicons
                   name={categoryIcon}
                   size={12}
-                  color="#4F46E5"
+                  color="#FF6B47"
                   style={{ marginRight: 6 }}
                 />
                 <Text className="text-primary font-bold text-[10px] uppercase tracking-[1.5px]">
@@ -137,7 +137,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
             </View>
             <TouchableOpacity
               onPress={handleDismiss}
-              className="w-10 h-10 bg-surface-alt dark:bg-[#23232E] rounded-2xl items-center justify-center"
+              className="w-10 h-10 bg-surface-alt dark:bg-[#242428] rounded-2xl items-center justify-center"
             >
               <Ionicons name="close" size={18} color="#94A3B8" />
             </TouchableOpacity>
@@ -145,9 +145,9 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
 
           {/* Room Details Info */}
           <View className="flex-row items-center gap-4 mb-7">
-            <View className="flex-row items-center bg-surface-alt dark:bg-[#23232E] px-4 py-3 rounded-2xl flex-1">
-              <View className="w-8 h-8 bg-white dark:bg-[#1A1A22] rounded-xl items-center justify-center mr-2.5">
-                <Ionicons name="people" size={15} color="#4F46E5" />
+            <View className="flex-row items-center bg-surface-alt dark:bg-[#242428] px-4 py-3 rounded-2xl flex-1">
+              <View className="w-8 h-8 bg-white dark:bg-[#1C1C20] rounded-xl items-center justify-center mr-2.5">
+                <Ionicons name="people" size={15} color="#FF6B47" />
               </View>
               <View>
                 <Text className="text-secondary dark:text-gray-100 font-bold text-sm">
@@ -158,9 +158,9 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
                 </Text>
               </View>
             </View>
-            <View className="flex-row items-center bg-surface-alt dark:bg-[#23232E] px-4 py-3 rounded-2xl flex-1">
-              <View className="w-8 h-8 bg-white dark:bg-[#1A1A22] rounded-xl items-center justify-center mr-2.5">
-                <Ionicons name="location" size={15} color="#4F46E5" />
+            <View className="flex-row items-center bg-surface-alt dark:bg-[#242428] px-4 py-3 rounded-2xl flex-1">
+              <View className="w-8 h-8 bg-white dark:bg-[#1C1C20] rounded-xl items-center justify-center mr-2.5">
+                <Ionicons name="location" size={15} color="#FF6B47" />
               </View>
               <View>
                 <Text className="text-secondary dark:text-gray-100 font-bold text-sm">
@@ -175,12 +175,12 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
 
           {/* Creator */}
           {creator && (
-            <View className="flex-row items-center bg-surface-alt dark:bg-[#23232E] px-4 py-3.5 rounded-2xl mb-6">
+            <View className="flex-row items-center bg-surface-alt dark:bg-[#242428] px-4 py-3.5 rounded-2xl mb-6">
               <Image
                 source={{
                   uri: creator.profilePic || "https://picsum.photos/200",
                 }}
-                className="w-11 h-11 rounded-full mr-3 border-[2px] border-white dark:border-[#1A1A22]"
+                className="w-11 h-11 rounded-2xl mr-3 border-[2px] border-white dark:border-[#1C1C20]"
               />
               <View className="flex-1">
                 <Text className="text-secondary dark:text-gray-100 font-bold text-[15px]">
@@ -205,7 +205,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
           )}
 
           {room?.description && (
-            <View className="bg-surface-alt dark:bg-[#23232E] p-4 rounded-2xl mb-4 border border-gray-100 dark:border-[#2A2A36]">
+            <View className="bg-surface-alt dark:bg-[#242428] p-4 rounded-2xl mb-4 border border-gray-100 dark:border-[#2C2C30]">
               <Text className="text-muted text-[10px] font-bold uppercase tracking-[2px] mb-1.5">
                 Description
               </Text>

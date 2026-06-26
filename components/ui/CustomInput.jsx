@@ -61,8 +61,8 @@ const CustomInput = forwardRef(function CustomInput(
   const animatedBorderColor = borderAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [
-      error ? "#EF4444" : isDark ? "#2A2A36" : "#E2E8F0",
-      error ? "#EF4444" : "#4F46E5",
+      error ? "#EF4444" : isDark ? "#2C2C30" : "#E2E8F0",
+      error ? "#EF4444" : "#FF6B47",
     ],
   });
 
@@ -92,7 +92,7 @@ const CustomInput = forwardRef(function CustomInput(
           <GlassContainer
             borderRadius={28}
             isInteractive={true}
-            fallbackClassName="bg-white dark:bg-[#1A1A22]"
+            fallbackClassName="bg-white dark:bg-[#1C1C20]"
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -118,18 +118,30 @@ const CustomInput = forwardRef(function CustomInput(
             />
           </GlassContainer>
         ) : (
-          <TextInput
-            ref={ref}
-            className="flex-1 text-secondary dark:text-gray-100 text-base font-medium h-full"
-            placeholder={placeholder}
-            placeholderTextColor={isDark ? "#4B5563" : "#CBD5E1"}
-            value={value}
-            onChangeText={onChangeText}
-            secureTextEntry={secureTextEntry}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
-            {...props}
-          />
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 16,
+              paddingVertical: 14,
+              backgroundColor: isDark ? "#1C1C20" : "#FFFFFF",
+              borderRadius: 28,
+            }}
+          >
+            {icon && <View className="mr-3 w-6 items-center">{icon}</View>}
+            <TextInput
+              ref={ref}
+              className="flex-1 text-secondary dark:text-gray-100 text-base font-medium"
+              placeholder={placeholder}
+              placeholderTextColor={isDark ? "#4B5563" : "#CBD5E1"}
+              value={value}
+              onChangeText={onChangeText}
+              secureTextEntry={secureTextEntry}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              {...props}
+            />
+          </View>
         )}
       </Animated.View>
       {error ? (

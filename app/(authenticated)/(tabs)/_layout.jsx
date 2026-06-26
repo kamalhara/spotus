@@ -129,8 +129,8 @@ const LiquidTabBar = ({ state, descriptors, navigation, unreadCount }) => {
 
         const iconColor = isFocused
           ? isDark
-            ? "#818CF8"
-            : "#4F46E5"
+            ? "#FFAB99"
+            : "#FF6B47"
           : isDark
             ? "#6B7280"
             : "#9CA3AF";
@@ -274,21 +274,21 @@ function TabsLayoutInner() {
           <NativeTabs.Trigger name="home">
             <Label>Home</Label>
             <Icon
-              selectedColor={isDark ? "#818CF8" : "#4F46E5"}
+              selectedColor={isDark ? "#FFAB99" : "#FF6B47"}
               sf={{ default: "house", selected: "house.fill" }}
             />
           </NativeTabs.Trigger>
           <NativeTabs.Trigger name="rooms_tab">
             <Label>Rooms</Label>
             <Icon
-              selectedColor={isDark ? "#818CF8" : "#4F46E5"}
+              selectedColor={isDark ? "#FFAB99" : "#FF6B47"}
               sf={{ default: "person.2", selected: "person.2.fill" }}
             />
           </NativeTabs.Trigger>
           <NativeTabs.Trigger name="chat_tab">
             <Label>Chat</Label>
             <Icon
-              selectedColor={isDark ? "#818CF8" : "#4F46E5"}
+              selectedColor={isDark ? "#FFAB99" : "#FF6B47"}
               sf={{ default: "message", selected: "message.fill" }}
             />
             {unreadCount > 0 && <Badge>{unreadCount}</Badge>}
@@ -296,7 +296,7 @@ function TabsLayoutInner() {
           <NativeTabs.Trigger name="profile">
             <Label>Profile</Label>
             <Icon
-              selectedColor={isDark ? "#818CF8" : "#4F46E5"}
+              selectedColor={isDark ? "#FFAB99" : "#FF6B47"}
               sf={{
                 default: "person.crop.circle",
                 selected: "person.crop.circle.fill",

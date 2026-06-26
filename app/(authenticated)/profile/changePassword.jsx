@@ -41,9 +41,9 @@ export default function ChangePassword() {
  <View className="flex-row items-center gap-3 mt-4">
  <TouchableOpacity
  onPress={() => router.back()}
- className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1A1A22] items-center justify-center border border-transparent dark:border-[#2A2A36]"
+ className="w-10 h-10 rounded-full bg-gray-100 dark:bg-[#1C1C20] items-center justify-center border border-transparent dark:border-[#2C2C30]"
  >
- <Ionicons name="arrow-back"size={20} color={isDark ?"#818CF8":"#4F46E5"} />
+ <Ionicons name="arrow-back"size={20} color={isDark ?"#FFAB99":"#FF6B47"} />
  </TouchableOpacity>
  <Text className="text-secondary dark:text-gray-100 font-display font-extrabold text-xl">
  Change Password

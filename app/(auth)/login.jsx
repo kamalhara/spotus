@@ -96,19 +96,19 @@ export default function Login() {
 
   if (!isLoaded) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-bg dark:bg-[#0F0F13]">
-        <ActivityIndicator size="large" color="#4F46E5" />
+      <SafeAreaView className="flex-1 justify-center items-center bg-bg dark:bg-[#111113]">
+        <ActivityIndicator size="large" color="#FF6B47" />
       </SafeAreaView>
     );
   }
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="bg-bg dark:bg-[#0F0F13] flex-1 px-8">
+      <SafeAreaView className="bg-bg dark:bg-[#111113] flex-1 px-8">
         <View className="flex-row items-center mt-4">
           <GlassButton
             onPress={() => router.push("/")}
-            className="w-10 h-10 bg-gray-50 dark:bg-[#1A1A22] rounded-full items-center justify-center border border-gray-100 dark:border-[#2A2A36]"
+            className="w-10 h-10 bg-gray-50 dark:bg-[#1C1C20] rounded-full items-center justify-center border border-gray-100 dark:border-[#2C2C30]"
           >
             <Ionicons
               name="arrow-back"
@@ -196,11 +196,11 @@ export default function Login() {
           />
 
           <View className="flex-row items-center justify-center gap-3 my-7">
-            <View className="flex-1 h-px bg-border-light dark:bg-[#2A2A36]" />
+            <View className="flex-1 h-px bg-border-light dark:bg-[#2C2C30]" />
             <Text className="text-gray-300 dark:text-gray-600 text-xs font-semibold uppercase tracking-wider">
               Or
             </Text>
-            <View className="flex-1 h-px bg-border-light dark:bg-[#2A2A36]" />
+            <View className="flex-1 h-px bg-border-light dark:bg-[#2C2C30]" />
           </View>
 
           <Oauth />

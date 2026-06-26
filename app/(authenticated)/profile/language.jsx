@@ -15,14 +15,14 @@ export default function Language() {
  const [selectedLanguage, setSelectedLanguage] = useState("en");
 
  return (
- <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]"edges={["top"]}>
+ <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]"edges={["top"]}>
  <ScreenHeader title="Language"subtitle="App language"/>
 
  <ScrollView
  showsVerticalScrollIndicator={false}
  contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
  >
- <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] overflow-hidden">
+ <View className="bg-white dark:bg-[#1C1C20] rounded-2xl border border-gray-100 dark:border-[#2C2C30] overflow-hidden">
  {LANGUAGES.map((language, index) => {
  const selected = selectedLanguage === language.code;
  return (
@@ -32,19 +32,19 @@ export default function Language() {
  activeOpacity={0.75}
  className={`px-5 py-4 flex-row items-center ${
  index !== LANGUAGES.length - 1
- ?"border-b border-gray-50 dark:border-[#2A2A36]"
+ ?"border-b border-gray-50 dark:border-[#2C2C30]"
  :""
  }`}
  >
  <View
  className={`w-10 h-10 rounded-2xl items-center justify-center mr-3.5 ${
- selected ?"bg-primary-surface dark:bg-primary-surface":"bg-surface-alt dark:bg-[#23232E]"
+ selected ?"bg-primary-surface dark:bg-primary-surface":"bg-surface-alt dark:bg-[#242428]"
  }`}
  >
  <Ionicons
  name={selected ?"checkmark":"language-outline"}
  size={18}
- color={selected ?"#4F46E5":"#94A3B8"}
+ color={selected ?"#FF6B47":"#94A3B8"}
  />
  </View>
  <View className="flex-1">

@@ -143,7 +143,7 @@ export default function UserOptionsModal({
           <Pressable>
             <GlassContainer
               borderRadius={16}
-              fallbackClassName="bg-white dark:bg-[#1A1A22] border border-border-light dark:border-[#2A2A36]"
+              fallbackClassName="bg-white dark:bg-[#1C1C20] border border-border-light dark:border-[#2C2C30]"
             >
               {/* Options */}
               {OPTIONS.map((option, index) => (
@@ -157,7 +157,7 @@ export default function UserOptionsModal({
                   disabled={loading}
                   className={`flex-row items-center px-5 py-3.5 ${
                     index < OPTIONS.length - 1
-                      ? "border-b border-gray-50 dark:border-[#2A2A36]"
+                      ? "border-b border-gray-50 dark:border-[#2C2C30]"
                       : ""
                   }`}
                 >
@@ -195,7 +195,7 @@ export default function UserOptionsModal({
             >
               <GlassContainer
                 borderRadius={16}
-                fallbackClassName="bg-white dark:bg-[#1A1A22] border border-border-light dark:border-[#2A2A36]"
+                fallbackClassName="bg-white dark:bg-[#1C1C20] border border-border-light dark:border-[#2C2C30]"
               >
                 <View className="py-4 items-center">
                   <Text className="text-secondary dark:text-gray-100 font-bold text-[15px]">
@@ -216,10 +216,10 @@ export default function UserOptionsModal({
         >
           <GlassContainer
             borderRadius={16}
-            fallbackClassName="bg-white dark:bg-[#1A1A22] border border-border-light dark:border-[#2A2A36]"
+            fallbackClassName="bg-white dark:bg-[#1C1C20] border border-border-light dark:border-[#2C2C30]"
           >
             <View className="p-6 items-center">
-              <ActivityIndicator size="large" color="#4F46E5" />
+              <ActivityIndicator size="large" color="#FF6B47" />
               <Text className="text-secondary dark:text-gray-100 font-semibold mt-3">
                 Deleting chat...
               </Text>

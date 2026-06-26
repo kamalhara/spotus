@@ -35,7 +35,7 @@ export function FloatingButtonProvider({ children }) {
  *   const { setFloatingButtonOverride, clearFloatingButtonOverride } = useFloatingButton();
  *
  *   useFocusEffect(useCallback(() => {
- *     setFloatingButtonOverride({ icon: "add", tintColor: "#4F46E5", onPress: handleCreate });
+ *     setFloatingButtonOverride({ icon: "add", tintColor: "#FF6B47", onPress: handleCreate });
  *     return () => clearFloatingButtonOverride();
  *   }, []));
  */

@@ -241,7 +241,7 @@ export default function ChatId() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -293,7 +293,7 @@ export default function ChatId() {
                   {isTyping ? (
                     <Text
                       style={{
-                        color: "#4F46E5",
+                        color: "#FF6B47",
                         fontSize: 12,
                         fontWeight: "bold",
                       }}
@@ -347,7 +347,7 @@ export default function ChatId() {
                 </Text>
               </View>
             ) : (
-              <View className="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-3xl p-5 shadow-sm shadow-black/5">
+              <View className="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-3xl p-5 shadow-sm shadow-black/5">
                 <Text className="text-secondary dark:text-gray-100 font-bold text-center mb-1">
                   Message Request
                 </Text>

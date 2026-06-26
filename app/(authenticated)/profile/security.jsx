@@ -12,7 +12,7 @@ export default function Security() {
   const { isDark } = useTheme();
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
       <ScreenHeader title="Security" subtitle="Account access and alerts" />
 
       <ScrollView
@@ -35,8 +35,8 @@ export default function Security() {
                 value={appLockEnabled}
                 onValueChange={setAppLockEnabled}
                 trackColor={{
-                  false: isDark ? "#23232E" : "#E5E7EB",
-                  true: "#4F46E5",
+                  false: isDark ? "#242428" : "#E5E7EB",
+                  true: "#FF6B47",
                 }}
                 thumbColor="#FFFFFF"
               />
@@ -61,8 +61,8 @@ export default function Security() {
                 value={loginAlertsEnabled}
                 onValueChange={setLoginAlertsEnabled}
                 trackColor={{
-                  false: isDark ? "#23232E" : "#E5E7EB",
-                  true: "#4F46E5",
+                  false: isDark ? "#242428" : "#E5E7EB",
+                  true: "#FF6B47",
                 }}
                 thumbColor="#FFFFFF"
               />

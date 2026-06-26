@@ -1,7 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
-import GlassContainer from "../ui/GlassContainer";
 import ParticipantAvatar from "./ParticipantAvatar";
 
 const CATEGORY_ICONS = {
@@ -20,22 +19,13 @@ const CATEGORY_COLORS = {
   Music: "#8B5CF6",
   Coffee: "#D97706",
   Art: "#EC4899",
-  Books: "#6366F1",
+  Books: "#FF8566",
   Tech: "#3B82F6",
   Food: "#EF4444",
   Fashion: "#F59E0B",
   Sports: "#10B981",
   "Local Events": "#14B8A6",
 };
-
-const AVATAR_COLORS = [
-  "#6366F1",
-  "#EC4899",
-  "#10B981",
-  "#F59E0B",
-  "#3B82F6",
-  "#8B5CF6",
-];
 
 export default function RoomCard({
   room,
@@ -49,7 +39,7 @@ export default function RoomCard({
   const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
   const categoryColor = CATEGORY_COLORS[room.category] || "#6B7280";
 
-  const buttonText = isDiscovery ? "Join" : "Enter";
+  const buttonText = isDiscovery ? "Jump in" : "Enter";
 
   const getExpiryText = () => {
     if (!room.expiresAt) return "Active Event";
@@ -69,10 +59,31 @@ export default function RoomCard({
     if (diffMs <= 0) return "Expired";
 
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    if (diffHours > 0) return `Expires in ${diffHours}h`;
+    if (diffHours >= 24) return `${Math.floor(diffHours / 24)}d left`;
+    if (diffHours > 0) return `${diffHours}h left`;
 
     const diffMins = Math.floor(diffMs / (1000 * 60));
-    return `Expires in ${diffMins}m`;
+    if (diffMins > 0) return `${diffMins}m left`;
+    return "< 1m left";
+  };
+
+  const participantCount =
+    room.participantCount || room.participants?.length || 0;
+  const isDying = (() => {
+    if (!room.expiresAt) return false;
+    const expiresMs = room.expiresAt.seconds
+      ? room.expiresAt.seconds * 1000
+      : room.expiresAt instanceof Date
+        ? room.expiresAt.getTime()
+        : room.expiresAt;
+    if (!expiresMs) return false;
+    return expiresMs - Date.now() < 15 * 60 * 1000;
+  })();
+
+  const getParticipantText = () => {
+    if (participantCount <= 1) return "Just started";
+    if (participantCount === 2) return "2 here";
+    return `${participantCount} here`;
   };
 
   const handlePressIn = () => {
@@ -95,9 +106,10 @@ export default function RoomCard({
     <>
       {/* Category accent stripe */}
       <View
-        className="absolute left-0 top-3 bottom-3 w-[3px] rounded-r-full"
+        className="absolute left-0 top-3 bottom-3 w-[4px] rounded-r-full"
         style={{ backgroundColor: categoryColor }}
       />
+      
       {/* Category — colored per type */}
       <View className="flex-row justify-between items-center mb-3">
         <View className="flex-row items-center gap-2">
@@ -136,15 +148,17 @@ export default function RoomCard({
       </View>
 
       {/* Title */}
-      <Text className="text-secondary dark:text-gray-100 text-[19px] font-display font-extrabold tracking-tight mb-1.5 leading-6">
+      <Text className="text-secondary dark:text-gray-100 font-display font-extrabold tracking-tight mb-1.5 text-[20px] leading-7">
         {room.title}
       </Text>
 
       <View className="flex-row items-center mb-4">
         {getExpiryText() === "Expired" ? (
           <View className="w-1.5 h-1.5 rounded-full bg-red-400 mr-1.5" />
+        ) : isDying ? (
+          <View className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5" />
         ) : (
-          <View className="w-1.5 h-1.5 rounded-full bg-orange-500 mr-1.5" />
+          <View className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5" />
         )}
         <Text className="text-gray-400 text-xs font-semibold">
           {getExpiryText()}
@@ -166,7 +180,7 @@ export default function RoomCard({
       </View>
 
       {/* Footer */}
-      <View className="flex-row justify-between items-center pt-4 mt-1 border-t border-border-light dark:border-[#2A2A36]">
+      <View className="flex-row justify-between items-center pt-4 mt-1">
         <View className="flex-row items-center">
           <View className="flex-row -space-x-2 mr-3">
             {(room.participants || []).slice(0, 3).map((participantId, i) => (
@@ -177,22 +191,14 @@ export default function RoomCard({
                 index={i}
               />
             ))}
-            {(!room.participants || room.participants.length === 0) &&
-              [0, 1, 2].map((i) => (
-                <View
-                  key={i}
-                  className="w-7 h-7 rounded-full border-2 border-white dark:border-[#1A1A22] items-center justify-center"
-                  style={{ backgroundColor: AVATAR_COLORS[i] }}
-                >
-                  <Text className="text-white text-[9px] font-display font-black">
-                    {String.fromCharCode(65 + i)}
-                  </Text>
-                </View>
-              ))}
+            {participantCount === 0 && (
+              <View className="w-7 h-7 rounded-full border-2 border-dashed border-gray-200 dark:border-gray-600 items-center justify-center bg-gray-50 dark:bg-[#252528]">
+                <Ionicons name="person-add-outline" size={12} color="#9CA3AF" />
+              </View>
+            )}
           </View>
           <Text className="text-muted dark:text-gray-500 text-[13px] font-semibold">
-            🔥 {room.participantCount || room.participants?.length || 1}{" "}
-            chatting now
+            {getParticipantText()}
           </Text>
         </View>
         <View className="bg-primary px-5 py-2.5 rounded-full">
@@ -212,19 +218,24 @@ export default function RoomCard({
         className="mb-4"
       >
         {isDiscovery ? (
-          <GlassContainer
-            borderRadius={24}
-            fallbackClassName="bg-white dark:bg-[#1A1A22] border border-border-light dark:border-[#2A2A36]"
-            style={{ padding: 20 }}
+          <View
+            className="rounded-[20px] p-5 bg-white dark:bg-[#1C1C20] border border-border-light dark:border-[#2C2C30]"
+            style={{
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.04,
+              shadowRadius: 8,
+              elevation: 2,
+            }}
           >
             {cardContent}
-          </GlassContainer>
+          </View>
         ) : (
           <View
             className={`rounded-[24px] p-5 border overflow-hidden ${
               isOwner
-                ? "bg-primary-surface dark:bg-primary-surface border-primary/20"
-                : "bg-white dark:bg-[#1A1A22] border-border-light dark:border-[#2A2A36]"
+                ? "bg-primary-surface dark:bg-[#2C2320] border-primary/30"
+                : "bg-white dark:bg-[#1C1C20] border-border-light dark:border-[#2C2C30]"
             }`}
           >
             {cardContent}

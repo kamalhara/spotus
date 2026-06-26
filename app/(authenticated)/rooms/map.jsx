@@ -54,7 +54,7 @@ function EmptyRooms() {
           <Ionicons
             name="add-outline"
             size={20}
-            color={isDark ? "#818CF8" : "#4F46E5"}
+            color={isDark ? "#FFAB99" : "#FF6B47"}
           />
           <Text className="text-primary dark:text-primary-light font-bold text-lg">
             Create Room
@@ -84,7 +84,7 @@ function LocationPermissionDenied() {
         size="regular"
       >
         <View className="flex-row items-center justify-center gap-2 py-3 px-6">
-          <Ionicons name="settings-outline" size={18} color="#4F46E5" />
+          <Ionicons name="settings-outline" size={18} color="#FF6B47" />
           <Text className="text-primary dark:text-primary-light font-bold text-[15px]">
             Open Settings
           </Text>
@@ -110,7 +110,7 @@ const CATEGORY_COLORS = {
   Music: "#8B5CF6",
   Coffee: "#D97706",
   Art: "#EC4899",
-  Books: "#6366F1",
+  Books: "#FF8566",
   Tech: "#3B82F6",
   Food: "#EF4444",
   Fashion: "#F59E0B",
@@ -315,14 +315,14 @@ export default function MapViewScreen() {
 
   if (loading && !region && !locationError) {
     return (
-      <View className="flex-1 bg-bg dark:bg-[#0F0F13] items-center justify-center">
-        <ActivityIndicator size="large" color="#4F46E5" />
+      <View className="flex-1 bg-bg dark:bg-[#111113] items-center justify-center">
+        <ActivityIndicator size="large" color="#FF6B47" />
       </View>
     );
   }
 
   return (
-    <View className="flex-1 bg-bg dark:bg-[#0F0F13]">
+    <View className="flex-1 bg-bg dark:bg-[#111113]">
       {locationError ? (
         <LocationPermissionDenied />
       ) : rooms.length === 0 && !loading ? (
@@ -336,7 +336,7 @@ export default function MapViewScreen() {
             showsUserLocation={true}
             showsMyLocationButton={false}
             customMapStyle={isDark ? darkMapStyle : []}
-            clusterColor="#4F46E5"
+            clusterColor="#FF6B47"
             mapPadding={{ top: insets.top, bottom: 200, left: 0, right: 0 }}
           >
             {userLocation && (
@@ -348,14 +348,14 @@ export default function MapViewScreen() {
               >
                 <View className="items-center justify-center">
                   <View className="w-10 h-10 bg-primary/20 rounded-full items-center justify-center">
-                    <View className="w-5 h-5 bg-primary rounded-full border-[2.5px] border-white dark:border-[#1A1A22]" />
+                    <View className="w-5 h-5 bg-primary rounded-full border-[2.5px] border-white dark:border-[#1C1C20]" />
                   </View>
                 </View>
               </Marker>
             )}
 
             {rooms.map((room, index) => {
-              const categoryColor = CATEGORY_COLORS[room.category] || "#4F46E5";
+              const categoryColor = CATEGORY_COLORS[room.category] || "#FF6B47";
               const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
               const isSelected = selectedRoomId === room.id;
 
@@ -378,7 +378,7 @@ export default function MapViewScreen() {
                         backgroundColor: isSelected
                           ? categoryColor
                           : isDark
-                            ? "#1A1A22"
+                            ? "#1C1C20"
                             : "white",
                         paddingHorizontal: 12,
                         paddingVertical: 8,

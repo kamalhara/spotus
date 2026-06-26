@@ -62,7 +62,7 @@ export default function ReactionPicker({
  {/* Reaction Row */}
  <Animated.View
  entering={ZoomIn.duration(150)}
- className="flex-row bg-white/95 dark:bg-[#1A1A22]/95 border border-gray-100 dark:border-[#2A2A36] px-3 py-2 rounded-full items-center"
+ className="flex-row bg-white/95 dark:bg-[#1C1C20]/95 border border-gray-100 dark:border-[#2C2C30] px-3 py-2 rounded-full items-center"
  style={{ elevation: 10, shadowColor:"#000"}}
  >
  {REACTIONS.map((emoji) => (
@@ -86,7 +86,7 @@ export default function ReactionPicker({
  {/* Options Menu */}
  <Animated.View
  entering={ZoomIn.duration(150).delay(50)}
- className="bg-white/95 dark:bg-[#1A1A22]/95 border border-gray-100 dark:border-[#2A2A36] rounded-2xl mt-2 overflow-hidden"
+ className="bg-white/95 dark:bg-[#1C1C20]/95 border border-gray-100 dark:border-[#2C2C30] rounded-2xl mt-2 overflow-hidden"
  style={{ elevation: 10, shadowColor:"#000", minWidth: 160 }}
  >
  {message && !message.imageUrl && (
@@ -96,7 +96,7 @@ export default function ReactionPicker({
  onClose();
  }}
  activeOpacity={0.7}
- className="flex-row items-center px-4 py-3 border-b border-gray-50 dark:border-[#2A2A36]"
+ className="flex-row items-center px-4 py-3 border-b border-gray-50 dark:border-[#2C2C30]"
  >
  <Ionicons name="copy-outline"size={18} color="#9CA3AF"/>
  <Text className="text-[15px] font-semibold ml-3 text-gray-700 dark:text-gray-100">
@@ -112,7 +112,7 @@ export default function ReactionPicker({
  onClose();
  }}
  activeOpacity={0.7}
- className="flex-row items-center px-4 py-3 border-b border-gray-50 dark:border-[#2A2A36]"
+ className="flex-row items-center px-4 py-3 border-b border-gray-50 dark:border-[#2C2C30]"
  >
  <Ionicons name="pencil-outline"size={18} color="#2563EB"/>
  <Text className="text-[15px] font-semibold ml-3 text-gray-700 dark:text-gray-100">
@@ -128,7 +128,7 @@ export default function ReactionPicker({
  onClose();
  }}
  activeOpacity={0.7}
- className="flex-row items-center px-4 py-3 border-b border-gray-50 dark:border-[#2A2A36]"
+ className="flex-row items-center px-4 py-3 border-b border-gray-50 dark:border-[#2C2C30]"
  >
  <Ionicons name="arrow-undo-outline"size={18} color="#EF4444"/>
  <Text className="text-[15px] font-semibold ml-3 text-red-500">
@@ -167,7 +167,7 @@ export default function ReactionPicker({
  });
  }}
  activeOpacity={0.7}
- className="flex-row items-center px-4 py-3 border-t border-gray-50 dark:border-[#2A2A36]"
+ className="flex-row items-center px-4 py-3 border-t border-gray-50 dark:border-[#2C2C30]"
  >
  <Ionicons name="warning-outline"size={18} color="#EF4444"/>
  <Text className="text-[15px] font-semibold ml-3 text-red-500">
@@ -183,7 +183,7 @@ export default function ReactionPicker({
  onClose();
  }}
  activeOpacity={0.7}
- className="flex-row items-center px-4 py-3 border-t border-gray-50 dark:border-[#2A2A36]"
+ className="flex-row items-center px-4 py-3 border-t border-gray-50 dark:border-[#2C2C30]"
  >
  <Ionicons name="pin-outline" size={18} color="#3B82F6"/>
  <Text className="text-[15px] font-semibold ml-3 text-blue-500">

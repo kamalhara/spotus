@@ -160,7 +160,7 @@ export default function RoomInfo() {
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13] px-5">
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113] px-5">
       <View className="flex-row justify-between items-center py-4">
         <GlassButton onPress={() => router.back()} size={40} shape="circle">
           <Ionicons
@@ -215,13 +215,13 @@ export default function RoomInfo() {
                       ? "rgba(79, 70, 229, 0.15)"
                       : "rgba(79, 70, 229, 0.08)",
                   }}
-                  fallbackClassName="bg-indigo-50 dark:bg-[#23232E]"
+                  fallbackClassName="bg-indigo-50 dark:bg-[#242428]"
                 >
                   <View className="px-3.5 py-2 flex-row items-center">
                     <Ionicons
                       name={categoryIcon}
                       size={12}
-                      color={`#4F46E5`}
+                      color={`#FF6B47`}
                       style={{ marginRight: 6 }}
                     />
                     <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
@@ -237,10 +237,10 @@ export default function RoomInfo() {
                       ? "rgba(79, 70, 229, 0.15)"
                       : "rgba(79, 70, 229, 0.08)",
                   }}
-                  fallbackClassName="bg-indigo-50 dark:bg-[#23232E]"
+                  fallbackClassName="bg-indigo-50 dark:bg-[#242428]"
                 >
                   <View className="flex-row items-center px-3.5 py-2">
-                    <Ionicons name="location-sharp" size={12} color="#4F46E5" />
+                    <Ionicons name="location-sharp" size={12} color="#FF6B47" />
                     <Text className="text-primary font-display font-black text-[10px] ml-1">
                       {room?.location || "0.4km away"}
                     </Text>
@@ -279,7 +279,7 @@ export default function RoomInfo() {
                     <TouchableOpacity
                        onPress={handleCopyCode}
                        activeOpacity={0.7}
-                       className="bg-white dark:bg-[#1A1A22] border border-purple-100 dark:border-purple-800/50 px-4 py-2.5 rounded-xl flex-row items-center mr-3"
+                       className="bg-white dark:bg-[#1C1C20] border border-purple-100 dark:border-purple-800/50 px-4 py-2.5 rounded-xl flex-row items-center mr-3"
                     >
                       <Text className="text-purple-700 dark:text-purple-300 font-display font-black tracking-[3px] text-[17px] mr-2">
                         {copied ? "COPIED" : room?.inviteCode}
@@ -324,7 +324,7 @@ export default function RoomInfo() {
                       ? "rgba(255, 255, 255, 0.05)"
                       : "rgba(0, 0, 0, 0.03)",
                   }}
-                  fallbackClassName="bg-gray-100 dark:bg-[#23232E]"
+                  fallbackClassName="bg-gray-100 dark:bg-[#242428]"
                 >
                   <View className="px-3.5 py-1.5">
                     <Text className="text-muted font-display font-black text-[10px] uppercase tracking-[1.5px]">
@@ -342,7 +342,7 @@ export default function RoomInfo() {
                         activeOpacity={0.7}
                         onPress={() => handleProfilePress(member.id)}
                         key={member.id}
-                        className="flex-row items-center justify-between bg-white dark:bg-[#23232E] p-3.5 rounded-2xl border border-gray-50 dark:border-[#2A2A36]"
+                        className="flex-row items-center justify-between bg-white dark:bg-[#242428] p-3.5 rounded-2xl border border-gray-50 dark:border-[#2C2C30]"
                         style={{
                           shadowColor: "#94A3B8",
                           shadowOffset: { width: 0, height: 1 },
@@ -405,7 +405,7 @@ export default function RoomInfo() {
                     {hasMoreMembers && (
                       <TouchableOpacity
                         onPress={() => setIsMembersExpanded(!isMembersExpanded)}
-                        className="flex-row items-center justify-center py-3 mt-2 bg-white dark:bg-[#23232E] rounded-2xl border border-gray-50 dark:border-[#2A2A36]"
+                        className="flex-row items-center justify-center py-3 mt-2 bg-white dark:bg-[#242428] rounded-2xl border border-gray-50 dark:border-[#2C2C30]"
                         style={{
                           shadowColor: "#94A3B8",
                           shadowOffset: { width: 0, height: 1 },
@@ -424,14 +424,14 @@ export default function RoomInfo() {
                             isMembersExpanded ? "chevron-up" : "chevron-down"
                           }
                           size={16}
-                          color="#4F46E5"
+                          color="#FF6B47"
                         />
                       </TouchableOpacity>
                     )}
                   </>
                 ) : (
                   <View className="py-8 items-center">
-                    <View className="w-14 h-14 bg-surface-alt dark:bg-[#23232E] rounded-2xl items-center justify-center mb-3">
+                    <View className="w-14 h-14 bg-surface-alt dark:bg-[#242428] rounded-2xl items-center justify-center mb-3">
                       <Ionicons
                         name="people-outline"
                         size={24}
@@ -449,13 +449,13 @@ export default function RoomInfo() {
         )}
 
         {/* Room Rules Section */}
-        <View className="bg-bg dark:bg-[#0F0F13] my-10 px-4">
+        <View className="bg-bg dark:bg-[#111113] my-10 px-4">
           <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight mb-4">
             Room Rules
           </Text>
 
           <View
-            className="bg-white dark:bg-[#1A1A22] rounded-3xl p-5 border border-gray-100 dark:border-[#2A2A36]"
+            className="bg-white dark:bg-[#1C1C20] rounded-3xl p-5 border border-gray-100 dark:border-[#2C2C30]"
             style={{
               shadowColor: "#94A3B8",
               shadowOffset: { width: 0, height: 4 },
@@ -467,7 +467,7 @@ export default function RoomInfo() {
             {roomRules.map((rule, index) => (
               <View
                 key={rule.title}
-                className={`flex flex-row items-start ${index !== roomRules.length - 1 ? "mb-5 pb-5 border-b border-gray-50 dark:border-[#2A2A36]" : ""}`}
+                className={`flex flex-row items-start ${index !== roomRules.length - 1 ? "mb-5 pb-5 border-b border-gray-50 dark:border-[#2C2C30]" : ""}`}
               >
                 <View className="w-10 h-10 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center mr-4">
                   <Ionicons name={rule.icon} size={20} color="#4B5563" />

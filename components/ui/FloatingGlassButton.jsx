@@ -45,14 +45,11 @@ const TAB_CONFIGS = {
   rooms_tab: {
     icon: "add",
     iconSize: 22,
-    tintColor: "#4F46E5",
+    tintColor: "#FF6B47",
     getAction: (router) => () => router.push("/rooms/create-rooms"),
   },
   chat_tab: {
-    icon: "create-outline",
-    iconSize: 20,
-    tintColor: null,
-    getAction: (router) => () => {}, // compose — no-op for now
+    hidden: true,
   },
   profile: {
     icon: "settings-outline",
@@ -80,12 +77,15 @@ export default function FloatingGlassButton({ activeTab, override }) {
 
   // Resolve the current config (override takes priority)
   const tabConfig = TAB_CONFIGS[activeTab] || TAB_CONFIGS.home;
+  if (tabConfig.hidden && !override) {
+    return null;
+  }
   const icon = override?.icon ?? tabConfig.icon;
   const iconSize = override?.iconSize ?? tabConfig.iconSize;
   const tintColor = override?.tintColor ?? tabConfig.tintColor;
   const iconColor =
     override?.iconColor ??
-    (tintColor ? "white" : isDark ? "#F8FAFC" : "#18181B");
+    (tintColor ? "white" : isDark ? "#F5F5F5" : "#18181B");
   const onPress = override?.onPress ?? tabConfig.getAction(router);
 
   // Track the previous icon for animation trigger
@@ -104,7 +104,7 @@ export default function FloatingGlassButton({ activeTab, override }) {
     interpolateColor(
       tintProgress.value,
       [0, 1],
-      ["transparent", tintColor || "#4F46E5"],
+      ["transparent", tintColor || "#FF6B47"],
     ),
   );
 
@@ -199,20 +199,25 @@ export default function FloatingGlassButton({ activeTab, override }) {
   return (
     <View style={positionStyle}>
       <TouchableOpacity onPress={handlePress} activeOpacity={0.75}>
-        <GlassView
-          style={{
-            width: BUTTON_SIZE,
-            height: BUTTON_SIZE,
-            borderRadius,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-          glassEffectStyle="regular"
-          isInteractive
-          tintColor={resolvedTint !== "transparent" ? resolvedTint : undefined}
+        <View
+          style={[
+            {
+              width: BUTTON_SIZE,
+              height: BUTTON_SIZE,
+              borderRadius,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: isDark
+                ? "rgba(28, 28, 32, 0.95)"
+                : "rgba(255, 255, 255, 0.95)",
+              borderWidth: 1,
+              borderColor: isDark ? "#2C2C30" : "#E8E6E1",
+            },
+            styles.fallbackShadow,
+          ]}
         >
           {iconContent}
-        </GlassView>
+        </View>
       </TouchableOpacity>
     </View>
   );

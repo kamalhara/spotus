@@ -72,7 +72,7 @@ export default function GlassButton({
 
   const fallbackClassName =
     className ||
-    `items-center justify-center bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]`;
+    `items-center justify-center bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]`;
 
   if (hasGlass) {
     return (

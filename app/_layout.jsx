@@ -43,7 +43,7 @@ function UserSync() {
 
 function ThemedApp() {
   return (
-    <View style={{ flex: 1 }} className="bg-bg dark:bg-[#0F0F13]">
+    <View style={{ flex: 1 }} className="bg-bg dark:bg-[#111113]">
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
           <ClerkLoaded>

@@ -153,11 +153,11 @@ function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
           </View>
 
           {/* Divider */}
-          <View className="h-px bg-gray-100 dark:bg-[#2A2A36] mx-5 mb-2" />
+          <View className="h-px bg-gray-100 dark:bg-[#2C2C30] mx-5 mb-2" />
 
           {loading ? (
             <View className="py-16 items-center">
-              <ActivityIndicator size="large" color="#4F46E5" />
+              <ActivityIndicator size="large" color="#FF6B47" />
               <Text className="text-gray-400 dark:text-gray-500 text-sm font-medium mt-4">
                 Loading…
               </Text>
@@ -210,7 +210,7 @@ function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
                       width: 44,
                       height: 44,
                       borderRadius: 22,
-                      backgroundColor: isDark ? "#2A2A36" : "#F3F4F6",
+                      backgroundColor: isDark ? "#2C2C30" : "#F3F4F6",
                     }}
                   >
                     <Image

@@ -19,7 +19,7 @@ const SECTIONS = [
 
 export default function PrivacyPolicy() {
  return (
- <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]"edges={["top"]}>
+ <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]"edges={["top"]}>
  <ScreenHeader title="Privacy Policy"subtitle="Privacy details"/>
 
  <ScrollView
@@ -29,7 +29,7 @@ export default function PrivacyPolicy() {
  {SECTIONS.map((section) => (
  <View
  key={section.title}
- className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-5 mb-3"
+ className="bg-white dark:bg-[#1C1C20] rounded-2xl border border-gray-100 dark:border-[#2C2C30] p-5 mb-3"
  >
  <Text className="text-secondary dark:text-gray-100 text-base font-display font-extrabold">
  {section.title}

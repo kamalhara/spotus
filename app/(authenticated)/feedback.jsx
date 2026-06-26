@@ -76,13 +76,13 @@ export default function FeedbackScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
         {/* Header */}
-        <View className="flex-row items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-[#2A2A36]">
+        <View className="flex-row items-center justify-between px-5 py-3 border-b border-gray-100 dark:border-[#2C2C30]">
           <GlassButton onPress={() => router.back()} size={40} shape="circle">
             <Ionicons
               name="chevron-back"
@@ -107,7 +107,7 @@ export default function FeedbackScreen() {
           {/* Info banner */}
           <View className="bg-primary/5 dark:bg-primary/10 rounded-2xl p-4 mb-6 flex-row items-start">
             <View className="w-9 h-9 bg-primary/10 rounded-xl items-center justify-center mr-3">
-              <Ionicons name="shield-checkmark" size={18} color="#4F46E5" />
+              <Ionicons name="shield-checkmark" size={18} color="#FF6B47" />
             </View>
             <View className="flex-1">
               <Text className="text-secondary dark:text-gray-100 text-sm font-bold mb-1">
@@ -139,7 +139,7 @@ export default function FeedbackScreen() {
                   className={`flex-row items-center p-4 rounded-2xl mb-2 border ${
                     isSelected
                       ? "bg-primary/5 dark:bg-primary/10 border-primary/20"
-                      : "bg-white dark:bg-[#1A1A22] border-gray-100 dark:border-[#2A2A36]"
+                      : "bg-white dark:bg-[#1C1C20] border-gray-100 dark:border-[#2C2C30]"
                   }`}
                 >
                   <View
@@ -153,7 +153,7 @@ export default function FeedbackScreen() {
                     <Ionicons
                       name={cat.icon}
                       size={18}
-                      color={isSelected ? "#4F46E5" : "#9CA3AF"}
+                      color={isSelected ? "#FF6B47" : "#9CA3AF"}
                     />
                   </View>
                   <Text
@@ -179,7 +179,7 @@ export default function FeedbackScreen() {
           <Text className="text-secondary dark:text-gray-100 text-base font-display font-extrabold mb-3 tracking-tight">
             Additional details (optional)
           </Text>
-          <View className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] p-4 mb-8">
+          <View className="bg-white dark:bg-[#1C1C20] rounded-2xl border border-gray-100 dark:border-[#2C2C30] p-4 mb-8">
             <TextInput
               placeholder="Describe what happened..."
               placeholderTextColor="#9CA3AF"
@@ -203,7 +203,7 @@ export default function FeedbackScreen() {
             style={
               selectedCategory
                 ? {
-                    shadowColor: "#4F46E5",
+                    shadowColor: "#FF6B47",
                     shadowOffset: { width: 0, height: 4 },
                     shadowOpacity: 0.2,
                     shadowRadius: 8,

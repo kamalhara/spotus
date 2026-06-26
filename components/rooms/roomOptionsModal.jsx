@@ -92,7 +92,7 @@ export default function RoomOptionsModal({
           <Pressable>
             <GlassContainer
               borderRadius={24}
-              fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+              fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
             >
               {OPTIONS.map((option, index) => (
                 <TouchableOpacity
@@ -131,7 +131,7 @@ export default function RoomOptionsModal({
 
             <GlassContainer
               borderRadius={24}
-              fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+              fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
               style={{ marginTop: 12 }}
             >
               <TouchableOpacity

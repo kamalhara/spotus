@@ -51,7 +51,7 @@ export default function Welcome() {
   }
 
   return (
-    <View className="bg-bg dark:bg-[#0F0F13] flex-1">
+    <View className="bg-bg dark:bg-[#111113] flex-1">
       <SafeAreaView className="flex-1 justify-between">
         {/* Brand */}
         <View className="mt-6 px-8">
@@ -71,7 +71,7 @@ export default function Welcome() {
             transform: [{ scale: scaleHero }],
           }}
         >
-          <View className="w-72 h-72 items-center justify-center bg-gray-50 dark:bg-[#1A1A22] rounded-[36px] border border-gray-100 dark:border-[#2A2A36]">
+          <View className="w-72 h-72 items-center justify-center bg-primary-surface dark:bg-[#1C1C20] rounded-[36px] border border-border-light dark:border-[#2C2C30]">
             <Image
               source={require("../assets/images/trans.png")}
               className="w-full h-full"
@@ -87,19 +87,17 @@ export default function Welcome() {
             transform: [{ translateY: slideUpContent }],
           }}
         >
-          <View className="bg-surface-alt dark:bg-[#1A1A22] px-8 pt-10 pb-14 rounded-t-[36px]">
+          <View className="bg-surface-alt dark:bg-[#1C1C20] px-8 pt-10 pb-14 rounded-t-[36px]">
             <Text className="text-secondary dark:text-gray-100 text-[36px] font-display leading-[42px] tracking-tight">
-              Find People {"\n"}
-              <Text className="text-primary">Nearby</Text>
+              See what&apos;s{"\n"}happening <Text className="text-primary">around you</Text>
             </Text>
-            <Text className="text-gray-400 dark:text-gray-500 text-[15px] mt-3 leading-6 mb-8">
-              Join local rooms, chat, and connect with people around you in real
-              time.
+            <Text className="text-muted text-[15px] mt-3 leading-6 mb-8">
+              Real conversations about real things, with real people nearby.
             </Text>
 
             <View className="gap-4">
               <CustomButton
-                title="Get Started"
+                title="Jump in"
                 onPress={() => router.push("/(auth)/signup")}
               />
 

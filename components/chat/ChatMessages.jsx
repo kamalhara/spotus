@@ -21,7 +21,7 @@ import ReactionPicker from "./ReactionPicker";
 import TypingIndicator from "./TypingIndicator";
 
 const COLORS = [
-  "#4F46E5",
+  "#FF6B47",
   "#EC4899",
   "#10B981",
   "#F59E0B",
@@ -93,6 +93,8 @@ export default function ChatMessages({
 }) {
   const flatListRef = useRef(null);
   const router = useRouter();
+  const isNearBottomRef = useRef(true);
+  const prevMessageCountRef = useRef(messages?.length ?? 0);
   const [reactionPicker, setReactionPicker] = useState(null);
   const [viewerImage, setViewerImage] = useState(null);
   const swipeableRefs = useRef({});
@@ -133,14 +135,19 @@ export default function ChatMessages({
     }
   };
 
-  // Auto-scroll to the bottom of the list when new messages or typing indicators appear
+  const scrollToEndIfNearBottom = useCallback((animated = true) => {
+    if (!isNearBottomRef.current) return;
+    flatListRef.current?.scrollToEnd({ animated });
+  }, []);
+
+  // Auto-scroll only when new messages arrive and user is already near the bottom
   useEffect(() => {
-    if (!messages?.length) return;
-    const timer = setTimeout(() => {
-      flatListRef.current?.scrollToEnd({ animated: true });
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [messages?.length, isTyping]);
+    const count = messages?.length ?? 0;
+    if (count > prevMessageCountRef.current) {
+      scrollToEndIfNearBottom(true);
+    }
+    prevMessageCountRef.current = count;
+  }, [messages?.length, scrollToEndIfNearBottom]);
 
   const renderLeftActions = useCallback((progress, dragX) => {
     const scale = dragX.interpolate({
@@ -174,7 +181,7 @@ export default function ChatMessages({
             justifyContent: "center",
           }}
         >
-          <Ionicons name="arrow-undo" size={18} color="#4F46E5" />
+          <Ionicons name="arrow-undo" size={18} color="#FF6B47" />
         </View>
       </Animated.View>
     );
@@ -183,8 +190,8 @@ export default function ChatMessages({
   if (!messages || messages.length === 0) {
     return (
       <View className="flex-1 items-center justify-center px-10">
-        <View className="w-16 h-16 bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl items-center justify-center mb-4">
-          <Ionicons name="chatbubble-outline" size={28} color="#4F46E5" />
+        <View className="w-16 h-16 bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl items-center justify-center mb-4">
+          <Ionicons name="chatbubble-outline" size={28} color="#FF6B47" />
         </View>
         <Text className="text-secondary dark:text-gray-100 text-base font-bold mt-1">
           No messages yet
@@ -211,7 +218,7 @@ export default function ChatMessages({
 
     return (
       <View
-        className={`flex-row items-center bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-full px-2 py-0.5 h-7 ${isSentByMe ? "mr-1" : "ml-1"}`}
+        className={`flex-row items-center bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-full px-2 py-0.5 h-7 ${isSentByMe ? "mr-1" : "ml-1"}`}
         style={{
           zIndex: 20,
           marginTop: -8,
@@ -231,6 +238,14 @@ export default function ChatMessages({
   };
 
   const isDirectMessage = collectionName === "chats";
+
+  const isEmojiOnly = (text) => {
+    if (!text) return false;
+    const noSpaces = text.replace(/\s+/g, '');
+    if (noSpaces.length === 0 || noSpaces.length > 6) return false;
+    const emojiRegex = /^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F1E6}-\u{1F1FF}\u{1F900}-\u{1F9FF}\u{1F018}-\u{1F270}\u{238C}-\u{2454}\u{20D0}-\u{20FF}]+$/u;
+    return emojiRegex.test(noSpaces);
+  };
 
   const renderMessage = ({ item, index }) => {
     const isSentByMe = item.senderId === currentUserId;
@@ -255,13 +270,13 @@ export default function ChatMessages({
       <View className="w-full">
         {showDateSeparator && (
           <View className="items-center my-5 flex-row justify-center px-10">
-            <View className="h-[1px] bg-gray-100 dark:bg-[#2A2A36] flex-1" />
-            <View className="bg-surface-alt dark:bg-[#23232E] border border-gray-100 dark:border-[#2A2A36] px-3 py-1 rounded-full mx-3">
+            <View className="h-[1px] bg-gray-100 dark:bg-[#2C2C30] flex-1" />
+            <View className="bg-surface-alt dark:bg-[#242428] border border-gray-100 dark:border-[#2C2C30] px-3 py-1 rounded-full mx-3">
               <Text className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                 {formatSeparatorDate(item.createdAt)}
               </Text>
             </View>
-            <View className="h-[1px] bg-gray-100 dark:bg-[#2A2A36] flex-1" />
+            <View className="h-[1px] bg-gray-100 dark:bg-[#2C2C30] flex-1" />
           </View>
         )}
         <View
@@ -283,11 +298,11 @@ export default function ChatMessages({
                   {item.profilePic ? (
                     <Image
                       source={{ uri: item.profilePic }}
-                      className="w-9 h-9 rounded-full border border-gray-100 dark:border-gray-800"
+                      className="w-9 h-9 rounded-xl border border-gray-100 dark:border-gray-800"
                     />
                   ) : (
                     <View
-                      className="w-9 h-9 rounded-full items-center justify-center"
+                      className="w-9 h-9 rounded-xl items-center justify-center"
                       style={{
                         backgroundColor: getUserColor(item.user),
                       }}
@@ -338,7 +353,7 @@ export default function ChatMessages({
                     ? item.imageUrl
                       ? "rounded-2xl rounded-br-md overflow-hidden"
                       : "bg-primary rounded-2xl rounded-br-md"
-                    : "bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36] rounded-2xl rounded-bl-sm"
+                    : "bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl rounded-bl-sm"
                 }`}
                 style={
                   !isSentByMe
@@ -361,7 +376,7 @@ export default function ChatMessages({
                       borderLeftWidth: 3,
                       borderLeftColor: isSentByMe
                         ? "rgba(255,255,255,0.4)"
-                        : "#4F46E5",
+                        : "#FF6B47",
                       backgroundColor: isSentByMe
                         ? "rgba(255,255,255,0.12)"
                         : "#F5F3FF",
@@ -377,7 +392,7 @@ export default function ChatMessages({
                       style={{
                         fontSize: 10,
                         fontWeight: "700",
-                        color: isSentByMe ? "rgba(255,255,255,0.7)" : "#4F46E5",
+                        color: isSentByMe ? "rgba(255,255,255,0.7)" : "#FF6B47",
                         marginBottom: 2,
                       }}
                     >
@@ -418,6 +433,10 @@ export default function ChatMessages({
                       }`}
                     />
                   </TouchableOpacity>
+                ) : isEmojiOnly(item.text) ? (
+                  <Text style={{ fontSize: 48, lineHeight: 56 }}>
+                    {item.text}
+                  </Text>
                 ) : (
                   <Text
                     className={`text-[15px] leading-[21px] ${isSentByMe ? "text-white" : "text-secondary dark:text-gray-100"}`}
@@ -430,7 +449,9 @@ export default function ChatMessages({
                   className={`${
                     item.imageUrl
                       ? "absolute bottom-2 right-2 bg-black/30 px-2 py-0.5 rounded-full border border-white/10"
-                      : "absolute bottom-1.5 right-2.5"
+                      : isEmojiOnly(item.text)
+                        ? "absolute -bottom-3 right-0 bg-white/80 dark:bg-black/80 px-1.5 py-0.5 rounded-full"
+                        : "absolute bottom-1.5 right-2.5"
                   } flex-row items-center`}
                 >
                   <Text
@@ -507,17 +528,19 @@ export default function ChatMessages({
           });
         }}
         contentContainerClassName="py-4 px-1"
+        onScroll={(e) => {
+          const { contentOffset, contentSize, layoutMeasurement } =
+            e.nativeEvent;
+          const distanceFromBottom =
+            contentSize.height - layoutMeasurement.height - contentOffset.y;
+          isNearBottomRef.current = distanceFromBottom < 120;
+        }}
+        scrollEventThrottle={16}
         onContentSizeChange={() => {
-          setTimeout(
-            () => flatListRef.current?.scrollToEnd({ animated: true }),
-            100,
-          );
+          scrollToEndIfNearBottom(true);
         }}
         onLayout={() => {
-          setTimeout(
-            () => flatListRef.current?.scrollToEnd({ animated: true }),
-            100,
-          );
+          scrollToEndIfNearBottom(false);
         }}
         ListFooterComponent={
           <View>
@@ -531,8 +554,8 @@ export default function ChatMessages({
                         className="w-56 h-56 opacity-50"
                       />
                       <View className="absolute inset-0 items-center justify-center bg-black/10">
-                        <View className="bg-white/90 dark:bg-[#1A1A22]/90 p-3 rounded-2xl items-center">
-                          <ActivityIndicator color="#4F46E5" size="small" />
+                        <View className="bg-white/90 dark:bg-[#1C1C20]/90 p-3 rounded-2xl items-center">
+                          <ActivityIndicator color="#FF6B47" size="small" />
                           <Text className="text-[10px] font-bold text-primary mt-2 tracking-widest">
                             SENDING...
                           </Text>

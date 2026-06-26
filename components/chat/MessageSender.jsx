@@ -1,16 +1,23 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
+  Animated,
+  Image,
+  Keyboard,
+  Platform,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GlassContainer from "../../components/ui/GlassContainer";
 import { setTyping } from "../../lib/chatTyping";
 
@@ -20,7 +27,7 @@ const MEDIA_OPTIONS = [
     icon: "camera",
     label: "Camera",
     bgColor: "#EEF2FF",
-    iconColor: "#4F46E5",
+    iconColor: "#FF6B47",
   },
   {
     key: "photo",
@@ -43,15 +50,20 @@ export default function MessageSender({
   handleEditMessage,
 }) {
   const [message, setMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
   const [showMediaMenu, setShowMediaMenu] = useState(false);
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
   const isActive = message.trim().length > 0;
+  const canSend = isActive;
 
   const typingTimeout = useRef(null);
   const isTypingLocal = useRef(false);
   const inputRef = useRef(null);
+  const insets = useSafeAreaInsets();
+  
+  const sendScale = useRef(new Animated.Value(1)).current;
 
   // Auto-focus input when replying or editing
   useEffect(() => {
@@ -90,15 +102,22 @@ export default function MessageSender({
   };
 
   const onSend = () => {
-    if (!isActive) return;
+    if (!canSend) return;
+
+    // Trigger elastic bounce and heavy haptic on send
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+    Animated.sequence([
+      Animated.timing(sendScale, { toValue: 1.2, duration: 50, useNativeDriver: true }),
+      Animated.spring(sendScale, { toValue: 1, friction: 3, tension: 40, useNativeDriver: true })
+    ]).start();
+
+    setIsSending(true);
 
     if (typingTimeout.current) {
       clearTimeout(typingTimeout.current);
     }
     isTypingLocal.current = false;
     setTyping(chatId, currentUserId, false);
-
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     if (editingMessage && handleEditMessage) {
       handleEditMessage(editingMessage.id, message);
@@ -109,6 +128,7 @@ export default function MessageSender({
 
     setMessage("");
     onCancelReply?.();
+    setIsSending(false);
   };
 
   const handleCancelEdit = () => {
@@ -175,7 +195,7 @@ export default function MessageSender({
   };
 
   return (
-    <View>
+    <View style={{ paddingBottom: insets.bottom }}>
       {/* Backdrop overlay to dismiss the menu */}
       {showMediaMenu && (
         <Pressable
@@ -189,7 +209,7 @@ export default function MessageSender({
         <View className="absolute bottom-[60px] left-0 right-0 z-10">
           <GlassContainer
             borderRadius={16}
-            fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+            fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
             style={{
               padding: 12,
               marginHorizontal: 4,
@@ -206,7 +226,7 @@ export default function MessageSender({
                   key={option.key}
                   onPress={() => handleMediaOption(option.key)}
                   activeOpacity={0.7}
-                  className="flex-1 flex-row items-center bg-gray-50 dark:bg-[#23232E] rounded-2xl p-3 border border-gray-100 dark:border-[#2A2A36]"
+                  className="flex-1 flex-row items-center bg-gray-50 dark:bg-[#242428] rounded-2xl p-3 border border-gray-100 dark:border-[#2C2C30]"
                 >
                   <View
                     className="w-10 h-10 rounded-xl items-center justify-center mr-3"
@@ -233,7 +253,7 @@ export default function MessageSender({
         <View className="mb-2">
           <GlassContainer
             borderRadius={16}
-            fallbackClassName="bg-white dark:bg-[#1A1A22] border border-gray-100 dark:border-[#2A2A36]"
+            fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
             style={{
               paddingHorizontal: 16,
               paddingVertical: 12,
@@ -242,7 +262,7 @@ export default function MessageSender({
             }}
           >
             <View className="w-8 h-8 rounded-xl bg-primary/10 items-center justify-center mr-3">
-              <Ionicons name="create-outline" size={15} color="#4F46E5" />
+              <Ionicons name="create-outline" size={15} color="#FF6B47" />
             </View>
             <View className="flex-1">
               <Text className="text-primary text-xs font-bold">
@@ -258,7 +278,7 @@ export default function MessageSender({
             <TouchableOpacity
               onPress={handleCancelEdit}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              className="w-8 h-8 rounded-xl bg-surface-alt dark:bg-[#23232E] items-center justify-center"
+              className="w-8 h-8 rounded-xl bg-surface-alt dark:bg-[#242428] items-center justify-center"
             >
               <Ionicons name="close" size={16} color="#94A3B8" />
             </TouchableOpacity>
@@ -271,18 +291,18 @@ export default function MessageSender({
         <View className="mb-2">
           <GlassContainer
             borderRadius={16}
-            fallbackClassName="bg-white dark:bg-[#1A1A22] border-l-4 border-l-primary border-y border-r border-border-light dark:border-y-[#2A2A36] dark:border-r-[#2A2A36]"
+            fallbackClassName="bg-white dark:bg-[#1C1C20] border-l-4 border-l-primary border-y border-r border-border-light dark:border-y-[#2C2C30] dark:border-r-[#2C2C30]"
             style={{
               paddingHorizontal: 16,
               paddingVertical: 12,
               flexDirection: "row",
               alignItems: "center",
               borderLeftWidth: 4,
-              borderLeftColor: "#4F46E5",
+              borderLeftColor: "#FF6B47",
             }}
           >
             <View className="mr-2">
-              <Ionicons name="arrow-undo" size={16} color="#4F46E5" />
+              <Ionicons name="arrow-undo" size={16} color="#FF6B47" />
             </View>
             <View style={{ flex: 1 }}>
               <Text className="text-[11px] font-bold text-primary mb-0.5">
@@ -298,7 +318,7 @@ export default function MessageSender({
             <TouchableOpacity
               onPress={onCancelReply}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              className="w-7 h-7 rounded-full bg-surface-alt dark:bg-[#23232E] items-center justify-center"
+              className="w-7 h-7 rounded-full bg-surface-alt dark:bg-[#242428] items-center justify-center"
             >
               <Ionicons name="close" size={16} color="#94A3B8" />
             </TouchableOpacity>
@@ -309,7 +329,7 @@ export default function MessageSender({
       {/* Input Bar */}
       <GlassContainer
         borderRadius={30}
-        fallbackClassName="bg-white dark:bg-[#1A1A22] border border-border dark:border-[#2A2A36]"
+        fallbackClassName="bg-white dark:bg-[#1C1C20] border border-border dark:border-[#2C2C30]"
         style={{
           padding: 6,
           flexDirection: "row",
@@ -318,7 +338,7 @@ export default function MessageSender({
         }}
       >
         <TouchableOpacity
-          className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-alt dark:bg-[#23232E] ml-0.5"
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-alt dark:bg-[#242428] ml-0.5"
           onPress={toggleMediaMenu}
         >
           <Ionicons
@@ -343,17 +363,29 @@ export default function MessageSender({
           underlineColorAndroid="transparent"
         />
 
-        <TouchableOpacity
-          disabled={!isActive}
-          onPress={onSend}
-          className={`w-[42px] h-[42px] rounded-full items-center justify-center mr-0.5 ${isActive ? "bg-primary" : "bg-surface-alt dark:bg-[#23232E]"}`}
-        >
-          <Ionicons
-            name="send"
-            size={17}
-            color={isActive ? "white" : "#CBD5E1"}
-          />
-        </TouchableOpacity>
+        {/* Send Button */}
+        <Animated.View style={{ transform: [{ scale: sendScale }] }}>
+          <TouchableOpacity
+            disabled={!canSend || isSending}
+            onPress={onSend}
+            activeOpacity={0.7}
+            className={`w-[42px] h-[42px] rounded-full items-center justify-center mr-0.5 ${isActive ? "bg-primary" : "bg-surface-alt dark:bg-[#242428]"}`}
+          >
+            {isSending ? (
+              <ActivityIndicator
+                size="small"
+                color={isActive ? "white" : "#94A3B8"}
+              />
+            ) : (
+              <Ionicons
+                name="send"
+                size={18}
+                color={isActive ? "white" : "#94A3B8"}
+                style={{ marginLeft: 2 }}
+              />
+            )}
+          </TouchableOpacity>
+        </Animated.View>
       </GlassContainer>
     </View>
   );

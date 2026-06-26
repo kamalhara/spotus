@@ -16,13 +16,13 @@ export default function PrivacyData() {
     <Switch
       value={value}
       onValueChange={onValueChange}
-      trackColor={{ false: isDark ? "#23232E" : "#E5E7EB", true: "#4F46E5" }}
+      trackColor={{ false: isDark ? "#242428" : "#E5E7EB", true: "#FF6B47" }}
       thumbColor="#FFFFFF"
     />
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#0F0F13]" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
       <ScreenHeader title="Privacy & Data" subtitle="Visibility and exports" />
 
       <ScrollView
@@ -72,7 +72,7 @@ export default function PrivacyData() {
 
         <TouchableOpacity
           activeOpacity={0.75}
-          className="bg-white dark:bg-[#1A1A22] rounded-2xl border border-gray-100 dark:border-[#2A2A36] mt-4 px-5 py-4"
+          className="bg-white dark:bg-[#1C1C20] rounded-2xl border border-gray-100 dark:border-[#2C2C30] mt-4 px-5 py-4"
         >
           <Text className="text-primary dark:text-primary-light text-sm font-bold">
             Review privacy policy

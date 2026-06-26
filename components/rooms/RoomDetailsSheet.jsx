@@ -85,7 +85,7 @@ const RoomDetailsSheet = forwardRef(
         }}
         backgroundStyle={{
           borderRadius: 32,
-          backgroundColor: isDark ? "#1A1A22" : "#FFFFFF",
+          backgroundColor: isDark ? "#1C1C20" : "#FFFFFF",
         }}
         enableDynamicSizing={false}
       >
@@ -108,13 +108,13 @@ const RoomDetailsSheet = forwardRef(
                   marginBottom: 16,
                   alignSelf: "flex-start",
                 }}
-                fallbackClassName="bg-indigo-50 dark:bg-[#23232E]"
+                fallbackClassName="bg-indigo-50 dark:bg-[#242428]"
               >
                 <View className="px-3.5 py-2 flex-row items-center">
                   <Ionicons
                     name={categoryIcon}
                     size={12}
-                    color="#4F46E5"
+                    color="#FF6B47"
                     style={{ marginRight: 6 }}
                   />
                   <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
@@ -133,7 +133,7 @@ const RoomDetailsSheet = forwardRef(
                   ? "rgba(255, 255, 255, 0.05)"
                   : "rgba(0, 0, 0, 0.03)",
               }}
-              fallbackClassName="bg-surface-alt dark:bg-[#23232E]"
+              fallbackClassName="bg-surface-alt dark:bg-[#242428]"
             >
               <TouchableOpacity
                 onPress={handleDismiss}
@@ -157,7 +157,7 @@ const RoomDetailsSheet = forwardRef(
                     ? "rgba(255, 255, 255, 0.05)"
                     : "rgba(0, 0, 0, 0.03)",
                 }}
-                fallbackClassName="bg-surface-alt dark:bg-[#23232E]"
+                fallbackClassName="bg-surface-alt dark:bg-[#242428]"
               >
                 <View className="px-3.5 py-1.5">
                   <Text className="text-muted font-display font-black text-[10px] uppercase tracking-[1.5px]">
@@ -174,14 +174,14 @@ const RoomDetailsSheet = forwardRef(
                     activeOpacity={0.7}
                     onPress={() => handleProfilePress(member.id)}
                     key={member.id}
-                    className="flex-row items-center justify-between bg-white dark:bg-[#23232E] p-4 rounded-[24px] border border-border-light dark:border-[#2A2A36]"
+                    className="flex-row items-center justify-between bg-white dark:bg-[#242428] p-4 rounded-[24px] border border-border-light dark:border-[#2C2C30]"
                   >
                     <View className="flex-row items-center flex-1">
                       <Image
                         source={{
                           uri: member.profilePic || "https://picsum.photos/200",
                         }}
-                        className="w-12 h-12 rounded-full mr-3.5 border-2 border-gray-50 dark:border-gray-700"
+                        className="w-12 h-12 rounded-2xl mr-3.5 border-2 border-gray-50 dark:border-gray-700"
                       />
                       <View>
                         <Text className="text-secondary dark:text-gray-100 font-display font-black text-sm tracking-tight">

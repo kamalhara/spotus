@@ -8,7 +8,7 @@ export default function ParticipantAvatar({ userId, size = 28, index = 0 }) {
   const [initial, setInitial] = useState("");
 
   const AVATAR_COLORS = [
-    "#6366F1",
+    "#FF8566",
     "#EC4899",
     "#10B981",
     "#F59E0B",
@@ -44,7 +44,7 @@ export default function ParticipantAvatar({ userId, size = 28, index = 0 }) {
 
   return (
     <View
-      className="rounded-full border-2 border-white dark:border-[#1A1A22] items-center justify-center overflow-hidden bg-surface dark:bg-[#1A1A22]"
+      className="rounded-xl border-2 border-white dark:border-[#1C1C20] items-center justify-center overflow-hidden bg-surface dark:bg-[#1C1C20]"
       style={{
         width: size,
         height: size,
