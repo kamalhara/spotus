@@ -17,6 +17,7 @@ export default function ReactionPicker({
  onUnsend,
  isHost,
  onKick,
+ onPin,
 }) {
  if (!isVisible) return null;
 
@@ -171,6 +172,22 @@ export default function ReactionPicker({
  <Ionicons name="warning-outline"size={18} color="#EF4444"/>
  <Text className="text-[15px] font-semibold ml-3 text-red-500">
  Kick from Event
+ </Text>
+ </TouchableOpacity>
+ )}
+
+ {isHost && (
+ <TouchableOpacity
+ onPress={() => {
+ onPin?.(message);
+ onClose();
+ }}
+ activeOpacity={0.7}
+ className="flex-row items-center px-4 py-3 border-t border-gray-50 dark:border-[#2A2A36]"
+ >
+ <Ionicons name="pin-outline" size={18} color="#3B82F6"/>
+ <Text className="text-[15px] font-semibold ml-3 text-blue-500">
+ Pin Announcement
  </Text>
  </TouchableOpacity>
  )}

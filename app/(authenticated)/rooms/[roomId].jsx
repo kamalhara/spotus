@@ -104,14 +104,15 @@ export default function RoomChat() {
     RoomSeen(roomId, currentUserId);
   }, [roomId, currentUserId]);
 
-  // Load the static room details like title and category
+  // Load the room details in real-time
   useEffect(() => {
     if (!roomId) return;
-    const loadRoom = async () => {
-      const snap = await getDoc(doc(db, "rooms", roomId));
-      if (snap.exists()) setRoom({ id: snap.id, ...snap.data() });
-    };
-    loadRoom();
+    const unsub = onSnapshot(doc(db, "rooms", roomId), (snap) => {
+      if (snap.exists()) {
+        setRoom({ id: snap.id, ...snap.data() });
+      }
+    });
+    return unsub;
   }, [roomId]);
 
   // Fetch profiles and trust scores for all members in the room
@@ -252,6 +253,33 @@ export default function RoomChat() {
       setMembers((prev) => prev.filter((m) => m.id !== kickUserId));
     } catch (error) {
       console.error("Failed to kick user:", error);
+    }
+  };
+
+  const handlePinMessage = async (message) => {
+    if (!room || room.createdBy !== currentUserId) return;
+    try {
+      await updateDoc(doc(db, "rooms", roomId), {
+        pinnedMessage: {
+          id: message.id,
+          text: message.text || "📷 Photo",
+          senderName: message.user || "Someone",
+          senderId: message.senderId,
+        }
+      });
+    } catch (error) {
+      console.error("Failed to pin message:", error);
+    }
+  };
+
+  const handleUnpinMessage = async () => {
+    if (!room || room.createdBy !== currentUserId) return;
+    try {
+      await updateDoc(doc(db, "rooms", roomId), {
+        pinnedMessage: null
+      });
+    } catch (error) {
+      console.error("Failed to unpin message:", error);
     }
   };
 
@@ -398,6 +426,41 @@ export default function RoomChat() {
         </View>
       )}
 
+      {/* Pinned Message Banner */}
+      {room?.pinnedMessage && (
+        <View className="px-5 pt-2 pb-1 z-10">
+          <GlassContainer
+            borderRadius={16}
+            fallbackClassName="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30"
+            style={{ paddingHorizontal: 16, paddingVertical: 12, backgroundColor: isDark ? "rgba(59,130,246,0.1)" : "rgba(239,246,255,0.8)" }}
+          >
+            <View className="flex-row items-start justify-between">
+              <View className="flex-1 pr-4">
+                <View className="flex-row items-center mb-1">
+                  <Ionicons name="pin" size={14} color="#3B82F6" />
+                  <Text className="text-blue-600 dark:text-blue-400 text-xs font-bold ml-1.5 uppercase tracking-widest">
+                    Pinned Announcement
+                  </Text>
+                </View>
+                <Text className="text-secondary dark:text-gray-200 text-sm font-semibold" numberOfLines={2}>
+                  <Text className="font-bold text-primary dark:text-primary-light">{room.pinnedMessage.senderName}: </Text>
+                  {room.pinnedMessage.text}
+                </Text>
+              </View>
+              {isHost && (
+                <TouchableOpacity
+                  onPress={handleUnpinMessage}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  className="bg-white/50 dark:bg-black/20 p-1.5 rounded-full"
+                >
+                  <Ionicons name="close" size={16} color="#3B82F6" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </GlassContainer>
+        </View>
+      )}
+
       <View className="flex-1">
         <ChatMessages
           messages={messages}
@@ -409,6 +472,7 @@ export default function RoomChat() {
           onEditMessage={setEditingMessage}
           isHost={isHost}
           onKickUser={handleKickUser}
+          onPinMessage={handlePinMessage}
         />
       </View>
 
