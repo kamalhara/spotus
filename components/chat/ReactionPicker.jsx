@@ -15,6 +15,8 @@ export default function ReactionPicker({
  onEdit,
  onDeleteForMe,
  onUnsend,
+ isHost,
+ onKick,
 }) {
  if (!isVisible) return null;
 
@@ -147,6 +149,31 @@ export default function ReactionPicker({
  Delete for me
  </Text>
  </TouchableOpacity>
+
+ {isHost && !isSentByMe && (
+ <TouchableOpacity
+ onPress={() => {
+ onClose();
+ import("react-native").then(({ Alert }) => {
+ Alert.alert(
+ "Kick User?",
+ `Are you sure you want to kick ${message.user || "this user"} from the event?`,
+ [
+ { text: "Cancel", style: "cancel" },
+ { text: "Kick", style: "destructive", onPress: () => onKick?.(message.senderId) }
+ ]
+ );
+ });
+ }}
+ activeOpacity={0.7}
+ className="flex-row items-center px-4 py-3 border-t border-gray-50 dark:border-[#2A2A36]"
+ >
+ <Ionicons name="warning-outline"size={18} color="#EF4444"/>
+ <Text className="text-[15px] font-semibold ml-3 text-red-500">
+ Kick from Event
+ </Text>
+ </TouchableOpacity>
+ )}
  </Animated.View>
  </View>
  </Pressable>

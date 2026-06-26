@@ -87,6 +87,8 @@ export default function ChatMessages({
   collectionName = "chats",
   onReply,
   onEditMessage,
+  isHost,
+  onKickUser,
 }) {
   const flatListRef = useRef(null);
   const router = useRouter();
@@ -581,6 +583,11 @@ export default function ChatMessages({
         }}
         onUnsend={() => {
           onUnsend(reactionPicker?.message);
+          setReactionPicker(null);
+        }}
+        isHost={isHost}
+        onKick={(kickUserId) => {
+          onKickUser?.(kickUserId);
           setReactionPicker(null);
         }}
       />

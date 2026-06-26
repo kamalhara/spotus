@@ -2,7 +2,6 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -410,7 +409,8 @@ export default function CreateRooms() {
                       </Text>
                     </View>
                     <Text className="text-gray-400 dark:text-gray-500 text-xs leading-4 pr-2">
-                      If off, the room is public and shown to all users. Hidden from the map when on.
+                      If off, the room is public and shown to all users. Hidden
+                      from the map when on.
                     </Text>
                   </View>
                   <Switch

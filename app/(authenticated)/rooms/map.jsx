@@ -78,7 +78,11 @@ function LocationPermissionDenied() {
         We need your location to find rooms near you. Please enable it in your
         device settings.
       </Text>
-      <GlassButton onPress={() => Linking.openSettings()} shape="pill" size="regular">
+      <GlassButton
+        onPress={() => Linking.openSettings()}
+        shape="pill"
+        size="regular"
+      >
         <View className="flex-row items-center justify-center gap-2 py-3 px-6">
           <Ionicons name="settings-outline" size={18} color="#4F46E5" />
           <Text className="text-primary dark:text-primary-light font-bold text-[15px]">

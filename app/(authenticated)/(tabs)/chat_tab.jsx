@@ -130,11 +130,14 @@ export default function Chat() {
   ).length;
 
   const activeChats = chats.filter(
-    (c) => c.status === "accepted" || !c.status || (c.status === "pending" && c.senderId === currentUserId)
+    (c) =>
+      c.status === "accepted" ||
+      !c.status ||
+      (c.status === "pending" && c.senderId === currentUserId),
   );
 
   const pendingReceivedChats = chats.filter(
-    (c) => c.status === "pending" && c.senderId !== currentUserId
+    (c) => c.status === "pending" && c.senderId !== currentUserId,
   );
 
   const filteredChats = activeChats.filter((chat) => {
@@ -348,22 +351,8 @@ export default function Chat() {
                   No conversations yet
                 </Text>
                 <Text className="text-gray-400 dark:text-gray-500 text-sm mt-1.5 text-center px-10 leading-5">
-                  Build trust in rooms to unlock direct messages with other
-                  members.
+                  Get chatting with other members in rooms.
                 </Text>
-
-                <View className="mt-6 bg-white dark:bg-[#1A1A22] rounded-2xl px-4 py-3.5 flex-row items-center border border-gray-100 dark:border-[#2A2A36]">
-                  <View className="w-7 h-7 bg-indigo-50 rounded-lg items-center justify-center mr-3">
-                    <Ionicons
-                      name="shield-checkmark"
-                      size={14}
-                      color="#4F46E5"
-                    />
-                  </View>
-                  <Text className="text-gray-500 dark:text-gray-400 text-[13px] font-medium flex-1">
-                    10 room messages = DM access
-                  </Text>
-                </View>
               </View>
             )}
           </View>

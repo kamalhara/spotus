@@ -16,10 +16,10 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import JoinByCodeSheet from "../../../components/rooms/JoinByCodeSheet";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
-import JoinByCodeSheet from "../../../components/rooms/JoinByCodeSheet";
 import GlassButton from "../../../components/ui/GlassButton";
 import { db } from "../../../config/firebase.config";
 import { useFloatingButton } from "../../../context/FloatingButtonContext";
@@ -265,7 +265,14 @@ export default function Home() {
         onPress: handleRefreshPress,
       });
     }
-  }, [ctaHidden, loading, isDark, handleCreateRoom, handleRefreshPress, setFloatingButtonOverride]);
+  }, [
+    ctaHidden,
+    loading,
+    isDark,
+    handleCreateRoom,
+    handleRefreshPress,
+    setFloatingButtonOverride,
+  ]);
 
   // Clear override when leaving this tab
   useFocusEffect(
@@ -474,7 +481,12 @@ export default function Home() {
           activeOpacity={0.8}
           className="flex-row items-center justify-center py-3.5 bg-purple-50 dark:bg-purple-900/20 rounded-2xl border border-purple-100 dark:border-purple-800/30"
         >
-          <Ionicons name="key-outline" size={16} color="#A855F7" style={{ marginRight: 6 }} />
+          <Ionicons
+            name="key-outline"
+            size={16}
+            color="#A855F7"
+            style={{ marginRight: 6 }}
+          />
           <Text className="text-purple-600 dark:text-purple-400 font-semibold text-[13px]">
             Got an Invite Code?
           </Text>

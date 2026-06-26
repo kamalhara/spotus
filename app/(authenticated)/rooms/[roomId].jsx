@@ -12,6 +12,8 @@ import {
   query,
   serverTimestamp,
   updateDoc,
+  arrayRemove,
+  arrayUnion,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -239,6 +241,21 @@ export default function RoomChat() {
       setUploadingImageUri(null);
     }
   };
+  const handleKickUser = async (kickUserId) => {
+    if (!room || room.createdBy !== currentUserId) return;
+    try {
+      await updateDoc(doc(db, "rooms", roomId), {
+        participants: arrayRemove(kickUserId),
+        bannedUsers: arrayUnion(kickUserId),
+      });
+      // Filter out the banned member from local state to reflect UI immediately
+      setMembers((prev) => prev.filter((m) => m.id !== kickUserId));
+    } catch (error) {
+      console.error("Failed to kick user:", error);
+    }
+  };
+
+  const isHost = room?.createdBy === currentUserId;
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
   const categoryColor = CATEGORY_COLORS[room?.category] || "#0F0F13";
 
@@ -386,10 +403,12 @@ export default function RoomChat() {
           messages={messages}
           currentUserId={currentUserId}
           chatDocId={roomId}
-          uploadingImageUri={uploadingImageUri}
           collectionName="rooms"
-          onReply={(msg) => setReplyTo(msg)}
+          uploadingImageUri={uploadingImageUri}
+          onReply={setReplyTo}
           onEditMessage={setEditingMessage}
+          isHost={isHost}
+          onKickUser={handleKickUser}
         />
       </View>
 
@@ -413,6 +432,8 @@ export default function RoomChat() {
         room={room}
         members={members}
         currentUserId={currentUserId}
+        isHost={isHost}
+        onKickUser={handleKickUser}
       />
     </KeyboardAvoidingView>
   );
