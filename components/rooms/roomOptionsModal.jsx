@@ -9,7 +9,14 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { Alert, Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
+import {
+  Alert,
+  Modal,
+  Pressable,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { db } from "../../config/firebase.config";
 import { useTheme } from "../../context/ThemeContext";
 import GlassContainer from "../ui/GlassContainer";
@@ -116,7 +123,11 @@ export default function RoomOptionsModal({
                             : "rgba(0, 0, 0, 0.05)",
                     }}
                   >
-                    <Ionicons name={option.icon} size={18} color={option.color} />
+                    <Ionicons
+                      name={option.icon}
+                      size={18}
+                      color={option.color}
+                    />
                   </View>
                   <Text
                     className="text-[16px] font-bold flex-1"
@@ -124,7 +135,11 @@ export default function RoomOptionsModal({
                   >
                     {option.label}
                   </Text>
-                  <Ionicons name="chevron-forward" size={16} color={isDark ? "#4B5563" : "#9CA3AF"} />
+                  <Ionicons
+                    name="chevron-forward"
+                    size={16}
+                    color={isDark ? "#4B5563" : "#9CA3AF"}
+                  />
                 </TouchableOpacity>
               ))}
             </GlassContainer>

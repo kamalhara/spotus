@@ -115,6 +115,18 @@ const RoomDetailsSheet = forwardRef(
               <Text className="text-secondary dark:text-gray-100 text-3xl font-display font-black leading-tight tracking-tighter">
                 {room?.title}
               </Text>
+              
+              <TouchableOpacity
+                onPress={() => {
+                  bottomSheetModalRef.current?.dismiss();
+                  router.push(`/rooms/roomInfo?roomId=${room?.id}`);
+                }}
+                className="mt-3 bg-primary/10 self-start px-4 py-2 rounded-xl flex-row items-center"
+                activeOpacity={0.7}
+              >
+                <Ionicons name="information-circle-outline" size={16} color="#FF6B47" />
+                <Text className="text-primary font-bold text-xs ml-1">View Room Info</Text>
+              </TouchableOpacity>
             </View>
             <GlassContainer
               borderRadius={16}

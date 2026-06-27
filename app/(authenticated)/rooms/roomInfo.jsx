@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   arrayRemove,
@@ -10,7 +9,14 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { Image, ScrollView, Share, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  ScrollView,
+  Share,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomOptionsModal from "../../../components/rooms/roomOptionsModal";
 import GlassButton from "../../../components/ui/GlassButton";
@@ -19,8 +25,8 @@ import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 
-import { CATEGORY_ICONS } from "../../../constants/categories";
 import GhostModeBanner from "../../../components/shared/GhostModeBanner";
+import { CATEGORY_ICONS } from "../../../constants/categories";
 
 const roomRules = [
   {
@@ -125,8 +131,6 @@ export default function RoomInfo() {
       console.error("Leave room error:", err);
     }
   };
-
-
 
   const handleShare = async () => {
     try {
@@ -236,10 +240,7 @@ export default function RoomInfo() {
             </View>
 
             {/* Ghost Mode Invite Block */}
-            <GhostModeBanner 
-              room={room} 
-              onShare={handleShare} 
-            />
+            <GhostModeBanner room={room} onShare={handleShare} />
 
             {/* Room Description */}
             <View className="mb-8 pb-8 border-b border-border-light dark:border-gray-800">
