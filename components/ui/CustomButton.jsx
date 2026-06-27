@@ -58,7 +58,7 @@ export default function CustomButton({
         case "ghost":
           return "bg-transparent";
         default:
-          return "bg-muted/60";
+          return "bg-gray-200 dark:bg-gray-800";
       }
     }
     switch (type) {
@@ -78,7 +78,7 @@ export default function CustomButton({
         case "ghost":
           return "text-muted";
         default:
-          return "text-white/80";
+          return "text-gray-400 dark:text-gray-500";
       }
     }
     switch (type) {
