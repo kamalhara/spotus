@@ -61,6 +61,9 @@ export default function Welcome() {
             </Text>
             <View className="w-2 h-2 rounded-full bg-primary ml-1.5 -mt-3" />
           </View>
+          <Text className="text-muted text-[13px] mt-1 tracking-wide">
+            Find Your Crowd Nearby
+          </Text>
         </View>
 
         {/* Hero */}
