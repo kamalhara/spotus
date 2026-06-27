@@ -49,6 +49,8 @@ export default function ChatId() {
   const [editingMessage, setEditingMessage] = useState(null);
   const [chatDoc, setChatDoc] = useState(null);
   const [showOptions, setShowOptions] = useState(false);
+  const [messageLimit, setMessageLimit] = useState(50);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   // Deterministic chat doc ID so both users share the same conversation
   const chatDocId = useMemo(() => {
@@ -116,16 +118,24 @@ export default function ChatId() {
     const q = query(
       collection(db, "chats", chatDocId, "messages"),
       orderBy("createdAt", "asc"),
-      limitToLast(50),
+      limitToLast(messageLimit),
     );
     const unsub = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs
         .map((d) => ({ id: d.id, ...d.data() }))
         .filter((msg) => !msg.deletedFor?.includes(currentUserId));
       setMessages(msgs);
+      setIsLoadingMore(false);
     });
     return unsub;
-  }, [chatDocId, currentUserId]);
+  }, [chatDocId, currentUserId, messageLimit]);
+
+  const handleLoadMore = () => {
+    if (messages.length >= messageLimit) {
+      setIsLoadingMore(true);
+      setMessageLimit((prev) => prev + 50);
+    }
+  };
 
   // Listen to chat doc for mute status
   useEffect(() => {
@@ -344,6 +354,8 @@ export default function ChatId() {
             onReply={(msg) => setReplyTo(msg)}
             onEditMessage={setEditingMessage}
             isTyping={isTyping}
+            onLoadMore={handleLoadMore}
+            isLoadingMore={isLoadingMore}
           />
         </View>
 

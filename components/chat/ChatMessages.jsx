@@ -90,6 +90,8 @@ export default function ChatMessages({
   onKickUser,
   onPinMessage,
   isTyping = false,
+  onLoadMore,
+  isLoadingMore = false,
 }) {
   const flatListRef = useRef(null);
   const router = useRouter();
@@ -518,6 +520,8 @@ export default function ChatMessages({
         initialNumToRender={15}
         maxToRenderPerBatch={10}
         windowSize={11}
+        onRefresh={onLoadMore}
+        refreshing={isLoadingMore}
         onScrollToIndexFailed={(info) => {
           const wait = new Promise((resolve) => setTimeout(resolve, 500));
           wait.then(() => {

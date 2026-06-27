@@ -52,6 +52,8 @@ export default function RoomChat() {
   const [editingMessage, setEditingMessage] = useState(null);
   const [showGhostBanner, setShowGhostBanner] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
+  const [messageLimit, setMessageLimit] = useState(50);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const { firestoreUser: user } = useFirestoreUser();
   const currentUserId = user?.id;
@@ -67,7 +69,7 @@ export default function RoomChat() {
     const q = query(
       collection(db, "rooms", roomId, "messages"),
       orderBy("createdAt", "asc"),
-      limitToLast(50),
+      limitToLast(messageLimit),
     );
     const unsub = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs
@@ -78,9 +80,17 @@ export default function RoomChat() {
             !user?.blockedUsers?.includes(msg.senderId),
         );
       setMessages(msgs);
+      setIsLoadingMore(false);
     });
     return unsub;
-  }, [currentUserId, roomId, user?.blockedUsers]);
+  }, [currentUserId, roomId, user?.blockedUsers, messageLimit]);
+
+  const handleLoadMore = () => {
+    if (messages.length >= messageLimit) {
+      setIsLoadingMore(true);
+      setMessageLimit((prev) => prev + 50);
+    }
+  };
 
   // Mark room messages as seen when entering
   useEffect(() => {
@@ -400,6 +410,8 @@ export default function RoomChat() {
           isHost={isHost}
           onKickUser={handleKickUser}
           onPinMessage={handlePinMessage}
+          onLoadMore={handleLoadMore}
+          isLoadingMore={isLoadingMore}
         />
       </View>
 
