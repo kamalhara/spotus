@@ -20,6 +20,12 @@ import "../global.css";
 import syncUserToFirebase from "../lib/syncUser";
 import { tokenCache } from "../utils/cache";
 import { trackScreen } from "../lib/analytics";
+import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false,
+});
 
 SplashScreen.preventAutoHideAsync();
 

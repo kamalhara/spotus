@@ -160,8 +160,7 @@ export default function Home() {
 
   const nearbyRooms = rooms.filter(
     (r) =>
-      !r.participants?.includes(firestoreUser?.id) &&
-      !blockedUsers.includes(r.createdBy),
+      !r.participants?.includes(firestoreUser?.id)
   );
 
   const filteredRooms = nearbyRooms.filter(

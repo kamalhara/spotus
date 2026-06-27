@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useRef, useState } from "react";
@@ -16,12 +15,13 @@ import { Marker } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
+import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
 import GlassButton from "../../../components/ui/GlassButton";
 import { db } from "../../../config/firebase.config";
+import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
-import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
 
 import { getCurrentLocation } from "../../../lib/location";
 const { width } = Dimensions.get("window");
@@ -33,6 +33,7 @@ const SNAP_INTERVAL = ITEM_WIDTH;
 function EmptyRooms() {
   const router = useRouter();
   const { isDark } = useTheme();
+  const insets = useSafeAreaInsets();
   return (
     <View className="flex-1 items-center justify-center py-20 px-6">
       <View className="w-24 h-24 bg-info-surface rounded-full items-center justify-center mb-6">
@@ -62,12 +63,23 @@ function EmptyRooms() {
           </Text>
         </View>
       </GlassButton>
+
+      <View style={{ position: "absolute", top: insets.top + 16, left: 16 }}>
+        <GlassButton
+          onPress={() => router.back()}
+          size={44}
+          shape="circle"
+        >
+          <Ionicons
+            name="chevron-back"
+            size={20}
+            color={isDark ? "#F3F4F6" : "#18181B"}
+          />
+        </GlassButton>
+      </View>
     </View>
   );
 }
-
-
-
 
 const darkMapStyle = [
   { elementType: "geometry", stylers: [{ color: "#212121" }] },
