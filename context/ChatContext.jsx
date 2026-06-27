@@ -1,8 +1,9 @@
-import { collection, doc, getDoc, onSnapshot, query, where } from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
 import { db } from "../config/firebase.config";
 import useFirestoreUser from "../hook/useFireStoreUser";
 import { isChatUnseen } from "../lib/chatSeen";
+import { fetchUserBatch } from "../lib/userCache";
 
 const ChatContext = createContext({
   chats: [],
@@ -37,16 +38,18 @@ export const ChatProvider = ({ children }) => {
         ...d.data(),
       }));
 
+      // Use the batching cache instead of individual getDoc calls.
+      // This collapses N separate reads into 1-2 batched queries.
       const enriched = await Promise.all(
         chatDocs.map(async (chat) => {
           const otherUserId = chat.participants?.find((id) => id !== currentUserId);
           if (!otherUserId) return { ...chat, otherUser: null };
 
-          const userSnap = await getDoc(doc(db, "users", otherUserId));
+          const userData = await fetchUserBatch(otherUserId);
           return {
             ...chat,
-            otherUser: userSnap.exists()
-              ? { id: userSnap.id, ...userSnap.data() }
+            otherUser: userData
+              ? { id: otherUserId, ...userData }
               : null,
           };
         })

@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { CATEGORY_ICONS } from "../../../constants/categories";
 import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -30,6 +31,7 @@ import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
+import { getTrustBadge } from "../../../lib/trust";
 
 const dateFormater = (timestamp) => {
   const date = new Date(timestamp * 1000);
@@ -375,14 +377,17 @@ export default function UserProfile() {
             </Text>
           ) : null}
 
-          {(user?.globalReputation ?? 0) > 0 && (
-            <View className="mt-3 flex-row items-center bg-green-50 dark:bg-green-900/20 px-3.5 py-1.5 rounded-full">
-              <Ionicons name="star" size={12} color="#10B981" />
-              <Text className="text-green-600 dark:text-green-400 text-xs font-semibold ml-1.5">
-                {user.globalReputation} rep
-              </Text>
-            </View>
-          )}
+          {(() => {
+            const badge = getTrustBadge(user?.globalReputation ?? 0);
+            return (
+              <View className="mt-3 flex-row items-center px-3.5 py-1.5 rounded-full" style={{ backgroundColor: `${badge.color}15` }}>
+                <Ionicons name={badge.icon} size={12} color={badge.color} />
+                <Text className="text-xs font-semibold ml-1.5" style={{ color: badge.color }}>
+                  {badge.label} • {user?.globalReputation ?? 0} rep
+                </Text>
+              </View>
+            );
+          })()}
         </View>
 
         {/* Action Buttons */}
@@ -489,11 +494,11 @@ export default function UserProfile() {
               >
                 <View className="flex-row items-center flex-1">
                   <View className="w-10 h-10 bg-primary/10 rounded-xl items-center justify-center mr-3">
-                    <Ionicons name={event.icon || "radio"} size={20} color="#FF6B47" />
+                    <Ionicons name={CATEGORY_ICONS[event.category] || "radio"} size={20} color="#FF6B47" />
                   </View>
                   <View className="flex-1 pr-2">
                     <Text className="text-secondary dark:text-gray-100 font-bold text-[15px]" numberOfLines={1}>
-                      {event.name || "Live Event"}
+                      {event.title || "Live Event"}
                     </Text>
                     <Text className="text-gray-500 dark:text-gray-400 text-xs mt-0.5" numberOfLines={1}>
                       {event.participants?.length || 1} tuning in

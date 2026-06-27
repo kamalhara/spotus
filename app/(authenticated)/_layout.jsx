@@ -20,7 +20,7 @@ export default function AuthenticatedLayout() {
 
     updateActivity();
 
-    const interval = setInterval(updateActivity, 30000); // every 30 sec
+    const interval = setInterval(updateActivity, 60000); // every 60 sec
 
     return () => clearInterval(interval);
   }, [user?.id]);

@@ -6,6 +6,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  limitToLast,
   onSnapshot,
   orderBy,
   query,
@@ -109,12 +110,13 @@ export default function ChatId() {
     return unsub;
   }, [chatId, currentUserId]);
 
-  // Listen to messages
+  // Listen to last 50 messages for performance
   useEffect(() => {
     if (!chatDocId) return;
     const q = query(
       collection(db, "chats", chatDocId, "messages"),
       orderBy("createdAt", "asc"),
+      limitToLast(50),
     );
     const unsub = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs

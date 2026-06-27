@@ -27,6 +27,7 @@ import GlassContainer from "../../../components/ui/GlassContainer";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { createRoom } from "../../../lib/createRoom";
+import { trackEvent } from "../../../lib/analytics";
 
 const CATEGORIES = [
   { label: "Music", icon: "musical-notes", color: "#8B5CF6" },
@@ -136,6 +137,12 @@ export default function CreateRooms() {
         showOnMap,
         duration,
       );
+      
+      trackEvent("room_created", {
+        category: selectedCategory,
+        duration: duration
+      });
+
       router.replace(`/rooms/${roomId}`);
     } catch (err) {
       console.error("Error creating room:", err);

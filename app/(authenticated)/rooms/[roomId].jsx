@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -6,10 +6,10 @@ import {
   addDoc,
   collection,
   doc,
-  getDoc,
   onSnapshot,
   orderBy,
   query,
+  limitToLast,
   serverTimestamp,
   updateDoc,
   arrayRemove,
@@ -36,6 +36,8 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { RoomSeen } from "../../../lib/chatSeen";
 import { sendPushNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
+import { fetchUserBatch } from "../../../lib/userCache";
+import GhostModeBanner from "../../../components/shared/GhostModeBanner";
 
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 export default function RoomChat() {
@@ -49,7 +51,7 @@ export default function RoomChat() {
   const [replyTo, setReplyTo] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
   const [showGhostBanner, setShowGhostBanner] = useState(true);
-  const [copied, setCopied] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
 
   const { firestoreUser: user } = useFirestoreUser();
   const currentUserId = user?.id;
@@ -58,11 +60,14 @@ export default function RoomChat() {
   const { roomId } = useLocalSearchParams();
 
   // Subscribe to real-time message updates for this room
+  // Load last 50 messages for performance. Older messages are
+  // rarely needed and can be loaded on demand in the future.
   useEffect(() => {
     if (!roomId) return;
     const q = query(
       collection(db, "rooms", roomId, "messages"),
       orderBy("createdAt", "asc"),
+      limitToLast(50),
     );
     const unsub = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs
@@ -94,18 +99,18 @@ export default function RoomChat() {
     return unsub;
   }, [roomId]);
 
-  // Fetch profiles and trust scores for all members in the room
+  // Fetch member profiles using batched cache instead of sequential getDoc
   useEffect(() => {
     const fetchMemberData = async () => {
       if (!room?.participants?.length) return;
       try {
-        const profiles = [];
-        for (const uid of room.participants) {
-          const userDoc = await getDoc(doc(db, "users", uid));
-          if (userDoc.exists())
-            profiles.push({ id: userDoc.id, ...userDoc.data() });
-        }
-        setMembers(profiles);
+        const profiles = await Promise.all(
+          room.participants.map(async (uid) => {
+            const data = await fetchUserBatch(uid);
+            return data ? { id: uid, ...data } : null;
+          })
+        );
+        setMembers(profiles.filter(Boolean));
       } catch (error) {
         console.error("Error fetching member data:", error);
       }
@@ -270,15 +275,6 @@ export default function RoomChat() {
     router.push(`/rooms/roomInfo?roomId=${roomId}`);
   };
 
-  const handleCopyCode = async () => {
-    if (room?.inviteCode) {
-      await Clipboard.setStringAsync(room?.inviteCode);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
   const handleShare = async () => {
     try {
       const inviteLink = `spotus.app/join/${room?.inviteCode}`;
@@ -350,60 +346,12 @@ export default function RoomChat() {
       </View>
 
       {/* Ghost Mode Banner */}
-      {room?.visibility === "ghost" && showGhostBanner && (
-        <View className="px-5 pt-3 pb-1">
-          <GlassContainer 
-            borderRadius={16} 
-            fallbackClassName="bg-purple-50 dark:bg-[#2A1635] border border-purple-200 dark:border-[#4B2261]"
-            style={{ paddingHorizontal: 16, paddingVertical: 14, backgroundColor: isDark ? "#2A1635" : "#FAF5FF" }}
-          >
-            <View className="flex-row items-start justify-between">
-              <View className="flex-1 pr-4">
-                <View className="flex-row items-center mb-1.5">
-                  <MaterialCommunityIcons name="ghost" size={16} color="#A855F7" />
-                  <Text className="text-purple-600 dark:text-purple-300 text-xs font-bold ml-1.5 uppercase tracking-widest">
-                    Ghost Mode Active
-                  </Text>
-                </View>
-                <Text className="text-purple-500 dark:text-purple-400 text-xs leading-4 pr-2">
-                  Share this code with friends so they can join the event:
-                </Text>
-              </View>
-              <TouchableOpacity
-                onPress={(e) => {
-                  e.stopPropagation();
-                  setShowGhostBanner(false);
-                }}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              >
-                <Ionicons name="close" size={18} color="#A855F7" />
-              </TouchableOpacity>
-            </View>
-
-            <View className="flex-row items-center mt-3 pt-3 border-t border-purple-200/50 dark:border-purple-800/30">
-              <TouchableOpacity
-                 onPress={handleCopyCode}
-                 activeOpacity={0.7}
-                 className="bg-white dark:bg-[#1C1C20] border border-purple-100 dark:border-purple-800/50 px-4 py-2.5 rounded-xl flex-row items-center mr-3"
-              >
-                <Text className="text-purple-700 dark:text-purple-300 font-display font-black tracking-[3px] text-[17px] mr-2">
-                  {copied ? "COPIED" : room?.inviteCode}
-                </Text>
-                <Ionicons name={copied ? "checkmark-outline" : "copy-outline"} size={14} color="#A855F7" />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                 onPress={handleShare}
-                 activeOpacity={0.7}
-                 className="bg-purple-600 px-4 py-2.5 rounded-xl flex-row items-center flex-1 justify-center"
-              >
-                <Ionicons name="share-outline" size={14} color="white" style={{ marginRight: 6 }} />
-                <Text className="text-white text-xs font-bold">Share Link</Text>
-              </TouchableOpacity>
-            </View>
-          </GlassContainer>
-        </View>
-      )}
+      <GhostModeBanner 
+        room={room} 
+        showGhostBanner={showGhostBanner} 
+        setShowGhostBanner={setShowGhostBanner} 
+        onShare={handleShare} 
+      />
 
       {/* Pinned Message Banner */}
       {room?.pinnedMessage && (

@@ -18,12 +18,6 @@
               "com.googleusercontent.apps.704434880673-objjnb36t9ctc3vpj8s3fi7vtucdui1b",
               "spotus"
             ]
-          },
-          {
-            "CFBundleURLSchemes": [
-              "com.googleusercontent.apps.704434880673-objjnb36t9ctc3vpj8s3fi7vtucdui1b",
-              "spotus"
-            ]
           }
         ],
         "ITSAppUsesNonExemptEncryption": false,

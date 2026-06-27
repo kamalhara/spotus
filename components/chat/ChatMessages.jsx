@@ -515,7 +515,9 @@ export default function ChatMessages({
         renderItem={renderMessage}
         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
         showsVerticalScrollIndicator={false}
-        initialNumToRender={10}
+        initialNumToRender={15}
+        maxToRenderPerBatch={10}
+        windowSize={11}
         onScrollToIndexFailed={(info) => {
           const wait = new Promise((resolve) => setTimeout(resolve, 500));
           wait.then(() => {

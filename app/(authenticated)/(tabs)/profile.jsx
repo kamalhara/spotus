@@ -8,9 +8,10 @@ import { useCallback, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Skeleton from "../../../components/ui/Skeleton";
-import { useTheme } from "../../../context/ThemeContext";
+
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
+import { getTrustBadge } from "../../../lib/trust";
 
 const MenuItem = ({
   icon,
@@ -57,7 +58,7 @@ export default function Profile() {
   const { signOut } = useAuth();
   const { firestoreUser, loading } = useFirestoreUser();
   const router = useRouter();
-  useTheme();
+
 
   const [rooms, setRooms] = useState([]);
   useFocusEffect(
@@ -136,13 +137,16 @@ export default function Profile() {
         contentContainerStyle={{ paddingBottom: 40 }}
       >
         {/* Profile Header */}
-        <View className="items-center px-6 mt-2 mb-7">
-          {/* Background accent */}
-          <View className="absolute top-0 left-0 right-0 h-36 overflow-hidden rounded-b-[40px] " />
+        <View className="relative items-center mb-8">
+          {/* Cover Photo / Gradient */}
+          <View className="absolute top-0 left-0 right-0 h-[140px] bg-primary/10 overflow-hidden">
+            <View className="w-full h-full opacity-60 bg-primary/20" />
+          </View>
 
-          <View className="relative mt-6">
+          {/* Avatar and Edit Button */}
+          <View className="relative mt-[80px]">
             <View
-              className="w-[110px] h-[110px] rounded-2xl border-4 border-white dark:border-gray-800 overflow-hidden bg-gray-100 dark:bg-gray-800"
+              className="w-[120px] h-[120px] rounded-[40px] border-4 border-white dark:border-[#111113] overflow-hidden bg-gray-100 dark:bg-gray-800"
               style={{
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 2 },
@@ -160,9 +164,16 @@ export default function Profile() {
                 style={{ width: "100%", height: "100%" }}
               />
             </View>
+            <TouchableOpacity 
+              onPress={() => router.push("/profile/edit")}
+              activeOpacity={0.8}
+              className="absolute bottom-0 right-0 w-10 h-10 bg-primary rounded-full items-center justify-center border-4 border-white dark:border-[#111113]"
+            >
+              <Ionicons name="pencil" size={16} color="white" />
+            </TouchableOpacity>
           </View>
 
-          <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold mt-4 tracking-tight">
+          <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold mt-4 tracking-tight px-6 text-center">
             {firestoreUser?.userName || "User"}
           </Text>
 
@@ -173,30 +184,73 @@ export default function Profile() {
             {firestoreUser?.bio ||
               "No bio yet — say something about yourself!"}
           </Text>
+
+          {/* User Tags (Motivation & Interests) */}
+          <View className="flex-row flex-wrap justify-center gap-2 mt-5 px-6">
+            {firestoreUser?.motivation && (
+              <View className="bg-primary/10 px-3 py-1.5 rounded-full flex-row items-center">
+                <Ionicons name="sparkles" size={12} color="#FF6B47" style={{ marginRight: 4 }} />
+                <Text className="text-primary font-bold text-[12px]">
+                  {firestoreUser.motivation}
+                </Text>
+              </View>
+            )}
+            {firestoreUser?.interests?.slice(0, 3).map((interest) => (
+              <View key={interest} className="bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
+                <Text className="text-gray-600 dark:text-gray-300 font-bold text-[12px]">
+                  {interest}
+                </Text>
+              </View>
+            ))}
+            {firestoreUser?.interests?.length > 3 && (
+              <View className="bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
+                <Text className="text-gray-600 dark:text-gray-300 font-bold text-[12px]">
+                  +{firestoreUser.interests.length - 3}
+                </Text>
+              </View>
+            )}
+          </View>
         </View>
 
-        {/* Stats — inline, not dashboard */}
-        <View className="mx-6 mb-7">
-          <Text className="text-muted text-[14px] font-semibold text-center">
-            <Text className="text-secondary dark:text-white font-display font-extrabold text-[15px]">{createdRooms}</Text> created · <Text className="text-secondary dark:text-white font-display font-extrabold text-[15px]">{joinedRooms}</Text> joined · <Text className="text-secondary dark:text-white font-display font-extrabold text-[15px]">{firestoreUser?.globalReputation ?? 0}</Text> rep
-          </Text>
+        {/* Stats Grid */}
+        <View className="mx-6 mb-8">
+          {(() => {
+            const badge = getTrustBadge(firestoreUser?.globalReputation ?? 0);
+            return (
+              <View className="mb-4 flex-row justify-center">
+                <View className="flex-row items-center px-4 py-2 rounded-full" style={{ backgroundColor: `${badge.color}15` }}>
+                  <Ionicons name={badge.icon} size={14} color={badge.color} />
+                  <Text className="text-sm font-semibold ml-2" style={{ color: badge.color }}>
+                    {badge.label} • {firestoreUser?.globalReputation ?? 0} rep
+                  </Text>
+                </View>
+              </View>
+            );
+          })()}
+          <View className="flex-row gap-3">
+            <View className="flex-1 bg-white dark:bg-[#1C1C20] rounded-2xl p-4 border border-gray-100 dark:border-[#2C2C30] items-center">
+              <Text className="text-secondary dark:text-white font-display font-black text-2xl">{createdRooms}</Text>
+              <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-bold uppercase tracking-wider mt-1">Created</Text>
+            </View>
+            <View className="flex-1 bg-white dark:bg-[#1C1C20] rounded-2xl p-4 border border-gray-100 dark:border-[#2C2C30] items-center">
+              <Text className="text-secondary dark:text-white font-display font-black text-2xl">{joinedRooms}</Text>
+              <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-bold uppercase tracking-wider mt-1">Joined</Text>
+            </View>
+          </View>
         </View>
+
+
 
         {/* Menu Groups */}
         <View className="bg-white dark:bg-[#1C1C20] mx-6 rounded-2xl border border-gray-100 dark:border-[#2C2C30] overflow-hidden">
-          <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
-            General
+          <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-bold uppercase tracking-wider px-5 pt-4 pb-2">
+            Settings
           </Text>
           <MenuItem
             icon="person-outline"
-            label="Settings"
+            label="Account Details"
             subtitle={firestoreUser?.email}
             onPress={() => router.push("/profile/accountSetting")}
-          />
-          <MenuItem
-            icon="create-outline"
-            label="Edit Profile"
-            onPress={() => router.push("/profile/edit")}
           />
           <MenuItem
             icon="shield-checkmark-outline"
@@ -236,6 +290,12 @@ export default function Profile() {
           <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
             Support
           </Text>
+          <MenuItem
+            icon="chatbubble-ellipses-outline"
+            label="Send Feedback"
+            color="#64748B"
+            onPress={() => router.push("/feedback")}
+          />
           <MenuItem
             icon="alert-circle-outline"
             label="Help Center"

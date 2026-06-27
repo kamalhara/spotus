@@ -12,10 +12,10 @@ import useFirestoreUser from"../../../hook/useFireStoreUser";
 export default function Notifications() {
  const { firestoreUser } = useFirestoreUser();
 
- const [directMessages, setDirectMessages] = useState(true);
- const [roomMessages, setRoomMessages] = useState(true);
+ const [messageRequests, setMessageRequests] = useState(true);
+ const [roomInvites, setRoomInvites] = useState(true);
+ const [replies, setReplies] = useState(true);
  const [nearbyRooms, setNearbyRooms] = useState(false);
- const [trustAlerts, setTrustAlerts] = useState(true);
  const [emailDigest, setEmailDigest] = useState(false);
  const { isDark } = useTheme();
 
@@ -23,10 +23,10 @@ export default function Notifications() {
  useEffect(() => {
  if (firestoreUser?.settings?.notifications) {
  const s = firestoreUser.settings.notifications;
- if (s.directMessages !== undefined) setDirectMessages(s.directMessages);
- if (s.roomMessages !== undefined) setRoomMessages(s.roomMessages);
+ if (s.messageRequests !== undefined) setMessageRequests(s.messageRequests);
+ if (s.roomInvites !== undefined) setRoomInvites(s.roomInvites);
+ if (s.replies !== undefined) setReplies(s.replies);
  if (s.nearbyRooms !== undefined) setNearbyRooms(s.nearbyRooms);
- if (s.trustAlerts !== undefined) setTrustAlerts(s.trustAlerts);
  if (s.emailDigest !== undefined) setEmailDigest(s.emailDigest);
  }
  }, [firestoreUser?.settings?.notifications]);
@@ -66,18 +66,24 @@ export default function Notifications() {
  showsVerticalScrollIndicator={false}
  contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
  >
- <SettingsSection title="Messages">
+ <SettingsSection title="Messages & Interactions">
  <SettingsRow
- icon="chatbubble-outline"
- title="Direct messages"
- description="New one-to-one messages from unlocked contacts."
- rightComponent={renderSwitch("directMessages", directMessages, setDirectMessages)}
+ icon="mail-unread-outline"
+ title="Message Requests"
+ description="When someone wants to DM you."
+ rightComponent={renderSwitch("messageRequests", messageRequests, setMessageRequests)}
  />
  <SettingsRow
- icon="people-outline"
- title="Room messages"
- description="Activity in rooms you have joined."
- rightComponent={renderSwitch("roomMessages", roomMessages, setRoomMessages)}
+ icon="person-add-outline"
+ title="Room Invites"
+ description="When someone invites you to a room."
+ rightComponent={renderSwitch("roomInvites", roomInvites, setRoomInvites)}
+ />
+ <SettingsRow
+ icon="chatbubbles-outline"
+ title="Replies & Mentions"
+ description="When someone replies to your message."
+ rightComponent={renderSwitch("replies", replies, setReplies)}
  isLast
  />
  </SettingsSection>
@@ -88,12 +94,6 @@ export default function Notifications() {
  title="Nearby rooms"
  description="New rooms that match your interests nearby."
  rightComponent={renderSwitch("nearbyRooms", nearbyRooms, setNearbyRooms)}
- />
- <SettingsRow
- icon="shield-checkmark-outline"
- title="Trust milestones"
- description="Progress updates when DMs become available."
- rightComponent={renderSwitch("trustAlerts", trustAlerts, setTrustAlerts)}
  isLast
  />
  </SettingsSection>

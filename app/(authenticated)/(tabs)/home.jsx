@@ -8,7 +8,6 @@ import {
   Animated,
   FlatList,
   Image,
-  Linking,
   RefreshControl,
   Text,
   TextInput,
@@ -21,11 +20,15 @@ import RoomCard from "../../../components/rooms/RoomCard";
 import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
 import GlassButton from "../../../components/ui/GlassButton";
+import NearbyPulse from "../../../components/home/NearbyPulse";
+import CategoryChips from "../../../components/home/CategoryChips";
+import { CATEGORY_ICONS } from "../../../constants/categories";
 import { db } from "../../../config/firebase.config";
 import { useFloatingButton } from "../../../context/FloatingButtonContext";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
+import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
 
 function EmptyRooms() {
   return (
@@ -43,32 +46,10 @@ function EmptyRooms() {
   );
 }
 
-function LocationPermissionDenied() {
-  return (
-    <View className="items-center justify-center py-20 px-6">
-      <View className="w-24 h-24 bg-red-50 dark:bg-red-900/20 rounded-full items-center justify-center mb-6">
-        <Ionicons name="location-outline" size={40} color="#EF4444" />
-      </View>
-      <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight text-center mb-2.5">
-        Location Required
-      </Text>
-      <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4 mb-6">
-        We need your location to find rooms near you. Please enable it in your
-        device settings.
-      </Text>
-      <TouchableOpacity
-        onPress={() => Linking.openSettings()}
-        className="bg-primary px-6 py-3.5 rounded-full"
-      >
-        <Text className="text-white font-bold text-[15px]">Open Settings</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
-
 export default function Home() {
   const [displayDistance, setDisplayDistance] = useState(5);
   const [searchDistance, setSearchDistance] = useState(5);
+  const [activeCategory, setActiveCategory] = useState("all");
   const debounceTimer = useRef(null);
   const sliderWidth = useRef(0);
   const tooltipOpacity = useRef(new Animated.Value(0)).current;
@@ -177,11 +158,19 @@ export default function Home() {
     setRefreshing(false);
   }, [loadRooms]);
 
-  const blockedUsers = firestoreUser?.blockedUsers || [];
   const nearbyRooms = rooms.filter(
     (r) =>
       !r.participants?.includes(firestoreUser?.id) &&
       !blockedUsers.includes(r.createdBy),
+  );
+
+  const filteredRooms = nearbyRooms.filter(
+    (r) => activeCategory === "all" || r.category === activeCategory
+  );
+
+  const totalPeopleChatting = nearbyRooms.reduce(
+    (acc, room) => acc + (room.participants?.length || 0),
+    0
   );
 
   const handleCreateRoom = useCallback(() => {
@@ -237,6 +226,12 @@ export default function Home() {
   // ── Everything above the room list, rendered as list header ────────
   const ListHeader = () => (
     <>
+      <NearbyPulse
+        roomsCount={nearbyRooms.length}
+        peopleCount={totalPeopleChatting}
+        radius={displayDistance}
+      />
+
       {/* Dynamic context header */}
       <Animated.View
         className="mt-5 mb-1"
@@ -248,8 +243,8 @@ export default function Home() {
         <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-extrabold tracking-tight">
           {loading
             ? "Looking nearby"
-            : nearbyRooms.length > 0
-              ? `${nearbyRooms.length} room${nearbyRooms.length === 1 ? "" : "s"} nearby`
+            : filteredRooms.length > 0
+              ? `${filteredRooms.length} room${filteredRooms.length === 1 ? "" : "s"} nearby`
               : "Quiet for now"}
         </Text>
       </Animated.View>
@@ -421,7 +416,7 @@ export default function Home() {
 
       {/* Join via Invite Code */}
       <Animated.View
-        className="mt-3"
+        className="mt-3 mb-6"
         style={{
           opacity: fadeInContent,
           transform: [{ translateY: slideUpContent }],
@@ -444,8 +439,14 @@ export default function Home() {
         </TouchableOpacity>
       </Animated.View>
 
+      <CategoryChips
+        categories={Object.keys(CATEGORY_ICONS)}
+        activeCategory={activeCategory}
+        onSelectCategory={setActiveCategory}
+      />
+
       {/* Nearby Rooms Section Header */}
-      <View className="mt-8 mb-2">
+      <View className="mb-2">
         <View className="flex flex-row justify-between items-center">
           <View className="flex-row items-center gap-2.5">
             <Text className="text-secondary dark:text-gray-100 text-[22px] font-display font-extrabold tracking-tight">

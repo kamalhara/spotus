@@ -44,8 +44,7 @@ const RoomCard = memo(function RoomCard({
     return "< 1m left";
   };
 
-  const participantCount =
-    room.participantCount || room.participants?.length || 0;
+  const participantCount = room.participants?.length || 0;
   const isDying = (() => {
     if (!room.expiresAt) return false;
     const expiresMs = room.expiresAt.seconds
@@ -62,6 +61,15 @@ const RoomCard = memo(function RoomCard({
     if (participantCount === 2) return "2 here";
     return `${participantCount} here`;
   };
+
+  const lastActivityMs = room.lastMessageAt?.seconds
+    ? room.lastMessageAt.seconds * 1000
+    : room.lastMessageAt instanceof Date
+      ? room.lastMessageAt.getTime()
+      : room.lastMessageAt || 
+        (room.createdAt?.seconds ? room.createdAt.seconds * 1000 : Date.now());
+  
+  const isActiveNow = (Date.now() - lastActivityMs) < 5 * 60 * 1000;
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -125,9 +133,24 @@ const RoomCard = memo(function RoomCard({
       </View>
 
       {/* Title */}
-      <Text className="text-secondary dark:text-gray-100 font-display font-extrabold tracking-tight mb-1.5 text-[20px] leading-7">
-        {room.title}
-      </Text>
+      <View className="flex-row items-center mb-1.5 justify-between">
+        <Text className="text-secondary dark:text-gray-100 font-display font-extrabold tracking-tight text-[20px] leading-7 flex-1" numberOfLines={1}>
+          {room.title}
+        </Text>
+        {isActiveNow && (
+          <View className="flex-row items-center ml-2 bg-green-500/10 px-2 py-1 rounded-md">
+            <View className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5" />
+            <Text className="text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-wider">Active</Text>
+          </View>
+        )}
+      </View>
+
+      {/* Last Message */}
+      {room.lastMessage && (
+        <Text className="text-gray-500 dark:text-gray-400 text-[13px] font-medium mb-3" numberOfLines={1}>
+          {room.lastMessageSenderId === currentUserId ? "You: " : ""}{room.lastMessage}
+        </Text>
+      )}
 
       <View className="flex-row items-center mb-4">
         {getExpiryText() === "Expired" ? (
@@ -168,8 +191,13 @@ const RoomCard = memo(function RoomCard({
                 index={i}
               />
             ))}
+            {participantCount > 3 && (
+              <View className="w-7 h-7 rounded-xl border-2 border-white dark:border-[#1C1C20] items-center justify-center bg-gray-100 dark:bg-[#252528]">
+                <Text className="text-gray-500 dark:text-gray-400 font-bold text-[10px]">+{participantCount - 3}</Text>
+              </View>
+            )}
             {participantCount === 0 && (
-              <View className="w-7 h-7 rounded-full border-2 border-dashed border-gray-200 dark:border-gray-600 items-center justify-center bg-gray-50 dark:bg-[#252528]">
+              <View className="w-7 h-7 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-600 items-center justify-center bg-gray-50 dark:bg-[#252528]">
                 <Ionicons name="person-add-outline" size={12} color="#9CA3AF" />
               </View>
             )}

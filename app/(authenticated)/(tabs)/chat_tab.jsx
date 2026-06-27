@@ -3,8 +3,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
   collection,
-  doc,
-  getDoc,
   onSnapshot,
   query,
   where,
@@ -40,7 +38,7 @@ export default function Chat() {
   const { chats, loading: chatsLoading } = useChats();
   const [search, setSearch] = useState("");
   const [searchFocused, setSearchFocused] = useState(false);
-  const [activeFilter] = useState("all");
+  const activeFilter = "all";
 
   // Entrance animation
   const fadeIn = useRef(new Animated.Value(0)).current;
@@ -82,12 +80,6 @@ export default function Chat() {
     return unsub;
   }, [currentUserId, firestoreUser?.blockedUsers]);
 
-
-
-  const unreadCount = chats.filter((chat) =>
-    isChatUnseen(chat, currentUserId),
-  ).length;
-
   const activeChats = chats.filter(
     (c) =>
       c.status === "accepted" ||
@@ -107,6 +99,10 @@ export default function Chat() {
       activeFilter === "all" || isChatUnseen(chat, currentUserId);
 
     return matchesSearch && matchesFilter;
+  });
+
+  const filteredRooms = rooms.filter((room) => {
+    return search === "" || room.title?.toLowerCase().includes(search.toLowerCase());
   });
 
   return (
@@ -197,18 +193,15 @@ export default function Chat() {
                 </View>
               )}
             </View>
-            {!roomsLoading && rooms.length === 0 ? (
-              <View className="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl px-4 py-3 flex-row items-center">
-                <View className="w-9 h-9 rounded-xl bg-surface-alt items-center justify-center mr-3">
-                  <Ionicons name="people-outline" size={17} color="#94A3B8" />
-                </View>
-                <Text className="text-gray-400 dark:text-gray-500 text-sm font-medium">
-                  No active rooms
-                </Text>
-              </View>
+            {!roomsLoading && filteredRooms.length === 0 ? (
+              <EmptyState 
+                variant="inline"
+                icon={search ? "search-outline" : "people-outline"}
+                title={search ? "No rooms found" : "No active rooms"}
+              />
             ) : (
               <RoomHorizontalList
-                rooms={rooms}
+                rooms={filteredRooms}
                 isLoading={roomsLoading}
                 onRoomPress={(room) => router.push(`/rooms/${room.id}`)}
               />
@@ -299,19 +292,11 @@ export default function Chat() {
               />
             ) : (
               <View className="flex-1 items-center justify-center pt-6">
-                <View className="w-16 h-16 bg-white dark:bg-[#1C1C20] rounded-3xl items-center justify-center mb-5 border border-gray-100 dark:border-[#2C2C30]">
-                  <Ionicons
-                    name="chatbubble-outline"
-                    size={30}
-                    color="#FF6B47"
-                  />
-                </View>
-                <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
-                  It&apos;s quiet in here...
-                </Text>
-                <Text className="text-muted text-sm mt-1.5 text-center px-10 leading-5">
-                  Join a room and say hi to someone
-                </Text>
+                <EmptyState
+                  icon="chatbubble-outline"
+                  title="It's quiet in here..."
+                  description="Join a room and say hi to someone"
+                />
               </View>
             )}
           </View>

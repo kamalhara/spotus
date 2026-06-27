@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { Image, Text, View } from "react-native";
 import { fetchUserBatch } from "../../lib/userCache";
 
-export default function ParticipantAvatar({ userId, size = 28, index = 0 }) {
+const ParticipantAvatar = memo(function ParticipantAvatar({ userId, size = 28, index = 0 }) {
   const [imageUrl, setImageUrl] = useState(null);
   const [initial, setInitial] = useState("");
 
@@ -65,4 +65,6 @@ export default function ParticipantAvatar({ userId, size = 28, index = 0 }) {
       )}
     </View>
   );
-}
+});
+
+export default ParticipantAvatar;

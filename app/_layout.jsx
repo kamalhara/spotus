@@ -9,7 +9,7 @@ import {
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useFonts } from "expo-font";
 import * as NavigationBar from "expo-navigation-bar";
-import { Stack } from "expo-router";
+import { Stack, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -19,6 +19,7 @@ import { ThemeProvider } from "../context/ThemeContext";
 import "../global.css";
 import syncUserToFirebase from "../lib/syncUser";
 import { tokenCache } from "../utils/cache";
+import { trackScreen } from "../lib/analytics";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -42,6 +43,14 @@ function UserSync() {
 }
 
 function ThemedApp() {
+  const pathname = usePathname();
+
+  useEffect(() => {
+    if (pathname) {
+      trackScreen(pathname);
+    }
+  }, [pathname]);
+
   return (
     <View style={{ flex: 1 }} className="bg-bg dark:bg-[#111113]">
       <GestureHandlerRootView style={{ flex: 1 }}>

@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/expo";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { db } from "../config/firebase.config";
 
@@ -8,29 +8,31 @@ export default function useFirestoreUser() {
   const [firestoreUser, setFirestoreUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch current user's profile data from Firestore when Clerk session is ready
+  // Real-time listener for current user's Firestore profile.
+  // Replaces the old getDoc (one-shot) approach so profile changes
+  // (bio, pic, settings) are immediately reflected across all screens.
   useEffect(() => {
-    const fetchUser = async () => {
-      if (!isLoaded || !user) return;
+    if (!isLoaded || !user) {
+      setLoading(false);
+      return;
+    }
 
-      try {
-        const ref = doc(db, "users", user.id);
-        const snap = await getDoc(ref);
-
+    const ref = doc(db, "users", user.id);
+    const unsub = onSnapshot(
+      ref,
+      (snap) => {
         if (snap.exists()) {
-          setFirestoreUser({
-            id: snap.id,
-            ...snap.data(),
-          });
+          setFirestoreUser({ id: snap.id, ...snap.data() });
         }
-      } catch (err) {
-        console.error("Firestore user fetch error:", err);
-      } finally {
+        setLoading(false);
+      },
+      (err) => {
+        console.error("Firestore user snapshot error:", err);
         setLoading(false);
       }
-    };
+    );
 
-    fetchUser();
+    return unsub;
   }, [isLoaded, user]);
 
   return { firestoreUser, loading };
