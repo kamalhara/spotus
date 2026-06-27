@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useCameraPermissions } from "expo-camera";
 import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
@@ -7,11 +7,7 @@ import {
   ActivityIndicator,
   Alert,
   Animated,
-  Image,
-  Keyboard,
-  Platform,
   Pressable,
-  ScrollView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -62,7 +58,7 @@ export default function MessageSender({
   const isTypingLocal = useRef(false);
   const inputRef = useRef(null);
   const insets = useSafeAreaInsets();
-  
+
   const sendScale = useRef(new Animated.Value(1)).current;
 
   // Auto-focus input when replying or editing
@@ -107,8 +103,17 @@ export default function MessageSender({
     // Trigger elastic bounce and heavy haptic on send
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
     Animated.sequence([
-      Animated.timing(sendScale, { toValue: 1.2, duration: 50, useNativeDriver: true }),
-      Animated.spring(sendScale, { toValue: 1, friction: 3, tension: 40, useNativeDriver: true })
+      Animated.timing(sendScale, {
+        toValue: 1.2,
+        duration: 50,
+        useNativeDriver: true,
+      }),
+      Animated.spring(sendScale, {
+        toValue: 1,
+        friction: 3,
+        tension: 40,
+        useNativeDriver: true,
+      }),
     ]).start();
 
     setIsSending(true);
@@ -195,7 +200,7 @@ export default function MessageSender({
   };
 
   return (
-    <View style={{ paddingBottom: insets.bottom }}>
+    <View style={{ paddingBottom: Math.max(insets.bottom, 12) }}>
       {/* Backdrop overlay to dismiss the menu */}
       {showMediaMenu && (
         <Pressable
@@ -206,10 +211,10 @@ export default function MessageSender({
 
       {/* Media Menu Popup */}
       {showMediaMenu && (
-        <View className="absolute bottom-[60px] left-0 right-0 z-10">
+        <View className="absolute bottom-[82px] left-0 right-0 z-10">
           <GlassContainer
             borderRadius={16}
-            fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
+            fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] "
             style={{
               padding: 12,
               marginHorizontal: 4,
@@ -220,7 +225,7 @@ export default function MessageSender({
               elevation: 3,
             }}
           >
-            <View className="flex-row gap-3">
+            <View className="flex-row gap-3 ">
               {MEDIA_OPTIONS.map((option) => (
                 <TouchableOpacity
                   key={option.key}

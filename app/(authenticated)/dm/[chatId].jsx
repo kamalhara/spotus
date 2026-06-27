@@ -386,7 +386,7 @@ export default function ChatId() {
             )}
           </View>
         ) : (
-          <View className="px-5 py-3 pb-5">
+          <View className="px-5 pt-3">
             <MessageSender
               handleSend={handleSend}
               chatId={chatDocId}

@@ -455,7 +455,7 @@ export default function RoomChat() {
         />
       </View>
 
-      <View className="px-5 py-3 flex items-center pb-6 bg-bg dark:bg-[#111113] border-t border-gray-100 dark:border-[#2C2C30]">
+      <View className="px-5 pt-3 flex items-center bg-bg dark:bg-[#111113] border-t border-gray-100 dark:border-[#2C2C30]">
         <MessageSender
           handleSend={handleSend}
           chatId={roomId}
