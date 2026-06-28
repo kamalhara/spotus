@@ -128,6 +128,15 @@ export default function Home() {
     router.push(`/rooms/${selectedRoom.id}`);
   };
 
+  const handleJoinByCode = () => {
+    if (isGhostBrowsing) {
+      setInterceptModal({ visible: true, action: "join conversations" });
+      trackEvent("Tried to join by code while exploring");
+      return;
+    }
+    joinSheetRef.current?.present();
+  };
+
   // Debounce: when displayDistance changes, wait 300ms then commit to searchDistance
   useEffect(() => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
@@ -447,7 +456,7 @@ export default function Home() {
         }}
       >
         <TouchableOpacity
-          onPress={() => joinSheetRef.current?.present()}
+          onPress={handleJoinByCode}
           activeOpacity={0.8}
           className="flex-row items-center justify-center py-3.5 bg-white dark:bg-[#1C1C20] rounded-2xl border border-border-light dark:border-[#2C2C30]"
         >
