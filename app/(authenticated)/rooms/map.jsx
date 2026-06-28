@@ -28,7 +28,6 @@ import GhostBrowsingBanner from "../../../components/shared/GhostBrowsingBanner"
 import GlassButton from "../../../components/ui/GlassButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { trackEvent } from "../../../lib/analytics";
-import { showExploreIntercept } from "../../../lib/exploreMode";
 import { db } from "../../../config/firebase.config";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 import { useTheme } from "../../../context/ThemeContext";
@@ -36,6 +35,7 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { subscribeNearbyRooms } from "../../../lib/getNearbyRoom";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { getCurrentLocation } from "../../../lib/location";
+import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.78; // Narrower to show adjacent cards
 const ITEM_MARGIN = 8;
@@ -329,6 +329,7 @@ export default function MapViewScreen() {
   const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
   const [showGhostBanner, setShowGhostBanner] = useState(true);
   const [retryTrigger, setRetryTrigger] = useState(0);
+  const [interceptModal, setInterceptModal] = useState({ visible: false, action: "" });
 
   const hasInitialRender = useRef(false);
 
@@ -462,10 +463,8 @@ export default function MapViewScreen() {
     if (!selectedRoomToJoin || !firestoreUser?.id) return;
     try {
       if (isGhostBrowsing) {
-        showExploreIntercept("join", () => {
-          setIsGhostBrowsing(false);
-          setRetryTrigger(prev => prev + 1);
-        });
+        setInterceptModal({ visible: true, action: "join conversations" });
+        trackEvent("Tried to join while exploring");
         return;
       }
       const roomRef = doc(db, "rooms", selectedRoomToJoin.id);
@@ -633,6 +632,18 @@ export default function MapViewScreen() {
         ref={bottomSheetModalRef}
         room={selectedRoomToJoin}
         onConfirm={handleJoinRoom}
+      />
+      
+      <ExploreInterceptModal
+        visible={interceptModal.visible}
+        actionName={interceptModal.action}
+        onClose={() => setInterceptModal({ visible: false, action: "" })}
+        onEnableLocation={async () => {
+          setInterceptModal({ visible: false, action: "" });
+          await AsyncStorage.setItem("isGhostBrowsing", "false");
+          setIsGhostBrowsing(false);
+          setRetryTrigger(prev => prev + 1);
+        }}
       />
     </View>
   );

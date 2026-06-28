@@ -31,7 +31,7 @@ import { getNearbyRooms } from "../../../lib/getNearbyRoom";
 import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { trackEvent } from "../../../lib/analytics";
-import { showExploreIntercept } from "../../../lib/exploreMode";
+import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
 
 function EmptyRooms() {
@@ -76,6 +76,7 @@ export default function Home() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
   const [retryTrigger, setRetryTrigger] = useState(0);
+  const [interceptModal, setInterceptModal] = useState({ visible: false, action: "" });
 
   // Entrance animations
   const fadeInHeader = useRef(new Animated.Value(0)).current;
@@ -115,10 +116,8 @@ export default function Home() {
 
   const handleJoinRoom = async () => {
     if (isGhostBrowsing) {
-      showExploreIntercept("join", () => {
-        setIsGhostBrowsing(false);
-        setRetryTrigger(prev => prev + 1);
-      });
+      setInterceptModal({ visible: true, action: "join conversations" });
+      trackEvent("Tried to join while exploring");
       return;
     }
     const roomRef = doc(db, "rooms", selectedRoom.id);
@@ -196,10 +195,8 @@ export default function Home() {
   const handleCreateRoom = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (isGhostBrowsing) {
-      showExploreIntercept("create room", () => {
-        setIsGhostBrowsing(false);
-        setRetryTrigger(prev => prev + 1);
-      });
+      setInterceptModal({ visible: true, action: "create a room" });
+      trackEvent("Tried to create room while exploring");
       return;
     }
     router.push("/rooms/create-rooms");
@@ -608,6 +605,18 @@ export default function Home() {
         ref={joinSheetRef}
         currentUserId={firestoreUser?.id}
         onJoinSuccess={(id) => router.push(`/rooms/${id}`)}
+      />
+
+      <ExploreInterceptModal
+        visible={interceptModal.visible}
+        actionName={interceptModal.action}
+        onClose={() => setInterceptModal({ visible: false, action: "" })}
+        onEnableLocation={async () => {
+          setInterceptModal({ visible: false, action: "" });
+          await AsyncStorage.setItem("isGhostBrowsing", "false");
+          setIsGhostBrowsing(false);
+          setRetryTrigger(prev => prev + 1);
+        }}
       />
     </>
   );

@@ -13,7 +13,7 @@ import {
   View,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { showExploreIntercept } from "../../../lib/exploreMode";
+import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -73,6 +73,7 @@ export default function CreateRooms() {
     title.trim().length > 0 && !!selectedCategory && !isCreating;
 
   const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
+  const [interceptModal, setInterceptModal] = useState(false);
   useEffect(() => {
     AsyncStorage.getItem("isGhostBrowsing").then((val) => {
       setIsGhostBrowsing(val === "true");
@@ -164,9 +165,7 @@ export default function CreateRooms() {
     if (!user) return alert("User not loaded");
     
     if (isGhostBrowsing) {
-      showExploreIntercept("create room", () => {
-        setIsGhostBrowsing(false);
-      });
+      setInterceptModal(true);
       return;
     }
 
@@ -471,6 +470,17 @@ export default function CreateRooms() {
           </TouchableWithoutFeedback>
         </Animated.ScrollView>
       </KeyboardAvoidingView>
+
+      <ExploreInterceptModal
+        visible={interceptModal}
+        actionName="create a room"
+        onClose={() => setInterceptModal(false)}
+        onEnableLocation={async () => {
+          setInterceptModal(false);
+          await AsyncStorage.setItem("isGhostBrowsing", "false");
+          setIsGhostBrowsing(false);
+        }}
+      />
     </SafeAreaView>
   );
 }
