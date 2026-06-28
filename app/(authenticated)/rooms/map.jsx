@@ -1,7 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
-import { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef, useState, useEffect } from "react";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSpring,
+  withSequence,
+  runOnJS,
+} from "react-native-reanimated";
 import {
   ActivityIndicator,
   Dimensions,
@@ -21,7 +29,7 @@ import { db } from "../../../config/firebase.config";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
-import { getNearbyRooms } from "../../../lib/getNearbyRoom";
+import { subscribeNearbyRooms } from "../../../lib/getNearbyRoom";
 
 import { getCurrentLocation } from "../../../lib/location";
 const { width } = Dimensions.get("window");
@@ -172,6 +180,131 @@ const darkMapStyle = [
   },
 ];
 
+const AnimatedRoomMarker = React.memo(({ room, isSelected, onPress, isDark }) => {
+  const categoryColor = CATEGORY_COLORS[room.category] || "#FF6B47";
+  const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
+  
+  const scale = useSharedValue(0);
+  const opacity = useSharedValue(0);
+  const [tracksViewChanges, setTracksViewChanges] = useState(true);
+
+  // Mount animation
+  useEffect(() => {
+    scale.value = withSpring(isSelected ? 1.15 : 1, { damping: 16, stiffness: 90 }, () => {
+      runOnJS(setTracksViewChanges)(false);
+    });
+    opacity.value = withTiming(1, { duration: 300 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Update animation when participants change
+  const prevParticipants = useRef(room.participants?.length || 1);
+  useEffect(() => {
+    const currentParticipants = room.participants?.length || 1;
+    if (currentParticipants !== prevParticipants.current) {
+      prevParticipants.current = currentParticipants;
+      setTracksViewChanges(true);
+      // Pulse animation
+      const baseScale = isSelected ? 1.15 : 1;
+      scale.value = withSequence(
+        withTiming(baseScale * 1.3, { duration: 150 }),
+        withSpring(baseScale, { damping: 14, stiffness: 100 }, () => {
+          runOnJS(setTracksViewChanges)(false);
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [room.participants?.length, isSelected]);
+
+  // Handle selection state change specifically without re-running mount animation
+  useEffect(() => {
+    const targetScale = isSelected ? 1.15 : 1;
+    if (scale.value !== targetScale && scale.value !== 0) {
+      setTracksViewChanges(true);
+      scale.value = withSpring(targetScale, { damping: 16, stiffness: 90 }, () => {
+        runOnJS(setTracksViewChanges)(false);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSelected]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+    opacity: opacity.value,
+  }));
+
+  return (
+    <Marker
+      coordinate={{
+        latitude: room.latitude,
+        longitude: room.longitude,
+      }}
+      onPress={onPress}
+      tracksViewChanges={tracksViewChanges}
+      style={{ zIndex: isSelected ? 10 : 1 }}
+    >
+      <Animated.View style={[{ alignItems: "center", justifyContent: "center" }, animatedStyle]}>
+        <View
+          style={{
+            backgroundColor: isSelected ? categoryColor : isDark ? "#1C1C20" : "white",
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: 24,
+            borderWidth: 2,
+            borderColor: isSelected ? "white" : categoryColor,
+            shadowColor: categoryColor,
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: isSelected ? 0.6 : 0.2,
+            shadowRadius: 6,
+            elevation: 8,
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+          <Ionicons
+            name={categoryIcon}
+            size={16}
+            color={isSelected ? "white" : categoryColor}
+            style={{ marginRight: 6 }}
+          />
+          <Text
+            style={{
+              fontSize: 13,
+              fontWeight: "900",
+              color: isSelected ? "white" : isDark ? "#F3F4F6" : "#18181B",
+            }}
+          >
+            {room.participants?.length || 1}
+          </Text>
+        </View>
+        <View
+          style={{
+            width: 0,
+            height: 0,
+            borderLeftWidth: 6,
+            borderRightWidth: 6,
+            borderTopWidth: 8,
+            borderLeftColor: "transparent",
+            borderRightColor: "transparent",
+            borderTopColor: isSelected ? "white" : categoryColor,
+            marginTop: -1,
+          }}
+        />
+      </Animated.View>
+    </Marker>
+  );
+}, (prevProps, nextProps) => {
+  return (
+    prevProps.room.id === nextProps.room.id &&
+    prevProps.room.category === nextProps.room.category &&
+    (prevProps.room.participants?.length || 1) === (nextProps.room.participants?.length || 1) &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.isDark === nextProps.isDark
+  );
+});
+
+AnimatedRoomMarker.displayName = "AnimatedRoomMarker";
+
 export default function MapViewScreen() {
   const router = useRouter();
   const { distance } = useLocalSearchParams();
@@ -191,38 +324,56 @@ export default function MapViewScreen() {
   const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [selectedRoomToJoin, setSelectedRoomToJoin] = useState(null);
 
+  const hasInitialRender = useRef(false);
+
   useFocusEffect(
     useCallback(() => {
+      let unsubscribe = null;
+      let isMounted = true;
+
       const loadData = async () => {
         try {
-          setLoading(true);
+          if (!hasInitialRender.current) {
+            setLoading(true);
+            hasInitialRender.current = true;
+          }
           const userLoc = await getCurrentLocation();
+          if (!isMounted) return;
           setUserLocation({
             latitude: userLoc.latitude,
             longitude: userLoc.longitude,
           });
-          setRegion({
-            latitude: userLoc.latitude,
-            longitude: userLoc.longitude,
-            latitudeDelta: 0.05,
-            longitudeDelta: 0.05,
-          });
+          if (!region) {
+            setRegion({
+              latitude: userLoc.latitude,
+              longitude: userLoc.longitude,
+              latitudeDelta: 0.05,
+              longitudeDelta: 0.05,
+            });
+          }
 
           const radiusKm = distance ? parseFloat(distance) : 5;
-          const allRooms = await getNearbyRooms(radiusKm, firestoreUser?.id);
+          
+          unsubscribe = await subscribeNearbyRooms(radiusKm, firestoreUser?.id, (allRooms) => {
+            if (!isMounted) return;
+            const mapRooms = allRooms.filter(
+              (r) =>
+                r.showOnMap === true &&
+                !r.participants?.includes(firestoreUser?.id),
+            );
 
-          const mapRooms = allRooms.filter(
-            (r) =>
-              r.showOnMap === true &&
-              !r.participants?.includes(firestoreUser?.id),
-          );
+            setRooms(mapRooms);
+            setLoading(false);
+            
+            setSelectedRoomId((prev) => {
+               if (!prev && mapRooms.length > 0) return mapRooms[0].id;
+               return prev;
+            });
+          });
 
-          setRooms(mapRooms);
-          if (mapRooms.length > 0) {
-            setSelectedRoomId(mapRooms[0].id);
-          }
         } catch (error) {
           console.error("Error loading map rooms", error);
+          if (!isMounted) return;
           if (
             error.message.includes("permission denied") ||
             error.message.includes("Not authorized") ||
@@ -230,12 +381,17 @@ export default function MapViewScreen() {
           ) {
             setLocationError(true);
           }
-        } finally {
           setLoading(false);
         }
       };
 
       loadData();
+      
+      return () => {
+        isMounted = false;
+        if (unsubscribe) unsubscribe();
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [distance, firestoreUser?.id]),
   );
 
@@ -317,85 +473,15 @@ export default function MapViewScreen() {
               </Marker>
             )}
 
-            {rooms.map((room, index) => {
-              const categoryColor = CATEGORY_COLORS[room.category] || "#FF6B47";
-              const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
-              const isSelected = selectedRoomId === room.id;
-
-              return (
-                <Marker
-                  key={room.id}
-                  coordinate={{
-                    latitude: room.latitude,
-                    longitude: room.longitude,
-                  }}
-                  onPress={() => handleMarkerPress(room, index)}
-                  tracksViewChanges={false} // Performance optimization
-                  style={{ zIndex: isSelected ? 10 : 1 }}
-                >
-                  <View
-                    style={{ alignItems: "center", justifyContent: "center" }}
-                  >
-                    <View
-                      style={{
-                        backgroundColor: isSelected
-                          ? categoryColor
-                          : isDark
-                            ? "#1C1C20"
-                            : "white",
-                        paddingHorizontal: 12,
-                        paddingVertical: 8,
-                        borderRadius: 24,
-                        borderWidth: 2,
-                        borderColor: isSelected ? "white" : categoryColor,
-                        shadowColor: categoryColor,
-                        shadowOffset: { width: 0, height: 4 },
-                        shadowOpacity: isSelected ? 0.6 : 0.2,
-                        shadowRadius: 6,
-                        elevation: 8,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        transform: [{ scale: isSelected ? 1.15 : 1 }],
-                      }}
-                    >
-                      <Ionicons
-                        name={categoryIcon}
-                        size={16}
-                        color={isSelected ? "white" : categoryColor}
-                        style={{ marginRight: 6 }}
-                      />
-                      <Text
-                        style={{
-                          fontSize: 13,
-                          fontWeight: "900",
-                          color: isSelected
-                            ? "white"
-                            : isDark
-                              ? "#F3F4F6"
-                              : "#18181B",
-                        }}
-                      >
-                        {room.participants?.length || 1}
-                      </Text>
-                    </View>
-                    <View
-                      style={{
-                        width: 0,
-                        height: 0,
-                        borderLeftWidth: 6,
-                        borderRightWidth: 6,
-                        borderTopWidth: 8,
-                        borderLeftColor: "transparent",
-                        borderRightColor: "transparent",
-                        borderTopColor: isSelected ? "white" : categoryColor,
-                        marginTop: -1,
-                        transform: [{ scale: isSelected ? 1.15 : 1 }],
-                      }}
-                    />
-                  </View>
-                </Marker>
-              );
-            })}
+            {rooms.map((room, index) => (
+              <AnimatedRoomMarker
+                key={room.id}
+                room={room}
+                isSelected={selectedRoomId === room.id}
+                isDark={isDark}
+                onPress={() => handleMarkerPress(room, index)}
+              />
+            ))}
           </MapView>
 
           {/* Floating Back Button & Room Count */}
