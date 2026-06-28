@@ -40,6 +40,15 @@ export default function GhostBrowsingBanner({ visible, onClose, onEnableLocation
               </Text>
             </View>
           </View>
+          {onClose && (
+            <TouchableOpacity
+              onPress={onClose}
+              hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+              className="w-8 h-8 rounded-full bg-purple-100 dark:bg-purple-900/30 items-center justify-center ml-2"
+            >
+              <Ionicons name="close" size={16} color="#A855F7" />
+            </TouchableOpacity>
+          )}
         </View>
 
         <View className="flex-row items-center mt-3 pt-3 border-t border-purple-200/50 dark:border-purple-800/30 gap-3">
