@@ -164,7 +164,7 @@ const RoomCard = memo(function RoomCard({
         <Text className="text-gray-400 text-xs font-semibold">
           {getExpiryText()}
         </Text>
-        {room.distance !== undefined && (
+        {room.distance !== undefined && !isExploreMode && (
           <>
             <Text className="text-gray-300 dark:text-gray-600 mx-2">•</Text>
             <Ionicons
@@ -175,6 +175,20 @@ const RoomCard = memo(function RoomCard({
             />
             <Text className="text-gray-400 text-xs font-medium">
               {room.distance.toFixed(1)} km
+            </Text>
+          </>
+        )}
+        {isExploreMode && (
+          <>
+            <Text className="text-gray-300 dark:text-gray-600 mx-2">•</Text>
+            <Ionicons
+              name="location"
+              size={12}
+              color="#9CA3AF"
+              style={{ marginRight: 2, marginTop: -1 }}
+            />
+            <Text className="text-gray-400 text-xs font-medium">
+              Approximate Area
             </Text>
           </>
         )}

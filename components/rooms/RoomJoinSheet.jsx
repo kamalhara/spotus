@@ -153,11 +153,17 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
                 <Ionicons name="location" size={15} color="#FF6B47" />
               </View>
               <View>
-                <Text className="text-secondary dark:text-gray-100 font-bold text-sm">
-                  {room?.distance !== undefined ? room.distance.toFixed(1) : "?"} km
-                </Text>
+                {room?.isApproximate ? (
+                  <Text className="text-secondary dark:text-gray-100 font-bold text-sm">
+                    Approximate
+                  </Text>
+                ) : (
+                  <Text className="text-secondary dark:text-gray-100 font-bold text-sm">
+                    {room?.distance !== undefined ? room.distance.toFixed(1) : "?"} km
+                  </Text>
+                )}
                 <Text className="text-muted text-[10px] font-bold uppercase tracking-wider">
-                  Away
+                  {room?.isApproximate ? "Area" : "Away"}
                 </Text>
               </View>
             </View>

@@ -34,7 +34,7 @@ import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { subscribeNearbyRooms } from "../../../lib/getNearbyRoom";
-
+import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { getCurrentLocation } from "../../../lib/location";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.78; // Narrower to show adjacent cards
@@ -347,7 +347,36 @@ export default function MapViewScreen() {
           if (!isMounted) return;
           if (isGhost === "true") {
             setIsGhostBrowsing(true);
+            const exploreData = await getExploreRooms();
+            if (!isMounted) return;
+            setRooms(exploreData);
+            setLoading(false);
+            
+            let centerLat = 37.7749;
+            let centerLng = -122.4194;
+            if (exploreData.length > 0) {
+              centerLat = exploreData[0].latitude;
+              centerLng = exploreData[0].longitude;
+            }
+            if (!region) {
+              setRegion({
+                latitude: centerLat,
+                longitude: centerLng,
+                latitudeDelta: 0.1,
+                longitudeDelta: 0.1,
+              });
+            }
+
+            setSelectedRoomId((prev) => {
+               if (!prev && exploreData.length > 0) return exploreData[0].id;
+               return prev;
+            });
+            // We don't subscribe to updates when exploring to save reads
+            return;
+          } else {
+            setIsGhostBrowsing(false);
           }
+          
           const userLoc = await getCurrentLocation();
           if (!isMounted) return;
           setUserLocation({
@@ -475,6 +504,10 @@ export default function MapViewScreen() {
           <GhostBrowsingBanner 
             visible={isGhostBrowsing && showGhostBanner} 
             onClose={() => setShowGhostBanner(false)} 
+            onEnableLocation={() => {
+              setIsGhostBrowsing(false);
+              setRetryTrigger(prev => prev + 1);
+            }}
           />
           <MapView
             ref={mapRef}

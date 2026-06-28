@@ -32,6 +32,7 @@ import LocationPermissionDenied from "../../../components/shared/LocationPermiss
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { trackEvent } from "../../../lib/analytics";
 import { showExploreIntercept } from "../../../lib/exploreMode";
+import { getExploreRooms } from "../../../lib/getExploreRooms";
 
 function EmptyRooms() {
   return (
@@ -143,10 +144,14 @@ export default function Home() {
       const isGhost = await AsyncStorage.getItem("isGhostBrowsing");
       if (isGhost === "true") {
         setIsGhostBrowsing(true);
+        const data = await getExploreRooms();
+        setRooms(data);
+      } else {
+        setIsGhostBrowsing(false);
+        // slider is in km, getNearbyRooms expects km
+        const data = await getNearbyRooms(searchDistance, firestoreUser?.id);
+        setRooms(data);
       }
-      // slider is in km, getNearbyRooms expects km
-      const data = await getNearbyRooms(searchDistance, firestoreUser?.id);
-      setRooms(data);
     } catch (error) {
       console.error("Error loading rooms:", error);
       if (
