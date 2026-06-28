@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { trackEvent } from "../../../lib/analytics";
 import { ScrollView, Switch, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ui/ScreenHeader";
@@ -10,7 +12,20 @@ export default function PrivacyData() {
   const [publicProfile, setPublicProfile] = useState(true);
   const [readReceipts, setReadReceipts] = useState(true);
   const [preciseLocation, setPreciseLocation] = useState(false);
+  const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
   const { isDark } = useTheme();
+
+  useEffect(() => {
+    AsyncStorage.getItem("isGhostBrowsing").then((val) => {
+      setIsGhostBrowsing(val === "true");
+    });
+  }, []);
+
+  const handleGhostToggle = async (val) => {
+    setIsGhostBrowsing(val);
+    await AsyncStorage.setItem("isGhostBrowsing", val ? "true" : "false");
+    trackEvent(val ? "Explore Mode enabled" : "Explore Mode disabled", { source: "privacy_settings" });
+  };
 
   const renderSwitch = (value, onValueChange) => (
     <Switch
@@ -51,6 +66,12 @@ export default function PrivacyData() {
             title="Precise location"
             description="Use exact location for room distance estimates."
             rightComponent={renderSwitch(preciseLocation, setPreciseLocation)}
+          />
+          <SettingsRow
+            icon="ghost-outline"
+            title="Private Explore Mode"
+            description="Browse SpotUs without sharing your exact location. Participation requires location access."
+            rightComponent={renderSwitch(isGhostBrowsing, handleGhostToggle)}
             isLast
           />
         </SettingsSection>

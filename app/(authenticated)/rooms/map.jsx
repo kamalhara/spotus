@@ -24,7 +24,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
 import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
+import GhostBrowsingBanner from "../../../components/shared/GhostBrowsingBanner";
 import GlassButton from "../../../components/ui/GlassButton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { trackEvent } from "../../../lib/analytics";
+import { showExploreIntercept } from "../../../lib/exploreMode";
 import { db } from "../../../config/firebase.config";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 import { useTheme } from "../../../context/ThemeContext";
@@ -51,8 +55,7 @@ function EmptyRooms() {
         No rooms nearby
       </Text>
       <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4 mb-10">
-        Expand your search radius or be the first to start a conversation in
-        your area.
+        Keep exploring or enable location to join conversations.
       </Text>
 
       <GlassButton
@@ -323,6 +326,9 @@ export default function MapViewScreen() {
   const [userLocation, setUserLocation] = useState(null);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [selectedRoomToJoin, setSelectedRoomToJoin] = useState(null);
+  const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
+  const [showGhostBanner, setShowGhostBanner] = useState(true);
+  const [retryTrigger, setRetryTrigger] = useState(0);
 
   const hasInitialRender = useRef(false);
 
@@ -336,6 +342,11 @@ export default function MapViewScreen() {
           if (!hasInitialRender.current) {
             setLoading(true);
             hasInitialRender.current = true;
+          }
+          const isGhost = await AsyncStorage.getItem("isGhostBrowsing");
+          if (!isMounted) return;
+          if (isGhost === "true") {
+            setIsGhostBrowsing(true);
           }
           const userLoc = await getCurrentLocation();
           if (!isMounted) return;
@@ -392,7 +403,7 @@ export default function MapViewScreen() {
         if (unsubscribe) unsubscribe();
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [distance, firestoreUser?.id]),
+    }, [distance, firestoreUser?.id, retryTrigger]),
   );
 
   const animateToRoom = (room) => {
@@ -421,6 +432,13 @@ export default function MapViewScreen() {
   const handleJoinRoom = async () => {
     if (!selectedRoomToJoin || !firestoreUser?.id) return;
     try {
+      if (isGhostBrowsing) {
+        showExploreIntercept("join", () => {
+          setIsGhostBrowsing(false);
+          setRetryTrigger(prev => prev + 1);
+        });
+        return;
+      }
       const roomRef = doc(db, "rooms", selectedRoomToJoin.id);
       await updateDoc(roomRef, {
         participants: arrayUnion(firestoreUser?.id),
@@ -443,11 +461,21 @@ export default function MapViewScreen() {
   return (
     <View className="flex-1 bg-bg dark:bg-[#111113]">
       {locationError ? (
-        <LocationPermissionDenied fullScreen />
+        <LocationPermissionDenied 
+          fullScreen 
+          onEnableGhostMode={() => {
+            setLocationError(false);
+            setRetryTrigger(prev => prev + 1);
+          }} 
+        />
       ) : rooms.length === 0 && !loading ? (
         <EmptyRooms />
       ) : (
         <>
+          <GhostBrowsingBanner 
+            visible={isGhostBrowsing && showGhostBanner} 
+            onClose={() => setShowGhostBanner(false)} 
+          />
           <MapView
             ref={mapRef}
             style={{ flex: 1 }}
@@ -559,6 +587,7 @@ export default function MapViewScreen() {
                     room={item}
                     onPress={() => handleCardPress(item)}
                     currentUserId={firestoreUser?.id}
+                    isExploreMode={isGhostBrowsing}
                   />
                 </View>
               )}

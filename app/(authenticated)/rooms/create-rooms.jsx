@@ -1,6 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -12,6 +12,8 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { showExploreIntercept } from "../../../lib/exploreMode";
 import Animated, {
   Extrapolation,
   interpolate,
@@ -70,6 +72,13 @@ export default function CreateRooms() {
   const canCreateRoom =
     title.trim().length > 0 && !!selectedCategory && !isCreating;
 
+  const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
+  useEffect(() => {
+    AsyncStorage.getItem("isGhostBrowsing").then((val) => {
+      setIsGhostBrowsing(val === "true");
+    });
+  }, []);
+
   const scrollY = useSharedValue(0);
 
   const scrollHandler = useAnimatedScrollHandler({
@@ -124,9 +133,7 @@ export default function CreateRooms() {
     };
   });
 
-  const handleCreateRoom = async () => {
-    if (!title || !selectedCategory) return alert("Please fill all the fields");
-    if (!user) return alert("User not loaded");
+  const proceedWithCreation = async () => {
     setIsCreating(true);
     try {
       const { roomId } = await createRoom(
@@ -150,6 +157,20 @@ export default function CreateRooms() {
     } finally {
       setIsCreating(false);
     }
+  };
+
+  const handleCreateRoom = async () => {
+    if (!title || !selectedCategory) return alert("Please fill all the fields");
+    if (!user) return alert("User not loaded");
+    
+    if (isGhostBrowsing) {
+      showExploreIntercept("create room", () => {
+        setIsGhostBrowsing(false);
+      });
+      return;
+    }
+
+    proceedWithCreation();
   };
 
   return (

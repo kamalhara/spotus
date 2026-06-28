@@ -29,6 +29,9 @@ import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
 import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { trackEvent } from "../../../lib/analytics";
+import { showExploreIntercept } from "../../../lib/exploreMode";
 
 function EmptyRooms() {
   return (
@@ -40,7 +43,7 @@ function EmptyRooms() {
         Nothing nearby
       </Text>
       <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">
-        Widen your radius or start a room — someone might be looking for the same thing.
+        Keep exploring or enable location to join conversations.
       </Text>
     </View>
   );
@@ -70,6 +73,8 @@ export default function Home() {
   const [refreshing, setRefreshing] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
+  const [retryTrigger, setRetryTrigger] = useState(0);
 
   // Entrance animations
   const fadeInHeader = useRef(new Animated.Value(0)).current;
@@ -108,6 +113,13 @@ export default function Home() {
   }, []);
 
   const handleJoinRoom = async () => {
+    if (isGhostBrowsing) {
+      showExploreIntercept("join", () => {
+        setIsGhostBrowsing(false);
+        setRetryTrigger(prev => prev + 1);
+      });
+      return;
+    }
     const roomRef = doc(db, "rooms", selectedRoom.id);
     await updateDoc(roomRef, {
       participants: arrayUnion(firestoreUser?.id),
@@ -128,6 +140,10 @@ export default function Home() {
   const loadRooms = useCallback(async () => {
     setLocationError(false);
     try {
+      const isGhost = await AsyncStorage.getItem("isGhostBrowsing");
+      if (isGhost === "true") {
+        setIsGhostBrowsing(true);
+      }
       // slider is in km, getNearbyRooms expects km
       const data = await getNearbyRooms(searchDistance, firestoreUser?.id);
       setRooms(data);
@@ -141,7 +157,7 @@ export default function Home() {
         setLocationError(true);
       }
     }
-  }, [searchDistance, firestoreUser?.id]);
+  }, [searchDistance, firestoreUser?.id, retryTrigger]);
 
   useFocusEffect(
     useCallback(() => {
@@ -174,8 +190,15 @@ export default function Home() {
 
   const handleCreateRoom = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (isGhostBrowsing) {
+      showExploreIntercept("create room", () => {
+        setIsGhostBrowsing(false);
+        setRetryTrigger(prev => prev + 1);
+      });
+      return;
+    }
     router.push("/rooms/create-rooms");
-  }, [router]);
+  }, [router, isGhostBrowsing]);
 
   const handleProfilePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -526,7 +549,10 @@ export default function Home() {
 
         {/* Scrollable content — greeting, slider, CTA, and rooms all scroll together */}
         {locationError ? (
-          <LocationPermissionDenied />
+          <LocationPermissionDenied onEnableGhostMode={() => {
+            setLocationError(false);
+            setRetryTrigger(prev => prev + 1);
+          }} />
         ) : (
           <FlatList
             data={listData}
@@ -537,6 +563,7 @@ export default function Home() {
                 <RoomCard
                   room={item}
                   onPress={() => handlePresentModalPress(item)}
+                  isExploreMode={isGhostBrowsing}
                 />
               )
             }

@@ -9,6 +9,7 @@ const RoomCard = memo(function RoomCard({
   onPress,
   variant = "discovery",
   currentUserId,
+  isExploreMode = false,
 }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const isOwner = room.createdBy === currentUserId;
@@ -16,7 +17,7 @@ const RoomCard = memo(function RoomCard({
   const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
   const categoryColor = CATEGORY_COLORS[room.category] || "#6B7280";
 
-  const buttonText = isDiscovery ? "Jump in" : "Enter";
+  const buttonText = isExploreMode ? "Preview" : isDiscovery ? "Jump in" : "Enter";
 
   const getExpiryText = () => {
     if (!room.expiresAt) return "Active Event";
