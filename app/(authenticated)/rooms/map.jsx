@@ -1,15 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
-import React, { useCallback, useRef, useState, useEffect } from "react";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSpring,
-  withSequence,
-  runOnJS,
-} from "react-native-reanimated";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -20,22 +13,29 @@ import {
 } from "react-native";
 import MapView from "react-native-map-clustering";
 import { Marker } from "react-native-maps";
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
-import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
+import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
 import GhostBrowsingBanner from "../../../components/shared/GhostBrowsingBanner";
+import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
 import GlassButton from "../../../components/ui/GlassButton";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { trackEvent } from "../../../lib/analytics";
 import { db } from "../../../config/firebase.config";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
-import { subscribeNearbyRooms } from "../../../lib/getNearbyRoom";
+import { trackEvent } from "../../../lib/analytics";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
+import { subscribeNearbyRooms } from "../../../lib/getNearbyRoom";
 import { getCurrentLocation } from "../../../lib/location";
-import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.78; // Narrower to show adjacent cards
 const ITEM_MARGIN = 8;
@@ -49,7 +49,7 @@ function EmptyRooms() {
   return (
     <View className="flex-1 items-center justify-center py-20 px-6">
       <View className="w-24 h-24 bg-info-surface rounded-full items-center justify-center mb-6">
-        <Ionicons name="compass" size={40} color="#3B82F6" />
+        <Ionicons name="compass" size={40} color="#FF6B47" />
       </View>
       <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight text-center mb-2.5">
         No rooms nearby
@@ -76,11 +76,7 @@ function EmptyRooms() {
       </GlassButton>
 
       <View style={{ position: "absolute", top: insets.top + 16, left: 16 }}>
-        <GlassButton
-          onPress={() => router.back()}
-          size={44}
-          shape="circle"
-        >
+        <GlassButton onPress={() => router.back()} size={44} shape="circle">
           <Ionicons
             name="chevron-back"
             size={20}
@@ -183,128 +179,149 @@ const darkMapStyle = [
   },
 ];
 
-const AnimatedRoomMarker = React.memo(({ room, isSelected, onPress, isDark }) => {
-  const categoryColor = CATEGORY_COLORS[room.category] || "#FF6B47";
-  const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
-  
-  const scale = useSharedValue(0);
-  const opacity = useSharedValue(0);
-  const [tracksViewChanges, setTracksViewChanges] = useState(true);
+const AnimatedRoomMarker = React.memo(
+  ({ room, isSelected, onPress, isDark }) => {
+    const categoryColor = CATEGORY_COLORS[room.category] || "#FF6B47";
+    const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
 
-  // Mount animation
-  useEffect(() => {
-    scale.value = withSpring(isSelected ? 1.15 : 1, { damping: 16, stiffness: 90 }, () => {
-      runOnJS(setTracksViewChanges)(false);
-    });
-    opacity.value = withTiming(1, { duration: 300 });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const scale = useSharedValue(0);
+    const opacity = useSharedValue(0);
+    const [tracksViewChanges, setTracksViewChanges] = useState(true);
 
-  // Update animation when participants change
-  const prevParticipants = useRef(room.participants?.length || 1);
-  useEffect(() => {
-    const currentParticipants = room.participants?.length || 1;
-    if (currentParticipants !== prevParticipants.current) {
-      prevParticipants.current = currentParticipants;
-      setTracksViewChanges(true);
-      // Pulse animation
-      const baseScale = isSelected ? 1.15 : 1;
-      scale.value = withSequence(
-        withTiming(baseScale * 1.3, { duration: 150 }),
-        withSpring(baseScale, { damping: 14, stiffness: 100 }, () => {
+    // Mount animation
+    useEffect(() => {
+      scale.value = withSpring(
+        isSelected ? 1.15 : 1,
+        { damping: 16, stiffness: 90 },
+        () => {
           runOnJS(setTracksViewChanges)(false);
-        })
+        },
       );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [room.participants?.length, isSelected]);
+      opacity.value = withTiming(1, { duration: 300 });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-  // Handle selection state change specifically without re-running mount animation
-  useEffect(() => {
-    const targetScale = isSelected ? 1.15 : 1;
-    if (scale.value !== targetScale && scale.value !== 0) {
-      setTracksViewChanges(true);
-      scale.value = withSpring(targetScale, { damping: 16, stiffness: 90 }, () => {
-        runOnJS(setTracksViewChanges)(false);
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSelected]);
+    // Update animation when participants change
+    const prevParticipants = useRef(room.participants?.length || 1);
+    useEffect(() => {
+      const currentParticipants = room.participants?.length || 1;
+      if (currentParticipants !== prevParticipants.current) {
+        prevParticipants.current = currentParticipants;
+        setTracksViewChanges(true);
+        // Pulse animation
+        const baseScale = isSelected ? 1.15 : 1;
+        scale.value = withSequence(
+          withTiming(baseScale * 1.3, { duration: 150 }),
+          withSpring(baseScale, { damping: 14, stiffness: 100 }, () => {
+            runOnJS(setTracksViewChanges)(false);
+          }),
+        );
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [room.participants?.length, isSelected]);
 
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-    opacity: opacity.value,
-  }));
+    // Handle selection state change specifically without re-running mount animation
+    useEffect(() => {
+      const targetScale = isSelected ? 1.15 : 1;
+      if (scale.value !== targetScale && scale.value !== 0) {
+        setTracksViewChanges(true);
+        scale.value = withSpring(
+          targetScale,
+          { damping: 16, stiffness: 90 },
+          () => {
+            runOnJS(setTracksViewChanges)(false);
+          },
+        );
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isSelected]);
 
-  return (
-    <Marker
-      coordinate={{
-        latitude: room.latitude,
-        longitude: room.longitude,
-      }}
-      onPress={onPress}
-      tracksViewChanges={tracksViewChanges}
-      style={{ zIndex: isSelected ? 10 : 1 }}
-    >
-      <Animated.View style={[{ alignItems: "center", justifyContent: "center" }, animatedStyle]}>
-        <View
-          style={{
-            backgroundColor: isSelected ? categoryColor : isDark ? "#1C1C20" : "white",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            borderRadius: 24,
-            borderWidth: 2,
-            borderColor: isSelected ? "white" : categoryColor,
-            shadowColor: categoryColor,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: isSelected ? 0.6 : 0.2,
-            shadowRadius: 6,
-            elevation: 8,
-            flexDirection: "row",
-            alignItems: "center",
-          }}
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    }));
+
+    return (
+      <Marker
+        coordinate={{
+          latitude: room.latitude,
+          longitude: room.longitude,
+        }}
+        onPress={onPress}
+        tracksViewChanges={tracksViewChanges}
+        style={{ zIndex: isSelected ? 10 : 1 }}
+      >
+        <Animated.View
+          style={[
+            { alignItems: "center", justifyContent: "center" },
+            animatedStyle,
+          ]}
         >
-          <Ionicons
-            name={categoryIcon}
-            size={16}
-            color={isSelected ? "white" : categoryColor}
-            style={{ marginRight: 6 }}
-          />
-          <Text
+          <View
             style={{
-              fontSize: 13,
-              fontWeight: "900",
-              color: isSelected ? "white" : isDark ? "#F3F4F6" : "#18181B",
+              backgroundColor: isSelected
+                ? categoryColor
+                : isDark
+                  ? "#1C1C20"
+                  : "white",
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+              borderRadius: 24,
+              borderWidth: 2,
+              borderColor: isSelected ? "white" : categoryColor,
+              shadowColor: categoryColor,
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: isSelected ? 0.6 : 0.2,
+              shadowRadius: 6,
+              elevation: 8,
+              flexDirection: "row",
+              alignItems: "center",
             }}
           >
-            {room.participants?.length || 1}
-          </Text>
-        </View>
-        <View
-          style={{
-            width: 0,
-            height: 0,
-            borderLeftWidth: 6,
-            borderRightWidth: 6,
-            borderTopWidth: 8,
-            borderLeftColor: "transparent",
-            borderRightColor: "transparent",
-            borderTopColor: isSelected ? "white" : categoryColor,
-            marginTop: -1,
-          }}
-        />
-      </Animated.View>
-    </Marker>
-  );
-}, (prevProps, nextProps) => {
-  return (
-    prevProps.room.id === nextProps.room.id &&
-    prevProps.room.category === nextProps.room.category &&
-    (prevProps.room.participants?.length || 1) === (nextProps.room.participants?.length || 1) &&
-    prevProps.isSelected === nextProps.isSelected &&
-    prevProps.isDark === nextProps.isDark
-  );
-});
+            <Ionicons
+              name={categoryIcon}
+              size={16}
+              color={isSelected ? "white" : categoryColor}
+              style={{ marginRight: 6 }}
+            />
+            <Text
+              style={{
+                fontSize: 13,
+                fontWeight: "900",
+                color: isSelected ? "white" : isDark ? "#F3F4F6" : "#18181B",
+              }}
+            >
+              {room.participants?.length || 1}
+            </Text>
+          </View>
+          <View
+            style={{
+              width: 0,
+              height: 0,
+              borderLeftWidth: 6,
+              borderRightWidth: 6,
+              borderTopWidth: 8,
+              borderLeftColor: "transparent",
+              borderRightColor: "transparent",
+              borderTopColor: isSelected ? "white" : categoryColor,
+              marginTop: -1,
+            }}
+          />
+        </Animated.View>
+      </Marker>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.room.id === nextProps.room.id &&
+      prevProps.room.category === nextProps.room.category &&
+      (prevProps.room.participants?.length || 1) ===
+        (nextProps.room.participants?.length || 1) &&
+      prevProps.isSelected === nextProps.isSelected &&
+      prevProps.isDark === nextProps.isDark
+    );
+  },
+);
 
 AnimatedRoomMarker.displayName = "AnimatedRoomMarker";
 
@@ -329,7 +346,10 @@ export default function MapViewScreen() {
   const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
   const [showGhostBanner, setShowGhostBanner] = useState(true);
   const [retryTrigger, setRetryTrigger] = useState(0);
-  const [interceptModal, setInterceptModal] = useState({ visible: false, action: "" });
+  const [interceptModal, setInterceptModal] = useState({
+    visible: false,
+    action: "",
+  });
 
   const hasInitialRender = useRef(false);
 
@@ -352,7 +372,7 @@ export default function MapViewScreen() {
             if (!isMounted) return;
             setRooms(exploreData);
             setLoading(false);
-            
+
             let centerLat = 37.7749;
             let centerLng = -122.4194;
             if (exploreData.length > 0) {
@@ -369,15 +389,15 @@ export default function MapViewScreen() {
             }
 
             setSelectedRoomId((prev) => {
-               if (!prev && exploreData.length > 0) return exploreData[0].id;
-               return prev;
+              if (!prev && exploreData.length > 0) return exploreData[0].id;
+              return prev;
             });
             // We don't subscribe to updates when exploring to save reads
             return;
           } else {
             setIsGhostBrowsing(false);
           }
-          
+
           const userLoc = await getCurrentLocation();
           if (!isMounted) return;
           setUserLocation({
@@ -394,24 +414,27 @@ export default function MapViewScreen() {
           }
 
           const radiusKm = distance ? parseFloat(distance) : 5;
-          
-          unsubscribe = await subscribeNearbyRooms(radiusKm, firestoreUser?.id, (allRooms) => {
-            if (!isMounted) return;
-            const mapRooms = allRooms.filter(
-              (r) =>
-                r.showOnMap === true &&
-                !r.participants?.includes(firestoreUser?.id),
-            );
 
-            setRooms(mapRooms);
-            setLoading(false);
-            
-            setSelectedRoomId((prev) => {
-               if (!prev && mapRooms.length > 0) return mapRooms[0].id;
-               return prev;
-            });
-          });
+          unsubscribe = await subscribeNearbyRooms(
+            radiusKm,
+            firestoreUser?.id,
+            (allRooms) => {
+              if (!isMounted) return;
+              const mapRooms = allRooms.filter(
+                (r) =>
+                  r.showOnMap === true &&
+                  !r.participants?.includes(firestoreUser?.id),
+              );
 
+              setRooms(mapRooms);
+              setLoading(false);
+
+              setSelectedRoomId((prev) => {
+                if (!prev && mapRooms.length > 0) return mapRooms[0].id;
+                return prev;
+              });
+            },
+          );
         } catch (error) {
           console.error("Error loading map rooms", error);
           if (!isMounted) return;
@@ -427,7 +450,7 @@ export default function MapViewScreen() {
       };
 
       loadData();
-      
+
       return () => {
         isMounted = false;
         if (unsubscribe) unsubscribe();
@@ -489,23 +512,23 @@ export default function MapViewScreen() {
   return (
     <View className="flex-1 bg-bg dark:bg-[#111113]">
       {locationError ? (
-        <LocationPermissionDenied 
-          fullScreen 
+        <LocationPermissionDenied
+          fullScreen
           onEnableGhostMode={() => {
             setLocationError(false);
-            setRetryTrigger(prev => prev + 1);
-          }} 
+            setRetryTrigger((prev) => prev + 1);
+          }}
         />
       ) : rooms.length === 0 && !loading ? (
         <EmptyRooms />
       ) : (
         <>
-          <GhostBrowsingBanner 
-            visible={isGhostBrowsing && showGhostBanner} 
-            onClose={() => setShowGhostBanner(false)} 
+          <GhostBrowsingBanner
+            visible={isGhostBrowsing && showGhostBanner}
+            onClose={() => setShowGhostBanner(false)}
             onEnableLocation={() => {
               setIsGhostBrowsing(false);
-              setRetryTrigger(prev => prev + 1);
+              setRetryTrigger((prev) => prev + 1);
             }}
           />
           <MapView
@@ -633,7 +656,7 @@ export default function MapViewScreen() {
         room={selectedRoomToJoin}
         onConfirm={handleJoinRoom}
       />
-      
+
       <ExploreInterceptModal
         visible={interceptModal.visible}
         actionName={interceptModal.action}
@@ -642,7 +665,7 @@ export default function MapViewScreen() {
           setInterceptModal({ visible: false, action: "" });
           await AsyncStorage.setItem("isGhostBrowsing", "false");
           setIsGhostBrowsing(false);
-          setRetryTrigger(prev => prev + 1);
+          setRetryTrigger((prev) => prev + 1);
         }}
       />
     </View>

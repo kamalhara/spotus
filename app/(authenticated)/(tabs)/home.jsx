@@ -33,6 +33,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { trackEvent } from "../../../lib/analytics";
 import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
+import FallbackRoomsSection from "../../../components/rooms/FallbackRoomsSection";
 
 function EmptyRooms() {
   return (
@@ -582,6 +583,11 @@ export default function Home() {
               item._skeleton ? `skel-${index}` : item.id
             }
             ListHeaderComponent={ListHeader}
+            ListFooterComponent={
+              !loading && filteredRooms.length < 2 ? (
+                <FallbackRoomsSection onRoomPress={handlePresentModalPress} />
+              ) : null
+            }
             contentContainerStyle={{ paddingBottom: 100, paddingTop: 4 }}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={loading ? null : <EmptyRooms />}

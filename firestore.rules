@@ -50,6 +50,12 @@ service cloud.firestore {
       allow write: if false; // Only backend/functions should write this
     }
 
+    // GLOBAL ROOMS
+    match /globalRooms/{roomId} {
+      allow read: if true;
+      allow write: if false; // Only backend/functions should write this
+    }
+
     // Fallback — deny everything else
     match /{document=**} {
       allow read, write: if false;
