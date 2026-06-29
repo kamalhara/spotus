@@ -1,12 +1,15 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Text, TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp, FadeOutUp } from "react-native-reanimated";
-import GlassContainer from "../ui/GlassContainer";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "../../context/ThemeContext";
+import GlassContainer from "../ui/GlassContainer";
 
-export default function GhostBrowsingBanner({ visible, onClose, onEnableLocation }) {
+export default function GhostBrowsingBanner({
+  visible,
+  onClose,
+  onEnableLocation,
+}) {
   const { isDark } = useTheme();
 
   if (!visible) return null;
@@ -33,7 +36,7 @@ export default function GhostBrowsingBanner({ visible, onClose, onEnableLocation
             </View>
             <View className="flex-1 pr-2">
               <Text className="text-purple-700 dark:text-purple-300 font-display font-bold text-[15px] tracking-tight">
-                👻 You're exploring anonymously.
+                You&apos;re exploring anonymously.
               </Text>
               <Text className="text-purple-500 dark:text-purple-400 text-[12px] leading-4 mt-0.5">
                 Enable location to join conversations and create rooms.

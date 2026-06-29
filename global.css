@@ -33,11 +33,7 @@
     --color-heart: #F472B6;
     --color-heart-surface: #FDF2F8;
 
-    --color-chat-received: #FFFFFF;
-    --color-card: #FFFFFF;
-    --color-card-border: #F2F0EC;
-    --color-input-bg: #F5F3EF;
-    --color-skeleton: #E8E6E1;
+
   }
 
   .dark {
@@ -70,10 +66,6 @@
     --color-heart: #F472B6;
     --color-heart-surface: rgba(244, 114, 182, 0.1);
 
-    --color-chat-received: #1C1C20;
-    --color-card: #1C1C20;
-    --color-card-border: #2C2C30;
-    --color-input-bg: #242428;
-    --color-skeleton: #242428;
+
   }
 }

@@ -34,16 +34,7 @@ module.exports = {
         heart: "var(--color-heart)",
         "heart-surface": "var(--color-heart-surface)",
 
-        "chat-sent": "#FF6B47",
-        "chat-sent-dark": "#E54D2E",
-        "chat-received": "var(--color-chat-received)",
-        card: "var(--color-card)",
-        "card-border": "var(--color-card-border)",
-        "input-bg": "var(--color-input-bg)",
-        skeleton: "var(--color-skeleton)",
 
-        "accent-yellow": "#FFD43B",
-        "accent-mint": "#69DB7C",
       },
       borderRadius: {
         "2.5xl": "20px",
