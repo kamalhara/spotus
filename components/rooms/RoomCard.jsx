@@ -1,8 +1,8 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import React, { memo, useRef } from "react";
+import { memo, useRef } from "react";
 import { Animated, Text, TouchableOpacity, View } from "react-native";
-import ParticipantAvatar from "./ParticipantAvatar";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
+import ParticipantAvatar from "./ParticipantAvatar";
 
 const RoomCard = memo(function RoomCard({
   room,
@@ -17,7 +17,11 @@ const RoomCard = memo(function RoomCard({
   const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
   const categoryColor = CATEGORY_COLORS[room.category] || "#6B7280";
 
-  const buttonText = isExploreMode ? "Preview" : isDiscovery ? "Jump in" : "Enter";
+  const buttonText = isExploreMode
+    ? "Preview"
+    : isDiscovery
+      ? "Jump in"
+      : "Enter";
 
   const getExpiryText = () => {
     if (!room.expiresAt) return "Active Event";
@@ -67,10 +71,10 @@ const RoomCard = memo(function RoomCard({
     ? room.lastMessageAt.seconds * 1000
     : room.lastMessageAt instanceof Date
       ? room.lastMessageAt.getTime()
-      : room.lastMessageAt || 
+      : room.lastMessageAt ||
         (room.createdAt?.seconds ? room.createdAt.seconds * 1000 : Date.now());
-  
-  const isActiveNow = (Date.now() - lastActivityMs) < 5 * 60 * 1000;
+
+  const isActiveNow = Date.now() - lastActivityMs < 5 * 60 * 1000;
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -90,12 +94,6 @@ const RoomCard = memo(function RoomCard({
 
   const cardContent = (
     <>
-      {/* Category accent stripe */}
-      <View
-        className="absolute left-0 top-3 bottom-3 w-[4px] rounded-r-full"
-        style={{ backgroundColor: categoryColor }}
-      />
-      
       {/* Category — colored per type */}
       <View className="flex-row justify-between items-center mb-3">
         <View className="flex-row items-center gap-2">
@@ -135,21 +133,30 @@ const RoomCard = memo(function RoomCard({
 
       {/* Title */}
       <View className="flex-row items-center mb-1.5 justify-between">
-        <Text className="text-secondary dark:text-gray-100 font-display font-extrabold tracking-tight text-[20px] leading-7 flex-1" numberOfLines={1}>
+        <Text
+          className="text-secondary dark:text-gray-100 font-display font-extrabold tracking-tight text-[20px] leading-7 flex-1"
+          numberOfLines={1}
+        >
           {room.title}
         </Text>
         {isActiveNow && (
           <View className="flex-row items-center ml-2 bg-green-500/10 px-2 py-1 rounded-md">
             <View className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5" />
-            <Text className="text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-wider">Active</Text>
+            <Text className="text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-wider">
+              Active
+            </Text>
           </View>
         )}
       </View>
 
       {/* Last Message */}
       {room.lastMessage && (
-        <Text className="text-gray-500 dark:text-gray-400 text-[13px] font-medium mb-3" numberOfLines={1}>
-          {room.lastMessageSenderId === currentUserId ? "You: " : ""}{room.lastMessage}
+        <Text
+          className="text-gray-500 dark:text-gray-400 text-[13px] font-medium mb-3"
+          numberOfLines={1}
+        >
+          {room.lastMessageSenderId === currentUserId ? "You: " : ""}
+          {room.lastMessage}
         </Text>
       )}
 
@@ -208,7 +215,9 @@ const RoomCard = memo(function RoomCard({
             ))}
             {participantCount > 3 && (
               <View className="w-7 h-7 rounded-xl border-2 border-white dark:border-[#1C1C20] items-center justify-center bg-gray-100 dark:bg-[#252528]">
-                <Text className="text-gray-500 dark:text-gray-400 font-bold text-[10px]">+{participantCount - 3}</Text>
+                <Text className="text-gray-500 dark:text-gray-400 font-bold text-[10px]">
+                  +{participantCount - 3}
+                </Text>
               </View>
             )}
             {participantCount === 0 && (
