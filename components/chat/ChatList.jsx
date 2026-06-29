@@ -1,7 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { deleteDoc, doc, setDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import React, { memo, useRef, useState } from "react";
+import { deleteChatWithMessages } from "../../lib/deleteRoom";
 import {
   Alert,
   Animated,
@@ -99,7 +100,7 @@ const ChatRow = memo(function ChatRow({ chat, onPress }) {
         style: "destructive",
         onPress: async () => {
           try {
-            await deleteDoc(doc(db, "chats", chat.id));
+            await deleteChatWithMessages(chat.id);
           } catch (err) {
             console.error("Error deleting chat:", err);
           }

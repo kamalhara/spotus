@@ -14,6 +14,8 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
+import { arrayRemove, arrayUnion } from "firebase/firestore";
+import { deleteChatWithMessages } from "../../../lib/deleteRoom";
 import { useEffect, useMemo, useState } from "react";
 import {
   Image,
@@ -380,7 +382,7 @@ export default function ChatId() {
                 <View className="flex-row gap-3">
                   <TouchableOpacity
                     onPress={async () => {
-                      await deleteDoc(doc(db, "chats", chatDocId));
+                      await deleteChatWithMessages(chatDocId);
                       router.replace("/home");
                     }}
                     className="flex-1 py-3.5 bg-gray-100 dark:bg-gray-800 rounded-2xl items-center"
