@@ -1,6 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
 import { memo, useRef } from "react";
-import { Animated, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Share, Text, TouchableOpacity, View } from "react-native";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
 import ParticipantAvatar from "./ParticipantAvatar";
 
@@ -92,6 +93,17 @@ const RoomCard = memo(function RoomCard({
     }).start();
   };
 
+  const handleShare = async () => {
+    try {
+      const inviteLink = Linking.createURL("join/" + room?.inviteCode);
+      await Share.share({
+        message: `Join my event: ${room?.title} on SpotUs! Use invite code ${room?.inviteCode} or tap here: ${inviteLink}`,
+      });
+    } catch (error) {
+      console.error("Error sharing room:", error);
+    }
+  };
+
   const cardContent = (
     <>
       {/* Category — colored per type */}
@@ -129,6 +141,13 @@ const RoomCard = memo(function RoomCard({
             </View>
           )}
         </View>
+
+        <TouchableOpacity 
+          onPress={handleShare}
+          className="w-8 h-8 rounded-full items-center justify-center bg-gray-50 dark:bg-[#2A2A2E]"
+        >
+          <Ionicons name="share-social-outline" size={16} color="#6B7280" />
+        </TouchableOpacity>
       </View>
 
       {/* Title */}

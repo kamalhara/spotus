@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as Linking from "expo-linking";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   arrayRemove,
@@ -134,7 +135,7 @@ export default function RoomInfo() {
 
   const handleShare = async () => {
     try {
-      const inviteLink = `spotus.app/join/${room?.inviteCode}`;
+      const inviteLink = Linking.createURL("join/" + room?.inviteCode);
       await Share.share({
         message: `Join my event: ${room?.title} on SpotUs! Use invite code ${room?.inviteCode} or tap here: ${inviteLink}`,
       });

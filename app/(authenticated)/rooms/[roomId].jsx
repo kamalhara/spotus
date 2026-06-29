@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Clipboard from "expo-clipboard";
+import * as Linking from "expo-linking";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -287,7 +288,7 @@ export default function RoomChat() {
 
   const handleShare = async () => {
     try {
-      const inviteLink = `spotus.app/join/${room?.inviteCode}`;
+      const inviteLink = Linking.createURL("join/" + room?.inviteCode);
       await Share.share({
         message: `Join my event: ${room?.title} on SpotUs! Use invite code ${room?.inviteCode} or tap here: ${inviteLink}`,
       });

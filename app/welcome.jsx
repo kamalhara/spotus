@@ -74,7 +74,7 @@ export default function Welcome() {
             transform: [{ scale: scaleHero }],
           }}
         >
-          <View className="w-72 h-72 items-center justify-center bg-primary-surface dark:bg-[#1C1C20] rounded-[36px] border border-border-light dark:border-[#2C2C30]">
+          <View className="w-72 h-72 items-center justify-center dark:bg-[#1C1C20] rounded-[36px]">
             <Image
               source={require("../assets/images/trans.png")}
               className="w-full h-full"
@@ -92,7 +92,8 @@ export default function Welcome() {
         >
           <View className="bg-surface-alt dark:bg-[#1C1C20] px-8 pt-10 pb-14 rounded-t-[36px]">
             <Text className="text-secondary dark:text-gray-100 text-[36px] font-display leading-[42px] tracking-tight">
-              See what&apos;s{"\n"}happening <Text className="text-primary">around you</Text>
+              See what&apos;s{"\n"}happening{" "}
+              <Text className="text-primary">around you</Text>
             </Text>
             <Text className="text-muted text-[15px] mt-3 leading-6 mb-8">
               Real conversations about real things, with real people nearby.
