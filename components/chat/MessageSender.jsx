@@ -338,7 +338,7 @@ export default function MessageSender({
         style={{
           padding: 6,
           flexDirection: "row",
-          alignItems: "center",
+          alignItems: "flex-end",
           width: "100%",
         }}
       >
@@ -362,9 +362,8 @@ export default function MessageSender({
           }}
           placeholder="Type a message..."
           placeholderTextColor="#CBD5E1"
-          className="flex-1 px-3.5 text-[15px] text-secondary dark:text-gray-100 tracking-tight h-11"
-          returnKeyType="send"
-          onSubmitEditing={onSend}
+          className="flex-1 px-3.5 text-[15px] text-secondary dark:text-gray-100 tracking-tight min-h-[42px] max-h-[120px] py-2.5"
+          multiline={true}
           underlineColorAndroid="transparent"
         />
 
