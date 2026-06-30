@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Slider from "@react-native-community/slider";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -15,26 +16,25 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import CategoryChips from "../../../components/home/CategoryChips";
+import NearbyPulse from "../../../components/home/NearbyPulse";
+import FallbackRoomsSection from "../../../components/rooms/FallbackRoomsSection";
 import JoinByCodeSheet from "../../../components/rooms/JoinByCodeSheet";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
 import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
+import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
+import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
 import GlassButton from "../../../components/ui/GlassButton";
-import NearbyPulse from "../../../components/home/NearbyPulse";
-import CategoryChips from "../../../components/home/CategoryChips";
-import { CATEGORY_ICONS } from "../../../constants/categories";
 import { db } from "../../../config/firebase.config";
+import { CATEGORY_ICONS } from "../../../constants/categories";
 import { useFloatingButton } from "../../../context/FloatingButtonContext";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { trackEvent } from "../../../lib/analytics";
+import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
 import { sendPushNotification } from "../../../lib/notification";
-import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { trackEvent } from "../../../lib/analytics";
-import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
-import { getExploreRooms } from "../../../lib/getExploreRooms";
-import FallbackRoomsSection from "../../../components/rooms/FallbackRoomsSection";
 
 function EmptyRooms() {
   return (
@@ -78,7 +78,10 @@ export default function Home() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
   const [retryTrigger, setRetryTrigger] = useState(0);
-  const [interceptModal, setInterceptModal] = useState({ visible: false, action: "" });
+  const [interceptModal, setInterceptModal] = useState({
+    visible: false,
+    action: "",
+  });
 
   // Entrance animations
   const fadeInHeader = useRef(new Animated.Value(0)).current;
@@ -123,16 +126,18 @@ export default function Home() {
       return;
     }
     const roomRef = doc(db, "rooms", selectedRoom.id);
-    
-    const wasAlreadyInRoom = selectedRoom.participants?.includes(firestoreUser?.id);
-    
+
+    const wasAlreadyInRoom = selectedRoom.participants?.includes(
+      firestoreUser?.id,
+    );
+
     await updateDoc(roomRef, {
       participants: arrayUnion(firestoreUser?.id),
     });
 
     if (!wasAlreadyInRoom && selectedRoom.participants) {
       const otherParticipants = selectedRoom.participants.filter(
-        (uid) => uid !== firestoreUser?.id
+        (uid) => uid !== firestoreUser?.id,
       );
       otherParticipants.forEach((uid) => {
         sendPushNotification(
@@ -140,7 +145,7 @@ export default function Home() {
           firestoreUser?.id,
           selectedRoom.title || "Room",
           `${firestoreUser?.userName || "Someone"} joined the room!`,
-          { type: "room", screen: "room", roomId: selectedRoom.id }
+          { type: "room", screen: "room", roomId: selectedRoom.id },
         );
       });
     }
@@ -209,17 +214,16 @@ export default function Home() {
   }, [loadRooms]);
 
   const nearbyRooms = rooms.filter(
-    (r) =>
-      !r.participants?.includes(firestoreUser?.id)
+    (r) => !r.participants?.includes(firestoreUser?.id),
   );
 
   const filteredRooms = nearbyRooms.filter(
-    (r) => activeCategory === "all" || r.category === activeCategory
+    (r) => activeCategory === "all" || r.category === activeCategory,
   );
 
   const totalPeopleChatting = nearbyRooms.reduce(
     (acc, room) => acc + (room.participants?.length || 0),
-    0
+    0,
   );
 
   const handleCreateRoom = useCallback(() => {
@@ -575,20 +579,18 @@ export default function Home() {
             </Text>
             <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
           </View>
-          <TouchableOpacity
-            onPress={() => router.push("/notificationsList")}
-            className="w-12 h-12 items-center justify-center bg-gray-100 dark:bg-[#1C1C20] rounded-2xl border border-gray-200 dark:border-[#2C2C30]"
-          >
-            <Ionicons name="notifications-outline" size={20} color={isDark ? "white" : "#18181B"} />
-          </TouchableOpacity>
+          {/* Spacer to preserve layout — button is now the shared FloatingGlassButton */}
+          <View style={{ width: 48 }} />
         </Animated.View>
 
         {/* Scrollable content — greeting, slider, CTA, and rooms all scroll together */}
         {locationError ? (
-          <LocationPermissionDenied onEnableGhostMode={() => {
-            setLocationError(false);
-            setRetryTrigger(prev => prev + 1);
-          }} />
+          <LocationPermissionDenied
+            onEnableGhostMode={() => {
+              setLocationError(false);
+              setRetryTrigger((prev) => prev + 1);
+            }}
+          />
         ) : (
           <FlatList
             data={listData}
@@ -654,7 +656,7 @@ export default function Home() {
           setInterceptModal({ visible: false, action: "" });
           await AsyncStorage.setItem("isGhostBrowsing", "false");
           setIsGhostBrowsing(false);
-          setRetryTrigger(prev => prev + 1);
+          setRetryTrigger((prev) => prev + 1);
         }}
       />
     </>
