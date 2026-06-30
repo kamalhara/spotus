@@ -18,7 +18,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import CategoryChips from "../../../components/home/CategoryChips";
 import NearbyPulse from "../../../components/home/NearbyPulse";
-import FallbackRoomsSection from "../../../components/rooms/FallbackRoomsSection";
 import JoinByCodeSheet from "../../../components/rooms/JoinByCodeSheet";
 import RoomCard from "../../../components/rooms/RoomCard";
 import RoomCardSkeleton from "../../../components/rooms/RoomCardSkeleton";
@@ -609,11 +608,7 @@ export default function Home() {
               item._skeleton ? `skel-${index}` : item.id
             }
             ListHeaderComponent={ListHeader}
-            ListFooterComponent={
-              !loading && filteredRooms.length < 2 ? (
-                <FallbackRoomsSection onRoomPress={handlePresentModalPress} />
-              ) : null
-            }
+            ListFooterComponent={null}
             contentContainerStyle={{ paddingBottom: 100, paddingTop: 4 }}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={loading ? null : <EmptyRooms />}
