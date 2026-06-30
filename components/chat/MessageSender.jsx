@@ -338,7 +338,7 @@ export default function MessageSender({
         style={{
           padding: 6,
           flexDirection: "row",
-          alignItems: "flex-end",
+          alignItems: "center",
           width: "100%",
         }}
       >
