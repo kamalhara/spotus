@@ -141,13 +141,6 @@ const RoomCard = memo(function RoomCard({
             </View>
           )}
         </View>
-
-        <TouchableOpacity 
-          onPress={handleShare}
-          className="w-8 h-8 rounded-full items-center justify-center bg-gray-50 dark:bg-[#2A2A2E]"
-        >
-          <Ionicons name="share-social-outline" size={16} color="#6B7280" />
-        </TouchableOpacity>
       </View>
 
       {/* Title */}
