@@ -28,6 +28,7 @@ import { useFloatingButton } from "../../../context/FloatingButtonContext";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
+import { sendPushNotification } from "../../../lib/notification";
 import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { trackEvent } from "../../../lib/analytics";
@@ -122,9 +123,28 @@ export default function Home() {
       return;
     }
     const roomRef = doc(db, "rooms", selectedRoom.id);
+    
+    const wasAlreadyInRoom = selectedRoom.participants?.includes(firestoreUser?.id);
+    
     await updateDoc(roomRef, {
       participants: arrayUnion(firestoreUser?.id),
     });
+
+    if (!wasAlreadyInRoom && selectedRoom.participants) {
+      const otherParticipants = selectedRoom.participants.filter(
+        (uid) => uid !== firestoreUser?.id
+      );
+      otherParticipants.forEach((uid) => {
+        sendPushNotification(
+          uid,
+          firestoreUser?.id,
+          selectedRoom.title || "Room",
+          `${firestoreUser?.userName || "Someone"} joined the room!`,
+          { type: "room", screen: "room", roomId: selectedRoom.id }
+        );
+      });
+    }
+
     bottomSheetModalRef.current?.dismiss();
     router.push(`/rooms/${selectedRoom.id}`);
   };
@@ -555,8 +575,12 @@ export default function Home() {
             </Text>
             <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
           </View>
-          {/* Spacer to preserve layout — button is now the shared FloatingGlassButton */}
-          <View style={{ width: 48 }} />
+          <TouchableOpacity
+            onPress={() => router.push("/notificationsList")}
+            className="w-12 h-12 items-center justify-center bg-gray-100 dark:bg-[#1C1C20] rounded-2xl border border-gray-200 dark:border-[#2C2C30]"
+          >
+            <Ionicons name="notifications-outline" size={20} color={isDark ? "white" : "#18181B"} />
+          </TouchableOpacity>
         </Animated.View>
 
         {/* Scrollable content — greeting, slider, CTA, and rooms all scroll together */}

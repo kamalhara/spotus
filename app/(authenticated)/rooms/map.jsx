@@ -33,6 +33,7 @@ import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { trackEvent } from "../../../lib/analytics";
+import { sendPushNotification } from "../../../lib/notification";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { subscribeNearbyRooms } from "../../../lib/getNearbyRoom";
 import { getCurrentLocation } from "../../../lib/location";
@@ -491,9 +492,27 @@ export default function MapViewScreen() {
         return;
       }
       const roomRef = doc(db, "rooms", selectedRoomToJoin.id);
+      const wasAlreadyInRoom = selectedRoomToJoin.participants?.includes(firestoreUser?.id);
+
       await updateDoc(roomRef, {
         participants: arrayUnion(firestoreUser?.id),
       });
+
+      if (!wasAlreadyInRoom && selectedRoomToJoin.participants) {
+        const otherParticipants = selectedRoomToJoin.participants.filter(
+          (uid) => uid !== firestoreUser?.id
+        );
+        otherParticipants.forEach((uid) => {
+          sendPushNotification(
+            uid,
+            firestoreUser?.id,
+            selectedRoomToJoin.title || "Room",
+            `${firestoreUser?.userName || "Someone"} joined the room!`,
+            { type: "room", screen: "room", roomId: selectedRoomToJoin.id }
+          );
+        });
+      }
+
       bottomSheetModalRef.current?.dismiss();
       router.push(`/rooms/${selectedRoomToJoin.id}`);
     } catch (err) {

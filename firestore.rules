@@ -56,6 +56,16 @@ service cloud.firestore {
       allow write: if false; // Only backend/functions should write this
     }
 
+    // NOTIFICATIONS
+    match /notifications/{notificationId} {
+      allow read, write: if true;
+    }
+
+    // STATS
+    match /stats/{statId} {
+      allow read, write: if true;
+    }
+
     // Fallback — deny everything else
     match /{document=**} {
       allow read, write: if false;

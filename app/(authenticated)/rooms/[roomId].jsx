@@ -182,9 +182,10 @@ export default function RoomChat() {
       otherParticipants.forEach((uid) => {
         sendPushNotification(
           uid,
+          currentUserId,
           `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
           trimmedText,
-          { screen: "room", roomId },
+          { type: "room", screen: "room", roomId },
         );
       });
     } catch (err) {
@@ -226,9 +227,10 @@ export default function RoomChat() {
       otherParticipants.forEach((uid) => {
         sendPushNotification(
           uid,
+          currentUserId,
           `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
           "📷 Sent a photo",
-          { screen: "room", roomId },
+          { type: "room", screen: "room", roomId },
         );
       });
     } catch (err) {

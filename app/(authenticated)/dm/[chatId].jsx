@@ -3,7 +3,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   addDoc,
   collection,
-  deleteDoc,
   doc,
   getDoc,
   limitToLast,
@@ -14,8 +13,6 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { arrayRemove, arrayUnion } from "firebase/firestore";
-import { deleteChatWithMessages } from "../../../lib/deleteRoom";
 import { useEffect, useMemo, useState } from "react";
 import {
   Image,
@@ -26,15 +23,16 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import GlassButton from "../../../components/ui/GlassButton";
 import ChatMessages from "../../../components/chat/ChatMessages";
 import MessageSender from "../../../components/chat/MessageSender";
 import UserOptionsModal from "../../../components/modals/userOptionsModal";
+import GlassButton from "../../../components/ui/GlassButton";
 import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import usePresenceStatus from "../../../hook/usePresenceStatus";
 import { ChatSeen } from "../../../lib/chatSeen";
+import { deleteChatWithMessages } from "../../../lib/deleteRoom";
 import { sendPushNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 
@@ -206,9 +204,10 @@ export default function ChatId() {
       if (!isMutedByRecipient) {
         sendPushNotification(
           chatId,
+          currentUserId,
           firestoreUser?.userName || "New message",
           text.trim(),
-          { screen: "dm", chatId, chatDocId },
+          { type: "message", screen: "dm", chatId, chatDocId },
         );
       }
     } catch (err) {
@@ -250,9 +249,10 @@ export default function ChatId() {
       if (!isMutedByRecipient) {
         sendPushNotification(
           chatId,
+          currentUserId,
           firestoreUser?.userName || "New message",
           "📷 Sent a photo",
-          { screen: "dm", chatId, chatDocId },
+          { type: "message", screen: "dm", chatId, chatDocId },
         );
       }
     } catch (err) {
@@ -340,7 +340,11 @@ export default function ChatId() {
               </View>
             </TouchableOpacity>
           </View>
-          <GlassButton onPress={() => setShowOptions(true)} size={40} shape="circle">
+          <GlassButton
+            onPress={() => setShowOptions(true)}
+            size={40}
+            shape="circle"
+          >
             <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
           </GlassButton>
         </View>
@@ -368,7 +372,8 @@ export default function ChatId() {
               <View className="bg-gray-100 dark:bg-gray-800 rounded-2xl p-5 items-center">
                 <Ionicons name="time-outline" size={24} color="#9CA3AF" />
                 <Text className="text-gray-500 dark:text-gray-400 font-medium text-center mt-2">
-                  Waiting for {otherUser?.userName || "user"} to accept your request.
+                  Waiting for {otherUser?.userName || "user"} to accept your
+                  request.
                 </Text>
               </View>
             ) : (
@@ -387,11 +392,16 @@ export default function ChatId() {
                     }}
                     className="flex-1 py-3.5 bg-gray-100 dark:bg-gray-800 rounded-2xl items-center"
                   >
-                    <Text className="text-gray-600 dark:text-gray-300 font-bold">Decline</Text>
+                    <Text className="text-gray-600 dark:text-gray-300 font-bold">
+                      Decline
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={async () => {
-                      await updateDoc(doc(db, "chats", chatDocId), { status: "accepted", updatedAt: serverTimestamp() });
+                      await updateDoc(doc(db, "chats", chatDocId), {
+                        status: "accepted",
+                        updatedAt: serverTimestamp(),
+                      });
                     }}
                     className="flex-1 py-3.5 bg-primary rounded-2xl items-center"
                   >
