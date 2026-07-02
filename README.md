@@ -244,6 +244,16 @@ npx eas build --profile production --platform all
 
 ---
 
+## 🚀 Deployment Status & Next Steps
+
+Based on the recent production readiness audit, SpotUs is currently **Ready for Internal Testing & Closed Beta**. Before proceeding to a Public Beta or Store Launch, the following critical updates must be addressed:
+
+- **Firebase Scaling:** Implement aggressive debounce on Map panning and chat pagination to prevent hitting the Firebase Spark Plan read limits.
+- **Store Requirements:** Add an explicit End User License Agreement (EULA) during onboarding emphasizing zero tolerance for abusive content, as required by the App Store for user-generated content apps.
+- **Resource Management:** Implement automated cleanup mechanisms (e.g., Cloud Functions) for expired rooms.
+
+---
+
 ## ⚠️ Confidentiality & Compliance
 
 This software, its design, structure, and database schemas are the intellectual property of the project owners.
