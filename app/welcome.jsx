@@ -1,5 +1,6 @@
 import { useAuth } from "@clerk/expo";
 import { Redirect, useRouter } from "expo-router";
+import { useColorScheme } from "nativewind";
 import { useEffect, useRef } from "react";
 import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,6 +9,8 @@ import CustomButton from "../components/ui/CustomButton";
 export default function Welcome() {
   const router = useRouter();
   const { isSignedIn, isLoaded } = useAuth();
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   // Animations
   const fadeInContent = useRef(new Animated.Value(0)).current;
@@ -76,7 +79,7 @@ export default function Welcome() {
         >
           <View className="w-72 h-72 items-center justify-center  rounded-[36px]">
             <Image
-              source={require("../assets/images/logo-dark.png")}
+              source={isDark ? require("../assets/images/logo-dark.png") : require("../assets/images/logo-light.png")}
               className="w-full h-full"
               resizeMode="contain"
             />
