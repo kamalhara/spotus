@@ -74,9 +74,9 @@ export default function Welcome() {
             transform: [{ scale: scaleHero }],
           }}
         >
-          <View className="w-72 h-72 items-center justify-center dark:bg-[#1C1C20] rounded-[36px]">
+          <View className="w-72 h-72 items-center justify-center  rounded-[36px]">
             <Image
-              source={require("../assets/images/trans.png")}
+              source={require("../assets/images/logo-dark.png")}
               className="w-full h-full"
               resizeMode="contain"
             />
