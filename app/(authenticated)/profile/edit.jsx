@@ -19,11 +19,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomInput from "../../../components/ui/CustomInput";
 import GlassButton from "../../../components/ui/GlassButton";
 import GlassContainer from "../../../components/ui/GlassContainer";
+import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
-import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 
 const INTERESTS = [
   { label: "Music", icon: "musical-notes", color: "#8B5CF6" },
@@ -142,8 +142,8 @@ export default function Edit() {
   };
   return (
     <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
-      <KeyboardAvoidingView 
-        style={{ flex: 1 }} 
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
         <ScrollView
@@ -154,185 +154,163 @@ export default function Edit() {
           }}
           showsVerticalScrollIndicator={false}
         >
-        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-          <View className="flex-1">
-            <View className="w-full flex-row items-center justify-between mt-2 py-3">
-              <GlassButton onPress={() => router.back()} shape="pill" size={40}>
-                <Text className="font-bold text-primary dark:text-primary-light">
-                  Cancel
-                </Text>
-              </GlassButton>
-              <Text className="font-display font-extrabold text-[17px] text-secondary dark:text-gray-100">
-                Edit Profile
-              </Text>
-
-              <GlassContainer isInteractive={true}>
-                <TouchableOpacity
-                  onPress={handleSaveProfile}
-                  disabled={isSaving}
-                  activeOpacity={0.75}
-                  className="px-4 py-2 rounded-full bg-primary flex-row items-center justify-center min-w-[70px]"
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View className="flex-1">
+              <View className="w-full flex-row items-center justify-between mt-2 py-3">
+                <GlassButton
+                  onPress={() => router.back()}
+                  shape="pill"
+                  size={40}
                 >
-                  {isSaving ? (
-                    <SpotUsLoader size="small" />
-                  ) : (
-                    <Text className="font-bold text-white text-[15px]">
-                      Save
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              </GlassContainer>
-            </View>
-
-            <View className="w-full mt-8">
-              <View className="w-full bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl p-5 items-center">
-                <View className="relative">
-                  <View className="rounded-full border-4 border-gray-50 dark:border-[#242428] w-32 h-32 bg-gray-100 dark:bg-gray-800 overflow-hidden">
-                    <Image
-                      source={{
-                        uri:
-                          newImageUri ||
-                          user?.profilePic ||
-                          "https://api.dicebear.com/7.x/initials/svg?seed=Felix",
-                      }}
-                      className="w-full h-full rounded-full"
-                      resizeMode="cover"
-                    />
-                  </View>
-                  <View className="absolute -bottom-1 -right-1">
-                    <GlassButton
-                      size={40}
-                      shape="circle"
-                      onPress={handlePickImage}
-                    >
-                      <Ionicons
-                        name="camera"
-                        size={16}
-                        color={isDark ? "#FFAB99" : "#FF6B47"}
-                      />
-                    </GlassButton>
-                  </View>
-                </View>
-                <Text className="font-bold text-primary dark:text-primary-light mt-4">
-                  Edit Picture
+                  <Text className="font-bold text-primary dark:text-primary-light">
+                    Cancel
+                  </Text>
+                </GlassButton>
+                <Text className="font-display font-extrabold text-[17px] text-secondary dark:text-gray-100">
+                  Edit Profile
                 </Text>
-              </View>
 
-              <View className="mt-6 bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl p-4 gap-4">
-                <CustomInput
-                  label="Full name"
-                  placeholder="Enter full name"
-                  value={userName}
-                  onChangeText={setUserName}
-                />
-
-                <CustomInput
-                  label="Bio"
-                  placeholder="Add a bio"
-                  value={bio}
-                  onChangeText={setBio}
-                  multiline={true}
-                  numberOfLines={3}
-                  style={{ height: 80, textAlignVertical: "top" }}
-                />
-                <View>
-                  <CustomInput
-                    label="Location"
-                    placeholder="Add Location"
-                    value={currentLocation}
-                    onChangeText={setCurrentLocation}
-                    icon={
-                      <Ionicons name="location" size={18} color="#9CA3AF" />
-                    }
-                  />
+                <GlassContainer isInteractive={true}>
                   <TouchableOpacity
-                    onPress={handleGetLocation}
-                    disabled={isLocating}
-                    className="w-full bg-primary/10 dark:bg-primary/20 flex-row items-center justify-center rounded-xl p-3 mt-3"
+                    onPress={handleSaveProfile}
+                    disabled={isSaving}
                     activeOpacity={0.75}
+                    className="px-4 py-2 rounded-full bg-primary flex-row items-center justify-center min-w-[70px]"
                   >
-                    {isLocating ? (
+                    {isSaving ? (
                       <SpotUsLoader size="small" />
                     ) : (
-                      <>
-                        <Ionicons name="location" size={18} color="#FF6B47" />
-                        <Text className="text-primary dark:text-primary-light font-bold ml-2">
-                          Use Current Location
-                        </Text>
-                      </>
+                      <Text className="font-bold text-white text-[15px]">
+                        Save
+                      </Text>
                     )}
                   </TouchableOpacity>
-                </View>
+                </GlassContainer>
               </View>
 
-              <View className="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl p-4 mt-6">
-                <View className="w-full flex flex-row items-center justify-between">
-                  <Text className="text-secondary dark:text-gray-100 text-lg font-display font-extrabold">
-                    Manage Interests
-                  </Text>
-                  <View className="bg-primary-surface dark:bg-primary-surface px-2.5 py-1 rounded-lg">
-                    <Text className="text-primary dark:text-primary-light text-xs font-bold">
-                      {selectedInterests.length}
-                    </Text>
-                  </View>
-                </View>
-
-                <View className="flex flex-row flex-wrap gap-2.5 mt-5">
-                  {INTERESTS.map((item) => {
-                    const isSelected = selectedInterests.includes(item.label);
-                    return (
-                      <TouchableOpacity
-                        onPress={() =>
-                          setSelectedInterests((prev) =>
-                            prev.includes(item.label)
-                              ? prev.filter((l) => l !== item.label)
-                              : [...prev, item.label],
-                          )
-                        }
-                        key={item.label}
-                        className={`flex-row items-center gap-2 px-3 py-2 rounded-xl border ${
-                          isSelected
-                            ? "border-transparent"
-                            : "bg-white dark:bg-[#1C1C20] border-gray-100 dark:border-[#2C2C30]"
-                        }`}
-                        style={
-                          isSelected
-                            ? {
-                                backgroundColor: `${item.color}15`,
-                                borderColor: `${item.color}30`,
-                              }
-                            : {}
-                        }
+              <View className="w-full mt-8">
+                <View className="w-full bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl p-5 items-center">
+                  <View className="relative">
+                    <View className="rounded-full border-4 border-gray-50 dark:border-[#242428] w-32 h-32 bg-gray-100 dark:bg-gray-800 overflow-hidden">
+                      <Image
+                        source={{
+                          uri:
+                            newImageUri ||
+                            user?.profilePic ||
+                            "https://api.dicebear.com/7.x/initials/svg?seed=Felix",
+                        }}
+                        className="w-full h-full rounded-full"
+                        resizeMode="cover"
+                      />
+                    </View>
+                    <View className="absolute -bottom-1 -right-1">
+                      <GlassButton
+                        size={40}
+                        shape="circle"
+                        onPress={handlePickImage}
                       >
                         <Ionicons
-                          name={isSelected ? "checkmark" : item.icon}
+                          name="camera"
                           size={16}
-                          color={isSelected ? item.color : "#9CA3AF"}
+                          color={isDark ? "#FFAB99" : "#FF6B47"}
                         />
-                        <Text
-                          className="text-sm font-medium"
-                          style={{ color: isSelected ? item.color : "#9CA3AF" }}
+                      </GlassButton>
+                    </View>
+                  </View>
+                  <Text className="font-bold text-primary dark:text-primary-light mt-4">
+                    Edit Picture
+                  </Text>
+                </View>
+
+                <View className="mt-6 bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl p-4 gap-4">
+                  <CustomInput
+                    label="Full name"
+                    placeholder="Enter full name"
+                    value={userName}
+                    onChangeText={setUserName}
+                  />
+
+                  <CustomInput
+                    label="Bio"
+                    placeholder="Add a bio"
+                    value={bio}
+                    onChangeText={setBio}
+                    multiline={true}
+                    numberOfLines={3}
+                    style={{ height: 80, textAlignVertical: "top" }}
+                  />
+                </View>
+
+                <View className="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl p-4 mt-6">
+                  <View className="w-full flex flex-row items-center justify-between">
+                    <Text className="text-secondary dark:text-gray-100 text-lg font-display font-extrabold">
+                      Manage Interests
+                    </Text>
+                    <View className="bg-primary-surface dark:bg-primary-surface px-2.5 py-1 rounded-lg">
+                      <Text className="text-primary dark:text-primary-light text-xs font-bold">
+                        {selectedInterests.length}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View className="flex flex-row flex-wrap gap-2.5 mt-5">
+                    {INTERESTS.map((item) => {
+                      const isSelected = selectedInterests.includes(item.label);
+                      return (
+                        <TouchableOpacity
+                          onPress={() =>
+                            setSelectedInterests((prev) =>
+                              prev.includes(item.label)
+                                ? prev.filter((l) => l !== item.label)
+                                : [...prev, item.label],
+                            )
+                          }
+                          key={item.label}
+                          className={`flex-row items-center gap-2 px-3 py-2 rounded-xl border ${
+                            isSelected
+                              ? "border-transparent"
+                              : "bg-white dark:bg-[#1C1C20] border-gray-100 dark:border-[#2C2C30]"
+                          }`}
+                          style={
+                            isSelected
+                              ? {
+                                  backgroundColor: `${item.color}15`,
+                                  borderColor: `${item.color}30`,
+                                }
+                              : {}
+                          }
                         >
-                          {item.label}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+                          <Ionicons
+                            name={isSelected ? "checkmark" : item.icon}
+                            size={16}
+                            color={isSelected ? item.color : "#9CA3AF"}
+                          />
+                          <Text
+                            className="text-sm font-medium"
+                            style={{
+                              color: isSelected ? item.color : "#9CA3AF",
+                            }}
+                          >
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
                 </View>
               </View>
-            </View>
 
-            <TouchableOpacity
-              activeOpacity={0.7}
-              className="mx-2 mt-8 bg-red-50 dark:bg-red-500/10 py-4 rounded-2xl border border-red-100 dark:border-red-500/20 flex-row items-center justify-center gap-2"
-            >
-              <Ionicons name="trash" size={18} color="#EF4444" />
-              <Text className="text-red-500 font-semibold text-[15px]">
-                Delete Account
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </TouchableWithoutFeedback>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                className="mx-2 mt-8 bg-red-50 dark:bg-red-500/10 py-4 rounded-2xl border border-red-100 dark:border-red-500/20 flex-row items-center justify-center gap-2"
+              >
+                <Ionicons name="trash" size={18} color="#EF4444" />
+                <Text className="text-red-500 font-semibold text-[15px]">
+                  Delete Account
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableWithoutFeedback>
         </ScrollView>
       </KeyboardAvoidingView>
 
