@@ -8,7 +8,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   Image,
-  RefreshControl,
   Text,
   TextInput,
   TouchableOpacity,
@@ -688,16 +687,12 @@ export default function Home() {
                 },
               },
             )}
+            onScrollEndDrag={(e) => {
+              if (e.nativeEvent.contentOffset.y < -80 && !refreshing) {
+                onRefresh();
+              }
+            }}
             scrollEventThrottle={16}
-            refreshControl={
-              <RefreshControl
-                refreshing={refreshing}
-                onRefresh={onRefresh}
-                tintColor={isDark ? "#111113" : "#FAFAF8"}
-                colors={[isDark ? "#111113" : "#FAFAF8"]}
-                progressBackgroundColor={isDark ? "#111113" : "#FAFAF8"}
-              />
-            }
           />
         )}
       </SafeAreaView>
