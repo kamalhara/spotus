@@ -693,10 +693,9 @@ export default function Home() {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                tintColor="transparent"
-                colors={["transparent"]}
-                progressBackgroundColor="transparent"
-                progressViewOffset={-5000}
+                tintColor={isDark ? "#111113" : "#FAFAF8"}
+                colors={[isDark ? "#111113" : "#FAFAF8"]}
+                progressBackgroundColor={isDark ? "#111113" : "#FAFAF8"}
               />
             }
           />

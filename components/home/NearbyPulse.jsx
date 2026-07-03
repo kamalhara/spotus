@@ -1,9 +1,12 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Animated, Text, View } from "react-native";
 
-
-export default function NearbyPulse({ roomsCount = 0, peopleCount = 0, radius = 5 }) {
+export default function NearbyPulse({
+  roomsCount = 0,
+  peopleCount = 0,
+  radius = 5,
+}) {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const opacityAnim = useRef(new Animated.Value(0.6)).current;
 
@@ -34,7 +37,7 @@ export default function NearbyPulse({ roomsCount = 0, peopleCount = 0, radius = 
             useNativeDriver: true,
           }),
         ]),
-      ])
+      ]),
     ).start();
   }, [pulseAnim, opacityAnim]);
 
@@ -44,13 +47,7 @@ export default function NearbyPulse({ roomsCount = 0, peopleCount = 0, radius = 
     <View className="flex-row items-center justify-between px-5 py-3 mx-5 mb-4 rounded-2xl bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] shadow-sm">
       <View className="flex-row items-center">
         <View className="relative w-3 h-3 mr-3 items-center justify-center">
-          <Animated.View
-            style={{
-              transform: [{ scale: pulseAnim }],
-              opacity: opacityAnim,
-            }}
-            className="absolute w-full h-full bg-green-400 rounded-full"
-          />
+          <View className="absolute w-full h-full bg-green-400 rounded-full" />
           <View className="w-2 h-2 bg-green-500 rounded-full" />
         </View>
         <View>
@@ -58,7 +55,8 @@ export default function NearbyPulse({ roomsCount = 0, peopleCount = 0, radius = 
             {peopleCount} people chatting
           </Text>
           <Text className="text-gray-500 dark:text-gray-400 text-[11px] mt-0.5">
-            in {roomsCount} {roomsCount === 1 ? "room" : "rooms"} within {radius}km
+            in {roomsCount} {roomsCount === 1 ? "room" : "rooms"} within{" "}
+            {radius}km
           </Text>
         </View>
       </View>
