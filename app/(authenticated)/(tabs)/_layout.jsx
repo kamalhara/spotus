@@ -7,15 +7,8 @@ import {
   Label,
   NativeTabs,
 } from "expo-router/unstable-native-tabs";
-import { useEffect, useRef } from "react";
-import {
-  Dimensions,
-  Platform,
-  Pressable,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { useEffect } from "react";
+import { Dimensions, Platform, Pressable, Text, View } from "react-native";
 import Animated, {
   interpolate,
   useAnimatedStyle,
@@ -29,7 +22,7 @@ import {
   useFloatingButton,
 } from "../../../context/FloatingButtonContext";
 import { useTheme } from "../../../context/ThemeContext";
-import useFirestoreUser from "../../../hook/useFireStoreUser";
+
 import { ChatProvider, useChats } from "../../../context/ChatContext";
 
 // ---------------------------------------------------------------------------
@@ -232,8 +225,6 @@ const AnimatedIcon = ({
   );
 };
 
-
-
 // ── Resolve active tab name from pathname ─────────────────────────────────
 function getActiveTab(pathname) {
   // pathname is e.g. "/(authenticated)/(tabs)/home" or "/home"
@@ -248,7 +239,6 @@ function getActiveTab(pathname) {
 
 // ── Inner layout that can access the floating button context ──────────────
 function TabsLayoutInner() {
-  const { firestoreUser } = useFirestoreUser();
   const { isDark } = useTheme();
   const { unreadCount } = useChats();
   const pathname = usePathname();
@@ -262,7 +252,9 @@ function TabsLayoutInner() {
           screenOptions={{
             headerShown: false,
           }}
-          tabBar={(props) => <LiquidTabBar {...props} unreadCount={unreadCount} />}
+          tabBar={(props) => (
+            <LiquidTabBar {...props} unreadCount={unreadCount} />
+          )}
         >
           <Tabs.Screen name="home" options={{ title: "Home" }} />
           <Tabs.Screen name="rooms_tab" options={{ title: "Rooms" }} />

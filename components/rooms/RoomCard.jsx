@@ -1,7 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import * as Linking from "expo-linking";
 import { memo, useRef } from "react";
-import { Animated, Share, Text, TouchableOpacity, View } from "react-native";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
 import ParticipantAvatar from "./ParticipantAvatar";
 
@@ -91,17 +90,6 @@ const RoomCard = memo(function RoomCard({
       useNativeDriver: true,
       speed: 50,
     }).start();
-  };
-
-  const handleShare = async () => {
-    try {
-      const inviteLink = Linking.createURL("join/" + room?.inviteCode);
-      await Share.share({
-        message: `Join my event: ${room?.title} on SpotUs! Use invite code ${room?.inviteCode} or tap here: ${inviteLink}`,
-      });
-    } catch (error) {
-      console.error("Error sharing room:", error);
-    }
   };
 
   const cardContent = (

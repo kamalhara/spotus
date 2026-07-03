@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import * as Location from "expo-location";
 import { useRouter } from "expo-router";
 import { doc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -46,7 +45,6 @@ export default function Edit() {
   const [currentLocation, setCurrentLocation] = useState("");
   const [locationCoords, setLocationCoords] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isLocating, setIsLocating] = useState(false);
   const [newImageUri, setNewImageUri] = useState(null);
 
   const { isDark } = useTheme();
@@ -63,39 +61,6 @@ export default function Edit() {
       }
     }
   }, [user]);
-
-  const handleGetLocation = async () => {
-    setIsLocating(true);
-    try {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        alert("Permission to access location was denied");
-        setIsLocating(false);
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      const coords = {
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      };
-      setLocationCoords(coords);
-
-      let geocode = await Location.reverseGeocodeAsync(coords);
-      if (geocode.length > 0) {
-        const place = geocode[0];
-        const locationName = `${place.city || place.subregion || place.name}, ${
-          place.region || place.country
-        }`;
-        setCurrentLocation(locationName);
-      }
-    } catch (error) {
-      console.error("Error getting location:", error);
-      alert("Failed to get current location.");
-    } finally {
-      setIsLocating(false);
-    }
-  };
 
   const handlePickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({

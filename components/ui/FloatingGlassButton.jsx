@@ -77,16 +77,13 @@ export default function FloatingGlassButton({ activeTab, override }) {
 
   // Resolve the current config (override takes priority)
   const tabConfig = TAB_CONFIGS[activeTab] || TAB_CONFIGS.home;
-  if (tabConfig.hidden && !override) {
-    return null;
-  }
   const icon = override?.icon ?? tabConfig.icon;
   const iconSize = override?.iconSize ?? tabConfig.iconSize;
   const tintColor = override?.tintColor ?? tabConfig.tintColor;
   const iconColor =
     override?.iconColor ??
     (tintColor ? "white" : isDark ? "#F5F5F5" : "#18181B");
-  const onPress = override?.onPress ?? tabConfig.getAction(router);
+  const onPress = override?.onPress ?? tabConfig.getAction?.(router);
 
   // Track the previous icon for animation trigger
   const prevIconRef = useRef(icon);
@@ -157,6 +154,10 @@ export default function FloatingGlassButton({ activeTab, override }) {
   const borderRadius = BUTTON_SIZE / 2;
 
   // ── Render ─────────────────────────────────────────────────────────────
+  if (tabConfig.hidden && !override) {
+    return null;
+  }
+
   const iconContent = (
     <Animated.View style={iconAnimatedStyle}>
       <Ionicons name={icon} size={iconSize} color={iconColor} />

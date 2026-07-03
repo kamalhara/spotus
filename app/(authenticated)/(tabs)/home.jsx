@@ -75,7 +75,7 @@ export default function Home() {
   const [locationError, setLocationError] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
-  const [retryTrigger, setRetryTrigger] = useState(0);
+
   const [interceptModal, setInterceptModal] = useState({
     visible: false,
     action: "",
@@ -228,7 +228,7 @@ export default function Home() {
         setLocationError(true);
       }
     }
-  }, [searchDistance, firestoreUser?.id, retryTrigger]);
+  }, [searchDistance, firestoreUser?.id]);
 
   useFocusEffect(
     useCallback(() => {
@@ -650,7 +650,7 @@ export default function Home() {
           <LocationPermissionDenied
             onEnableGhostMode={() => {
               setLocationError(false);
-              setRetryTrigger((prev) => prev + 1);
+              loadRooms();
             }}
           />
         ) : (
@@ -717,7 +717,7 @@ export default function Home() {
           setInterceptModal({ visible: false, action: "" });
           await AsyncStorage.setItem("isGhostBrowsing", "false");
           setIsGhostBrowsing(false);
-          setRetryTrigger((prev) => prev + 1);
+          loadRooms();
         }}
       />
     </>
