@@ -7,7 +7,6 @@ import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
-  FlatList,
   Image,
   RefreshControl,
   Text,
@@ -611,7 +610,6 @@ export default function Home() {
             <Text className="text-secondary dark:text-gray-100 tracking-tighter text-[22px] font-display font-black">
               Spot Us
             </Text>
-            <View className="w-2 h-2 rounded-full bg-primary ml-1 -mt-2" />
           </View>
           {/* Spacer to preserve layout — button is now the shared FloatingGlassButton */}
           <View style={{ width: 48 }} />
@@ -688,7 +686,7 @@ export default function Home() {
                   const hidden = offset > ctaBottomY.current;
                   if (hidden !== ctaHidden) setCtaHidden(hidden);
                 },
-              }
+              },
             )}
             scrollEventThrottle={16}
             refreshControl={
