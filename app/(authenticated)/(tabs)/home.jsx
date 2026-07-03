@@ -25,6 +25,7 @@ import RoomJoinSheet from "../../../components/rooms/RoomJoinSheet";
 import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
 import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
 import GlassButton from "../../../components/ui/GlassButton";
+import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 import { db } from "../../../config/firebase.config";
 import { CATEGORY_ICONS } from "../../../constants/categories";
 import { useFloatingButton } from "../../../context/FloatingButtonContext";
@@ -86,6 +87,16 @@ export default function Home() {
   const fadeInHeader = useRef(new Animated.Value(0)).current;
   const fadeInContent = useRef(new Animated.Value(0)).current;
   const slideUpContent = useRef(new Animated.Value(20)).current;
+  const customRefreshAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.spring(customRefreshAnim, {
+      toValue: refreshing ? 1 : 0,
+      useNativeDriver: true,
+      bounciness: 12,
+      speed: 14,
+    }).start();
+  }, [refreshing, customRefreshAnim]);
 
   useEffect(() => {
     Animated.sequence([
@@ -582,6 +593,47 @@ export default function Home() {
           <View style={{ width: 48 }} />
         </Animated.View>
 
+        {/* Custom Pull to Refresh Loader */}
+        <Animated.View
+          style={{
+            position: "absolute",
+            top: 70, // Below header
+            left: 0,
+            right: 0,
+            alignItems: "center",
+            zIndex: 50,
+            opacity: customRefreshAnim,
+            transform: [
+              {
+                translateY: customRefreshAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [-20, 15],
+                }),
+              },
+              {
+                scale: customRefreshAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.6, 1],
+                }),
+              },
+            ],
+          }}
+          pointerEvents="none"
+        >
+          <View
+            className="bg-white dark:bg-[#1C1C20] p-2.5 rounded-full"
+            style={{
+              shadowColor: isDark ? "#000" : "#FF6B47",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.15,
+              shadowRadius: 8,
+              elevation: 5,
+            }}
+          >
+            <SpotUsLoader size={26} />
+          </View>
+        </Animated.View>
+
         {/* Scrollable content — greeting, slider, CTA, and rooms all scroll together */}
         {locationError ? (
           <LocationPermissionDenied
@@ -623,8 +675,10 @@ export default function Home() {
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                tintColor={isDark ? "#FFAB99" : "#FF6B47"}
-                colors={["#FF6B47"]}
+                tintColor="#00000000"
+                colors={["#00000000"]}
+                progressBackgroundColor="#00000000"
+                progressViewOffset={-500}
               />
             }
           />
