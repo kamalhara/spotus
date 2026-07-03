@@ -88,6 +88,7 @@ export default function Home() {
   const fadeInContent = useRef(new Animated.Value(0)).current;
   const slideUpContent = useRef(new Animated.Value(20)).current;
   const customRefreshAnim = useRef(new Animated.Value(0)).current;
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.spring(customRefreshAnim, {
@@ -97,6 +98,29 @@ export default function Home() {
       speed: 14,
     }).start();
   }, [refreshing, customRefreshAnim]);
+
+  const scrollPullAnim = scrollY.interpolate({
+    inputRange: [-100, 0],
+    outputRange: [1, 0],
+    extrapolate: "clamp",
+  });
+
+  const combinedAnim = Animated.add(customRefreshAnim, scrollPullAnim);
+
+  const loaderOpacity = combinedAnim.interpolate({
+    inputRange: [0, 1, 2],
+    outputRange: [0, 1, 1],
+  });
+
+  const loaderTranslateY = combinedAnim.interpolate({
+    inputRange: [0, 1, 2],
+    outputRange: [-60, 20, 20],
+  });
+
+  const loaderScale = combinedAnim.interpolate({
+    inputRange: [0, 1, 2],
+    outputRange: [0.6, 1, 1],
+  });
 
   useEffect(() => {
     Animated.sequence([
@@ -597,25 +621,15 @@ export default function Home() {
         <Animated.View
           style={{
             position: "absolute",
-            top: 70, // Below header
+            top: 100, // Further below header to prevent overlap
             left: 0,
             right: 0,
             alignItems: "center",
             zIndex: 50,
-            opacity: customRefreshAnim,
+            opacity: loaderOpacity,
             transform: [
-              {
-                translateY: customRefreshAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-20, 15],
-                }),
-              },
-              {
-                scale: customRefreshAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0.6, 1],
-                }),
-              },
+              { translateY: loaderTranslateY },
+              { scale: loaderScale },
             ],
           }}
           pointerEvents="none"
@@ -643,7 +657,7 @@ export default function Home() {
             }}
           />
         ) : (
-          <FlatList
+          <Animated.FlatList
             data={listData}
             renderItem={({ item }) =>
               item._skeleton ? (
@@ -664,21 +678,27 @@ export default function Home() {
             contentContainerStyle={{ paddingBottom: 100, paddingTop: 4 }}
             showsVerticalScrollIndicator={false}
             ListEmptyComponent={loading ? null : <EmptyRooms />}
-            onScroll={(e) => {
-              const offset = e.nativeEvent.contentOffset.y;
-              scrollOffsetY.current = offset;
-              const hidden = offset > ctaBottomY.current;
-              if (hidden !== ctaHidden) setCtaHidden(hidden);
-            }}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+              {
+                useNativeDriver: true,
+                listener: (e) => {
+                  const offset = e.nativeEvent.contentOffset.y;
+                  scrollOffsetY.current = offset;
+                  const hidden = offset > ctaBottomY.current;
+                  if (hidden !== ctaHidden) setCtaHidden(hidden);
+                },
+              }
+            )}
             scrollEventThrottle={16}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}
                 onRefresh={onRefresh}
-                tintColor="#00000000"
-                colors={["#00000000"]}
-                progressBackgroundColor="#00000000"
-                progressViewOffset={-500}
+                tintColor="transparent"
+                colors={["transparent"]}
+                progressBackgroundColor="transparent"
+                progressViewOffset={-5000}
               />
             }
           />
