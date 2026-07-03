@@ -1,5 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
-import { ScrollView, Text, View } from "react-native";
+import { Image, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ui/ScreenHeader";
 import SettingsRow from "../../../components/ui/SettingsRow";
@@ -16,16 +15,19 @@ export default function About() {
       >
         <View className="bg-white dark:bg-[#1C1C20] rounded-2xl border border-gray-100 dark:border-[#2C2C30] p-6 items-center mb-4">
           <View className="w-16 h-16 rounded-2xl bg-primary items-center justify-center mb-4">
-            <Ionicons name="navigate" size={28} color="white" />
+            <Image
+              source={require("../../../assets/images/icon-dark.png")}
+              className="w-full h-full"
+              resizeMode="contain"
+            />{" "}
           </View>
           <View className="flex-row items-center">
             <Text className="text-secondary dark:text-gray-100 text-2xl font-display font-extrabold tracking-tight">
               Spot Us
             </Text>
-            <View className="w-2 h-2 rounded-full bg-primary ml-1.5 -mt-3" />
           </View>
           <Text className="text-gray-400 dark:text-gray-500 text-sm leading-5 text-center mt-3">
-            Rooms, trust, and direct messages for people nearby.
+            Rooms and direct messages for people nearby.
           </Text>
         </View>
 
