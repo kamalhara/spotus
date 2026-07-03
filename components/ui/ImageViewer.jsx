@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Animated,
   Dimensions,
@@ -16,6 +15,7 @@ import {
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import GlassButton from "./GlassButton";
+import SpotUsLoader from "./SpotUsLoader";
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
 
@@ -262,7 +262,7 @@ export default function ImageViewer({
           <GlassButton onPress={handleShare} disabled={isSharing}>
             <View style={styles.closeButtonInner}>
               {isSharing ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <SpotUsLoader size="small" />
               ) : (
                 <Ionicons name="share-outline" size={20} color="#fff" />
               )}

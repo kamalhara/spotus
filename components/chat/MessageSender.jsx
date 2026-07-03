@@ -4,7 +4,6 @@ import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Animated,
   Pressable,
@@ -16,6 +15,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GlassContainer from "../../components/ui/GlassContainer";
 import { setTyping } from "../../lib/chatTyping";
+import SpotUsLoader from "../../components/ui/SpotUsLoader";
 
 const MEDIA_OPTIONS = [
   {
@@ -376,10 +376,7 @@ export default function MessageSender({
             className={`w-[42px] h-[42px] rounded-full items-center justify-center mr-0.5 ${isActive ? "bg-primary" : "bg-surface-alt dark:bg-[#242428]"}`}
           >
             {isSending ? (
-              <ActivityIndicator
-                size="small"
-                color={isActive ? "white" : "#94A3B8"}
-              />
+              <SpotUsLoader size="small" />
             ) : (
               <Ionicons
                 name="send"

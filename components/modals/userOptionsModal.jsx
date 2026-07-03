@@ -11,7 +11,6 @@ import {
 } from "firebase/firestore";
 import { useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Modal,
   Pressable,
@@ -22,6 +21,7 @@ import {
 import { db } from "../../config/firebase.config";
 import { useTheme } from "../../context/ThemeContext";
 import GlassContainer from "../ui/GlassContainer";
+import SpotUsLoader from "../../components/ui/SpotUsLoader";
 
 export default function UserOptionsModal({
   showOptions,
@@ -219,7 +219,7 @@ export default function UserOptionsModal({
             fallbackClassName="bg-white dark:bg-[#1C1C20] border border-border-light dark:border-[#2C2C30]"
           >
             <View className="p-6 items-center">
-              <ActivityIndicator size="large" color="#FF6B47" />
+              <SpotUsLoader size="large" />
               <Text className="text-secondary dark:text-gray-100 font-semibold mt-3">
                 Deleting chat...
               </Text>

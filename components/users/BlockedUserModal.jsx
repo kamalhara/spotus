@@ -3,7 +3,6 @@ import * as Haptics from "expo-haptics";
 import { arrayRemove, doc, getDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Alert,
   Image,
   Modal,
@@ -17,6 +16,7 @@ import { useTheme } from "../../context/ThemeContext";
 import useFirestoreUser from "../../hook/useFireStoreUser";
 import GlassButton from "../ui/GlassButton";
 import GlassContainer from "../ui/GlassContainer";
+import SpotUsLoader from "../../components/ui/SpotUsLoader";
 
 function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
   const { firestoreUser } = useFirestoreUser();
@@ -157,7 +157,7 @@ function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
 
           {loading ? (
             <View className="py-16 items-center">
-              <ActivityIndicator size="large" color="#FF6B47" />
+              <SpotUsLoader size="large" />
               <Text className="text-gray-400 dark:text-gray-500 text-sm font-medium mt-4">
                 Loading…
               </Text>
@@ -248,7 +248,7 @@ function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
                     }}
                   >
                     {unblocking === user.id ? (
-                      <ActivityIndicator size="small" color="#EF4444" />
+                      <SpotUsLoader size="small" />
                     ) : (
                       <>
                         <Ionicons name="ban" size={13} color="#EF4444" />

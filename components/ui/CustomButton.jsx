@@ -1,13 +1,13 @@
 import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import {
-  ActivityIndicator,
   Animated,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
 import GlassContainer from "./GlassContainer";
+import SpotUsLoader from "./SpotUsLoader";
 
 export default function CustomButton({
   title,
@@ -124,10 +124,7 @@ export default function CustomButton({
           className={`w-full flex-row justify-center items-center ${getSizeStyles()} ${getButtonStyles()} ${className}`}
         >
           {loading ? (
-            <ActivityIndicator
-              color={type === "primary" ? "white" : "#FF6B47"}
-              size="small"
-            />
+            <SpotUsLoader size="small" />
           ) : (
             <View className="flex-row items-center justify-center">
               {icon && <View className="mr-2.5">{icon}</View>}

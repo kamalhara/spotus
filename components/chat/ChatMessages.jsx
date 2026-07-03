@@ -4,7 +4,6 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Animated,
   FlatList,
   Image,
@@ -18,6 +17,7 @@ import { toggleReaction } from "../../lib/reactions";
 import ImageViewer from "../ui/ImageViewer";
 import ReactionPicker from "./ReactionPicker";
 import TypingIndicator from "./TypingIndicator";
+import SpotUsLoader from "../../components/ui/SpotUsLoader";
 
 const COLORS = [
   "#FF6B47",
@@ -560,7 +560,7 @@ export default function ChatMessages({
                       />
                       <View className="absolute inset-0 items-center justify-center bg-black/10">
                         <View className="bg-white/90 dark:bg-[#1C1C20]/90 p-3 rounded-2xl items-center">
-                          <ActivityIndicator color="#FF6B47" size="small" />
+                          <SpotUsLoader size="small" />
                           <Text className="text-[10px] font-bold text-primary mt-2 tracking-widest">
                             SENDING...
                           </Text>

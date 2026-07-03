@@ -3,7 +3,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Animated,
   Keyboard,
   Text,
@@ -16,6 +15,7 @@ import CustomButton from "../../components/ui/CustomButton";
 import CustomInput from "../../components/ui/CustomInput";
 import GlassButton from "../../components/ui/GlassButton";
 import { useTheme } from "../../context/ThemeContext";
+import SpotUsLoader from "../../components/ui/SpotUsLoader";
 
 export default function SignUp() {
   const { isLoaded } = useAuth();
@@ -94,7 +94,7 @@ export default function SignUp() {
   if (!isLoaded) {
     return (
       <SafeAreaView className="flex-1 justify-center items-center bg-bg dark:bg-[#111113]">
-        <ActivityIndicator size="large" color="#FF6B47" />
+        <SpotUsLoader size="large" />
       </SafeAreaView>
     );
   }

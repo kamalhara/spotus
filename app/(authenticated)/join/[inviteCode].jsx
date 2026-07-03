@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { joinRoomByCode } from "../../../lib/joinRoom";
+import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 
 export default function JoinRoomScreen() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function JoinRoomScreen() {
     <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113] justify-center items-center px-6">
       {loading ? (
         <View className="items-center">
-          <ActivityIndicator size="large" color="#FF6B47" />
+          <SpotUsLoader size="large" />
           <Text className="text-secondary dark:text-gray-100 font-bold mt-4">
             Joining Event...
           </Text>

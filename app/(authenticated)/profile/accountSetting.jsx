@@ -5,7 +5,6 @@ import { Image } from "expo-image";
 import { Redirect, useRouter } from "expo-router";
 import { useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Keyboard,
   Platform,
   ScrollView,
@@ -29,6 +28,7 @@ import GlassContainer from "../../../components/ui/GlassContainer";
 import BlockedUserModal from "../../../components/users/BlockedUserModal";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 
 if (
   Platform.OS === "android" &&
@@ -153,10 +153,7 @@ export default function Profile() {
   if (loading) {
     return (
       <View className="flex-1 items-center justify-center bg-bg dark:bg-[#111113]">
-        <ActivityIndicator
-          size="large"
-          color={isDark ? "#FFAB99" : "#FF6B47"}
-        />
+        <SpotUsLoader size="large" />
       </View>
     );
   }

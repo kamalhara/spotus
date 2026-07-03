@@ -3,7 +3,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Animated,
   Keyboard,
   KeyboardAvoidingView,
@@ -20,6 +19,7 @@ import CustomButton from "../../components/ui/CustomButton";
 import CustomInput from "../../components/ui/CustomInput";
 import GlassButton from "../../components/ui/GlassButton";
 import { useTheme } from "../../context/ThemeContext";
+import SpotUsLoader from "../../components/ui/SpotUsLoader";
 
 // Enable LayoutAnimation on Android
 if (
@@ -502,7 +502,7 @@ export default function ForgotPassword() {
                   className="py-3 items-center"
                 >
                   {sendingCode ? (
-                    <ActivityIndicator size="small" color="#FF6B47" />
+                    <SpotUsLoader size="small" />
                   ) : (
                     <Text
                       className={`text-sm font-medium ${resendCooldown > 0 ? "text-gray-300" : "text-primary"}`}

@@ -5,7 +5,6 @@ import { useRouter } from "expo-router";
 import { doc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
   Image,
   Keyboard,
   KeyboardAvoidingView,
@@ -24,6 +23,7 @@ import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
+import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 
 const INTERESTS = [
   { label: "Music", icon: "musical-notes", color: "#8B5CF6" },
@@ -174,7 +174,7 @@ export default function Edit() {
                   className="px-4 py-2 rounded-full bg-primary flex-row items-center justify-center min-w-[70px]"
                 >
                   {isSaving ? (
-                    <ActivityIndicator color="#FFFFFF" size="small" />
+                    <SpotUsLoader size="small" />
                   ) : (
                     <Text className="font-bold text-white text-[15px]">
                       Save
@@ -252,7 +252,7 @@ export default function Edit() {
                     activeOpacity={0.75}
                   >
                     {isLocating ? (
-                      <ActivityIndicator color="#FF6B47" size="small" />
+                      <SpotUsLoader size="small" />
                     ) : (
                       <>
                         <Ionicons name="location" size={18} color="#FF6B47" />

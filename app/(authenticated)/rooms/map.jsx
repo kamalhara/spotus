@@ -4,7 +4,6 @@ import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
   Dimensions,
   FlatList,
   SafeAreaView,
@@ -37,6 +36,7 @@ import { sendPushNotification } from "../../../lib/notification";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { subscribeNearbyRooms } from "../../../lib/getNearbyRoom";
 import { getCurrentLocation } from "../../../lib/location";
+import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.78; // Narrower to show adjacent cards
 const ITEM_MARGIN = 8;
@@ -523,7 +523,7 @@ export default function MapViewScreen() {
   if (loading && !region && !locationError) {
     return (
       <View className="flex-1 bg-bg dark:bg-[#111113] items-center justify-center">
-        <ActivityIndicator size="large" color="#FF6B47" />
+        <SpotUsLoader size="large" />
       </View>
     );
   }
