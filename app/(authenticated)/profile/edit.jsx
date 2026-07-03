@@ -335,6 +335,18 @@ export default function Edit() {
         </TouchableWithoutFeedback>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Full-screen Loading Overlay */}
+      {isSaving && (
+        <View className="absolute top-0 bottom-0 left-0 right-0 z-50 items-center justify-center bg-white/70 dark:bg-black/70">
+          <View className="bg-white dark:bg-[#1C1C20] p-6 rounded-3xl items-center shadow-lg border border-gray-100 dark:border-[#2C2C30]">
+            <SpotUsLoader size="large" />
+            <Text className="mt-5 font-bold text-secondary dark:text-gray-100 text-base">
+              Saving Profile...
+            </Text>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
