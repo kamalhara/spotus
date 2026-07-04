@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { trackEvent } from "../../../lib/analytics";
+import { useEffect, useState } from "react";
 import { ScrollView, Switch, Text, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ui/ScreenHeader";
 import SettingsRow from "../../../components/ui/SettingsRow";
 import SettingsSection from "../../../components/ui/SettingsSection";
 import { useTheme } from "../../../context/ThemeContext";
+import { trackEvent } from "../../../lib/analytics";
 
 export default function PrivacyData() {
   const [publicProfile, setPublicProfile] = useState(true);
@@ -24,7 +24,9 @@ export default function PrivacyData() {
   const handleGhostToggle = async (val) => {
     setIsGhostBrowsing(val);
     await AsyncStorage.setItem("isGhostBrowsing", val ? "true" : "false");
-    trackEvent(val ? "Explore Mode enabled" : "Explore Mode disabled", { source: "privacy_settings" });
+    trackEvent(val ? "Explore Mode enabled" : "Explore Mode disabled", {
+      source: "privacy_settings",
+    });
   };
 
   const renderSwitch = (value, onValueChange) => (

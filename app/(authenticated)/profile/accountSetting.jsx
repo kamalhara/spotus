@@ -25,10 +25,10 @@ import Animated, {
 import { SafeAreaView } from "react-native-safe-area-context";
 import GlassButton from "../../../components/ui/GlassButton";
 import GlassContainer from "../../../components/ui/GlassContainer";
+import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 import BlockedUserModal from "../../../components/users/BlockedUserModal";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
-import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 
 if (
   Platform.OS === "android" &&

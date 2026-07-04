@@ -1,13 +1,13 @@
-import { doc, updateDoc } from"firebase/firestore";
-import { useEffect, useState } from"react";
-import { ScrollView, Switch } from"react-native";
-import { SafeAreaView } from"react-native-safe-area-context";
-import ScreenHeader from"../../../components/ui/ScreenHeader";
-import SettingsRow from"../../../components/ui/SettingsRow";
-import SettingsSection from"../../../components/ui/SettingsSection";
-import { db } from"../../../config/firebase.config";
-import { useTheme } from"../../../context/ThemeContext";
-import useFirestoreUser from"../../../hook/useFireStoreUser";
+import { doc, updateDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { ScrollView, Switch } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ScreenHeader from "../../../components/ui/ScreenHeader";
+import SettingsRow from "../../../components/ui/SettingsRow";
+import SettingsSection from "../../../components/ui/SettingsSection";
+import { db } from "../../../config/firebase.config";
+import { useTheme } from "../../../context/ThemeContext";
+import useFirestoreUser from "../../../hook/useFireStoreUser";
 
 export default function Notifications() {
   const { firestoreUser } = useFirestoreUser();
@@ -61,7 +61,10 @@ export default function Notifications() {
 
   return (
     <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
-      <ScreenHeader title="Notifications" subtitle="Push notification preferences" />
+      <ScreenHeader
+        title="Notifications"
+        subtitle="Push notification preferences"
+      />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -75,7 +78,7 @@ export default function Notifications() {
             rightComponent={renderSwitch(
               "notificationsEnabled",
               notificationsEnabled,
-              setNotificationsEnabled
+              setNotificationsEnabled,
             )}
           />
           <SettingsRow
@@ -85,7 +88,7 @@ export default function Notifications() {
             rightComponent={renderSwitch(
               "messageNotifications",
               messageNotifications,
-              setMessageNotifications
+              setMessageNotifications,
             )}
           />
           <SettingsRow
@@ -95,7 +98,7 @@ export default function Notifications() {
             rightComponent={renderSwitch(
               "roomNotifications",
               roomNotifications,
-              setRoomNotifications
+              setRoomNotifications,
             )}
             isLast
           />
