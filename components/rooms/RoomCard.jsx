@@ -208,7 +208,11 @@ const RoomCard = memo(function RoomCard({
               )}
               {participantCount === 0 && (
                 <View className="w-6 h-6 rounded-lg border border-dashed border-gray-200 dark:border-gray-600 items-center justify-center bg-gray-50 dark:bg-[#252528]">
-                  <Ionicons name="person-add-outline" size={10} color="#9CA3AF" />
+                  <Ionicons
+                    name="person-add-outline"
+                    size={10}
+                    color="#9CA3AF"
+                  />
                 </View>
               )}
             </View>
@@ -216,8 +220,10 @@ const RoomCard = memo(function RoomCard({
               {getParticipantText()}
             </Text>
           </View>
-          <View className="border border-primary/30 px-4 py-2 rounded-xl">
-            <Text className="text-primary font-semibold text-[12px]">{buttonText}</Text>
+          <View className=" px-4 py-2 rounded-xl">
+            <Text className="text-primary font-semibold text-[12px]">
+              {buttonText}
+            </Text>
           </View>
         </View>
       </View>
@@ -234,9 +240,7 @@ const RoomCard = memo(function RoomCard({
         className="mb-3"
       >
         {isDiscovery ? (
-          <View
-            className="rounded-2xl p-4 bg-white dark:bg-[#1A1A1E] border border-border-light dark:border-[#2A2A2E]"
-          >
+          <View className="rounded-2xl p-4 bg-white dark:bg-[#1A1A1E] border border-border-light dark:border-[#2A2A2E]">
             {cardContent}
           </View>
         ) : (
