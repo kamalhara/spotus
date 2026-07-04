@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useRef } from "react";
 import { Animated, Text, View } from "react-native";
 
@@ -7,62 +6,65 @@ export default function NearbyPulse({
   peopleCount = 0,
   radius = 5,
 }) {
-  const pulseAnim = useRef(new Animated.Value(1)).current;
-  const opacityAnim = useRef(new Animated.Value(0.6)).current;
+  const pulseScale = useRef(new Animated.Value(1)).current;
+  const pulseOpacity = useRef(new Animated.Value(0.8)).current;
 
   useEffect(() => {
     Animated.loop(
       Animated.parallel([
         Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 1.5,
-            duration: 1000,
+          Animated.timing(pulseScale, {
+            toValue: 2,
+            duration: 1200,
             useNativeDriver: true,
           }),
-          Animated.timing(pulseAnim, {
+          Animated.timing(pulseScale, {
             toValue: 1,
-            duration: 1000,
+            duration: 0,
             useNativeDriver: true,
           }),
         ]),
         Animated.sequence([
-          Animated.timing(opacityAnim, {
+          Animated.timing(pulseOpacity, {
             toValue: 0,
-            duration: 1000,
+            duration: 1200,
             useNativeDriver: true,
           }),
-          Animated.timing(opacityAnim, {
-            toValue: 0.6,
-            duration: 1000,
+          Animated.timing(pulseOpacity, {
+            toValue: 0.8,
+            duration: 0,
             useNativeDriver: true,
           }),
         ]),
       ]),
     ).start();
-  }, [pulseAnim, opacityAnim]);
+  }, [pulseScale, pulseOpacity]);
 
   if (roomsCount === 0) return null;
 
   return (
-    <View className="flex-row items-center justify-between px-5 py-3 mx-5 mb-4 rounded-2xl bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] shadow-sm">
-      <View className="flex-row items-center">
-        <View className="relative w-3 h-3 mr-3 items-center justify-center">
-          <View className="absolute w-full h-full bg-green-400 rounded-full" />
-          <View className="w-2 h-2 bg-green-500 rounded-full" />
-        </View>
-        <View>
-          <Text className="text-secondary dark:text-white font-display font-bold text-[14px]">
-            {peopleCount} people chatting
-          </Text>
-          <Text className="text-gray-500 dark:text-gray-400 text-[11px] mt-0.5">
-            in {roomsCount} {roomsCount === 1 ? "room" : "rooms"} within{" "}
-            {radius}km
-          </Text>
-        </View>
+    <View className="flex-row items-center py-2 px-1">
+      <View className="relative w-3 h-3 mr-2.5 items-center justify-center">
+        <Animated.View
+          style={{
+            position: "absolute",
+            width: 8,
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: "#22C55E",
+            transform: [{ scale: pulseScale }],
+            opacity: pulseOpacity,
+          }}
+        />
+        <View className="w-2 h-2 bg-green-500 rounded-full" />
       </View>
-      <View className="w-8 h-8 rounded-full bg-gray-50 dark:bg-[#252528] items-center justify-center">
-        <Ionicons name="flash" size={14} color="#FF6B47" />
-      </View>
+      <Text className="text-secondary dark:text-gray-200 text-[13px] font-medium">
+        {peopleCount} chatting
+      </Text>
+      <Text className="text-gray-300 dark:text-gray-600 mx-1.5">·</Text>
+      <Text className="text-gray-400 dark:text-gray-500 text-[13px] font-body">
+        {roomsCount} {roomsCount === 1 ? "room" : "rooms"} within {radius}km
+      </Text>
     </View>
   );
 }

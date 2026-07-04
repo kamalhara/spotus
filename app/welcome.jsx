@@ -19,7 +19,6 @@ export default function Welcome() {
   const scaleHero = useRef(new Animated.Value(0.9)).current;
 
   useEffect(() => {
-    // Staggered entrance animations
     Animated.sequence([
       Animated.parallel([
         Animated.timing(fadeInHero, {
@@ -54,17 +53,14 @@ export default function Welcome() {
   }
 
   return (
-    <View className="bg-bg dark:bg-[#111113] flex-1">
+    <View className="bg-bg dark:bg-[#111112] flex-1">
       <SafeAreaView className="flex-1 justify-between">
         {/* Brand */}
         <View className="mt-6 px-8">
-          <View className="flex-row items-center">
-            <Text className="text-secondary dark:text-gray-100 text-2xl font-display tracking-tight">
-              Spot Us
-            </Text>
-            <View className="w-2 h-2 rounded-full bg-primary ml-1.5 -mt-3" />
-          </View>
-          <Text className="text-muted text-[13px] mt-1 tracking-wide">
+          <Text className="text-secondary dark:text-gray-100 text-2xl font-heading tracking-tight">
+            Spot Us
+          </Text>
+          <Text className="text-muted text-[13px] mt-1 font-body">
             Find Your Crowd Nearby
           </Text>
         </View>
@@ -77,7 +73,7 @@ export default function Welcome() {
             transform: [{ scale: scaleHero }],
           }}
         >
-          <View className="w-72 h-72 items-center justify-center  rounded-[36px]">
+          <View className="w-72 h-72 items-center justify-center rounded-[36px]">
             <Image
               source={
                 isDark
@@ -97,12 +93,12 @@ export default function Welcome() {
             transform: [{ translateY: slideUpContent }],
           }}
         >
-          <View className="bg-surface-alt dark:bg-[#1C1C20] px-8 pt-10 pb-14 rounded-t-[36px]">
-            <Text className="text-secondary dark:text-gray-100 text-[36px] font-display leading-[42px] tracking-tight">
-              See what&apos;s{"\n"}happening{" "}
+          <View className="bg-surface-alt dark:bg-[#1A1A1E] px-8 pt-10 pb-14 rounded-t-[28px]">
+            <Text className="text-secondary dark:text-gray-100 text-[34px] font-display leading-[40px] tracking-tight">
+              See what{'\u2019'}s{"\n"}happening{" "}
               <Text className="text-primary">around you</Text>
             </Text>
-            <Text className="text-muted text-[15px] mt-3 leading-6 mb-8">
+            <Text className="text-muted text-[15px] mt-4 leading-6 mb-8 font-body">
               Real conversations about real things, with real people nearby.
             </Text>
 
@@ -117,10 +113,10 @@ export default function Welcome() {
                 className="py-3 mt-1"
               >
                 <View className="flex-row justify-center items-center gap-1.5">
-                  <Text className="text-gray-400 dark:text-gray-500 text-[15px]">
+                  <Text className="text-gray-400 dark:text-gray-500 text-[14px] font-body">
                     Already have an account?
                   </Text>
-                  <Text className="text-primary dark:text-primary-light font-bold text-[15px]">
+                  <Text className="text-primary dark:text-primary-light font-semibold text-[14px]">
                     Log In
                   </Text>
                 </View>

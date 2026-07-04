@@ -12,7 +12,6 @@ WebBrowser.maybeCompleteAuthSession();
 
 // Clerk recommendation for faster OAuth loading
 const useWarmUpBrowser = () => {
-  // Optimization: Warm up the web browser for faster OAuth redirect handling
   useEffect(() => {
     void WebBrowser.warmUpAsync();
     return () => {
@@ -46,14 +45,14 @@ function OAuthButton({ onPress, icon, label }) {
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <GlassContainer isInteractive={true}>
         <TouchableOpacity
-          className="flex-row items-center justify-center py-[17px] px-6 rounded-[18px] border-[1.5px] border-border dark:border-[#2C2C30] bg-white dark:bg-[#1C1C20] active:opacity-70"
+          className="flex-row items-center justify-center py-[14px] px-5 rounded-2xl border border-border dark:border-[#2A2A2E] bg-white dark:bg-[#1A1A1E]"
           onPress={onPress}
           onPressIn={handlePressIn}
           onPressOut={handlePressOut}
           activeOpacity={0.85}
         >
           {icon}
-          <Text className="text-secondary dark:text-gray-100 font-bold ml-3 text-[15px] tracking-tight">
+          <Text className="text-secondary dark:text-gray-100 font-semibold ml-3 text-[14px] tracking-tight">
             {label}
           </Text>
         </TouchableOpacity>
@@ -103,7 +102,7 @@ export default function Oauth() {
   );
 
   const GoogleIcon = (
-    <Svg width="22" height="22" viewBox="0 0 48 48">
+    <Svg width="20" height="20" viewBox="0 0 48 48">
       <Path
         fill="#FFC107"
         d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"
@@ -124,7 +123,7 @@ export default function Oauth() {
   );
 
   const AppleIcon = (
-    <Svg width="22" height="22" viewBox="0 0 50 50">
+    <Svg width="20" height="20" viewBox="0 0 50 50">
       <Path
         fill={isDark ? "#F3F4F6" : "#18181B"}
         d="M 44.527344 34.75 C 43.449219 37.144531 42.929688 38.214844 41.542969 40.328125 C 39.601563 43.28125 36.863281 46.96875 33.480469 46.992188 C 30.46875 47.019531 29.691406 45.027344 25.601563 45.0625 C 21.515625 45.082031 20.664063 47.03125 17.648438 47 C 14.261719 46.96875 11.671875 43.648438 9.730469 40.699219 C 4.300781 32.429688 3.726563 22.734375 7.082031 17.578125 C 9.457031 13.921875 13.210938 11.773438 16.738281 11.773438 C 20.332031 11.773438 22.589844 13.746094 25.558594 13.746094 C 28.441406 13.746094 30.195313 11.769531 34.351563 11.769531 C 37.492188 11.769531 40.8125 13.480469 43.1875 16.433594 C 35.421875 20.691406 36.683594 31.78125 44.527344 34.75 Z M 31.195313 8.46875 C 32.707031 6.527344 33.855469 3.789063 33.4375 1 C 30.972656 1.167969 28.089844 2.742188 26.40625 4.78125 C 24.878906 6.640625 23.613281 9.398438 24.105469 12.066406 C 26.796875 12.152344 29.582031 10.546875 31.195313 8.46875 Z"
@@ -133,7 +132,7 @@ export default function Oauth() {
   );
 
   return (
-    <View className="flex flex-col gap-3.5 mb-5">
+    <View className="flex flex-col gap-3 mb-4">
       <OAuthButton
         onPress={() => handleOAuth("oauth_google")}
         icon={GoogleIcon}

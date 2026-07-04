@@ -61,7 +61,7 @@ const CustomInput = forwardRef(function CustomInput(
   const animatedBorderColor = borderAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [
-      error ? "#EF4444" : isDark ? "#2C2C30" : "#E2E8F0",
+      error ? "#EF4444" : isDark ? "#2A2A2E" : "#E2E2DE",
       error ? "#EF4444" : "#FF6B47",
     ],
   });
@@ -73,7 +73,7 @@ const CustomInput = forwardRef(function CustomInput(
     >
       {label && (
         <Text
-          className={`text-[11px] ml-1 tracking-[1.5px] text-muted font-bold mb-2.5 uppercase ${className}`}
+          className={`text-[13px] ml-0.5 text-muted font-semibold mb-2 ${className}`}
         >
           {label}
         </Text>
@@ -81,34 +81,34 @@ const CustomInput = forwardRef(function CustomInput(
       <Animated.View
         style={[
           {
-            borderWidth: 1.5,
+            borderWidth: 1,
             borderColor: animatedBorderColor,
-            borderRadius: 30,
+            borderRadius: 14,
           },
           containerStyle,
         ]}
       >
         {hasGlass ? (
           <GlassContainer
-            borderRadius={28}
+            borderRadius={13}
             isInteractive={true}
-            fallbackClassName="bg-white dark:bg-[#1C1C20]"
+            fallbackClassName="bg-white dark:bg-[#1A1A1E]"
             style={{
               flexDirection: "row",
               alignItems: "center",
-              paddingHorizontal: 16,
-              paddingVertical: 14,
+              paddingHorizontal: 14,
+              paddingVertical: 13,
               backgroundColor: isDark
                 ? "rgba(255, 255, 255, 0.03)"
                 : "rgba(255, 255, 255, 0.4)",
             }}
           >
-            {icon && <View className="mr-3 w-6 items-center">{icon}</View>}
+            {icon && <View className="mr-2.5 w-5 items-center opacity-50">{icon}</View>}
             <TextInput
               ref={ref}
-              className="flex-1 text-secondary dark:text-gray-100 text-base font-medium h-full"
+              className="flex-1 text-secondary dark:text-gray-100 text-[15px] font-medium h-full"
               placeholder={placeholder}
-              placeholderTextColor={isDark ? "#4B5563" : "#CBD5E1"}
+              placeholderTextColor={isDark ? "#4B5563" : "#C0BDB8"}
               value={value}
               onChangeText={onChangeText}
               secureTextEntry={secureTextEntry}
@@ -122,18 +122,18 @@ const CustomInput = forwardRef(function CustomInput(
             style={{
               flexDirection: "row",
               alignItems: "center",
-              paddingHorizontal: 16,
-              paddingVertical: 14,
-              backgroundColor: isDark ? "#1C1C20" : "#FFFFFF",
-              borderRadius: 28,
+              paddingHorizontal: 14,
+              paddingVertical: 13,
+              backgroundColor: isDark ? "#1A1A1E" : "#FEFEFE",
+              borderRadius: 13,
             }}
           >
-            {icon && <View className="mr-3 w-6 items-center">{icon}</View>}
+            {icon && <View className="mr-2.5 w-5 items-center opacity-50">{icon}</View>}
             <TextInput
               ref={ref}
-              className="flex-1 text-secondary dark:text-gray-100 text-base font-medium"
+              className="flex-1 text-secondary dark:text-gray-100 text-[15px] font-medium"
               placeholder={placeholder}
-              placeholderTextColor={isDark ? "#4B5563" : "#CBD5E1"}
+              placeholderTextColor={isDark ? "#4B5563" : "#C0BDB8"}
               value={value}
               onChangeText={onChangeText}
               secureTextEntry={secureTextEntry}

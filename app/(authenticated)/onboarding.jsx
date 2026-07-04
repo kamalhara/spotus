@@ -150,17 +150,17 @@ export default function OnboardingScreen() {
   const renderStep1 = () => (
     <>
       <View className="mt-8 mb-10">
-        <Text className="text-3xl font-display font-black text-secondary dark:text-white mb-2 tracking-tight">
+        <Text className="text-[28px] font-display text-secondary dark:text-white mb-2 tracking-tight">
           Before you dive in...
         </Text>
-        <Text className="text-base text-muted font-medium">
+        <Text className="text-[15px] text-muted font-body leading-6">
           Pick a name and pic so people know it&apos;s you.
         </Text>
       </View>
 
       <View className="items-center mb-10">
         <TouchableOpacity onPress={pickImage} className="relative" activeOpacity={0.8}>
-          <View className="w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20 items-center justify-center bg-gray-100 dark:bg-gray-800">
+          <View className="w-28 h-28 rounded-[32px] overflow-hidden border-2 border-gray-100 dark:border-[#2A2A2E] items-center justify-center bg-gray-50 dark:bg-[#1A1A1E]">
             {imageUri ? (
               <Image
                 source={{ uri: imageUri }}
@@ -169,13 +169,13 @@ export default function OnboardingScreen() {
             ) : (
               <Ionicons
                 name="person"
-                size={60}
-                color={isDark ? "#4B5563" : "#9CA3AF"}
+                size={48}
+                color={isDark ? "#4B5563" : "#C0BDB8"}
               />
             )}
           </View>
-          <View className="absolute bottom-0 right-0 bg-primary w-10 h-10 rounded-full items-center justify-center border-4 border-bg dark:border-[#111113]">
-            <Ionicons name="camera" size={18} color="white" />
+          <View className="absolute bottom-0 right-0 bg-primary w-9 h-9 rounded-full items-center justify-center border-3 border-bg dark:border-[#111112]" style={{ borderWidth: 3 }}>
+            <Ionicons name="camera" size={15} color="white" />
           </View>
         </TouchableOpacity>
       </View>
@@ -217,19 +217,19 @@ export default function OnboardingScreen() {
   const renderStep2 = () => (
     <>
       <View className="mt-8 mb-8">
-        <Text className="text-3xl font-display font-black text-secondary dark:text-white mb-2 tracking-tight">
+        <Text className="text-[28px] font-display text-secondary dark:text-white mb-2 tracking-tight">
           What are you into?
         </Text>
-        <Text className="text-base text-muted font-medium">
+        <Text className="text-[15px] text-muted font-body leading-6">
           Select at least 3 interests to help us find relevant rooms.
         </Text>
       </View>
 
       {error ? (
-        <Text className="text-red-500 text-sm font-semibold mb-4">{error}</Text>
+        <Text className="text-red-500 text-[13px] font-medium mb-4">{error}</Text>
       ) : null}
 
-      <View className="flex-row flex-wrap gap-3 mb-8">
+      <View className="flex-row flex-wrap gap-2.5 mb-8">
         {Object.keys(CATEGORY_ICONS).map((cat) => {
           const isSelected = selectedInterests.includes(cat);
           const color = CATEGORY_COLORS[cat] || "#FF6B47";
@@ -238,21 +238,22 @@ export default function OnboardingScreen() {
               key={cat}
               onPress={() => toggleInterest(cat)}
               activeOpacity={0.8}
-              className={`flex-row items-center px-4 py-3 rounded-2xl border-2 ${
-                isSelected ? "border-transparent" : "border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1C1C20]"
+              className={`flex-row items-center px-3.5 py-2.5 rounded-xl border ${
+                isSelected ? "border-transparent" : "border-gray-150 dark:border-[#2A2A2E] bg-white dark:bg-[#1A1A1E]"
               }`}
-              style={isSelected ? { backgroundColor: color } : {}}
+              style={isSelected ? { backgroundColor: `${color}18` } : {}}
             >
               <Ionicons
                 name={CATEGORY_ICONS[cat]}
-                size={18}
-                color={isSelected ? "white" : color}
-                style={{ marginRight: 8 }}
+                size={16}
+                color={isSelected ? color : "#9CA3AF"}
+                style={{ marginRight: 6 }}
               />
               <Text
-                className={`font-bold text-[15px] ${
-                  isSelected ? "text-white" : "text-secondary dark:text-gray-300"
+                className={`font-semibold text-[14px] ${
+                  isSelected ? "" : "text-secondary dark:text-gray-300"
                 }`}
+                style={isSelected ? { color } : {}}
               >
                 {cat}
               </Text>
@@ -261,12 +262,12 @@ export default function OnboardingScreen() {
         })}
       </View>
 
-      <View className="mt-auto pt-8 flex-row gap-4">
+      <View className="mt-auto pt-8 flex-row gap-3">
         <TouchableOpacity 
           onPress={() => setStep(1)} 
-          className="w-14 h-14 bg-gray-100 dark:bg-gray-800 rounded-2xl items-center justify-center"
+          className="w-12 h-12 bg-gray-50 dark:bg-[#1A1A1E] rounded-xl items-center justify-center border border-gray-100 dark:border-[#2A2A2E]"
         >
-          <Ionicons name="arrow-back" size={24} color={isDark ? "white" : "black"} />
+          <Ionicons name="arrow-back" size={20} color={isDark ? "white" : "black"} />
         </TouchableOpacity>
         <View className="flex-1">
           <CustomButton
@@ -282,34 +283,34 @@ export default function OnboardingScreen() {
   const renderStep3 = () => (
     <>
       <View className="mt-8 mb-10">
-        <Text className="text-3xl font-display font-black text-secondary dark:text-white mb-2 tracking-tight">
+        <Text className="text-[28px] font-display text-secondary dark:text-white mb-2 tracking-tight">
           How far will you go?
         </Text>
-        <Text className="text-base text-muted font-medium">
+        <Text className="text-[15px] text-muted font-body leading-6">
           Set your preferred discovery radius. You can change this anytime.
         </Text>
       </View>
 
       <View className="items-center justify-center py-10">
-        <View className="w-32 h-32 bg-primary/10 rounded-full items-center justify-center mb-8 border-4 border-primary/20">
-          <Ionicons name="location" size={48} color="#FF6B47" />
-          <Text className="text-primary font-black font-display mt-1 text-lg">{preferredRadius} km</Text>
+        <View className="w-28 h-28 bg-primary/8 rounded-[32px] items-center justify-center mb-8">
+          <Ionicons name="location" size={40} color="#FF6B47" />
+          <Text className="text-primary font-heading mt-1 text-lg">{preferredRadius} km</Text>
         </View>
         
-        <View className="flex-row flex-wrap justify-center gap-3">
+        <View className="flex-row flex-wrap justify-center gap-2.5">
           {RADIUS_OPTIONS.map((rad) => (
             <TouchableOpacity
               key={rad}
               onPress={() => setPreferredRadius(rad)}
               activeOpacity={0.8}
-              className={`w-[60px] h-[60px] items-center justify-center rounded-2xl border-2 ${
+              className={`w-[56px] h-[56px] items-center justify-center rounded-xl border ${
                 preferredRadius === rad
                   ? "bg-primary border-primary"
-                  : "bg-white dark:bg-[#1C1C20] border-gray-200 dark:border-gray-800"
+                  : "bg-white dark:bg-[#1A1A1E] border-gray-150 dark:border-[#2A2A2E]"
               }`}
             >
               <Text
-                className={`font-bold text-lg ${
+                className={`font-heading text-lg ${
                   preferredRadius === rad ? "text-white" : "text-secondary dark:text-gray-300"
                 }`}
               >
@@ -320,12 +321,12 @@ export default function OnboardingScreen() {
         </View>
       </View>
 
-      <View className="mt-auto pt-8 flex-row gap-4">
+      <View className="mt-auto pt-8 flex-row gap-3">
         <TouchableOpacity 
           onPress={() => setStep(2)} 
-          className="w-14 h-14 bg-gray-100 dark:bg-gray-800 rounded-2xl items-center justify-center"
+          className="w-12 h-12 bg-gray-50 dark:bg-[#1A1A1E] rounded-xl items-center justify-center border border-gray-100 dark:border-[#2A2A2E]"
         >
-          <Ionicons name="arrow-back" size={24} color={isDark ? "white" : "black"} />
+          <Ionicons name="arrow-back" size={20} color={isDark ? "white" : "black"} />
         </TouchableOpacity>
         <View className="flex-1">
           <CustomButton
@@ -340,19 +341,19 @@ export default function OnboardingScreen() {
   const renderStep4 = () => (
     <>
       <View className="mt-8 mb-10">
-        <Text className="text-3xl font-display font-black text-secondary dark:text-white mb-2 tracking-tight">
+        <Text className="text-[28px] font-display text-secondary dark:text-white mb-2 tracking-tight">
           What brings you to SpotUs?
         </Text>
-        <Text className="text-base text-muted font-medium">
+        <Text className="text-[15px] text-muted font-body leading-6">
           Pick your primary motivation.
         </Text>
       </View>
 
       {error ? (
-        <Text className="text-red-500 text-sm font-semibold mb-4">{error}</Text>
+        <Text className="text-red-500 text-[13px] font-medium mb-4">{error}</Text>
       ) : null}
 
-      <View className="flex flex-col gap-3">
+      <View className="flex flex-col gap-2.5">
         {MOTIVATIONS.map((mot) => {
           const isSelected = motivation === mot;
           return (
@@ -360,33 +361,33 @@ export default function OnboardingScreen() {
               key={mot}
               onPress={() => setMotivation(mot)}
               activeOpacity={0.8}
-              className={`flex-row items-center justify-between px-5 py-4 rounded-2xl border-2 ${
+              className={`flex-row items-center justify-between px-4 py-3.5 rounded-xl border ${
                 isSelected
-                  ? "border-primary bg-primary/10"
-                  : "border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1C1C20]"
+                  ? "border-primary/30 bg-primary/5 dark:bg-primary/10"
+                  : "border-gray-150 dark:border-[#2A2A2E] bg-white dark:bg-[#1A1A1E]"
               }`}
             >
               <Text
-                className={`font-bold text-[16px] ${
+                className={`font-semibold text-[15px] ${
                   isSelected ? "text-primary" : "text-secondary dark:text-gray-300"
                 }`}
               >
                 {mot}
               </Text>
               {isSelected && (
-                <Ionicons name="checkmark-circle" size={20} color="#FF6B47" />
+                <Ionicons name="checkmark-circle" size={18} color="#FF6B47" />
               )}
             </TouchableOpacity>
           );
         })}
       </View>
 
-      <View className="mt-auto pt-8 flex-row gap-4">
+      <View className="mt-auto pt-8 flex-row gap-3">
         <TouchableOpacity 
           onPress={() => setStep(3)} 
-          className="w-14 h-14 bg-gray-100 dark:bg-gray-800 rounded-2xl items-center justify-center"
+          className="w-12 h-12 bg-gray-50 dark:bg-[#1A1A1E] rounded-xl items-center justify-center border border-gray-100 dark:border-[#2A2A2E]"
         >
-          <Ionicons name="arrow-back" size={24} color={isDark ? "white" : "black"} />
+          <Ionicons name="arrow-back" size={20} color={isDark ? "white" : "black"} />
         </TouchableOpacity>
         <View className="flex-1">
           <CustomButton
@@ -400,26 +401,17 @@ export default function OnboardingScreen() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]">
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111112]">
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         className="flex-1"
       >
         <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24 }}>
-          {/* Progress dots */}
-          <View className="flex-row items-center justify-center gap-2 mt-2 mb-4">
-            {[1, 2, 3, 4].map((s) => (
-              <View 
-                key={s} 
-                className={`h-2 rounded-full ${
-                  s === step 
-                    ? "w-8 bg-primary" 
-                    : s < step 
-                      ? "w-2 bg-primary/40" 
-                      : "w-2 bg-gray-200 dark:bg-gray-800"
-                }`} 
-              />
-            ))}
+          {/* Step counter — text instead of dots */}
+          <View className="mt-2 mb-4">
+            <Text className="text-muted text-[12px] font-medium">
+              Step {step} of 4
+            </Text>
           </View>
 
           {step === 1 && renderStep1()}

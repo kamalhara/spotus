@@ -96,7 +96,7 @@ export default function Login() {
 
   if (!isLoaded) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-bg dark:bg-[#111113]">
+      <SafeAreaView className="flex-1 justify-center items-center bg-bg dark:bg-[#111112]">
         <SpotUsLoader size="large" />
       </SafeAreaView>
     );
@@ -104,11 +104,11 @@ export default function Login() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="bg-bg dark:bg-[#111113] flex-1 px-8">
+      <SafeAreaView className="bg-bg dark:bg-[#111112] flex-1 px-8">
         <View className="flex-row items-center mt-4">
           <GlassButton
             onPress={() => router.push("/")}
-            className="w-10 h-10 bg-gray-50 dark:bg-[#1C1C20] rounded-full items-center justify-center border border-gray-100 dark:border-[#2C2C30]"
+            className="w-10 h-10 bg-gray-50 dark:bg-[#1A1A1E] rounded-full items-center justify-center border border-gray-100 dark:border-[#2A2A2E]"
           >
             <Ionicons
               name="arrow-back"
@@ -124,13 +124,11 @@ export default function Login() {
             transform: [{ translateY: slideUp }],
           }}
         >
-          <View className="mt-8 mb-10">
-            <Text className="text-secondary dark:text-gray-100 text-[32px] font-bold tracking-tight mb-1">
+          <View className="mt-10 mb-10">
+            <Text className="text-secondary dark:text-gray-100 text-[32px] font-display tracking-tight mb-2">
               Welcome{"\n"}Back
             </Text>
-            {/* Accent line */}
-            <View className="mt-3 mb-3 w-12 h-1 rounded-full bg-primary" />
-            <Text className="text-gray-400 dark:text-gray-500 text-base leading-6">
+            <Text className="text-gray-400 dark:text-gray-500 text-[15px] leading-6 font-body">
               Sign in to continue where you left off.
             </Text>
           </View>
@@ -143,7 +141,7 @@ export default function Login() {
               onChangeText={setEmailAddress}
               autoCapitalize="none"
               keyboardType="email-address"
-              icon={<Ionicons name="mail-outline" size={20} color="#9CA3AF" />}
+              icon={<Ionicons name="mail-outline" size={18} color="#9CA3AF" />}
             />
 
             <CustomInput
@@ -155,7 +153,7 @@ export default function Login() {
               icon={
                 <Ionicons
                   name="lock-closed-outline"
-                  size={20}
+                  size={18}
                   color="#9CA3AF"
                 />
               }
@@ -172,17 +170,15 @@ export default function Login() {
                 })
               }
             >
-              <Text className="text-primary font-medium text-sm">
+              <Text className="text-primary font-medium text-[13px]">
                 Forgot Password?
               </Text>
             </TouchableOpacity>
 
             {error ? (
-              <View className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 flex-row items-start">
-                <View className="w-5 h-5 bg-red-100 rounded-full items-center justify-center mr-2.5 mt-0.5">
-                  <Ionicons name="alert-circle" size={12} color="#EF4444" />
-                </View>
-                <Text className="text-red-500 text-sm flex-1 leading-5">
+              <View className="bg-red-50 dark:bg-red-950/30 rounded-xl px-4 py-3 flex-row items-start">
+                <Ionicons name="alert-circle" size={16} color="#EF4444" style={{ marginRight: 8, marginTop: 1 }} />
+                <Text className="text-red-500 text-[13px] flex-1 leading-5 font-medium">
                   {error}
                 </Text>
               </View>
@@ -196,21 +192,21 @@ export default function Login() {
           />
 
           <View className="flex-row items-center justify-center gap-3 my-7">
-            <View className="flex-1 h-px bg-border-light dark:bg-[#2C2C30]" />
-            <Text className="text-gray-300 dark:text-gray-600 text-xs font-semibold uppercase tracking-wider">
+            <View className="flex-1 h-px bg-border-light dark:bg-[#2A2A2E]" />
+            <Text className="text-gray-300 dark:text-gray-600 text-[10px] font-medium uppercase tracking-widest">
               Or
             </Text>
-            <View className="flex-1 h-px bg-border-light dark:bg-[#2C2C30]" />
+            <View className="flex-1 h-px bg-border-light dark:bg-[#2A2A2E]" />
           </View>
 
           <Oauth />
 
-          <View className="flex-row items-center justify-center gap-1.5 mt-4">
-            <Text className="text-gray-400 dark:text-gray-500 text-[15px]">
+          <View className="flex-row items-center justify-center gap-1.5 mt-2">
+            <Text className="text-gray-400 dark:text-gray-500 text-[14px] font-body">
               Don&apos;t have an account?
             </Text>
             <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
-              <Text className="text-primary dark:text-primary-light font-semibold text-[15px]">
+              <Text className="text-primary dark:text-primary-light font-semibold text-[14px]">
                 Sign Up
               </Text>
             </TouchableOpacity>

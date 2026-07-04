@@ -63,8 +63,8 @@ const LiquidTabBar = ({ state, descriptors, navigation, unreadCount }) => {
         right: TAB_BAR_MARGIN,
         height: TAB_BAR_HEIGHT,
         backgroundColor: isDark
-          ? "rgba(24, 24, 27, 0.85)"
-          : "rgba(255, 255, 255, 0.85)",
+          ? "rgba(26, 26, 30, 0.88)"
+          : "rgba(255, 255, 255, 0.88)",
         borderRadius: 40,
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 6 },
@@ -95,8 +95,8 @@ const LiquidTabBar = ({ state, descriptors, navigation, unreadCount }) => {
             flex: 1,
             width: "100%",
             backgroundColor: isDark
-              ? "rgba(255, 255, 255, 0.1)"
-              : "rgba(0, 0, 0, 0.05)",
+              ? "rgba(255, 255, 255, 0.08)"
+              : "rgba(0, 0, 0, 0.04)",
             borderRadius: 30,
           }}
         />

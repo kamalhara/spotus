@@ -11,6 +11,7 @@ module.exports = {
         "primary-dark": "var(--color-primary-dark)",
         "primary-surface": "var(--color-primary-surface)",
         secondary: "var(--color-secondary)",
+        "text-tertiary": "var(--color-text-tertiary)",
         bg: "var(--color-bg)",
         muted: "var(--color-muted)",
         surface: "var(--color-surface)",
@@ -33,8 +34,6 @@ module.exports = {
 
         heart: "var(--color-heart)",
         "heart-surface": "var(--color-heart-surface)",
-
-
       },
       borderRadius: {
         "2.5xl": "20px",
@@ -53,4 +52,3 @@ module.exports = {
   },
   plugins: [],
 };
-

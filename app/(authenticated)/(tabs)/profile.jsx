@@ -18,7 +18,7 @@ const MenuItem = ({
   label,
   subtitle,
   onPress,
-  color = "#FF6B47",
+  color = "#6B7280",
   isLast = false,
 }) => (
   <TouchableOpacity
@@ -27,22 +27,17 @@ const MenuItem = ({
       onPress?.();
     }}
     activeOpacity={0.6}
-    className={`px-5 py-4 flex-row items-center justify-between ${!isLast ? "border-b border-gray-50 dark:border-gray-800" : ""}`}
+    className={`px-5 py-3.5 flex-row items-center justify-between ${!isLast ? "border-b border-gray-50 dark:border-[#222226]" : ""}`}
   >
     <View className="flex-row items-center flex-1">
-      <View
-        className="w-9 h-9 rounded-xl items-center justify-center mr-3.5"
-        style={{ backgroundColor: `${color}12` }}
-      >
-        <Ionicons name={icon} size={18} color={color} />
-      </View>
+      <Ionicons name={icon} size={18} color={color} style={{ marginRight: 14 }} />
       <View className="flex-1">
-        <Text className="text-secondary dark:text-gray-100 font-semibold text-[15px]">
+        <Text className="text-secondary dark:text-gray-100 font-medium text-[15px]">
           {label}
         </Text>
         {subtitle && (
           <Text
-            className="text-gray-400 dark:text-gray-500 text-xs mt-0.5"
+            className="text-gray-400 dark:text-gray-500 text-[12px] mt-0.5 font-body"
             numberOfLines={1}
           >
             {subtitle}
@@ -50,7 +45,7 @@ const MenuItem = ({
         )}
       </View>
     </View>
-    <Ionicons name="chevron-forward" size={16} color="#D1D5DB" />
+    <Ionicons name="chevron-forward" size={14} color="#D1D5DB" />
   </TouchableOpacity>
 );
 
@@ -76,11 +71,11 @@ export default function Profile() {
   if (loading) {
     return (
       <SafeAreaView
-        className="flex-1 bg-bg dark:bg-[#111113] px-6"
+        className="flex-1 bg-bg dark:bg-[#111112] px-6"
         edges={["top"]}
       >
         <View className="items-center mt-8 mb-7">
-          <Skeleton width={110} height={110} borderRadius={55} />
+          <Skeleton width={100} height={100} borderRadius={36} />
           <Skeleton
             width={150}
             height={28}
@@ -131,29 +126,17 @@ export default function Profile() {
   ).length;
 
   return (
-    <SafeAreaView className="bg-bg dark:bg-[#111113] flex-1" edges={["top"]}>
+    <SafeAreaView className="bg-bg dark:bg-[#111112] flex-1" edges={["top"]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
       >
-        {/* Profile Header */}
-        <View className="relative items-center mb-8">
-          {/* Cover Photo / Gradient */}
-          <View className="absolute top-0 left-0 right-0 h-[140px] bg-primary/10 overflow-hidden">
-            <View className="w-full h-full opacity-60 bg-primary/20" />
-          </View>
-
+        {/* Profile Header — clean, no gradient */}
+        <View className="items-center px-6 pt-6 pb-4">
           {/* Avatar and Edit Button */}
-          <View className="relative mt-[80px]">
+          <View className="relative">
             <View
-              className="w-[120px] h-[120px] rounded-[40px] border-4 border-white dark:border-[#111113] overflow-hidden bg-gray-100 dark:bg-gray-800"
-              style={{
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.06,
-                shadowRadius: 8,
-                elevation: 2,
-              }}
+              className="w-[100px] h-[100px] rounded-[36px] overflow-hidden bg-gray-100 dark:bg-gray-800"
             >
               <Image
                 source={
@@ -167,44 +150,68 @@ export default function Profile() {
             <TouchableOpacity 
               onPress={() => router.push("/profile/edit")}
               activeOpacity={0.8}
-              className="absolute bottom-0 right-0 w-10 h-10 bg-primary rounded-full items-center justify-center border-4 border-white dark:border-[#111113]"
+              className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary rounded-full items-center justify-center border-3 border-bg dark:border-[#111112]"
+              style={{ borderWidth: 3 }}
             >
-              <Ionicons name="pencil" size={16} color="white" />
+              <Ionicons name="pencil" size={13} color="white" />
             </TouchableOpacity>
           </View>
 
-          <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold mt-4 tracking-tight px-6 text-center">
+          <Text className="text-secondary dark:text-gray-100 text-[24px] font-heading mt-4 tracking-tight text-center">
             {firestoreUser?.userName || "User"}
           </Text>
 
           <Text
-            className="text-muted dark:text-gray-400 text-[14px] mt-2 text-center px-8 font-medium leading-5"
+            className="text-muted dark:text-gray-400 text-[14px] mt-1.5 text-center px-8 font-body leading-5"
             numberOfLines={2}
           >
             {firestoreUser?.bio ||
               "No bio yet — say something about yourself!"}
           </Text>
 
-          {/* User Tags (Motivation & Interests) */}
-          <View className="flex-row flex-wrap justify-center gap-2 mt-5 px-6">
+          {/* Inline stats */}
+          <View className="flex-row items-center mt-4 gap-4">
+            {(() => {
+              const badge = getTrustBadge(firestoreUser?.globalReputation ?? 0);
+              return (
+                <View className="flex-row items-center">
+                  <Ionicons name={badge.icon} size={13} color={badge.color} />
+                  <Text className="text-[12px] font-medium ml-1" style={{ color: badge.color }}>
+                    {badge.label}
+                  </Text>
+                </View>
+              );
+            })()}
+            <Text className="text-gray-300 dark:text-gray-600">·</Text>
+            <Text className="text-muted text-[12px] font-medium">
+              {createdRooms} created
+            </Text>
+            <Text className="text-gray-300 dark:text-gray-600">·</Text>
+            <Text className="text-muted text-[12px] font-medium">
+              {joinedRooms} joined
+            </Text>
+          </View>
+
+          {/* User Tags */}
+          <View className="flex-row flex-wrap justify-center gap-2 mt-4">
             {firestoreUser?.motivation && (
-              <View className="bg-primary/10 px-3 py-1.5 rounded-full flex-row items-center">
-                <Ionicons name="sparkles" size={12} color="#FF6B47" style={{ marginRight: 4 }} />
-                <Text className="text-primary font-bold text-[12px]">
+              <View className="bg-primary/8 px-3 py-1.5 rounded-lg flex-row items-center">
+                <Ionicons name="sparkles" size={11} color="#FF6B47" style={{ marginRight: 4 }} />
+                <Text className="text-primary font-medium text-[11px]">
                   {firestoreUser.motivation}
                 </Text>
               </View>
             )}
             {firestoreUser?.interests?.slice(0, 3).map((interest) => (
-              <View key={interest} className="bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
-                <Text className="text-gray-600 dark:text-gray-300 font-bold text-[12px]">
+              <View key={interest} className="bg-gray-100 dark:bg-[#222226] px-3 py-1.5 rounded-lg">
+                <Text className="text-gray-500 dark:text-gray-400 font-medium text-[11px]">
                   {interest}
                 </Text>
               </View>
             ))}
             {firestoreUser?.interests?.length > 3 && (
-              <View className="bg-gray-100 dark:bg-gray-800 px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700">
-                <Text className="text-gray-600 dark:text-gray-300 font-bold text-[12px]">
+              <View className="bg-gray-100 dark:bg-[#222226] px-3 py-1.5 rounded-lg">
+                <Text className="text-gray-500 dark:text-gray-400 font-medium text-[11px]">
                   +{firestoreUser.interests.length - 3}
                 </Text>
               </View>
@@ -212,38 +219,9 @@ export default function Profile() {
           </View>
         </View>
 
-        {/* Stats Grid */}
-        <View className="mx-6 mb-8">
-          {(() => {
-            const badge = getTrustBadge(firestoreUser?.globalReputation ?? 0);
-            return (
-              <View className="mb-4 flex-row justify-center">
-                <View className="flex-row items-center px-4 py-2 rounded-full" style={{ backgroundColor: `${badge.color}15` }}>
-                  <Ionicons name={badge.icon} size={14} color={badge.color} />
-                  <Text className="text-sm font-semibold ml-2" style={{ color: badge.color }}>
-                    {badge.label} • {firestoreUser?.globalReputation ?? 0} rep
-                  </Text>
-                </View>
-              </View>
-            );
-          })()}
-          <View className="flex-row gap-3">
-            <View className="flex-1 bg-white dark:bg-[#1C1C20] rounded-2xl p-4 border border-gray-100 dark:border-[#2C2C30] items-center">
-              <Text className="text-secondary dark:text-white font-display font-black text-2xl">{createdRooms}</Text>
-              <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-bold uppercase tracking-wider mt-1">Created</Text>
-            </View>
-            <View className="flex-1 bg-white dark:bg-[#1C1C20] rounded-2xl p-4 border border-gray-100 dark:border-[#2C2C30] items-center">
-              <Text className="text-secondary dark:text-white font-display font-black text-2xl">{joinedRooms}</Text>
-              <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-bold uppercase tracking-wider mt-1">Joined</Text>
-            </View>
-          </View>
-        </View>
-
-
-
         {/* Menu Groups */}
-        <View className="bg-white dark:bg-[#1C1C20] mx-6 rounded-2xl border border-gray-100 dark:border-[#2C2C30] overflow-hidden">
-          <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-bold uppercase tracking-wider px-5 pt-4 pb-2">
+        <View className="bg-white dark:bg-[#1A1A1E] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A2E] overflow-hidden">
+          <Text className="text-gray-400 dark:text-gray-500 text-[12px] font-medium px-5 pt-4 pb-2">
             Settings
           </Text>
           <MenuItem
@@ -260,52 +238,46 @@ export default function Profile() {
           />
         </View>
 
-        <View className="bg-white dark:bg-[#1C1C20] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2C2C30] overflow-hidden">
-          <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+        <View className="bg-white dark:bg-[#1A1A1E] mx-6 mt-3 rounded-2xl border border-gray-100 dark:border-[#2A2A2E] overflow-hidden">
+          <Text className="text-gray-400 dark:text-gray-500 text-[12px] font-medium px-5 pt-4 pb-2">
             App
           </Text>
           <MenuItem
             icon="notifications-outline"
             label="Notifications"
-            color="#8B5CF6"
             onPress={() => router.push("/profile/notifications")}
           />
           <MenuItem
             icon="eye-outline"
             label="Privacy & Data"
-            color="#8B5CF6"
             onPress={() => router.push("/profile/privacyData")}
           />
           <MenuItem
             icon="language-outline"
             label="Language"
             subtitle="English"
-            color="#8B5CF6"
             onPress={() => router.push("/profile/language")}
             isLast
           />
         </View>
 
-        <View className="bg-white dark:bg-[#1C1C20] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2C2C30] overflow-hidden">
-          <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+        <View className="bg-white dark:bg-[#1A1A1E] mx-6 mt-3 rounded-2xl border border-gray-100 dark:border-[#2A2A2E] overflow-hidden">
+          <Text className="text-gray-400 dark:text-gray-500 text-[12px] font-medium px-5 pt-4 pb-2">
             Support
           </Text>
           <MenuItem
             icon="chatbubble-ellipses-outline"
             label="Send Feedback"
-            color="#64748B"
             onPress={() => router.push("/feedback")}
           />
           <MenuItem
             icon="alert-circle-outline"
             label="Help Center"
-            color="#64748B"
             onPress={() => router.push("/profile/helpCenter")}
           />
           <MenuItem
             icon="information-circle-outline"
             label="About SpotUs"
-            color="#64748B"
             onPress={() => router.push("/profile/about")}
             isLast
           />
@@ -315,15 +287,15 @@ export default function Profile() {
         <TouchableOpacity
           onPress={handleSignOut}
           activeOpacity={0.7}
-          className="mx-6 mt-7 bg-red-50 dark:bg-red-950/30 py-4 rounded-2xl border border-red-100 dark:border-red-900/30 flex-row items-center justify-center gap-2"
+          className="mx-6 mt-6 py-3.5 rounded-2xl flex-row items-center justify-center gap-2"
         >
-          <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-          <Text className="text-red-500 font-semibold text-[15px]">
+          <Ionicons name="log-out-outline" size={16} color="#EF4444" />
+          <Text className="text-red-500 font-medium text-[14px]">
             Sign Out
           </Text>
         </TouchableOpacity>
 
-        <Text className="text-center text-gray-300 dark:text-gray-600 text-[10px] mt-6 tracking-wider">
+        <Text className="text-center text-gray-300 dark:text-gray-600 text-[10px] mt-5 tracking-wider font-body">
           SpotUs v1.0.0
         </Text>
       </ScrollView>

@@ -60,10 +60,10 @@ export default function RoomsScreen() {
   ];
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113] px-6">
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111112] px-6">
       {/* Header */}
       <View className="flex-row items-center justify-between mt-3 mb-5">
-        <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold tracking-tight">
+        <Text className="text-secondary dark:text-gray-100 text-[24px] font-heading tracking-tight">
           My Rooms
         </Text>
         {/* Spacer — button is now the shared FloatingGlassButton */}
@@ -87,24 +87,21 @@ export default function RoomsScreen() {
           )
         }
         renderSectionHeader={({ section }) => (
-          <View className="bg-bg dark:bg-[#111113] pt-6 pb-4">
+          <View className="bg-bg dark:bg-[#111112] pt-5 pb-3">
             <View className="flex-row items-center gap-2">
-              <Text className="text-secondary dark:text-gray-100 text-[18px] font-display font-extrabold">
+              <Text className="text-secondary dark:text-gray-100 text-[17px] font-heading tracking-tight">
                 {section.title}
               </Text>
-              <View
-                className={`px-2.5 py-1 rounded-full ${section.count > 0 ? "bg-primary-surface dark:bg-primary-surface" : "bg-gray-100 dark:bg-gray-800"}`}
-              >
-                <Text
-                  className={`text-[12px] font-display font-black ${section.count > 0 ? "text-primary" : "text-gray-500 dark:text-gray-400"}`}
-                >
+              {section.count > 0 && (
+                <Text className="text-muted text-[13px] font-medium">
                   {section.count}
                 </Text>
-              </View>
+              )}
             </View>
             {section.isEmpty && (
-              <View className="bg-white dark:bg-[#1C1C20] rounded-2xl border border-gray-100 dark:border-[#2C2C30] mt-3">
+              <View className="mt-3">
                 <EmptyState
+                  variant="inline"
                   icon={section.emptyIcon}
                   title={section.emptyText}
                   description={

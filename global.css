@@ -4,14 +4,15 @@
 
 @layer base {
   :root {
-    --color-bg: #FAFAF8;
-    --color-surface: #FFFFFF;
-    --color-surface-alt: #F5F3EF;
+    --color-bg: #FAF9F7;
+    --color-surface: #FEFEFE;
+    --color-surface-alt: #F6F4F0;
     --color-surface-elevated: #FDFCFA;
-    --color-secondary: #1A1A1A;
-    --color-muted: #8C8C8C;
-    --color-border: #E8E6E1;
-    --color-border-light: #F2F0EC;
+    --color-secondary: #171717;
+    --color-text-tertiary: #6B6B6B;
+    --color-muted: #8A8A8A;
+    --color-border: #EAE8E4;
+    --color-border-light: #F3F1ED;
 
     --color-primary: #FF6B47;
     --color-primary-light: #FF9A85;
@@ -32,19 +33,18 @@
 
     --color-heart: #F472B6;
     --color-heart-surface: #FDF2F8;
-
-
   }
 
   .dark {
-    --color-bg: #111113;
-    --color-surface: #1C1C20;
-    --color-surface-alt: #242428;
-    --color-surface-elevated: #202024;
+    --color-bg: #111112;
+    --color-surface: #1A1A1E;
+    --color-surface-alt: #222226;
+    --color-surface-elevated: #1E1E22;
     --color-secondary: #F5F5F5;
-    --color-muted: #999999;
-    --color-border: #2C2C30;
-    --color-border-light: #202024;
+    --color-text-tertiary: #A0A0A0;
+    --color-muted: #888888;
+    --color-border: #2A2A2E;
+    --color-border-light: #1E1E22;
 
     --color-primary: #FF8566;
     --color-primary-light: #FFAB99;
@@ -65,7 +65,5 @@
 
     --color-heart: #F472B6;
     --color-heart-surface: rgba(244, 114, 182, 0.1);
-
-
   }
 }

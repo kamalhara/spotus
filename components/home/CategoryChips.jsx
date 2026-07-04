@@ -15,22 +15,23 @@ export default function CategoryChips({
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 20, gap: 10 }}
+        contentContainerStyle={{ paddingHorizontal: 20, gap: 6 }}
       >
         <TouchableOpacity
           onPress={() => onSelectCategory("all")}
-          activeOpacity={0.8}
-          className={`px-4 py-2 rounded-full border ${
+          activeOpacity={0.7}
+          className="px-3.5 py-2 rounded-xl"
+          style={
             activeCategory === "all"
-              ? "bg-primary border-primary"
-              : "bg-white dark:bg-[#1C1C20] border-gray-200 dark:border-[#2C2C30]"
-          }`}
+              ? { backgroundColor: "rgba(255, 107, 71, 0.1)" }
+              : {}
+          }
         >
           <Text
-            className={`font-bold text-[13px] ${
+            className={`font-semibold text-[13px] ${
               activeCategory === "all"
-                ? "text-white"
-                : "text-gray-600 dark:text-gray-300"
+                ? "text-primary"
+                : "text-gray-400 dark:text-gray-500"
             }`}
           >
             All
@@ -46,25 +47,25 @@ export default function CategoryChips({
             <TouchableOpacity
               key={cat}
               onPress={() => onSelectCategory(cat)}
-              activeOpacity={0.8}
-              className={`flex-row items-center px-4 py-2 rounded-full border ${
+              activeOpacity={0.7}
+              className="flex-row items-center px-3.5 py-2 rounded-xl"
+              style={
                 isActive
-                  ? "border-transparent"
-                  : "bg-white dark:bg-[#1C1C20] border-gray-200 dark:border-[#2C2C30]"
-              }`}
-              style={isActive ? { backgroundColor: color } : {}}
+                  ? { backgroundColor: `${color}12` }
+                  : {}
+              }
             >
               <Ionicons
                 name={icon}
-                size={14}
-                color={isActive ? "white" : color}
-                style={{ marginRight: 6 }}
+                size={13}
+                color={isActive ? color : "#9CA3AF"}
+                style={{ marginRight: 5 }}
               />
               <Text
-                style={{ color: isActive ? "white" : color }}
-                className={`font-bold text-[13px] ${
-                  isActive ? "text-white" : "text-gray-700 dark:text-gray-300"
+                className={`font-semibold text-[13px] ${
+                  isActive ? "" : "text-gray-400 dark:text-gray-500"
                 }`}
+                style={isActive ? { color } : {}}
               >
                 {cat}
               </Text>

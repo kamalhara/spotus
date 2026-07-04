@@ -34,16 +34,23 @@ import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
 import { sendPushNotification } from "../../../lib/notification";
 
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
 function EmptyRooms() {
   return (
     <View className="items-center justify-center py-16 px-6">
-      <View className="w-16 h-16 bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-2xl items-center justify-center mb-5">
-        <Ionicons name="radio-outline" size={28} color="#FF6B47" />
+      <View className="w-14 h-14 border border-dashed border-gray-200 dark:border-gray-700 rounded-2xl items-center justify-center mb-4">
+        <Ionicons name="radio-outline" size={24} color="#C0BDB8" />
       </View>
-      <Text className="text-secondary dark:text-gray-100 text-xl font-display font-extrabold tracking-tight text-center mb-2.5">
+      <Text className="text-secondary dark:text-gray-100 text-lg font-heading tracking-tight text-center mb-2">
         Nothing nearby
       </Text>
-      <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4">
+      <Text className="text-muted text-[14px] font-body text-center leading-5 px-4">
         Keep exploring or enable location to join conversations.
       </Text>
     </View>
@@ -214,7 +221,6 @@ export default function Home() {
         setRooms(data);
       } else {
         setIsGhostBrowsing(false);
-        // slider is in km, getNearbyRooms expects km
         const data = await getNearbyRooms(searchDistance, firestoreUser?.id);
         setRooms(data);
       }
@@ -322,46 +328,45 @@ export default function Home() {
         radius={displayDistance}
       />
 
-      {/* Dynamic context header */}
+      {/* Greeting + context */}
       <Animated.View
-        className="mt-5 mb-1"
+        className="mt-4 mb-1"
         style={{
           opacity: fadeInContent,
           transform: [{ translateY: slideUpContent }],
         }}
       >
-        <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-extrabold tracking-tight">
+        <Text className="text-secondary dark:text-gray-100 text-[26px] font-display tracking-tight">
           {loading
-            ? "Looking nearby"
+            ? "Looking nearby..."
             : filteredRooms.length > 0
-              ? `${filteredRooms.length} room${filteredRooms.length === 1 ? "" : "s"} nearby`
+              ? `${getGreeting()}`
               : "Quiet for now"}
         </Text>
+        {!loading && filteredRooms.length > 0 && (
+          <Text className="text-muted text-[14px] font-body mt-1">
+            {filteredRooms.length} room{filteredRooms.length === 1 ? "" : "s"}{" "}
+            within {displayDistance}km
+          </Text>
+        )}
       </Animated.View>
 
-      {/* Slider Card — elevated */}
+      {/* Slider — compact */}
       <Animated.View
-        className="mt-6"
+        className="mt-5"
         style={{
           opacity: fadeInContent,
           transform: [{ translateY: slideUpContent }],
         }}
       >
-        <View className="bg-white dark:bg-[#1C1C20] rounded-3xl px-6 py-5 border border-border-light dark:border-[#2C2C30]">
-          <View className="flex-row items-center justify-between mb-3">
-            <View className="flex-row items-center">
-              <View className="w-7 h-7 bg-primary/10 rounded-lg items-center justify-center mr-2.5">
-                <Ionicons name="locate" size={14} color="#FF6B47" />
-              </View>
-              <Text className="text-secondary dark:text-gray-100 text-sm font-bold">
-                How far?
-              </Text>
-            </View>
-            <View className="bg-primary px-3 py-1.5 rounded-xl">
-              <Text className="text-white text-sm font-display font-black">
-                {displayDistance} km
-              </Text>
-            </View>
+        <View className="bg-white dark:bg-[#1A1A1E] rounded-2xl px-5 py-4 border border-border-light dark:border-[#2A2A2E]">
+          <View className="flex-row items-center justify-between mb-2">
+            <Text className="text-secondary dark:text-gray-100 text-[13px] font-semibold">
+              Discovery radius
+            </Text>
+            <Text className="text-primary text-[13px] font-heading">
+              {displayDistance} km
+            </Text>
           </View>
           <View
             onLayout={(e) => {
@@ -421,7 +426,7 @@ export default function Home() {
               />
             </Animated.View>
             <Slider
-              style={{ width: "100%", height: 40 }}
+              style={{ width: "100%", height: 36 }}
               minimumValue={1}
               maximumValue={40}
               step={1}
@@ -455,20 +460,20 @@ export default function Home() {
                 setDisplayDistance(Math.round(val));
               }}
               minimumTrackTintColor="#FF6B47"
-              maximumTrackTintColor={isDark ? "#2C2C30" : "#E8E6E1"}
+              maximumTrackTintColor={isDark ? "#2A2A2E" : "#EAE8E4"}
               thumbTintColor={isDark ? "#FFAB99" : "#FF6B47"}
             />
           </View>
-          <View className="flex flex-row justify-between mt-1">
-            <Text className="text-muted text-xs font-semibold">1 km</Text>
-            <Text className="text-muted text-xs font-semibold">40 km</Text>
+          <View className="flex flex-row justify-between">
+            <Text className="text-muted text-[10px] font-medium">1 km</Text>
+            <Text className="text-muted text-[10px] font-medium">40 km</Text>
           </View>
         </View>
       </Animated.View>
 
-      {/* Create Room CTA */}
+      {/* Create Room CTA — more integrated, less banner-like */}
       <Animated.View
-        className="mt-7"
+        className="mt-5"
         onLayout={(e) => {
           ctaBottomY.current =
             e.nativeEvent.layout.y + e.nativeEvent.layout.height;
@@ -481,32 +486,30 @@ export default function Home() {
         <TouchableOpacity
           onPress={handleCreateRoom}
           activeOpacity={0.9}
-          className="bg-primary py-5 px-6 rounded-3xl flex-row items-center"
-          style={{
-            shadowColor: "#FF6B47",
-            shadowOffset: { width: 0, height: 8 },
-            shadowOpacity: 0.2,
-            shadowRadius: 12,
-            elevation: 4,
-          }}
+          className="bg-primary py-4 px-5 rounded-2xl flex-row items-center"
         >
-          <View className="w-11 h-11 bg-white/20 rounded-xl items-center justify-center mr-4">
-            <Ionicons name="add" size={24} color="white" />
+          <View className="w-9 h-9 bg-white/20 rounded-xl items-center justify-center mr-3">
+            <Ionicons name="add" size={20} color="white" />
           </View>
           <View className="flex-1">
-            <Text className="text-white font-display font-extrabold text-lg tracking-tight">
+            <Text className="text-white font-heading text-[15px] tracking-tight">
               Create a room
             </Text>
-            <Text className="text-white/70 text-[13px] font-semibold mt-0.5">
-              Hang out with people nearby
+            <Text className="text-white/60 text-[12px] font-body mt-0.5">
+              Start a conversation nearby
             </Text>
           </View>
+          <Ionicons
+            name="arrow-forward"
+            size={16}
+            color="rgba(255,255,255,0.5)"
+          />
         </TouchableOpacity>
       </Animated.View>
 
-      {/* Join via Invite Code */}
+      {/* Join via Invite Code — inline link style */}
       <Animated.View
-        className="mt-3 mb-6"
+        className="mt-3 mb-5"
         style={{
           opacity: fadeInContent,
           transform: [{ translateY: slideUpContent }],
@@ -514,16 +517,16 @@ export default function Home() {
       >
         <TouchableOpacity
           onPress={handleJoinByCode}
-          activeOpacity={0.8}
-          className="flex-row items-center justify-center py-3.5 bg-white dark:bg-[#1C1C20] rounded-2xl border border-border-light dark:border-[#2C2C30]"
+          activeOpacity={0.7}
+          className="flex-row items-center justify-center py-2.5"
         >
           <Ionicons
             name="key-outline"
-            size={16}
+            size={14}
             color="#FF6B47"
-            style={{ marginRight: 6 }}
+            style={{ marginRight: 5 }}
           />
-          <Text className="text-secondary dark:text-gray-200 font-semibold text-[13px]">
+          <Text className="text-primary font-semibold text-[13px]">
             Have an invite code?
           </Text>
         </TouchableOpacity>
@@ -538,16 +541,14 @@ export default function Home() {
       {/* Nearby Rooms Section Header */}
       <View className="mb-2">
         <View className="flex flex-row justify-between items-center">
-          <View className="flex-row items-center gap-2.5">
-            <Text className="text-secondary dark:text-gray-100 text-[22px] font-display font-extrabold tracking-tight">
+          <View className="flex-row items-center gap-2">
+            <Text className="text-secondary dark:text-gray-100 text-[20px] font-heading tracking-tight">
               Nearby
             </Text>
             {nearbyRooms.length > 0 && (
-              <View className="bg-primary-surface px-2.5 py-1 rounded-full">
-                <Text className="text-primary text-[12px] font-display font-black">
-                  {nearbyRooms.length}
-                </Text>
-              </View>
+              <Text className="text-muted text-[13px] font-medium">
+                {nearbyRooms.length}
+              </Text>
             )}
           </View>
           <GlassButton
@@ -558,17 +559,17 @@ export default function Home() {
               })
             }
             shape="pill"
-            size={34}
+            size={32}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <Ionicons
                 name="map"
-                size={14}
+                size={13}
                 color={isDark ? "#E2E8F0" : "#4B5563"}
                 style={{ marginRight: 4 }}
               />
-              <Text className="text-gray-600 dark:text-gray-300 text-xs font-bold">
-                Map View
+              <Text className="text-gray-600 dark:text-gray-300 text-[11px] font-semibold">
+                Map
               </Text>
             </View>
           </GlassButton>
@@ -588,7 +589,7 @@ export default function Home() {
 
   return (
     <>
-      <SafeAreaView className="bg-bg dark:bg-[#111113] h-screen px-6">
+      <SafeAreaView className="bg-bg dark:bg-[#111112] h-screen px-6">
         {/* Header — stays pinned */}
         <Animated.View
           className="flex flex-row justify-between items-center my-3"
@@ -602,23 +603,23 @@ export default function Home() {
               source={{
                 uri: firestoreUser?.profilePic || "https://picsum.photos/200",
               }}
-              className="w-12 h-12 rounded-2xl border-2 border-white dark:border-gray-800"
+              className="w-11 h-11 rounded-2xl"
             />
           </TouchableOpacity>
           <View className="flex-row items-center">
-            <Text className="text-secondary dark:text-gray-100 tracking-tighter text-[22px] font-display font-black">
+            <Text className="text-secondary dark:text-gray-100 tracking-tighter text-[20px] font-heading">
               Spot Us
             </Text>
           </View>
           {/* Spacer to preserve layout — button is now the shared FloatingGlassButton */}
-          <View style={{ width: 48 }} />
+          <View style={{ width: 44 }} />
         </Animated.View>
 
         {/* Custom Pull to Refresh Loader */}
         <Animated.View
           style={{
             position: "absolute",
-            top: 100, // Further below header to prevent overlap
+            top: 100,
             left: 0,
             right: 0,
             alignItems: "center",
@@ -632,7 +633,7 @@ export default function Home() {
           pointerEvents="none"
         >
           <View
-            className="bg-white dark:bg-[#1C1C20] p-2.5 rounded-full"
+            className="bg-white dark:bg-[#1A1A1E] p-2.5 rounded-full"
             style={{
               shadowColor: isDark ? "#000" : "#FF6B47",
               shadowOffset: { width: 0, height: 4 },
@@ -645,7 +646,7 @@ export default function Home() {
           </View>
         </Animated.View>
 
-        {/* Scrollable content — greeting, slider, CTA, and rooms all scroll together */}
+        {/* Scrollable content */}
         {locationError ? (
           <LocationPermissionDenied
             onEnableGhostMode={() => {

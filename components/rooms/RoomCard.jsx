@@ -26,7 +26,6 @@ const RoomCard = memo(function RoomCard({
   const getExpiryText = () => {
     if (!room.expiresAt) return "Active Event";
 
-    // Handle both Firestore Timestamp objects and raw JS Dates
     const expiresMs = room.expiresAt.seconds
       ? room.expiresAt.seconds * 1000
       : room.expiresAt instanceof Date
@@ -78,7 +77,7 @@ const RoomCard = memo(function RoomCard({
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
-      toValue: 0.98,
+      toValue: 0.97,
       useNativeDriver: true,
       speed: 50,
     }).start();
@@ -93,148 +92,136 @@ const RoomCard = memo(function RoomCard({
   };
 
   const cardContent = (
-    <>
-      {/* Category — colored per type */}
-      <View className="flex-row justify-between items-center mb-3">
-        <View className="flex-row items-center gap-2">
-          <View
-            className="flex-row items-center px-3 py-1.5 rounded-lg"
-            style={{ backgroundColor: `${categoryColor}10` }}
+    <View className="flex-row">
+      {/* Left accent bar */}
+      <View
+        className="w-[3px] rounded-full mr-4 self-stretch"
+        style={{ backgroundColor: categoryColor, opacity: 0.7 }}
+      />
+      <View className="flex-1">
+        {/* Category + Ghost badge */}
+        <View className="flex-row items-center mb-2">
+          <Ionicons
+            name={categoryIcon}
+            size={11}
+            color={categoryColor}
+            style={{ marginRight: 5 }}
+          />
+          <Text
+            className="font-medium text-[11px]"
+            style={{ color: categoryColor }}
           >
-            <Ionicons
-              name={categoryIcon}
-              size={11}
-              color={categoryColor}
-              style={{ marginRight: 5 }}
-            />
-            <Text
-              className="font-semibold text-[11px]"
-              style={{ color: categoryColor }}
-            >
-              {room.category}
-            </Text>
-          </View>
+            {room.category}
+          </Text>
 
           {room.visibility === "ghost" && (
-            <View className="flex-row items-center px-2 py-1.5 rounded-lg bg-purple-50 dark:bg-purple-500/10 border border-purple-100 dark:border-purple-500/20">
+            <View className="flex-row items-center ml-2.5 px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-500/10">
               <MaterialCommunityIcons
                 name="ghost"
-                size={12}
+                size={10}
                 color="#A855F7"
-                style={{ marginRight: 4 }}
+                style={{ marginRight: 3 }}
               />
-              <Text className="font-semibold text-[10px] text-purple-600 dark:text-purple-400">
-                Ghost Mode
+              <Text className="font-semibold text-[9px] text-purple-600 dark:text-purple-400">
+                Ghost
+              </Text>
+            </View>
+          )}
+
+          {isActiveNow && (
+            <View className="flex-row items-center ml-auto">
+              <View className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1" />
+              <Text className="text-green-600 dark:text-green-400 text-[10px] font-medium">
+                Active
               </Text>
             </View>
           )}
         </View>
-      </View>
 
-      {/* Title */}
-      <View className="flex-row items-center mb-1.5 justify-between">
+        {/* Title */}
         <Text
-          className="text-secondary dark:text-gray-100 font-display font-extrabold tracking-tight text-[20px] leading-7 flex-1"
+          className="text-secondary dark:text-gray-100 font-heading tracking-tight text-[18px] leading-6 mb-1"
           numberOfLines={1}
         >
           {room.title}
         </Text>
-        {isActiveNow && (
-          <View className="flex-row items-center ml-2 bg-green-500/10 px-2 py-1 rounded-md">
-            <View className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5" />
-            <Text className="text-green-600 dark:text-green-400 text-[10px] font-bold uppercase tracking-wider">
-              Active
-            </Text>
-          </View>
-        )}
-      </View>
 
-      {/* Last Message */}
-      {room.lastMessage && (
-        <Text
-          className="text-gray-500 dark:text-gray-400 text-[13px] font-medium mb-3"
-          numberOfLines={1}
-        >
-          {room.lastMessageSenderId === currentUserId ? "You: " : ""}
-          {room.lastMessage}
-        </Text>
-      )}
-
-      <View className="flex-row items-center mb-4">
-        {getExpiryText() === "Expired" ? (
-          <View className="w-1.5 h-1.5 rounded-full bg-red-400 mr-1.5" />
-        ) : isDying ? (
-          <View className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5" />
-        ) : (
-          <View className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5" />
-        )}
-        <Text className="text-gray-400 text-xs font-semibold">
-          {getExpiryText()}
-        </Text>
-        {room.distance !== undefined && !isExploreMode && (
-          <>
-            <Text className="text-gray-300 dark:text-gray-600 mx-2">•</Text>
-            <Ionicons
-              name="location"
-              size={12}
-              color="#9CA3AF"
-              style={{ marginRight: 2, marginTop: -1 }}
-            />
-            <Text className="text-gray-400 text-xs font-medium">
-              {room.distance.toFixed(1)} km
-            </Text>
-          </>
-        )}
-        {isExploreMode && (
-          <>
-            <Text className="text-gray-300 dark:text-gray-600 mx-2">•</Text>
-            <Ionicons
-              name="location"
-              size={12}
-              color="#9CA3AF"
-              style={{ marginRight: 2, marginTop: -1 }}
-            />
-            <Text className="text-gray-400 text-xs font-medium">
-              Approximate Area
-            </Text>
-          </>
-        )}
-      </View>
-
-      {/* Footer */}
-      <View className="flex-row justify-between items-center pt-4 mt-1">
-        <View className="flex-row items-center">
-          <View className="flex-row -space-x-2 mr-3">
-            {(room.participants || []).slice(0, 3).map((participantId, i) => (
-              <ParticipantAvatar
-                key={participantId}
-                userId={participantId}
-                size={28}
-                index={i}
-              />
-            ))}
-            {participantCount > 3 && (
-              <View className="w-7 h-7 rounded-xl border-2 border-white dark:border-[#1C1C20] items-center justify-center bg-gray-100 dark:bg-[#252528]">
-                <Text className="text-gray-500 dark:text-gray-400 font-bold text-[10px]">
-                  +{participantCount - 3}
-                </Text>
-              </View>
-            )}
-            {participantCount === 0 && (
-              <View className="w-7 h-7 rounded-xl border-2 border-dashed border-gray-200 dark:border-gray-600 items-center justify-center bg-gray-50 dark:bg-[#252528]">
-                <Ionicons name="person-add-outline" size={12} color="#9CA3AF" />
-              </View>
-            )}
-          </View>
-          <Text className="text-muted dark:text-gray-500 text-[13px] font-semibold">
-            {getParticipantText()}
+        {/* Last Message */}
+        {room.lastMessage && (
+          <Text
+            className="text-gray-400 dark:text-gray-500 text-[13px] font-body mb-2"
+            numberOfLines={1}
+          >
+            {room.lastMessageSenderId === currentUserId ? "You: " : ""}
+            {room.lastMessage}
           </Text>
+        )}
+
+        {/* Meta row */}
+        <View className="flex-row items-center mb-3">
+          {getExpiryText() === "Expired" ? (
+            <View className="w-1.5 h-1.5 rounded-full bg-red-400 mr-1.5" />
+          ) : isDying ? (
+            <View className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5" />
+          ) : (
+            <View className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5" />
+          )}
+          <Text className="text-gray-400 text-[11px] font-medium">
+            {getExpiryText()}
+          </Text>
+          {room.distance !== undefined && !isExploreMode && (
+            <>
+              <Text className="text-gray-300 dark:text-gray-600 mx-1.5">·</Text>
+              <Text className="text-gray-400 text-[11px] font-medium">
+                {room.distance.toFixed(1)} km
+              </Text>
+            </>
+          )}
+          {isExploreMode && (
+            <>
+              <Text className="text-gray-300 dark:text-gray-600 mx-1.5">·</Text>
+              <Text className="text-gray-400 text-[11px] font-medium">
+                Approximate Area
+              </Text>
+            </>
+          )}
         </View>
-        <View className="bg-primary px-5 py-2.5 rounded-full">
-          <Text className="text-white font-bold text-[13px]">{buttonText}</Text>
+
+        {/* Footer */}
+        <View className="flex-row justify-between items-center pt-3 border-t border-gray-50 dark:border-[#2A2A2E]">
+          <View className="flex-row items-center">
+            <View className="flex-row -space-x-2 mr-2.5">
+              {(room.participants || []).slice(0, 3).map((participantId, i) => (
+                <ParticipantAvatar
+                  key={participantId}
+                  userId={participantId}
+                  size={24}
+                  index={i}
+                />
+              ))}
+              {participantCount > 3 && (
+                <View className="w-6 h-6 rounded-lg border-2 border-white dark:border-[#1A1A1E] items-center justify-center bg-gray-100 dark:bg-[#252528]">
+                  <Text className="text-gray-500 dark:text-gray-400 font-bold text-[9px]">
+                    +{participantCount - 3}
+                  </Text>
+                </View>
+              )}
+              {participantCount === 0 && (
+                <View className="w-6 h-6 rounded-lg border border-dashed border-gray-200 dark:border-gray-600 items-center justify-center bg-gray-50 dark:bg-[#252528]">
+                  <Ionicons name="person-add-outline" size={10} color="#9CA3AF" />
+                </View>
+              )}
+            </View>
+            <Text className="text-muted dark:text-gray-500 text-[12px] font-medium">
+              {getParticipantText()}
+            </Text>
+          </View>
+          <View className="border border-primary/30 px-4 py-2 rounded-xl">
+            <Text className="text-primary font-semibold text-[12px]">{buttonText}</Text>
+          </View>
         </View>
       </View>
-    </>
+    </View>
   );
 
   return (
@@ -244,27 +231,20 @@ const RoomCard = memo(function RoomCard({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.95}
-        className="mb-4"
+        className="mb-3"
       >
         {isDiscovery ? (
           <View
-            className="rounded-[20px] p-5 bg-white dark:bg-[#1C1C20] border border-border-light dark:border-[#2C2C30]"
-            style={{
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.04,
-              shadowRadius: 8,
-              elevation: 2,
-            }}
+            className="rounded-2xl p-4 bg-white dark:bg-[#1A1A1E] border border-border-light dark:border-[#2A2A2E]"
           >
             {cardContent}
           </View>
         ) : (
           <View
-            className={`rounded-[24px] p-5 border overflow-hidden ${
+            className={`rounded-2xl p-4 border overflow-hidden ${
               isOwner
-                ? "bg-primary-surface dark:bg-[#2C2320] border-primary/30"
-                : "bg-white dark:bg-[#1C1C20] border-border-light dark:border-[#2C2C30]"
+                ? "bg-primary-surface dark:bg-[#2C2320] border-primary/20"
+                : "bg-white dark:bg-[#1A1A1E] border-border-light dark:border-[#2A2A2E]"
             }`}
           >
             {cardContent}

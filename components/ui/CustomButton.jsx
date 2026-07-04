@@ -14,8 +14,8 @@ export default function CustomButton({
   onPress,
   disabled,
   loading = false,
-  type = "primary", // can be"primary","outline", or"ghost"
-  size = "md", // can be"sm","md","lg"
+  type = "primary", // "primary", "outline", or "ghost"
+  size = "md", // "sm", "md", "lg"
   className = "",
   icon,
 }) {
@@ -34,7 +34,7 @@ export default function CustomButton({
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
-      toValue: 0.97,
+      toValue: 0.95,
       useNativeDriver: true,
       speed: 50,
       bounciness: 4,
@@ -95,9 +95,9 @@ export default function CustomButton({
       case "sm":
         return "px-4 py-3 rounded-xl";
       case "lg":
-        return "px-6 py-[20px] rounded-[20px]";
+        return "px-6 py-[18px] rounded-2xl";
       default:
-        return "px-5 py-[18px] rounded-[18px]";
+        return "px-5 py-[16px] rounded-2xl";
     }
   };
 
@@ -106,10 +106,21 @@ export default function CustomButton({
       case "sm":
         return "text-sm";
       case "lg":
-        return "text-lg";
+        return "text-[17px]";
       default:
-        return "text-[16px]";
+        return "text-[15px]";
     }
+  };
+
+  const getShadowStyle = () => {
+    if (disabled || loading || type !== "primary") return {};
+    return {
+      shadowColor: "#FF6B47",
+      shadowOffset: { width: 0, height: 6 },
+      shadowOpacity: 0.18,
+      shadowRadius: 10,
+      elevation: 4,
+    };
   };
 
   return (
@@ -122,6 +133,7 @@ export default function CustomButton({
           disabled={disabled || loading}
           activeOpacity={0.85}
           className={`w-full flex-row justify-center items-center ${getSizeStyles()} ${getButtonStyles()} ${className}`}
+          style={getShadowStyle()}
         >
           {loading ? (
             <SpotUsLoader size="small" />
@@ -129,7 +141,7 @@ export default function CustomButton({
             <View className="flex-row items-center justify-center">
               {icon && <View className="mr-2.5">{icon}</View>}
               <Text
-                className={`font-bold text-center tracking-tight ${getTextSize()} ${getTextStyles()}`}
+                className={`font-heading text-center tracking-tight ${getTextSize()} ${getTextStyles()}`}
               >
                 {title}
               </Text>

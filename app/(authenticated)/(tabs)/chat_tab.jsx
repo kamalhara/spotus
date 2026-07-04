@@ -60,7 +60,6 @@ export default function Chat() {
   }, [fadeIn, slideUp]);
 
   // Fetch rooms user is in
-  // Fetch all rooms where the current user is a participant
   useEffect(() => {
     if (!currentUserId) return;
     setRoomsLoading(true);
@@ -106,7 +105,7 @@ export default function Chat() {
   });
 
   return (
-    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
+    <SafeAreaView className="flex-1 bg-bg dark:bg-[#111112]" edges={["top"]}>
       <TouchableWithoutFeedback
         onPress={() => {
           Keyboard.dismiss();
@@ -117,14 +116,14 @@ export default function Chat() {
         <View className="flex-1 px-6">
           {/* Header */}
           <Animated.View
-            className="flex-row items-center justify-between mt-3 mb-6"
+            className="flex-row items-center justify-between mt-3 mb-5"
             style={{ opacity: fadeIn }}
           >
             <View>
-              <Text className="text-secondary dark:text-gray-100 text-[26px] font-display font-extrabold tracking-tight">
+              <Text className="text-secondary dark:text-gray-100 text-[24px] font-heading tracking-tight">
                 Messages
               </Text>
-              <Text className="text-muted dark:text-gray-500 text-[13px] font-semibold mt-1">
+              <Text className="text-muted dark:text-gray-500 text-[12px] font-body mt-0.5">
                 {chats.length} DM{chats.length === 1 ? "" : "s"} ·{" "}
                 {rooms.length}
                 {""}
@@ -133,7 +132,7 @@ export default function Chat() {
             </View>
           </Animated.View>
 
-          {/* Search Bar */}
+          {/* Search Bar — thinner */}
           <Animated.View
             style={{
               opacity: fadeIn,
@@ -141,29 +140,29 @@ export default function Chat() {
             }}
           >
             <GlassContainer
-              borderRadius={30}
+              borderRadius={14}
               isInteractive={true}
-              fallbackClassName={`flex-row items-center bg-white dark:bg-[#1C1C20] px-4 py-3.5 mb-5 border ${
+              fallbackClassName={`flex-row items-center bg-white dark:bg-[#1A1A1E] px-3.5 py-3 mb-4 border ${
                 searchFocused
-                  ? "border-primary/40"
-                  : "border-border-light dark:border-[#2C2C30]"
+                  ? "border-primary/30"
+                  : "border-border-light dark:border-[#2A2A2E]"
               }`}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                paddingHorizontal: 16,
-                paddingVertical: 14,
-                marginBottom: 20,
+                paddingHorizontal: 14,
+                paddingVertical: 12,
+                marginBottom: 16,
               }}
             >
               <Ionicons
                 name="search"
-                size={18}
+                size={16}
                 color={searchFocused ? "#FF6B47" : "#94A3B8"}
               />
               <TextInput
                 placeholder="Search messages..."
-                className="flex-1 ml-3 text-secondary dark:text-gray-100 text-[15px] font-medium"
+                className="flex-1 ml-2.5 text-secondary dark:text-gray-100 text-[14px] font-medium"
                 placeholderTextColor="#94A3B8"
                 value={search}
                 onChangeText={setSearch}
@@ -175,22 +174,20 @@ export default function Chat() {
 
           {/* Rooms horizontal scroll */}
           <Animated.View
-            className="mb-5"
+            className="mb-4"
             style={{
               opacity: fadeIn,
               transform: [{ translateY: slideUp }],
             }}
           >
-            <View className="flex-row items-center justify-between mb-4">
-              <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
+            <View className="flex-row items-center justify-between mb-3">
+              <Text className="text-secondary dark:text-gray-100 text-[16px] font-heading tracking-tight">
                 Active Rooms
               </Text>
               {rooms.length > 0 && (
-                <View className="ml-2 bg-primary-surface dark:bg-primary-surface px-2.5 py-1 rounded-full">
-                  <Text className="text-primary text-[11px] font-display font-black">
-                    {rooms.length}
-                  </Text>
-                </View>
+                <Text className="text-muted text-[12px] font-medium">
+                  {rooms.length}
+                </Text>
               )}
             </View>
             {!roomsLoading && filteredRooms.length === 0 ? (
@@ -209,10 +206,10 @@ export default function Chat() {
           </Animated.View>
 
           {/* Chat list */}
-          <View className="flex-1 mt-2">
+          <View className="flex-1 mt-1">
             {pendingReceivedChats.length > 0 && (
-              <View className="mb-6">
-                <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight mb-4">
+              <View className="mb-5">
+                <Text className="text-secondary dark:text-gray-100 text-[16px] font-heading tracking-tight mb-3">
                   Message Requests
                 </Text>
                 {pendingReceivedChats.map((item) => (
@@ -233,12 +230,12 @@ export default function Chat() {
               </View>
             )}
 
-            <View className="flex-row items-center justify-between mb-4">
-              <Text className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight">
+            <View className="flex-row items-center justify-between mb-3">
+              <Text className="text-secondary dark:text-gray-100 text-[16px] font-heading tracking-tight">
                 Recent
               </Text>
               {activeChats.length > 0 && (
-                <Text className="text-muted dark:text-gray-500 text-[13px] font-medium">
+                <Text className="text-muted dark:text-gray-500 text-[12px] font-body">
                   {activeChats.length} conversations
                 </Text>
               )}

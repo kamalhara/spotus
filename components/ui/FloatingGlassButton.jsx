@@ -209,10 +209,10 @@ export default function FloatingGlassButton({ activeTab, override }) {
               alignItems: "center",
               justifyContent: "center",
               backgroundColor: isDark
-                ? "rgba(28, 28, 32, 0.95)"
+                ? "rgba(26, 26, 30, 0.95)"
                 : "rgba(255, 255, 255, 0.95)",
               borderWidth: 1,
-              borderColor: isDark ? "#2C2C30" : "#E8E6E1",
+              borderColor: isDark ? "#2A2A2E" : "#EAE8E4",
             },
             styles.fallbackShadow,
           ]}
