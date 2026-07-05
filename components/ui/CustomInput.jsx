@@ -1,6 +1,14 @@
+import { Ionicons } from "@expo/vector-icons";
 import { GlassView, isLiquidGlassAvailable } from "expo-glass-effect";
-import { forwardRef, useRef } from "react";
-import { Animated, Platform, Text, TextInput, View } from "react-native";
+import { forwardRef, useRef, useState } from "react";
+import {
+  Animated,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useTheme } from "../../context/ThemeContext";
 import GlassContainer from "./GlassContainer";
 
@@ -15,6 +23,7 @@ const CustomInput = forwardRef(function CustomInput(
     error,
     className = "",
     containerStyle,
+    showPasswordToggle = false,
     ...props
   },
   ref,
@@ -22,6 +31,7 @@ const CustomInput = forwardRef(function CustomInput(
   const { isDark } = useTheme();
   const borderAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const [isSecure, setIsSecure] = useState(secureTextEntry);
 
   const hasGlass =
     Platform.OS === "ios" && GlassView && isLiquidGlassAvailable();
@@ -103,7 +113,9 @@ const CustomInput = forwardRef(function CustomInput(
                 : "rgba(255, 255, 255, 0.4)",
             }}
           >
-            {icon && <View className="mr-2.5 w-5 items-center opacity-50">{icon}</View>}
+            {icon && (
+              <View className="mr-2.5 w-5 items-center opacity-50">{icon}</View>
+            )}
             <TextInput
               ref={ref}
               className="flex-1 text-secondary dark:text-gray-100 text-[15px] font-medium h-full"
@@ -111,11 +123,22 @@ const CustomInput = forwardRef(function CustomInput(
               placeholderTextColor={isDark ? "#4B5563" : "#C0BDB8"}
               value={value}
               onChangeText={onChangeText}
-              secureTextEntry={secureTextEntry}
+              secureTextEntry={isSecure}
               onFocus={handleFocus}
               onBlur={handleBlur}
               {...props}
             />
+            {showPasswordToggle && (
+              <TouchableOpacity
+                onPress={() => setIsSecure(!isSecure)}
+              >
+                <Ionicons
+                  name={isSecure ? "eye-off" : "eye"}
+                  size={20}
+                  color={isDark ? "#9CA3AF" : "#4B5563"}
+                />
+              </TouchableOpacity>
+            )}
           </GlassContainer>
         ) : (
           <View
@@ -128,7 +151,9 @@ const CustomInput = forwardRef(function CustomInput(
               borderRadius: 13,
             }}
           >
-            {icon && <View className="mr-2.5 w-5 items-center opacity-50">{icon}</View>}
+            {icon && (
+              <View className="mr-2.5 w-5 items-center opacity-50">{icon}</View>
+            )}
             <TextInput
               ref={ref}
               className="flex-1 text-secondary dark:text-gray-100 text-[15px] font-medium"
@@ -136,11 +161,22 @@ const CustomInput = forwardRef(function CustomInput(
               placeholderTextColor={isDark ? "#4B5563" : "#C0BDB8"}
               value={value}
               onChangeText={onChangeText}
-              secureTextEntry={secureTextEntry}
+              secureTextEntry={isSecure}
               onFocus={handleFocus}
               onBlur={handleBlur}
               {...props}
             />
+            {showPasswordToggle && (
+              <TouchableOpacity
+                onPress={() => setIsSecure(!isSecure)}
+              >
+                <Ionicons
+                  name={isSecure ? "eye-off" : "eye"}
+                  size={20}
+                  color={isDark ? "#9CA3AF" : "#4B5563"}
+                />
+              </TouchableOpacity>
+            )}
           </View>
         )}
       </Animated.View>

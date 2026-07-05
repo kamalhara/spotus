@@ -14,8 +14,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../components/ui/CustomButton";
 import CustomInput from "../../components/ui/CustomInput";
 import GlassButton from "../../components/ui/GlassButton";
-import { useTheme } from "../../context/ThemeContext";
 import SpotUsLoader from "../../components/ui/SpotUsLoader";
+import { useTheme } from "../../context/ThemeContext";
 
 export default function SignUp() {
   const { isLoaded } = useAuth();
@@ -169,6 +169,7 @@ export default function SignUp() {
                 placeholder="Create a password"
                 value={password}
                 onChangeText={setPassword}
+                showPasswordToggle={true}
                 secureTextEntry
                 icon={
                   <Ionicons
@@ -181,7 +182,12 @@ export default function SignUp() {
 
               {error ? (
                 <View className="bg-red-50 dark:bg-red-950/30 rounded-xl px-4 py-3 flex-row items-start">
-                  <Ionicons name="alert-circle" size={16} color="#EF4444" style={{ marginRight: 8, marginTop: 1 }} />
+                  <Ionicons
+                    name="alert-circle"
+                    size={16}
+                    color="#EF4444"
+                    style={{ marginRight: 8, marginTop: 1 }}
+                  />
                   <Text className="text-red-500 text-[13px] flex-1 leading-5 font-medium">
                     {error}
                   </Text>
@@ -210,7 +216,12 @@ export default function SignUp() {
               />
               {error ? (
                 <View className="bg-red-50 dark:bg-red-950/30 rounded-xl px-4 py-3 flex-row items-start">
-                  <Ionicons name="alert-circle" size={16} color="#EF4444" style={{ marginRight: 8, marginTop: 1 }} />
+                  <Ionicons
+                    name="alert-circle"
+                    size={16}
+                    color="#EF4444"
+                    style={{ marginRight: 8, marginTop: 1 }}
+                  />
                   <Text className="text-red-500 text-[13px] flex-1 leading-5 font-medium">
                     {error}
                   </Text>
