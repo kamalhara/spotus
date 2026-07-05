@@ -140,14 +140,22 @@ export default function ChatMessages({
     flatListRef.current?.scrollToEnd({ animated });
   }, []);
 
-  // Auto-scroll only when new messages arrive and user is already near the bottom
+  // Auto-scroll when new messages arrive
   useEffect(() => {
     const count = messages?.length ?? 0;
     if (count > prevMessageCountRef.current) {
-      scrollToEndIfNearBottom(true);
+      const lastMessage = messages[count - 1];
+      if (lastMessage?.senderId === currentUserId) {
+        isNearBottomRef.current = true;
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      } else {
+        scrollToEndIfNearBottom(true);
+      }
     }
     prevMessageCountRef.current = count;
-  }, [messages?.length, scrollToEndIfNearBottom]);
+  }, [messages, currentUserId, scrollToEndIfNearBottom]);
 
   const renderLeftActions = useCallback((progress, dragX) => {
     const scale = dragX.interpolate({
