@@ -5,12 +5,16 @@ import { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Oauth from "../../components/auth/Oauth";
 import CustomButton from "../../components/ui/CustomButton";
 import CustomInput from "../../components/ui/CustomInput";
 import GlassButton from "../../components/ui/GlassButton";
@@ -101,156 +105,188 @@ export default function SignUp() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <SafeAreaView className="bg-bg dark:bg-[#111112] flex-1 px-8">
-        <View className="flex-row items-center mt-4">
-          <GlassButton
-            onPress={() =>
-              pendingVerification
-                ? setPendingVerification(false)
-                : router.back()
-            }
-            className="w-10 h-10 bg-gray-50 dark:bg-[#1A1A1E] rounded-full items-center justify-center border border-gray-100 dark:border-[#2A2A2E]"
-          >
-            <Ionicons
-              name="arrow-back"
-              size={20}
-              color={isDark ? "white" : "black"}
-            />
-          </GlassButton>
-        </View>
-
-        <Animated.View
-          style={{
-            opacity: fadeIn,
-            transform: [{ translateY: slideUp }],
-          }}
+      <SafeAreaView className="bg-bg dark:bg-[#111112] flex-1 ">
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={{ flex: 1 }}
         >
-          <View className="mb-8 mt-10">
-            {/* Step indicator — text style instead of colored bars */}
-            <Text className="text-muted text-[12px] font-medium mb-3">
-              Step {pendingVerification ? "2" : "1"} of 2
-            </Text>
-
-            <Text className="text-secondary dark:text-gray-100 text-[32px] font-display tracking-tight mb-2">
-              {pendingVerification ? "Verify Email" : "Create\nAccount"}
-            </Text>
-            <Text className="text-gray-400 dark:text-gray-500 text-[15px] leading-6 font-body">
-              {pendingVerification
-                ? `Enter the code sent to ${emailAddress}`
-                : "Create an account to join rooms near you."}
-            </Text>
-          </View>
-
-          {!pendingVerification ? (
-            <View className="gap-6">
-              <CustomInput
-                label="Full Name"
-                placeholder="e.g. Alexandria"
-                value={name}
-                onChangeText={setName}
-                autoCapitalize="words"
-                icon={
-                  <Ionicons name="person-outline" size={18} color="#9CA3AF" />
+          <ScrollView
+            className="px-8"
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View className="flex-row items-center mt-2">
+              <GlassButton
+                onPress={() =>
+                  pendingVerification
+                    ? setPendingVerification(false)
+                    : router.back()
                 }
-              />
-              <CustomInput
-                label="Email Address"
-                placeholder="example@gmail.com"
-                value={emailAddress}
-                onChangeText={setEmailAddress}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                icon={
-                  <Ionicons name="mail-outline" size={18} color="#9CA3AF" />
-                }
-              />
-              <CustomInput
-                label="Password"
-                placeholder="Create a password"
-                value={password}
-                onChangeText={setPassword}
-                showPasswordToggle={true}
-                secureTextEntry
-                icon={
-                  <Ionicons
-                    name="lock-closed-outline"
-                    size={18}
-                    color="#9CA3AF"
-                  />
-                }
-              />
-
-              {error ? (
-                <View className="bg-red-50 dark:bg-red-950/30 rounded-xl px-4 py-3 flex-row items-start">
-                  <Ionicons
-                    name="alert-circle"
-                    size={16}
-                    color="#EF4444"
-                    style={{ marginRight: 8, marginTop: 1 }}
-                  />
-                  <Text className="text-red-500 text-[13px] flex-1 leading-5 font-medium">
-                    {error}
-                  </Text>
-                </View>
-              ) : null}
-
-              <View className="mt-2">
-                <CustomButton
-                  title="Sign Up"
-                  onPress={onSignUpPress}
-                  loading={loading}
+                className="w-10 h-10 bg-gray-50 dark:bg-[#1A1A1E] rounded-full items-center justify-center border border-gray-100 dark:border-[#2A2A2E]"
+              >
+                <Ionicons
+                  name="arrow-back"
+                  size={20}
+                  color={isDark ? "white" : "black"}
                 />
-              </View>
+              </GlassButton>
             </View>
-          ) : (
-            <View className="gap-6">
-              <CustomInput
-                label="Verification Code"
-                placeholder="123456"
-                value={code}
-                onChangeText={setCode}
-                keyboardType="number-pad"
-                icon={
-                  <Ionicons name="keypad-outline" size={18} color="#9CA3AF" />
-                }
-              />
-              {error ? (
-                <View className="bg-red-50 dark:bg-red-950/30 rounded-xl px-4 py-3 flex-row items-start">
-                  <Ionicons
-                    name="alert-circle"
-                    size={16}
-                    color="#EF4444"
-                    style={{ marginRight: 8, marginTop: 1 }}
-                  />
-                  <Text className="text-red-500 text-[13px] flex-1 leading-5 font-medium">
-                    {error}
-                  </Text>
-                </View>
-              ) : null}
-              <CustomButton
-                title="Verify & Join"
-                onPress={onPressVerify}
-                loading={loading}
-              />
-              <CustomButton
-                title="Cancel"
-                type="ghost"
-                onPress={() => setPendingVerification(false)}
-              />
-            </View>
-          )}
 
-          <View className="flex-row items-center justify-center gap-1.5 mt-8">
-            <Text className="text-gray-400 dark:text-gray-500 text-[14px] font-body">
-              Already have an account?
-            </Text>
-            <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-              <Text className="text-primary dark:text-primary-light font-semibold text-[14px]">
-                Log In
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
+            <Animated.View
+              style={{
+                opacity: fadeIn,
+                transform: [{ translateY: slideUp }],
+              }}
+            >
+              <View className="mb-5 mt-4">
+                {/* Step indicator — text style instead of colored bars */}
+                <Text className="text-muted text-[12px] font-medium mb-3">
+                  Step {pendingVerification ? "2" : "1"} of 2
+                </Text>
+
+                <Text className="text-secondary dark:text-gray-100 text-[32px] font-display tracking-tight mb-2">
+                  {pendingVerification ? "Verify Email" : "Create\nAccount"}
+                </Text>
+                <Text className="text-gray-400 dark:text-gray-500 text-[15px] leading-6 font-body">
+                  {pendingVerification
+                    ? `Enter the code sent to ${emailAddress}`
+                    : "Create an account to join rooms near you."}
+                </Text>
+              </View>
+
+              {!pendingVerification ? (
+                <View className="gap-4">
+                  <CustomInput
+                    label="Full Name"
+                    placeholder="e.g. Alexandria"
+                    value={name}
+                    onChangeText={setName}
+                    autoCapitalize="words"
+                    icon={
+                      <Ionicons
+                        name="person-outline"
+                        size={18}
+                        color="#9CA3AF"
+                      />
+                    }
+                  />
+                  <CustomInput
+                    label="Email Address"
+                    placeholder="example@gmail.com"
+                    value={emailAddress}
+                    onChangeText={setEmailAddress}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    icon={
+                      <Ionicons name="mail-outline" size={18} color="#9CA3AF" />
+                    }
+                  />
+                  <CustomInput
+                    label="Password"
+                    placeholder="Create a password"
+                    value={password}
+                    onChangeText={setPassword}
+                    showPasswordToggle={true}
+                    secureTextEntry
+                    icon={
+                      <Ionicons
+                        name="lock-closed-outline"
+                        size={18}
+                        color="#9CA3AF"
+                      />
+                    }
+                  />
+
+                  {error ? (
+                    <View className="bg-red-50 dark:bg-red-950/30 rounded-xl px-4 py-3 flex-row items-start">
+                      <Ionicons
+                        name="alert-circle"
+                        size={16}
+                        color="#EF4444"
+                        style={{ marginRight: 8, marginTop: 1 }}
+                      />
+                      <Text className="text-red-500 text-[13px] flex-1 leading-5 font-medium">
+                        {error}
+                      </Text>
+                    </View>
+                  ) : null}
+
+                  <View className="mt-2">
+                    <CustomButton
+                      title="Sign Up"
+                      onPress={onSignUpPress}
+                      loading={loading}
+                    />
+
+                    <View className="flex-row items-center justify-center gap-3 my-4">
+                      <View className="flex-1 h-px bg-border-light dark:bg-[#2A2A2E]" />
+                      <Text className="text-gray-300 dark:text-gray-600 text-[10px] font-medium uppercase tracking-widest">
+                        Or
+                      </Text>
+                      <View className="flex-1 h-px bg-border-light dark:bg-[#2A2A2E]" />
+                    </View>
+
+                    <Oauth />
+
+                    <View className="flex-row items-center justify-center gap-1.5 mt-3 mb-1">
+                      <Text className="text-gray-400 dark:text-gray-500 text-[14px] font-body">
+                        Already have an account?
+                      </Text>
+                      <TouchableOpacity
+                        onPress={() => router.push("/(auth)/login")}
+                      >
+                        <Text className="text-primary dark:text-primary-light font-semibold text-[14px]">
+                          Log In
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              ) : (
+                <View className="gap-4">
+                  <CustomInput
+                    label="Verification Code"
+                    placeholder="123456"
+                    value={code}
+                    onChangeText={setCode}
+                    keyboardType="number-pad"
+                    icon={
+                      <Ionicons
+                        name="keypad-outline"
+                        size={18}
+                        color="#9CA3AF"
+                      />
+                    }
+                  />
+                  {error ? (
+                    <View className="bg-red-50 dark:bg-red-950/30 rounded-xl px-4 py-3 flex-row items-start">
+                      <Ionicons
+                        name="alert-circle"
+                        size={16}
+                        color="#EF4444"
+                        style={{ marginRight: 8, marginTop: 1 }}
+                      />
+                      <Text className="text-red-500 text-[13px] flex-1 leading-5 font-medium">
+                        {error}
+                      </Text>
+                    </View>
+                  ) : null}
+                  <CustomButton
+                    title="Verify & Join"
+                    onPress={onPressVerify}
+                    loading={loading}
+                  />
+                  <CustomButton
+                    title="Cancel"
+                    type="ghost"
+                    onPress={() => setPendingVerification(false)}
+                  />
+                </View>
+              )}
+            </Animated.View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </TouchableWithoutFeedback>
   );
