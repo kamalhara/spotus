@@ -103,6 +103,23 @@ export default function AuthenticatedLayout() {
         options={{ headerShown: false }}
       />
       <Stack.Screen name="profile/terms" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="profile/communityGuidelines"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="profile/safety" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="profile/contentModeration"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="profile/childSafety"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="profile/deleteAccount"
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="feedback" options={{ headerShown: false }} />
     </Stack>
   );

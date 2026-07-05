@@ -510,7 +510,8 @@ export default function Profile() {
 
         {(filterMatch("Help Center") ||
           filterMatch("Privacy Policy") ||
-          filterMatch("Terms of Service")) && (
+          filterMatch("Terms of Service") ||
+          filterMatch("Community Guidelines")) && (
           <View className="bg-white dark:bg-[#1C1C20] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2C2C30] overflow-hidden">
             <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Support
@@ -537,9 +538,67 @@ export default function Profile() {
                 label="Terms of Service"
                 color="#8B5CF6"
                 onPress={() => router.push("/profile/terms")}
+              />
+            )}
+            {filterMatch("Community Guidelines") && (
+              <MenuItem
+                icon="people-outline"
+                label="Community Guidelines"
+                color="#8B5CF6"
+                onPress={() => router.push("/profile/communityGuidelines")}
                 isLast
               />
             )}
+          </View>
+        )}
+
+        {(filterMatch("Safety Center") ||
+          filterMatch("Content Moderation") ||
+          filterMatch("Child Safety")) && (
+          <View className="bg-white dark:bg-[#1C1C20] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2C2C30] overflow-hidden">
+            <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+              Legal & Safety
+            </Text>
+            {filterMatch("Safety Center") && (
+              <MenuItem
+                icon="shield-outline"
+                label="Safety Center"
+                color="#10B981"
+                onPress={() => router.push("/profile/safety")}
+              />
+            )}
+            {filterMatch("Content Moderation") && (
+              <MenuItem
+                icon="flag-outline"
+                label="Content Moderation"
+                color="#10B981"
+                onPress={() => router.push("/profile/contentModeration")}
+              />
+            )}
+            {filterMatch("Child Safety") && (
+              <MenuItem
+                icon="heart-outline"
+                label="Child Safety"
+                color="#10B981"
+                onPress={() => router.push("/profile/childSafety")}
+                isLast
+              />
+            )}
+          </View>
+        )}
+
+        {filterMatch("Delete Account") && (
+          <View className="bg-white dark:bg-[#1C1C20] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2C2C30] overflow-hidden">
+            <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
+              Danger Zone
+            </Text>
+            <MenuItem
+              icon="trash-outline"
+              label="Delete Account"
+              color="#EF4444"
+              onPress={() => router.push("/profile/deleteAccount")}
+              isLast
+            />
           </View>
         )}
 
@@ -554,6 +613,11 @@ export default function Profile() {
           !filterMatch("Help Center") &&
           !filterMatch("Privacy Policy") &&
           !filterMatch("Terms of Service") &&
+          !filterMatch("Community Guidelines") &&
+          !filterMatch("Safety Center") &&
+          !filterMatch("Content Moderation") &&
+          !filterMatch("Child Safety") &&
+          !filterMatch("Delete Account") &&
           !filterMatch("Theme") &&
           !filterMatch("Appearance") &&
           !filterMatch("Dark Mode") && (

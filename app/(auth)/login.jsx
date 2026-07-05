@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   Animated,
   Keyboard,
+  Linking,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
@@ -211,6 +212,23 @@ export default function Login() {
               </Text>
             </TouchableOpacity>
           </View>
+
+          <Text className="text-gray-300 dark:text-gray-600 text-[11px] text-center mt-5 leading-4 font-body">
+            By logging in, you agree to our{" "}
+            <Text
+              className="text-gray-400 dark:text-gray-500 font-semibold"
+              onPress={() => Linking.openURL("https://spotus.app/terms")}
+            >
+              Terms
+            </Text>
+            {" "}and{" "}
+            <Text
+              className="text-gray-400 dark:text-gray-500 font-semibold"
+              onPress={() => Linking.openURL("https://spotus.app/privacy")}
+            >
+              Privacy Policy
+            </Text>
+          </Text>
         </Animated.View>
       </SafeAreaView>
     </TouchableWithoutFeedback>

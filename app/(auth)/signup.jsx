@@ -6,6 +6,7 @@ import {
   Animated,
   Keyboard,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   Text,
@@ -35,6 +36,7 @@ export default function SignUp() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // Entrance animation
   const fadeIn = useRef(new Animated.Value(0)).current;
@@ -212,11 +214,51 @@ export default function SignUp() {
                     </View>
                   ) : null}
 
+                  {/* Terms Agreement Checkbox */}
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => setAgreedToTerms(!agreedToTerms)}
+                    className="flex-row items-start gap-2.5"
+                  >
+                    <View
+                      className={`w-5 h-5 rounded-md border-2 items-center justify-center mt-0.5 ${
+                        agreedToTerms
+                          ? "bg-primary border-primary"
+                          : "border-gray-300 dark:border-gray-600"
+                      }`}
+                    >
+                      {agreedToTerms && (
+                        <Ionicons name="checkmark" size={14} color="#fff" />
+                      )}
+                    </View>
+                    <Text className="text-gray-400 dark:text-gray-500 text-[13px] leading-5 flex-1 font-body">
+                      I agree to the{" "}
+                      <Text
+                        className="text-primary dark:text-primary-light font-semibold"
+                        onPress={() =>
+                          Linking.openURL("https://spotus.app/terms")
+                        }
+                      >
+                        Terms of Service
+                      </Text>
+                      {" "}and{" "}
+                      <Text
+                        className="text-primary dark:text-primary-light font-semibold"
+                        onPress={() =>
+                          Linking.openURL("https://spotus.app/privacy")
+                        }
+                      >
+                        Privacy Policy
+                      </Text>
+                    </Text>
+                  </TouchableOpacity>
+
                   <View className="mt-2">
                     <CustomButton
                       title="Sign Up"
                       onPress={onSignUpPress}
                       loading={loading}
+                      disabled={!agreedToTerms}
                     />
 
                     <View className="flex-row items-center justify-center gap-3 my-4">
