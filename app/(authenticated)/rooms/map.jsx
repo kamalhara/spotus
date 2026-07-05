@@ -3,13 +3,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Dimensions,
-  FlatList,
-  SafeAreaView,
-  Text,
-  View,
-} from "react-native";
+import { Dimensions, FlatList, SafeAreaView, Text, View } from "react-native";
 import MapView from "react-native-map-clustering";
 import { Marker } from "react-native-maps";
 import Animated, {
@@ -27,16 +21,16 @@ import ExploreInterceptModal from "../../../components/shared/ExploreInterceptMo
 import GhostBrowsingBanner from "../../../components/shared/GhostBrowsingBanner";
 import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
 import GlassButton from "../../../components/ui/GlassButton";
+import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 import { db } from "../../../config/firebase.config";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { trackEvent } from "../../../lib/analytics";
-import { sendPushNotification } from "../../../lib/notification";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { subscribeNearbyRooms } from "../../../lib/getNearbyRoom";
 import { getCurrentLocation } from "../../../lib/location";
-import SpotUsLoader from "../../../components/ui/SpotUsLoader";
+import { sendPushNotification } from "../../../lib/notification";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.78; // Narrower to show adjacent cards
 const ITEM_MARGIN = 8;
@@ -492,7 +486,9 @@ export default function MapViewScreen() {
         return;
       }
       const roomRef = doc(db, "rooms", selectedRoomToJoin.id);
-      const wasAlreadyInRoom = selectedRoomToJoin.participants?.includes(firestoreUser?.id);
+      const wasAlreadyInRoom = selectedRoomToJoin.participants?.includes(
+        firestoreUser?.id,
+      );
 
       await updateDoc(roomRef, {
         participants: arrayUnion(firestoreUser?.id),
@@ -500,7 +496,7 @@ export default function MapViewScreen() {
 
       if (!wasAlreadyInRoom && selectedRoomToJoin.participants) {
         const otherParticipants = selectedRoomToJoin.participants.filter(
-          (uid) => uid !== firestoreUser?.id
+          (uid) => uid !== firestoreUser?.id,
         );
         otherParticipants.forEach((uid) => {
           sendPushNotification(
@@ -508,7 +504,7 @@ export default function MapViewScreen() {
             firestoreUser?.id,
             selectedRoomToJoin.title || "Room",
             `${firestoreUser?.userName || "Someone"} joined the room!`,
-            { type: "room", screen: "room", roomId: selectedRoomToJoin.id }
+            { type: "room", screen: "room", roomId: selectedRoomToJoin.id },
           );
         });
       }

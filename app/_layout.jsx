@@ -15,12 +15,15 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { Platform, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import {
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
 import { ThemeProvider } from "../context/ThemeContext";
 import "../global.css";
+import { trackScreen } from "../lib/analytics";
 import syncUserToFirebase from "../lib/syncUser";
 import { tokenCache } from "../utils/cache";
-import { trackScreen } from "../lib/analytics";
-import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,

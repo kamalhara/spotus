@@ -30,7 +30,12 @@ const MenuItem = ({
     className={`px-5 py-3.5 flex-row items-center justify-between ${!isLast ? "border-b border-gray-50 dark:border-[#222226]" : ""}`}
   >
     <View className="flex-row items-center flex-1">
-      <Ionicons name={icon} size={18} color={color} style={{ marginRight: 14 }} />
+      <Ionicons
+        name={icon}
+        size={18}
+        color={color}
+        style={{ marginRight: 14 }}
+      />
       <View className="flex-1">
         <Text className="text-secondary dark:text-gray-100 font-medium text-[15px]">
           {label}
@@ -53,7 +58,6 @@ export default function Profile() {
   const { signOut } = useAuth();
   const { firestoreUser, loading } = useFirestoreUser();
   const router = useRouter();
-
 
   const [rooms, setRooms] = useState([]);
   useFocusEffect(
@@ -135,9 +139,7 @@ export default function Profile() {
         <View className="items-center px-6 pt-6 pb-4">
           {/* Avatar and Edit Button */}
           <View className="relative">
-            <View
-              className="w-[100px] h-[100px] rounded-[36px] overflow-hidden bg-gray-100 dark:bg-gray-800"
-            >
+            <View className="w-[100px] h-[100px] rounded-[36px] overflow-hidden bg-gray-100 dark:bg-gray-800">
               <Image
                 source={
                   firestoreUser?.profilePic || "https://picsum.photos/200"
@@ -147,7 +149,7 @@ export default function Profile() {
                 style={{ width: "100%", height: "100%" }}
               />
             </View>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => router.push("/profile/edit")}
               activeOpacity={0.8}
               className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary rounded-full items-center justify-center border-3 border-bg dark:border-[#111112]"
@@ -165,8 +167,7 @@ export default function Profile() {
             className="text-muted dark:text-gray-400 text-[14px] mt-1.5 text-center px-8 font-body leading-5"
             numberOfLines={2}
           >
-            {firestoreUser?.bio ||
-              "No bio yet — say something about yourself!"}
+            {firestoreUser?.bio || "No bio yet — say something about yourself!"}
           </Text>
 
           {/* Inline stats */}
@@ -176,7 +177,10 @@ export default function Profile() {
               return (
                 <View className="flex-row items-center">
                   <Ionicons name={badge.icon} size={13} color={badge.color} />
-                  <Text className="text-[12px] font-medium ml-1" style={{ color: badge.color }}>
+                  <Text
+                    className="text-[12px] font-medium ml-1"
+                    style={{ color: badge.color }}
+                  >
                     {badge.label}
                   </Text>
                 </View>
@@ -196,14 +200,22 @@ export default function Profile() {
           <View className="flex-row flex-wrap justify-center gap-2 mt-4">
             {firestoreUser?.motivation && (
               <View className="bg-primary/8 px-3 py-1.5 rounded-lg flex-row items-center">
-                <Ionicons name="sparkles" size={11} color="#FF6B47" style={{ marginRight: 4 }} />
+                <Ionicons
+                  name="sparkles"
+                  size={11}
+                  color="#FF6B47"
+                  style={{ marginRight: 4 }}
+                />
                 <Text className="text-primary font-medium text-[11px]">
                   {firestoreUser.motivation}
                 </Text>
               </View>
             )}
             {firestoreUser?.interests?.slice(0, 3).map((interest) => (
-              <View key={interest} className="bg-gray-100 dark:bg-[#222226] px-3 py-1.5 rounded-lg">
+              <View
+                key={interest}
+                className="bg-gray-100 dark:bg-[#222226] px-3 py-1.5 rounded-lg"
+              >
                 <Text className="text-gray-500 dark:text-gray-400 font-medium text-[11px]">
                   {interest}
                 </Text>
@@ -290,9 +302,7 @@ export default function Profile() {
           className="mx-6 mt-6 py-3.5 rounded-2xl flex-row items-center justify-center gap-2"
         >
           <Ionicons name="log-out-outline" size={16} color="#EF4444" />
-          <Text className="text-red-500 font-medium text-[14px]">
-            Sign Out
-          </Text>
+          <Text className="text-red-500 font-medium text-[14px]">Sign Out</Text>
         </TouchableOpacity>
 
         <Text className="text-center text-gray-300 dark:text-gray-600 text-[10px] mt-5 tracking-wider font-body">

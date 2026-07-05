@@ -14,8 +14,8 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GlassContainer from "../../components/ui/GlassContainer";
-import { setTyping } from "../../lib/chatTyping";
 import SpotUsLoader from "../../components/ui/SpotUsLoader";
+import { setTyping } from "../../lib/chatTyping";
 
 const MEDIA_OPTIONS = [
   {

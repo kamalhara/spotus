@@ -129,9 +129,7 @@ const CustomInput = forwardRef(function CustomInput(
               {...props}
             />
             {showPasswordToggle && (
-              <TouchableOpacity
-                onPress={() => setIsSecure(!isSecure)}
-              >
+              <TouchableOpacity onPress={() => setIsSecure(!isSecure)}>
                 <Ionicons
                   name={isSecure ? "eye-off" : "eye"}
                   size={20}
@@ -167,9 +165,7 @@ const CustomInput = forwardRef(function CustomInput(
               {...props}
             />
             {showPasswordToggle && (
-              <TouchableOpacity
-                onPress={() => setIsSecure(!isSecure)}
-              >
+              <TouchableOpacity onPress={() => setIsSecure(!isSecure)}>
                 <Ionicons
                   name={isSecure ? "eye-off" : "eye"}
                   size={20}

@@ -1,11 +1,6 @@
 import * as Haptics from "expo-haptics";
 import { useRef } from "react";
-import {
-  Animated,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
 import GlassContainer from "./GlassContainer";
 import SpotUsLoader from "./SpotUsLoader";
 

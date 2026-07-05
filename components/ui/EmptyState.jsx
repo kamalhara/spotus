@@ -13,7 +13,12 @@ export default function EmptyState({
   if (variant === "inline") {
     return (
       <View className="bg-surface-alt dark:bg-[#222226] rounded-xl px-4 py-3 flex-row items-center">
-        <Ionicons name={icon} size={17} color="#9CA3AF" style={{ marginRight: 10 }} />
+        <Ionicons
+          name={icon}
+          size={17}
+          color="#9CA3AF"
+          style={{ marginRight: 10 }}
+        />
         <View className="flex-1">
           <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium">
             {title}
@@ -26,7 +31,9 @@ export default function EmptyState({
         </View>
         {actionLabel && onAction && (
           <TouchableOpacity onPress={onAction} activeOpacity={0.8}>
-            <Text className="text-primary text-[13px] font-semibold">{actionLabel}</Text>
+            <Text className="text-primary text-[13px] font-semibold">
+              {actionLabel}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -35,9 +42,7 @@ export default function EmptyState({
 
   return (
     <View className="items-center justify-center px-8 py-14">
-      <View
-        className="w-16 h-16 rounded-2xl items-center justify-center mb-5 border border-dashed border-gray-200 dark:border-gray-700"
-      >
+      <View className="w-16 h-16 rounded-2xl items-center justify-center mb-5 border border-dashed border-gray-200 dark:border-gray-700">
         <Ionicons name={icon} size={26} color="#C0BDB8" />
       </View>
       <Text className="text-secondary dark:text-gray-100 text-lg font-heading tracking-tight text-center">

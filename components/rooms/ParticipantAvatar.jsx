@@ -1,8 +1,12 @@
-import React, { useEffect, useState, memo } from "react";
+import { memo, useEffect, useState } from "react";
 import { Image, Text, View } from "react-native";
 import { fetchUserBatch } from "../../lib/userCache";
 
-const ParticipantAvatar = memo(function ParticipantAvatar({ userId, size = 28, index = 0 }) {
+const ParticipantAvatar = memo(function ParticipantAvatar({
+  userId,
+  size = 28,
+  index = 0,
+}) {
   const [imageUrl, setImageUrl] = useState(null);
   const [initial, setInitial] = useState("");
 
@@ -23,7 +27,7 @@ const ParticipantAvatar = memo(function ParticipantAvatar({ userId, size = 28, i
         if (data && isMounted) {
           const avatarUrl = data.profilePic || data.imageUrl;
           const name = data.userName || data.fullName;
-          
+
           if (avatarUrl) {
             setImageUrl(avatarUrl);
           } else if (name) {
@@ -37,7 +41,9 @@ const ParticipantAvatar = memo(function ParticipantAvatar({ userId, size = 28, i
       }
     };
     if (userId) fetchUser();
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [userId, index]);
 
   return (
@@ -46,7 +52,9 @@ const ParticipantAvatar = memo(function ParticipantAvatar({ userId, size = 28, i
       style={{
         width: size,
         height: size,
-        backgroundColor: imageUrl ? "transparent" : AVATAR_COLORS[index % AVATAR_COLORS.length],
+        backgroundColor: imageUrl
+          ? "transparent"
+          : AVATAR_COLORS[index % AVATAR_COLORS.length],
       }}
     >
       {imageUrl ? (
