@@ -1,20 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
-import * as Clipboard from "expo-clipboard";
 import * as Linking from "expo-linking";
-import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   addDoc,
+  arrayRemove,
+  arrayUnion,
   collection,
   doc,
+  limitToLast,
   onSnapshot,
   orderBy,
   query,
-  limitToLast,
   serverTimestamp,
   updateDoc,
-  arrayRemove,
-  arrayUnion,
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -29,6 +27,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ChatMessages from "../../../components/chat/ChatMessages";
 import MessageSender from "../../../components/chat/MessageSender";
 import RoomDetailsSheet from "../../../components/rooms/RoomDetailsSheet";
+import GhostModeBanner from "../../../components/shared/GhostModeBanner";
 import GlassButton from "../../../components/ui/GlassButton";
 import GlassContainer from "../../../components/ui/GlassContainer";
 import { db } from "../../../config/firebase.config";
@@ -38,7 +37,6 @@ import { RoomSeen } from "../../../lib/chatSeen";
 import { sendPushNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 import { fetchUserBatch } from "../../../lib/userCache";
-import GhostModeBanner from "../../../components/shared/GhostModeBanner";
 
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 export default function RoomChat() {
@@ -52,7 +50,7 @@ export default function RoomChat() {
   const [replyTo, setReplyTo] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
   const [showGhostBanner, setShowGhostBanner] = useState(true);
-  const [isTyping, setIsTyping] = useState(false);
+
   const [messageLimit, setMessageLimit] = useState(50);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -119,7 +117,7 @@ export default function RoomChat() {
           room.participants.map(async (uid) => {
             const data = await fetchUserBatch(uid);
             return data ? { id: uid, ...data } : null;
-          })
+          }),
         );
         setMembers(profiles.filter(Boolean));
       } catch (error) {
@@ -262,7 +260,7 @@ export default function RoomChat() {
           text: message.text || "📷 Photo",
           senderName: message.user || "Someone",
           senderId: message.senderId,
-        }
+        },
       });
     } catch (error) {
       console.error("Failed to pin message:", error);
@@ -273,7 +271,7 @@ export default function RoomChat() {
     if (!room || room.createdBy !== currentUserId) return;
     try {
       await updateDoc(doc(db, "rooms", roomId), {
-        pinnedMessage: null
+        pinnedMessage: null,
       });
     } catch (error) {
       console.error("Failed to unpin message:", error);
@@ -347,11 +345,20 @@ export default function RoomChat() {
             </View>
 
             <View className="flex-row items-center">
-              <GlassButton onPress={handleShare} size={40} shape="circle" style={{ marginRight: 8 }}>
+              <GlassButton
+                onPress={handleShare}
+                size={40}
+                shape="circle"
+                style={{ marginRight: 8 }}
+              >
                 <Ionicons name="share-outline" size={18} color="#9CA3AF" />
               </GlassButton>
               <GlassButton onPress={handleInfoPress} size={40} shape="circle">
-                <Ionicons name="ellipsis-horizontal" size={18} color="#9CA3AF" />
+                <Ionicons
+                  name="ellipsis-horizontal"
+                  size={18}
+                  color="#9CA3AF"
+                />
               </GlassButton>
             </View>
           </View>
@@ -359,11 +366,11 @@ export default function RoomChat() {
       </View>
 
       {/* Ghost Mode Banner */}
-      <GhostModeBanner 
-        room={room} 
-        showGhostBanner={showGhostBanner} 
-        setShowGhostBanner={setShowGhostBanner} 
-        onShare={handleShare} 
+      <GhostModeBanner
+        room={room}
+        showGhostBanner={showGhostBanner}
+        setShowGhostBanner={setShowGhostBanner}
+        onShare={handleShare}
       />
 
       {/* Pinned Message Banner */}
@@ -372,7 +379,13 @@ export default function RoomChat() {
           <GlassContainer
             borderRadius={16}
             fallbackClassName="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30"
-            style={{ paddingHorizontal: 16, paddingVertical: 12, backgroundColor: isDark ? "rgba(59,130,246,0.1)" : "rgba(239,246,255,0.8)" }}
+            style={{
+              paddingHorizontal: 16,
+              paddingVertical: 12,
+              backgroundColor: isDark
+                ? "rgba(59,130,246,0.1)"
+                : "rgba(239,246,255,0.8)",
+            }}
           >
             <View className="flex-row items-start justify-between">
               <View className="flex-1 pr-4">
@@ -382,8 +395,13 @@ export default function RoomChat() {
                     Pinned Announcement
                   </Text>
                 </View>
-                <Text className="text-secondary dark:text-gray-200 text-sm font-semibold" numberOfLines={2}>
-                  <Text className="font-bold text-primary dark:text-primary-light">{room.pinnedMessage.senderName}: </Text>
+                <Text
+                  className="text-secondary dark:text-gray-200 text-sm font-semibold"
+                  numberOfLines={2}
+                >
+                  <Text className="font-bold text-primary dark:text-primary-light">
+                    {room.pinnedMessage.senderName}:{" "}
+                  </Text>
                   {room.pinnedMessage.text}
                 </Text>
               </View>
