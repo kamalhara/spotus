@@ -241,7 +241,7 @@ export default function SignUp() {
                       >
                         Terms of Service
                       </Text>
-                      {" "}and{" "}
+                      ,{" "}
                       <Text
                         className="text-primary dark:text-primary-light font-semibold"
                         onPress={() =>
@@ -249,6 +249,15 @@ export default function SignUp() {
                         }
                       >
                         Privacy Policy
+                      </Text>
+                      , and{" "}
+                      <Text
+                        className="text-primary dark:text-primary-light font-semibold"
+                        onPress={() =>
+                          Linking.openURL("https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")
+                        }
+                      >
+                        EULA
                       </Text>
                     </Text>
                   </TouchableOpacity>

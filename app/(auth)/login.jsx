@@ -221,12 +221,19 @@ export default function Login() {
             >
               Terms
             </Text>
-            {" "}and{" "}
+            ,{" "}
             <Text
               className="text-gray-400 dark:text-gray-500 font-semibold"
               onPress={() => Linking.openURL("https://spotus.app/privacy")}
             >
               Privacy Policy
+            </Text>
+            , and{" "}
+            <Text
+              className="text-gray-400 dark:text-gray-500 font-semibold"
+              onPress={() => Linking.openURL("https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")}
+            >
+              EULA
             </Text>
           </Text>
         </Animated.View>
