@@ -278,9 +278,9 @@ export default function Profile() {
             Support
           </Text>
           <MenuItem
-            icon="chatbubble-ellipses-outline"
-            label="Send Feedback"
-            onPress={() => router.push("/feedback")}
+            icon="warning-outline"
+            label="Report a Problem"
+            onPress={() => router.push("/report")}
           />
           <MenuItem
             icon="alert-circle-outline"

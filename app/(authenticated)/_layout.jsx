@@ -1,6 +1,12 @@
 import * as Notifications from "expo-notifications";
 import { Stack, useRouter } from "expo-router";
-import { doc, increment, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import {
+  doc,
+  increment,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { useEffect } from "react";
 import { db } from "../../config/firebase.config";
 import useFirestoreUser from "../../hook/useFireStoreUser";
@@ -12,28 +18,34 @@ export default function AuthenticatedLayout() {
 
   // Handle incoming push notifications
   useEffect(() => {
-    const subscription = Notifications.addNotificationResponseReceivedListener(async (response) => {
-      // Track analytics
-      try {
-        await setDoc(doc(db, "stats", "notifications"), {
-          notificationsOpened: increment(1)
-        }, { merge: true });
-      } catch (e) {
-        console.error("Error tracking notification open:", e);
-      }
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      async (response) => {
+        // Track analytics
+        try {
+          await setDoc(
+            doc(db, "stats", "notifications"),
+            {
+              notificationsOpened: increment(1),
+            },
+            { merge: true },
+          );
+        } catch (e) {
+          console.error("Error tracking notification open:", e);
+        }
 
-      // Handle deep linking
-      const data = response.notification.request.content.data;
-      if (!data) return;
+        // Handle deep linking
+        const data = response.notification.request.content.data;
+        if (!data) return;
 
-      if (data.screen === "dm" && data.chatId) {
-        router.push(`/dm/${data.chatId}`);
-      } else if (data.screen === "room" && data.roomId) {
-        router.push(`/rooms/${data.roomId}`);
-      } else if (data.screen === "profile") {
-        router.push("/profile");
-      }
-    });
+        if (data.screen === "dm" && data.chatId) {
+          router.push(`/dm/${data.chatId}`);
+        } else if (data.screen === "room" && data.roomId) {
+          router.push(`/rooms/${data.roomId}`);
+        } else if (data.screen === "profile") {
+          router.push("/profile");
+        }
+      },
+    );
 
     return () => subscription.remove();
   }, [router]);
@@ -120,7 +132,7 @@ export default function AuthenticatedLayout() {
         name="profile/deleteAccount"
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="feedback" options={{ headerShown: false }} />
+      <Stack.Screen name="report" options={{ headerShown: false }} />
     </Stack>
   );
 }
