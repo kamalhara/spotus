@@ -234,7 +234,7 @@ export default function Profile() {
         {/* Menu Groups */}
         <View className="bg-white dark:bg-[#1A1A1E] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A2E] overflow-hidden">
           <Text className="text-gray-400 dark:text-gray-500 text-[12px] font-medium px-5 pt-4 pb-2">
-            Settings
+            Account
           </Text>
           <MenuItem
             icon="person-outline"
@@ -260,11 +260,6 @@ export default function Profile() {
             onPress={() => router.push("/profile/notifications")}
           />
           <MenuItem
-            icon="eye-outline"
-            label="Privacy & Data"
-            onPress={() => router.push("/profile/privacyData")}
-          />
-          <MenuItem
             icon="language-outline"
             label="Language"
             subtitle="English"
@@ -275,17 +270,44 @@ export default function Profile() {
 
         <View className="bg-white dark:bg-[#1A1A1E] mx-6 mt-3 rounded-2xl border border-gray-100 dark:border-[#2A2A2E] overflow-hidden">
           <Text className="text-gray-400 dark:text-gray-500 text-[12px] font-medium px-5 pt-4 pb-2">
+            Safety & Privacy
+          </Text>
+          <MenuItem
+            icon="eye-outline"
+            label="Privacy & Data"
+            onPress={() => router.push("/profile/privacyData")}
+          />
+          <MenuItem
+            icon="shield-outline"
+            label="Safety Center"
+            onPress={() => router.push("/profile/safety")}
+          />
+          <MenuItem
+            icon="document-text-outline"
+            label="Community Guidelines"
+            onPress={() => router.push("/profile/communityGuidelines")}
+            isLast
+          />
+        </View>
+
+        <View className="bg-white dark:bg-[#1A1A1E] mx-6 mt-3 rounded-2xl border border-gray-100 dark:border-[#2A2A2E] overflow-hidden">
+          <Text className="text-gray-400 dark:text-gray-500 text-[12px] font-medium px-5 pt-4 pb-2">
             Support
           </Text>
           <MenuItem
-            icon="warning-outline"
-            label="Report a Problem"
-            onPress={() => router.push("/report")}
-          />
-          <MenuItem
-            icon="alert-circle-outline"
+            icon="help-circle-outline"
             label="Help Center"
             onPress={() => router.push("/profile/helpCenter")}
+          />
+          <MenuItem
+            icon="bug-outline"
+            label="Report a Problem"
+            onPress={() => router.push("/profile/reportProblem")}
+          />
+          <MenuItem
+            icon="mail-outline"
+            label="Contact Support"
+            onPress={() => router.push("/profile/contactSupport")}
           />
           <MenuItem
             icon="information-circle-outline"

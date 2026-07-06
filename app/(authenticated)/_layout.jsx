@@ -132,6 +132,14 @@ export default function AuthenticatedLayout() {
         name="profile/deleteAccount"
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="profile/reportProblem"
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="profile/contactSupport"
+        options={{ headerShown: false }}
+      />
       <Stack.Screen name="report" options={{ headerShown: false }} />
     </Stack>
   );

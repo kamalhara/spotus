@@ -38,10 +38,16 @@ service cloud.firestore {
       }
     }
 
-    // REPORTS — anyone can create, no one can read/update/delete from client
+    // REPORTS — anyone can create/update, no one can read/delete from client
     match /reports/{reportId} {
       allow create, update: if true;
       allow read, delete: if false;
+    }
+
+    // SUPPORT TICKETS — bug reports, feature requests, app issues
+    match /supportTickets/{ticketId} {
+      allow create: if true;
+      allow read, update, delete: if false;
     }
 
     // EXPLORE ROOMS

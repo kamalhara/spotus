@@ -104,7 +104,7 @@ export default function UserOptionsModal({
   const { isDark } = useTheme();
   const handleReportUser = async () => {
     setShowOptions(false);
-    router.push("/feedback");
+    router.push("/report");
   };
 
   const OPTIONS = [
