@@ -19,7 +19,7 @@ export default function About() {
               source={require("../../../assets/images/icon-dark.png")}
               className="w-full h-full"
               resizeMode="contain"
-            />{" "}
+            />
           </View>
           <View className="flex-row items-center">
             <Text className="text-secondary dark:text-gray-100 text-2xl font-display font-extrabold tracking-tight">
