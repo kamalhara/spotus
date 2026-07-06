@@ -388,7 +388,7 @@ export default function ChatId() {
                   <TouchableOpacity
                     onPress={async () => {
                       await deleteChatWithMessages(chatDocId);
-                      router.replace("/home");
+                      router.replace("/(authenticated)/(tabs)/home");
                     }}
                     className="flex-1 py-3.5 bg-gray-100 dark:bg-gray-800 rounded-2xl items-center"
                   >

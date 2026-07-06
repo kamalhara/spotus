@@ -127,7 +127,7 @@ export default function RoomInfo() {
       });
 
       setShowOptions(false);
-      router.replace("/home");
+      router.replace("/(authenticated)/(tabs)/home");
     } catch (err) {
       console.error("Leave room error:", err);
     }

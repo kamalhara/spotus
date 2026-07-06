@@ -14,9 +14,11 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  Animated,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   Share,
   Text,
@@ -38,6 +40,7 @@ import { sendPushNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 import { fetchUserBatch } from "../../../lib/userCache";
 
+import CustomButton from "../../../components/ui/CustomButton";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 export default function RoomChat() {
   const { isDark } = useTheme();
@@ -50,6 +53,9 @@ export default function RoomChat() {
   const [replyTo, setReplyTo] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
   const [showGhostBanner, setShowGhostBanner] = useState(true);
+
+  const [roomExpired, setRoomExpired] = useState(false);
+  const expiredFade = useRef(new Animated.Value(0)).current;
 
   const [messageLimit, setMessageLimit] = useState(50);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -103,10 +109,48 @@ export default function RoomChat() {
     const unsub = onSnapshot(doc(db, "rooms", roomId), (snap) => {
       if (snap.exists()) {
         setRoom({ id: snap.id, ...snap.data() });
+      } else {
+        // Room was deleted
+        setRoomExpired(true);
+        Animated.timing(expiredFade, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
       }
     });
     return unsub;
-  }, [roomId]);
+  }, [roomId, expiredFade]);
+
+  // Check room expiration every second while inside the room
+  useEffect(() => {
+    if (!room?.expiresAt || roomExpired) return;
+
+    const checkExpiry = () => {
+      const expiresMs = room.expiresAt.seconds
+        ? room.expiresAt.seconds * 1000
+        : room.expiresAt instanceof Date
+          ? room.expiresAt.getTime()
+          : room.expiresAt;
+
+      if (Date.now() >= expiresMs) {
+        setRoomExpired(true);
+        Animated.timing(expiredFade, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }
+    };
+
+    checkExpiry();
+    const interval = setInterval(checkExpiry, 1000);
+    return () => clearInterval(interval);
+  }, [room?.expiresAt, roomExpired, expiredFade]);
+
+  const handleExpiredDismiss = useCallback(() => {
+    router.replace("/(authenticated)/(tabs)/home");
+  }, [router]);
 
   // Fetch member profiles using batched cache instead of sequential getDoc
   useEffect(() => {
@@ -298,167 +342,216 @@ export default function RoomChat() {
   };
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-bg dark:bg-[#111113]"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      {/* Header */}
-      <View className="bg-white dark:bg-[#1C1C20] z-10 border-b border-gray-100 dark:border-[#2C2C30]">
-        <SafeAreaView edges={["top"]}>
-          <View className="flex-row items-center justify-between px-5 py-3">
-            <View className="flex-row items-center flex-1">
-              <GlassButton
-                onPress={() => router.back()}
-                size={40}
-                shape="circle"
-                style={{ marginRight: 12 }}
-              >
-                <Ionicons
-                  name="chevron-back"
-                  size={20}
-                  color={isDark ? "white" : "#18181B"}
-                />
-              </GlassButton>
-
-              <View className="w-11 h-11 rounded-2xl bg-primary/10 items-center justify-center mr-3">
-                <Ionicons name={categoryIcon} size={18} color={categoryColor} />
+    <>
+      <Modal
+        visible={roomExpired}
+        transparent
+        animationType="none"
+        statusBarTranslucent
+      >
+        <Animated.View
+          style={{ flex: 1, opacity: expiredFade }}
+          className="bg-black/60 items-center justify-center px-6"
+        >
+          <View className="w-full max-w-[340px] rounded-[32px] overflow-hidden">
+            <GlassContainer
+              intensity={isDark ? 30 : 60}
+              tint={isDark ? "dark" : "light"}
+              borderRadius={32}
+              style={{
+                padding: 32,
+                alignItems: "center",
+              }}
+              fallbackClassName="bg-white/90 dark:bg-[#1C1C20]/90"
+            >
+              <View className="w-20 h-20 bg-primary/10 rounded-full items-center justify-center mb-6 border border-primary/20">
+                <Ionicons name="time" size={40} color="#FF6B47" />
               </View>
 
-              <TouchableOpacity
-                className="flex-1"
-                onPress={() => detailsSheetRef.current?.present()}
-                activeOpacity={0.7}
-              >
-                <Text
-                  className="text-secondary dark:text-gray-100 text-base font-display font-extrabold"
-                  numberOfLines={1}
-                >
-                  {room?.title || "Loading..."}
-                </Text>
-                <View className="flex-row items-center mt-0.5">
-                  <Text className="text-gray-400 dark:text-gray-500 text-xs">
-                    {room?.category || "Room"} ·{""}
-                    {room?.participants?.length || 0} members
-                  </Text>
-                </View>
-              </TouchableOpacity>
-            </View>
+              <Text className="text-secondary dark:text-white text-2xl font-display font-extrabold text-center mb-3">
+                Room Expired
+              </Text>
 
-            <View className="flex-row items-center">
-              <GlassButton
-                onPress={handleShare}
-                size={40}
-                shape="circle"
-                style={{ marginRight: 8 }}
-              >
-                <Ionicons name="share-outline" size={18} color="#9CA3AF" />
-              </GlassButton>
-              <GlassButton onPress={handleInfoPress} size={40} shape="circle">
-                <Ionicons
-                  name="ellipsis-horizontal"
-                  size={18}
-                  color="#9CA3AF"
-                />
-              </GlassButton>
-            </View>
+              <Text className="text-gray-500 dark:text-gray-300 text-sm text-center leading-6 mb-8 font-medium">
+                This room&apos;s time is up! All messages and content will be
+                securely cleaned up.
+              </Text>
+
+              <CustomButton
+                title="Return to Home"
+                onPress={handleExpiredDismiss}
+              />
+            </GlassContainer>
           </View>
-        </SafeAreaView>
-      </View>
+        </Animated.View>
+      </Modal>
 
-      {/* Ghost Mode Banner */}
-      <GhostModeBanner
-        room={room}
-        showGhostBanner={showGhostBanner}
-        setShowGhostBanner={setShowGhostBanner}
-        onShare={handleShare}
-      />
+      <KeyboardAvoidingView
+        className="flex-1 bg-bg dark:bg-[#111113]"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        {/* Header */}
+        <View className="bg-white dark:bg-[#1C1C20] z-10 border-b border-gray-100 dark:border-[#2C2C30]">
+          <SafeAreaView edges={["top"]}>
+            <View className="flex-row items-center justify-between px-5 py-3">
+              <View className="flex-row items-center flex-1">
+                <GlassButton
+                  onPress={() => router.back()}
+                  size={40}
+                  shape="circle"
+                  style={{ marginRight: 12 }}
+                >
+                  <Ionicons
+                    name="chevron-back"
+                    size={20}
+                    color={isDark ? "white" : "#18181B"}
+                  />
+                </GlassButton>
 
-      {/* Pinned Message Banner */}
-      {room?.pinnedMessage && (
-        <View className="px-5 pt-2 pb-1 z-10">
-          <GlassContainer
-            borderRadius={16}
-            fallbackClassName="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30"
-            style={{
-              paddingHorizontal: 16,
-              paddingVertical: 12,
-              backgroundColor: isDark
-                ? "rgba(59,130,246,0.1)"
-                : "rgba(239,246,255,0.8)",
-            }}
-          >
-            <View className="flex-row items-start justify-between">
-              <View className="flex-1 pr-4">
-                <View className="flex-row items-center mb-1">
-                  <Ionicons name="pin" size={14} color="#3B82F6" />
-                  <Text className="text-blue-600 dark:text-blue-400 text-xs font-bold ml-1.5 uppercase tracking-widest">
-                    Pinned Announcement
+                <View className="w-11 h-11 rounded-2xl bg-primary/10 items-center justify-center mr-3">
+                  <Ionicons
+                    name={categoryIcon}
+                    size={18}
+                    color={categoryColor}
+                  />
+                </View>
+
+                <TouchableOpacity
+                  className="flex-1"
+                  onPress={() => detailsSheetRef.current?.present()}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    className="text-secondary dark:text-gray-100 text-base font-display font-extrabold"
+                    numberOfLines={1}
+                  >
+                    {room?.title || "Loading..."}
+                  </Text>
+                  <View className="flex-row items-center mt-0.5">
+                    <Text className="text-gray-400 dark:text-gray-500 text-xs">
+                      {room?.category || "Room"} ·{""}
+                      {room?.participants?.length || 0} members
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+              <View className="flex-row items-center">
+                <GlassButton
+                  onPress={handleShare}
+                  size={40}
+                  shape="circle"
+                  style={{ marginRight: 8 }}
+                >
+                  <Ionicons name="share-outline" size={18} color="#9CA3AF" />
+                </GlassButton>
+                <GlassButton onPress={handleInfoPress} size={40} shape="circle">
+                  <Ionicons
+                    name="ellipsis-horizontal"
+                    size={18}
+                    color="#9CA3AF"
+                  />
+                </GlassButton>
+              </View>
+            </View>
+          </SafeAreaView>
+        </View>
+
+        {/* Ghost Mode Banner */}
+        <GhostModeBanner
+          room={room}
+          showGhostBanner={showGhostBanner}
+          setShowGhostBanner={setShowGhostBanner}
+          onShare={handleShare}
+        />
+
+        {/* Pinned Message Banner */}
+        {room?.pinnedMessage && (
+          <View className="px-5 pt-2 pb-1 z-10">
+            <GlassContainer
+              borderRadius={16}
+              fallbackClassName="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30"
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                backgroundColor: isDark
+                  ? "rgba(59,130,246,0.1)"
+                  : "rgba(239,246,255,0.8)",
+              }}
+            >
+              <View className="flex-row items-start justify-between">
+                <View className="flex-1 pr-4">
+                  <View className="flex-row items-center mb-1">
+                    <Ionicons name="pin" size={14} color="#3B82F6" />
+                    <Text className="text-blue-600 dark:text-blue-400 text-xs font-bold ml-1.5 uppercase tracking-widest">
+                      Pinned Announcement
+                    </Text>
+                  </View>
+                  <Text
+                    className="text-secondary dark:text-gray-200 text-sm font-semibold"
+                    numberOfLines={2}
+                  >
+                    <Text className="font-bold text-primary dark:text-primary-light">
+                      {room.pinnedMessage.senderName}:{" "}
+                    </Text>
+                    {room.pinnedMessage.text}
                   </Text>
                 </View>
-                <Text
-                  className="text-secondary dark:text-gray-200 text-sm font-semibold"
-                  numberOfLines={2}
-                >
-                  <Text className="font-bold text-primary dark:text-primary-light">
-                    {room.pinnedMessage.senderName}:{" "}
-                  </Text>
-                  {room.pinnedMessage.text}
-                </Text>
+                {isHost && (
+                  <TouchableOpacity
+                    onPress={handleUnpinMessage}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                    className="bg-white/50 dark:bg-black/20 p-1.5 rounded-full"
+                  >
+                    <Ionicons name="close" size={16} color="#3B82F6" />
+                  </TouchableOpacity>
+                )}
               </View>
-              {isHost && (
-                <TouchableOpacity
-                  onPress={handleUnpinMessage}
-                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                  className="bg-white/50 dark:bg-black/20 p-1.5 rounded-full"
-                >
-                  <Ionicons name="close" size={16} color="#3B82F6" />
-                </TouchableOpacity>
-              )}
-            </View>
-          </GlassContainer>
-        </View>
-      )}
+            </GlassContainer>
+          </View>
+        )}
 
-      <View className="flex-1">
-        <ChatMessages
-          messages={messages}
+        <View className="flex-1">
+          <ChatMessages
+            messages={messages}
+            currentUserId={currentUserId}
+            chatDocId={roomId}
+            collectionName="rooms"
+            uploadingImageUri={uploadingImageUri}
+            onReply={setReplyTo}
+            onEditMessage={setEditingMessage}
+            isHost={isHost}
+            onKickUser={handleKickUser}
+            onPinMessage={handlePinMessage}
+            onLoadMore={handleLoadMore}
+            isLoadingMore={isLoadingMore}
+          />
+        </View>
+
+        <View className="px-5 pt-3 flex items-center bg-bg dark:bg-[#111113] border-t border-gray-100 dark:border-[#2C2C30]">
+          <MessageSender
+            handleSend={handleSend}
+            chatId={roomId}
+            currentUserId={currentUserId}
+            handleSendImage={handleSendImage}
+            replyTo={replyTo}
+            onCancelReply={() => setReplyTo(null)}
+            setReplyTo={setReplyTo}
+            editingMessage={editingMessage}
+            setEditingMessage={setEditingMessage}
+            handleEditMessage={handleEditMessage}
+          />
+        </View>
+
+        <RoomDetailsSheet
+          ref={detailsSheetRef}
+          room={room}
+          members={members}
           currentUserId={currentUserId}
-          chatDocId={roomId}
-          collectionName="rooms"
-          uploadingImageUri={uploadingImageUri}
-          onReply={setReplyTo}
-          onEditMessage={setEditingMessage}
           isHost={isHost}
           onKickUser={handleKickUser}
-          onPinMessage={handlePinMessage}
-          onLoadMore={handleLoadMore}
-          isLoadingMore={isLoadingMore}
         />
-      </View>
-
-      <View className="px-5 pt-3 flex items-center bg-bg dark:bg-[#111113] border-t border-gray-100 dark:border-[#2C2C30]">
-        <MessageSender
-          handleSend={handleSend}
-          chatId={roomId}
-          currentUserId={currentUserId}
-          handleSendImage={handleSendImage}
-          replyTo={replyTo}
-          onCancelReply={() => setReplyTo(null)}
-          setReplyTo={setReplyTo}
-          editingMessage={editingMessage}
-          setEditingMessage={setEditingMessage}
-          handleEditMessage={handleEditMessage}
-        />
-      </View>
-
-      <RoomDetailsSheet
-        ref={detailsSheetRef}
-        room={room}
-        members={members}
-        currentUserId={currentUserId}
-        isHost={isHost}
-        onKickUser={handleKickUser}
-      />
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </>
   );
 }
