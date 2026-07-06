@@ -1,12 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import {
-  addDoc,
   arrayRemove,
   arrayUnion,
-  collection,
   doc,
-  serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import {
@@ -20,6 +17,8 @@ import {
 import { db } from "../../config/firebase.config";
 import { useTheme } from "../../context/ThemeContext";
 import GlassContainer from "../ui/GlassContainer";
+import ReportSheet from "./../modals/ReportSheet";
+import { useRef } from "react";
 
 export default function RoomOptionsModal({
   showOptions,
@@ -31,22 +30,14 @@ export default function RoomOptionsModal({
   const { isDark } = useTheme();
   const isMuted = roomDoc?.mutedBy?.includes(currentUserId) || false;
 
-  const handleReport = async () => {
+  const reportSheetRef = useRef(null);
+  
+  const handleReport = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setShowOptions(false);
-    try {
-      await addDoc(collection(db, "reports"), {
-        type: "room",
-        roomId,
-        reporterId: currentUserId,
-        reason: "Reported from room options",
-        createdAt: serverTimestamp(),
-      });
-      Alert.alert("Report submitted", "Thanks for helping keep SpotUs safe.");
-    } catch (err) {
-      console.error("Error submitting room report:", err);
-      Alert.alert("Error", "Could not submit report. Please try again.");
-    }
+    setTimeout(() => {
+      reportSheetRef.current?.present();
+    }, 300); // Wait for modal to close
   };
 
   const handleMute = async () => {
@@ -85,6 +76,7 @@ export default function RoomOptionsModal({
   ];
 
   return (
+    <>
     <Modal
       transparent
       visible={showOptions}
@@ -163,5 +155,7 @@ export default function RoomOptionsModal({
         </View>
       </Pressable>
     </Modal>
+    <ReportSheet ref={reportSheetRef} currentUserId={currentUserId} targetId={roomId} type="room" />
+    </>
   );
 }

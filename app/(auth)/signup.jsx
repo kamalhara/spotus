@@ -254,7 +254,9 @@ export default function SignUp() {
                       <Text
                         className="text-primary dark:text-primary-light font-semibold"
                         onPress={() =>
-                          Linking.openURL("https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")
+                          Linking.openURL(
+                            "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/",
+                          )
                         }
                       >
                         EULA

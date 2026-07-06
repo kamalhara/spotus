@@ -4,9 +4,7 @@ import * as Haptics from "expo-haptics";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  addDoc,
   arrayUnion,
-  collection,
   doc,
   getDoc,
   onSnapshot,
@@ -14,7 +12,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import {
   Alert,
   ScrollView,
@@ -23,6 +21,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import ReportSheet from "../../../components/modals/ReportSheet";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import GlassButton from "../../../components/ui/GlassButton";
@@ -49,6 +48,7 @@ export default function UserProfile() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [chatDoc, setChatDoc] = useState(null);
+  const reportSheetRef = useRef(null);
 
   const [rooms, setRooms] = useState([]);
 
@@ -164,21 +164,9 @@ export default function UserProfile() {
     router.back();
   };
 
-  const handleReport = async () => {
+  const handleReport = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    try {
-      await addDoc(collection(db, "reports"), {
-        type: "user",
-        reportedUserId: userId,
-        reporterId: viewer?.id,
-        reason: "Reported from user profile",
-        createdAt: serverTimestamp(),
-      });
-      Alert.alert("Report submitted", "Thanks for helping keep SpotUs safe.");
-    } catch (err) {
-      console.error("Error submitting report:", err);
-      Alert.alert("Error", "Could not submit report. Please try again.");
-    }
+    reportSheetRef.current?.present();
   };
 
   const handleOptions = () => {
@@ -697,7 +685,7 @@ export default function UserProfile() {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              onPress={handleOptions}
+              onPress={handleReport}
               activeOpacity={0.7}
               className="flex-1 py-3.5 rounded-2xl bg-gray-50 dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] flex-row items-center justify-center"
             >
@@ -709,6 +697,7 @@ export default function UserProfile() {
           </View>
         </View>
       </ScrollView>
+      <ReportSheet ref={reportSheetRef} currentUserId={viewer?.id} targetId={userId} type="user" />
     </SafeAreaView>
   );
 }

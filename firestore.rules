@@ -40,8 +40,8 @@ service cloud.firestore {
 
     // REPORTS — anyone can create, no one can read/update/delete from client
     match /reports/{reportId} {
-      allow create: if true;
-      allow read, update, delete: if false;
+      allow create, update: if true;
+      allow read, delete: if false;
     }
 
     // EXPLORE ROOMS

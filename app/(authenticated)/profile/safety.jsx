@@ -81,6 +81,22 @@ export default function Safety() {
           />
         </SettingsSection>
 
+        <SettingsSection title="How Reporting Works" className="mt-3">
+          <SettingsRow
+            icon="shield-checkmark"
+            title="Reports are reviewed"
+            description="Our team reviews every report manually. False reports may result in account restrictions."
+            color="#FF6B47"
+          />
+          <SettingsRow
+            icon="warning-outline"
+            title="Child safety priority"
+            description="Reports involving minors are escalated immediately to specialized teams and law enforcement when necessary."
+            color="#EF4444"
+            isLast
+          />
+        </SettingsSection>
+
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={() => Linking.openURL("mailto:support@spotus.app")}
