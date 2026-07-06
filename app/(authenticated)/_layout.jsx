@@ -7,7 +7,8 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { AppState } from "react-native";
 import { db } from "../../config/firebase.config";
 import useFirestoreUser from "../../hook/useFireStoreUser";
 import { registerForPushNotifications } from "../../lib/notification";
@@ -50,21 +51,49 @@ export default function AuthenticatedLayout() {
     return () => subscription.remove();
   }, [router]);
 
-  // Heartbeat: update lastSeen every 30s
+  // Heartbeat & AppState tracking
+  const appState = useRef(AppState.currentState);
+
   useEffect(() => {
     if (!user?.id) return;
 
-    const updateActivity = async () => {
-      await updateDoc(doc(db, "users", user.id), {
-        lastSeen: serverTimestamp(),
-      });
+    const updatePresence = async (isOnline) => {
+      try {
+        await updateDoc(doc(db, "users", user.id), {
+          isOnline,
+          lastSeen: serverTimestamp(),
+        });
+      } catch (error) {
+        console.error("Error updating presence:", error);
+      }
     };
 
-    updateActivity();
+    // Initial heartbeat
+    updatePresence(true);
+    const interval = setInterval(() => updatePresence(true), 60000);
 
-    const interval = setInterval(updateActivity, 60000); // every 60 sec
+    // AppState listener for background/foreground
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (
+        appState.current.match(/inactive|background/) &&
+        nextAppState === "active"
+      ) {
+        // App has come to the foreground
+        updatePresence(true);
+      } else if (
+        appState.current === "active" &&
+        nextAppState.match(/inactive|background/)
+      ) {
+        // App has gone to the background
+        updatePresence(false);
+      }
+      appState.current = nextAppState;
+    });
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      subscription.remove();
+    };
   }, [user?.id]);
 
   // Register for push notifications
