@@ -1,19 +1,65 @@
-# Repository Guidelines
+# SpotUs - AI Agent Context & Repository Guidelines
+
+This file serves as the core context for AI agents working on the `spot-us` codebase. It outlines the tech stack, app architecture, coding conventions, and deployment processes.
+
+## App Overview
+**SpotUs** is a React Native mobile application built with Expo. It is a location-based chat and community app where users can discover and join global or nearby rooms, chat in real-time, and share media. 
+
+## Tech Stack & Core Dependencies
+- **Framework:** React Native + Expo (SDK ~54)
+- **Routing:** Expo Router (File-based routing)
+- **Styling:** NativeWind (v4, Tailwind CSS for React Native) + Global CSS
+- **Backend & Database:** Firebase (Firestore for real-time DB/chat, `geofire-common` for location querying)
+- **Authentication:** Clerk (`@clerk/expo`)
+- **Media Uploads:** Cloudinary (via custom upload script)
+- **Mapping & Location:** `react-native-maps`, `react-native-map-clustering`, `expo-location`
+- **Fonts:** Google Fonts via Expo (`Inter`, `Outfit`, `Plus Jakarta Sans`)
 
 ## Project Structure & Module Organization
-This is an Expo React Native app using Expo Router. Route screens live in `app/`, with grouped flows such as `app/(auth)`, `app/(authenticated)/(tabs)`, `app/(authenticated)/rooms`, and `app/(authenticated)/profile`. Shared UI and feature components live in `components/`, organized by domain (`chat`, `rooms`, `home`, `ui`). Business logic and Firebase helpers live in `lib/`; reusable hooks are in `hook/`; app-wide providers are in `context/`; Firebase setup is in `config/`. Static images are under `assets/images`, category metadata is in `constants/`, and legal markdown content is in `docs/legal`.
+- **`app/`**: Route screens using Expo Router conventions.
+  - `app/(auth)`: Clerk authentication flows (Login, Sign up).
+  - `app/(authenticated)/(tabs)`: Main bottom tab navigation.
+  - `app/(authenticated)/rooms`: Room-specific screens and chat interfaces.
+  - `app/(authenticated)/profile`: User profile management.
+- **`components/`**: Shared UI and feature components organized by domain (`chat/`, `rooms/`, `home/`, `ui/`). Use `PascalCase` filenames for components.
+- **`lib/`**: Core business logic and service integrations.
+  - Includes: `createRoom.js`, `joinRoom.js`, `getNearbyRoom.js`, `syncUser.js`, `chatSeen.js`, `uploadCloudinary.js`, `location.js`.
+- **`hook/`**: Custom reusable React hooks (`useSomething` naming convention).
+- **`context/`**: React Context providers for global state (e.g., Theme, Auth State, Location State).
+- **`config/`**: Setup and initialization for third-party services (Firebase, Clerk).
+- **`constants/`**: App-wide constants, category metadata, theme colors.
+- **`assets/images/`**: Static image assets.
+- **`docs/legal/`**: Legal markdown content (Privacy Policy, Terms).
 
 ## Build, Test, and Development Commands
-Run `npm install` after pulling dependency changes. Use `npm start` to launch Expo Metro, `npm run ios` or `npm run android` for native builds, and `npm run web` for the web target. Run `npm run lint` before handing off changes; it uses `expo lint`. There is currently no dedicated `npm test` script, so document any manual verification performed in your PR.
+- **Install Dependencies:** `npm install`
+- **Start Metro Bundler:** `npm start`
+- **Run Native Builds:** `npm run ios` or `npm run android`
+- **Run Web Target:** `npm run web`
+- **Linting:** `npm run lint` (Uses `expo lint`, run before committing changes)
 
 ## Coding Style & Naming Conventions
-Use JavaScript/JSX functional components with React hooks. Keep indentation at two spaces and follow the existing NativeWind `className` styling approach for layout and colors. Components use `PascalCase` filenames when exported as UI components, hooks use `useSomething` naming, and route files follow Expo Router conventions such as `[roomId].jsx` and grouped folders in parentheses. Prefer existing helpers in `lib/`, `context/`, and `components/ui` before adding new abstractions.
+1. **Components:** Use functional components with React Hooks. File names must be `PascalCase.jsx` or `.tsx` when exporting UI components.
+2. **Styling:** Use NativeWind `className` prop. Rely on `tailwind.config.js` and `global.css` for design tokens instead of generic inline styles.
+3. **Routing:** Follow Expo Router conventions (`[roomId].jsx` for dynamic segments, `_layout.jsx` for nested layouts).
+4. **Abstraction:** Prefer existing helpers in `lib/`, hooks in `hook/`, and shared UI in `components/ui/` before creating new ones. Keep indentation at 2 spaces.
 
 ## Testing Guidelines
-No test framework is configured yet. When adding tests, place them near the relevant module or in a clear `__tests__` folder, and use `*.test.js` or `*.test.jsx` naming. For behavior touching Firebase, location, navigation, or notifications, include mocked dependencies and verify loading, error, and permission-denied states.
+- No formal test framework (Jest/Detox) is currently configured.
+- When adding tests in the future, place them near the relevant module or in a clear `__tests__` folder using `*.test.js(x)` naming.
+- **Manual Verification:** Document manual tests in PRs. For behavior touching Firebase, Location, Navigation, or Notifications, verify loading states, error handling, and permission-denied scenarios (mock dependencies if possible).
+
+## Database & Backend Rules (Firebase)
+- All Firestore access must be governed by `firestore.rules`.
+- Carefully review `firestore.rules` when modifying data structures for `users`, `rooms`, `chats`, or `reports` to ensure proper access control.
+- Real-time location queries use `geofire-common` hashes.
+
+## Security & Configuration
+- **DO NOT** commit secrets, private keys, or `.env` files.
+- Configuration relies on `.env` values such as `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY`, `EXPO_PUBLIC_FIREBASE_*`, and potentially Cloudinary secrets.
+- Always use the `EXPO_PUBLIC_` prefix for variables needed on the client-side.
 
 ## Commit & Pull Request Guidelines
-Recent commits use Conventional Commit-style prefixes, for example `feat:`, `fix:`, and `refactor:`. Keep commit subjects short and imperative. PRs should include a concise summary, linked issue when applicable, screenshots or recordings for UI changes, and the commands or devices used for verification.
-
-## Security & Configuration Tips
-Do not commit secrets or private keys. Runtime configuration is expected through `.env` values such as `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` and Firebase `EXPO_PUBLIC_FIREBASE_*` variables. Review `firestore.rules` when changing room, chat, user, or reporting data access.
+- Use **Conventional Commits** (e.g., `feat:`, `fix:`, `refactor:`, `chore:`).
+- Keep commit subjects short, imperative, and descriptive.
+- PRs must include a concise summary, linked issue numbers, screenshots/recordings for UI changes, and details on verification steps taken.
