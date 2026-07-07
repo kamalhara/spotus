@@ -4,6 +4,14 @@ import { Animated, Text, TouchableOpacity, View } from "react-native";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
 import ParticipantAvatar from "./ParticipantAvatar";
 
+function toMillis(value) {
+  if (!value) return null;
+  if (value.seconds) return value.seconds * 1000;
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === "number") return value;
+  return null;
+}
+
 const RoomCard = memo(function RoomCard({
   room,
   onPress,
@@ -20,45 +28,33 @@ const RoomCard = memo(function RoomCard({
   const buttonText = isExploreMode
     ? "Preview"
     : isDiscovery
-      ? "Jump in"
+      ? "Join"
       : "Enter";
 
-  const getExpiryText = () => {
-    if (!room.expiresAt) return "Active Event";
-
-    const expiresMs = room.expiresAt.seconds
-      ? room.expiresAt.seconds * 1000
-      : room.expiresAt instanceof Date
-        ? room.expiresAt.getTime()
-        : room.expiresAt;
-
-    if (!expiresMs) return "Active Event";
-
+  const getExpiryInfo = () => {
+    const expiresMs = toMillis(room.expiresAt);
+    if (!expiresMs) return { label: "Open now", tone: "active" };
     const now = Date.now();
     const diffMs = expiresMs - now;
 
-    if (diffMs <= 0) return "Expired";
+    if (diffMs <= 0) return { label: "Expired", tone: "expired" };
 
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    if (diffHours >= 24) return `${Math.floor(diffHours / 24)}d left`;
-    if (diffHours > 0) return `${diffHours}h left`;
+    const label =
+      diffHours >= 24
+        ? `${Math.floor(diffHours / 24)}d left`
+        : diffHours > 0
+          ? `${diffHours}h left`
+          : `${Math.max(1, Math.floor(diffMs / (1000 * 60)))}m left`;
 
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    if (diffMins > 0) return `${diffMins}m left`;
-    return "< 1m left";
+    return {
+      label,
+      tone: diffMs < 15 * 60 * 1000 ? "ending" : "active",
+    };
   };
 
   const participantCount = room.participants?.length || 0;
-  const isDying = (() => {
-    if (!room.expiresAt) return false;
-    const expiresMs = room.expiresAt.seconds
-      ? room.expiresAt.seconds * 1000
-      : room.expiresAt instanceof Date
-        ? room.expiresAt.getTime()
-        : room.expiresAt;
-    if (!expiresMs) return false;
-    return expiresMs - Date.now() < 15 * 60 * 1000;
-  })();
+  const expiryInfo = getExpiryInfo();
 
   const getParticipantText = () => {
     if (participantCount <= 1) return "Just started";
@@ -66,14 +62,10 @@ const RoomCard = memo(function RoomCard({
     return `${participantCount} here`;
   };
 
-  const lastActivityMs = room.lastMessageAt?.seconds
-    ? room.lastMessageAt.seconds * 1000
-    : room.lastMessageAt instanceof Date
-      ? room.lastMessageAt.getTime()
-      : room.lastMessageAt ||
-        (room.createdAt?.seconds ? room.createdAt.seconds * 1000 : Date.now());
+  const lastActivityMs = toMillis(room.lastMessageAt) || toMillis(room.createdAt);
 
-  const isActiveNow = Date.now() - lastActivityMs < 5 * 60 * 1000;
+  const isActiveNow =
+    !!lastActivityMs && Date.now() - lastActivityMs < 5 * 60 * 1000;
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -111,7 +103,7 @@ const RoomCard = memo(function RoomCard({
             className="font-medium text-[11px]"
             style={{ color: categoryColor }}
           >
-            {room.category}
+            {room.category || "General"}
           </Text>
 
           {room.visibility === "ghost" && (
@@ -159,15 +151,15 @@ const RoomCard = memo(function RoomCard({
 
         {/* Meta row */}
         <View className="flex-row items-center mb-3">
-          {getExpiryText() === "Expired" ? (
+          {expiryInfo.tone === "expired" ? (
             <View className="w-1.5 h-1.5 rounded-full bg-red-400 mr-1.5" />
-          ) : isDying ? (
+          ) : expiryInfo.tone === "ending" ? (
             <View className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5" />
           ) : (
             <View className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5" />
           )}
           <Text className="text-gray-400 text-[11px] font-medium">
-            {getExpiryText()}
+            {expiryInfo.label}
           </Text>
           {room.distance !== undefined && !isExploreMode && (
             <>
@@ -181,7 +173,7 @@ const RoomCard = memo(function RoomCard({
             <>
               <Text className="text-gray-300 dark:text-gray-600 mx-1.5">·</Text>
               <Text className="text-gray-400 text-[11px] font-medium">
-                Approximate Area
+                Nearby area
               </Text>
             </>
           )}

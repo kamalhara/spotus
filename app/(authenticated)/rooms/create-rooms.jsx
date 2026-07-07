@@ -2,6 +2,7 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -69,8 +70,9 @@ export default function CreateRooms() {
   const selectedCategoryMeta = CATEGORIES.find(
     (item) => item.label === selectedCategory,
   );
+  const trimmedTitle = title.trim();
   const canCreateRoom =
-    title.trim().length > 0 && !!selectedCategory && !isCreating;
+    trimmedTitle.length > 0 && !!selectedCategory && !!user?.id && !isCreating;
 
   const [isGhostBrowsing, setIsGhostBrowsing] = useState(false);
   const [interceptModal, setInterceptModal] = useState(false);
@@ -138,38 +140,48 @@ export default function CreateRooms() {
     setIsCreating(true);
     try {
       const { roomId } = await createRoom(
-        title,
+        trimmedTitle,
         description,
         selectedCategory,
         user.id,
         showOnMap,
         duration,
       );
-      
+
       trackEvent("room_created", {
         category: selectedCategory,
-        duration: duration
+        duration,
       });
 
       router.replace(`/rooms/${roomId}`);
     } catch (err) {
       console.error("Error creating room:", err);
-      alert(err.message || "Failed to create room.");
+      Alert.alert("Could not create room", err?.message || "Please try again.");
     } finally {
       setIsCreating(false);
     }
   };
 
   const handleCreateRoom = async () => {
-    if (!title || !selectedCategory) return alert("Please fill all the fields");
-    if (!user) return alert("User not loaded");
-    
+    if (!trimmedTitle || !selectedCategory) {
+      Alert.alert(
+        "Room details needed",
+        "Add a room name and choose a category before creating it.",
+      );
+      return;
+    }
+
+    if (!user?.id) {
+      Alert.alert("Profile still loading", "Please try again in a moment.");
+      return;
+    }
+
     if (isGhostBrowsing) {
       setInterceptModal(true);
       return;
     }
 
-    proceedWithCreation();
+    await proceedWithCreation();
   };
 
   return (
@@ -194,7 +206,7 @@ export default function CreateRooms() {
               className="text-secondary dark:text-gray-100 text-[17px] font-bold tracking-tight"
               numberOfLines={1}
             >
-              Drop a Room
+              Create room
             </Text>
           </Animated.View>
 
@@ -232,18 +244,18 @@ export default function CreateRooms() {
               {/* Inline Title — fades out on scroll */}
               <Animated.View className="mt-4 mb-8" style={inlineTitleStyle}>
                 <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-extrabold tracking-tight leading-[34px]">
-                  What&apos;s happening?
+                  Name the room
                 </Text>
                 <Text className="text-muted text-sm leading-5 mt-2">
-                  Give it a name and let people find you.
+                  Be specific about the topic, place, or plan people are joining.
                 </Text>
               </Animated.View>
 
               {/* Room Title Input */}
               <View className="mb-1">
                 <CustomInput
-                  label="Room Title"
-                  placeholder="e.g. Saturday park hangs"
+                  label="Room name"
+                  placeholder="e.g. Chess at the library"
                   value={title}
                   onChangeText={(text) => {
                     if (text.length <= MAX_TITLE) setTitle(text);
@@ -256,8 +268,8 @@ export default function CreateRooms() {
 
               <View>
                 <CustomInput
-                  label="Description (Optional)"
-                  placeholder="Tell people what to expect"
+                  label="Notes (optional)"
+                  placeholder="Time, landmark, or what to bring"
                   value={description}
                   onChangeText={(text) => setDescription(text)}
                 />
@@ -266,7 +278,7 @@ export default function CreateRooms() {
               {/* Duration Picker */}
               <View className="mt-5">
                 <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
-                  Duration (Expires in)
+                  Room closes after
                 </Text>
                 <View className="flex-row flex-wrap gap-2.5">
                   {DURATIONS.map(({ label, value }) => {
@@ -343,7 +355,7 @@ export default function CreateRooms() {
               {/* Preview */}
               <View className="mt-8">
                 <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
-                  Preview
+                  List preview
                 </Text>
                 <GlassContainer
                   borderRadius={16}
@@ -406,7 +418,9 @@ export default function CreateRooms() {
                     {title || "Your room title"}
                   </Text>
                   <Text className="text-gray-400 dark:text-gray-500 text-xs mt-2 leading-4">
-                    This is how your room will appear in the list.
+                    {showOnMap
+                      ? `Visible nearby for ${duration}h`
+                      : "Hidden from map; people join with the invite code"}
                   </Text>
                 </GlassContainer>
               </View>
@@ -432,12 +446,12 @@ export default function CreateRooms() {
                         style={{ marginRight: 6 }}
                       />
                       <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
-                        Ghost Mode
+                        Hide from map
                       </Text>
                     </View>
                     <Text className="text-gray-400 dark:text-gray-500 text-xs leading-4 pr-2">
-                      If off, the room is public and shown to all users. Hidden
-                      from the map when on.
+                      People can still join with the invite code. Nearby
+                      discovery will not show this room.
                     </Text>
                   </View>
                   <Switch
@@ -460,7 +474,7 @@ export default function CreateRooms() {
               {/* Create Button */}
               <View className="flex-1 justify-end mt-10">
                 <CustomButton
-                  title="Let's go"
+                  title="Create room"
                   onPress={handleCreateRoom}
                   disabled={!canCreateRoom}
                   loading={isCreating}

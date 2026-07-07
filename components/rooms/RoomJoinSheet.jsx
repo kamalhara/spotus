@@ -27,6 +27,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
   const bottomSheetModalRef = useRef(null);
 
   const [creator, setCreator] = useState(null);
+  const [isJoining, setIsJoining] = useState(false);
 
   // Fetch room creator profile
   useEffect(() => {
@@ -83,9 +84,14 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
     bottomSheetModalRef.current?.dismiss();
   };
 
-  const handleConfirm = () => {
-    onConfirm?.(room);
-    handleDismiss();
+  const handleConfirm = async () => {
+    if (!room || isJoining) return;
+    setIsJoining(true);
+    try {
+      await onConfirm?.(room);
+    } finally {
+      setIsJoining(false);
+    }
   };
 
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
@@ -212,7 +218,7 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
           )}
 
           <Text className="text-muted text-[13px] leading-5 font-medium text-center">
-            Join to chat with the members in this room.
+            Join the room to see the chat and send messages.
           </Text>
         </View>
 
@@ -220,10 +226,19 @@ const RoomJoinSheet = forwardRef(({ room, onConfirm }, ref) => {
         <View className="h-px bg-border-light dark:bg-border-light mt-6 mb-5" />
         <View className="flex-row gap-3.5 justify-between">
           <View className="flex-1">
-            <CustomButton title="Cancel" type="ghost" onPress={handleDismiss} />
+            <CustomButton
+              title="Cancel"
+              type="ghost"
+              onPress={handleDismiss}
+              disabled={isJoining}
+            />
           </View>
           <View className="flex-[2]">
-            <CustomButton title="Join Room" onPress={handleConfirm} />
+            <CustomButton
+              title="Join"
+              onPress={handleConfirm}
+              loading={isJoining}
+            />
           </View>
         </View>
       </BottomSheetView>

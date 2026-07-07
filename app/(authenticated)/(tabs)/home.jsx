@@ -4,8 +4,9 @@ import Slider from "@react-native-community/slider";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Alert,
   Animated,
   Image,
   Text,
@@ -41,17 +42,23 @@ function getGreeting() {
   return "Good evening";
 }
 
-function EmptyRooms() {
+function EmptyRooms({ activeCategory, isGhostBrowsing }) {
+  const isFiltered = activeCategory !== "all";
+
   return (
     <View className="items-center justify-center py-16 px-6">
       <View className="w-14 h-14 border border-dashed border-gray-200 dark:border-gray-700 rounded-2xl items-center justify-center mb-4">
         <Ionicons name="radio-outline" size={24} color="#C0BDB8" />
       </View>
       <Text className="text-secondary dark:text-gray-100 text-lg font-heading tracking-tight text-center mb-2">
-        Nothing nearby
+        {isFiltered ? `No ${activeCategory} rooms` : "No open rooms nearby"}
       </Text>
       <Text className="text-muted text-[14px] font-body text-center leading-5 px-4">
-        Keep exploring or enable location to join conversations.
+        {isGhostBrowsing
+          ? "Exploring mode only shows public samples. Turn on location to see rooms around you."
+          : isFiltered
+            ? "Try another category or widen the radius."
+            : "Start one for the people around you or widen the radius."}
       </Text>
     </View>
   );
@@ -158,39 +165,58 @@ export default function Home() {
     bottomSheetModalRef.current?.present();
   }, []);
 
-  const handleJoinRoom = async () => {
+  const handleJoinRoom = async (roomToJoin = selectedRoom) => {
     if (isGhostBrowsing) {
       setInterceptModal({ visible: true, action: "join conversations" });
       trackEvent("Tried to join while exploring");
       return;
     }
-    const roomRef = doc(db, "rooms", selectedRoom.id);
 
-    const wasAlreadyInRoom = selectedRoom.participants?.includes(
-      firestoreUser?.id,
-    );
-
-    await updateDoc(roomRef, {
-      participants: arrayUnion(firestoreUser?.id),
-    });
-
-    if (!wasAlreadyInRoom && selectedRoom.participants) {
-      const otherParticipants = selectedRoom.participants.filter(
-        (uid) => uid !== firestoreUser?.id,
+    if (!roomToJoin?.id || !firestoreUser?.id) {
+      Alert.alert(
+        "Unable to join",
+        "Your profile or the selected room is still loading. Please try again.",
       );
-      otherParticipants.forEach((uid) => {
-        sendPushNotification(
-          uid,
-          firestoreUser?.id,
-          selectedRoom.title || "Room",
-          `${firestoreUser?.userName || "Someone"} joined the room!`,
-          { type: "room", screen: "room", roomId: selectedRoom.id },
-        );
-      });
+      return;
     }
 
-    bottomSheetModalRef.current?.dismiss();
-    router.push(`/rooms/${selectedRoom.id}`);
+    const roomRef = doc(db, "rooms", roomToJoin.id);
+    const wasAlreadyInRoom = roomToJoin.participants?.includes(
+      firestoreUser.id,
+    );
+
+    try {
+      await updateDoc(roomRef, {
+        participants: arrayUnion(firestoreUser.id),
+      });
+
+      if (!wasAlreadyInRoom && roomToJoin.participants) {
+        const otherParticipants = roomToJoin.participants.filter(
+          (uid) => uid !== firestoreUser.id,
+        );
+        void Promise.all(
+          otherParticipants.map((uid) =>
+            Promise.resolve().then(() =>
+              sendPushNotification(
+                uid,
+                firestoreUser.id,
+                roomToJoin.title || "Room",
+                `${firestoreUser?.userName || "Someone"} joined the room`,
+                { type: "room", screen: "room", roomId: roomToJoin.id },
+              ),
+            ),
+          ),
+        ).catch((error) => {
+          console.error("Error notifying room participants:", error);
+        });
+      }
+
+      bottomSheetModalRef.current?.dismiss();
+      router.push(`/rooms/${roomToJoin.id}`);
+    } catch (error) {
+      console.error("Error joining room:", error);
+      Alert.alert("Could not join room", "Please try again in a moment.");
+    }
   };
 
   const handleJoinByCode = () => {
@@ -226,12 +252,15 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error loading rooms:", error);
+      const message = String(error?.message || error || "");
       if (
-        error.message.includes("permission denied") ||
-        error.message.includes("Not authorized") ||
-        error.message.includes("Location permission")
+        message.includes("permission denied") ||
+        message.includes("Not authorized") ||
+        message.includes("Location permission")
       ) {
         setLocationError(true);
+      } else {
+        setRooms([]);
       }
     }
   }, [searchDistance, firestoreUser?.id]);
@@ -251,18 +280,36 @@ export default function Home() {
     setRefreshing(false);
   }, [loadRooms]);
 
-  const nearbyRooms = rooms.filter(
-    (r) => !r.participants?.includes(firestoreUser?.id),
+  const nearbyRooms = useMemo(
+    () => rooms.filter((r) => !r.participants?.includes(firestoreUser?.id)),
+    [rooms, firestoreUser?.id],
   );
 
-  const filteredRooms = nearbyRooms.filter(
-    (r) => activeCategory === "all" || r.category === activeCategory,
+  const filteredRooms = useMemo(
+    () =>
+      nearbyRooms.filter(
+        (r) => activeCategory === "all" || r.category === activeCategory,
+      ),
+    [nearbyRooms, activeCategory],
   );
 
-  const totalPeopleChatting = nearbyRooms.reduce(
-    (acc, room) => acc + (room.participants?.length || 0),
-    0,
+  const totalPeopleChatting = useMemo(
+    () =>
+      nearbyRooms.reduce(
+        (acc, room) => acc + (room.participants?.length || 0),
+        0,
+      ),
+    [nearbyRooms],
   );
+
+  const roomCountLabel =
+    activeCategory === "all"
+      ? `${filteredRooms.length} open room${
+          filteredRooms.length === 1 ? "" : "s"
+        }`
+      : `${filteredRooms.length} ${activeCategory} room${
+          filteredRooms.length === 1 ? "" : "s"
+        }`;
 
   const handleCreateRoom = useCallback(() => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -345,8 +392,7 @@ export default function Home() {
         </Text>
         {!loading && filteredRooms.length > 0 && (
           <Text className="text-muted text-[14px] font-body mt-1">
-            {filteredRooms.length} room{filteredRooms.length === 1 ? "" : "s"}{" "}
-            within {displayDistance}km
+            {roomCountLabel} within {displayDistance}km
           </Text>
         )}
       </Animated.View>
@@ -493,10 +539,10 @@ export default function Home() {
           </View>
           <View className="flex-1">
             <Text className="text-white font-heading text-[15px] tracking-tight">
-              Create a room
+              Host a nearby room
             </Text>
             <Text className="text-white/60 text-[12px] font-body mt-0.5">
-              Start a conversation nearby
+              Pick a topic, set a timer, share the invite code
             </Text>
           </View>
           <Ionicons
@@ -527,7 +573,7 @@ export default function Home() {
             style={{ marginRight: 5 }}
           />
           <Text className="text-primary font-semibold text-[13px]">
-            Have an invite code?
+            Join with invite code
           </Text>
         </TouchableOpacity>
       </Animated.View>
@@ -543,11 +589,11 @@ export default function Home() {
         <View className="flex flex-row justify-between items-center">
           <View className="flex-row items-center gap-2">
             <Text className="text-secondary dark:text-gray-100 text-[20px] font-heading tracking-tight">
-              Nearby
+              {activeCategory === "all" ? "Nearby" : activeCategory}
             </Text>
-            {nearbyRooms.length > 0 && (
+            {filteredRooms.length > 0 && (
               <Text className="text-muted text-[13px] font-medium">
-                {nearbyRooms.length}
+                {filteredRooms.length}
               </Text>
             )}
           </View>
@@ -585,7 +631,7 @@ export default function Home() {
         { _skeleton: true, id: "s2" },
         { _skeleton: true, id: "s3" },
       ]
-    : nearbyRooms;
+    : filteredRooms;
 
   return (
     <>
@@ -664,6 +710,7 @@ export default function Home() {
                 <RoomCard
                   room={item}
                   onPress={() => handlePresentModalPress(item)}
+                  currentUserId={firestoreUser?.id}
                   isExploreMode={isGhostBrowsing}
                 />
               )
@@ -675,7 +722,14 @@ export default function Home() {
             ListFooterComponent={null}
             contentContainerStyle={{ paddingBottom: 100, paddingTop: 4 }}
             showsVerticalScrollIndicator={false}
-            ListEmptyComponent={loading ? null : <EmptyRooms />}
+            ListEmptyComponent={
+              loading ? null : (
+                <EmptyRooms
+                  activeCategory={activeCategory}
+                  isGhostBrowsing={isGhostBrowsing}
+                />
+              )
+            }
             onScroll={Animated.event(
               [{ nativeEvent: { contentOffset: { y: scrollY } } }],
               {
@@ -683,7 +737,8 @@ export default function Home() {
                 listener: (e) => {
                   const offset = e.nativeEvent.contentOffset.y;
                   scrollOffsetY.current = offset;
-                  const hidden = offset > ctaBottomY.current;
+                  const hidden =
+                    ctaBottomY.current > 0 && offset > ctaBottomY.current;
                   if (hidden !== ctaHidden) setCtaHidden(hidden);
                 },
               },

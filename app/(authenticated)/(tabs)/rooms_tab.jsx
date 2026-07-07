@@ -43,7 +43,7 @@ export default function RoomsScreen() {
       data: loading ? [1, 2] : myCreatedRooms,
       isEmpty: !loading && myCreatedRooms.length === 0,
       emptyIcon: "add-circle-outline",
-      emptyText: "No rooms yet\u2014start something?",
+      emptyText: "No rooms created yet",
       emptyAction: "Create room",
       emptyRoute: "/rooms/create-rooms",
     },
@@ -53,7 +53,7 @@ export default function RoomsScreen() {
       data: loading ? [1, 2, 3] : myJoinedRooms,
       isEmpty: !loading && myJoinedRooms.length === 0,
       emptyIcon: "compass-outline",
-      emptyText: "You're missing out. Go find a conversation.",
+      emptyText: "No joined rooms yet",
       emptyAction: "Explore rooms",
       emptyRoute: "/home",
     },
@@ -83,6 +83,7 @@ export default function RoomsScreen() {
               room={item}
               onPress={() => router.push(`/rooms/${item.id}`)}
               variant="joined"
+              currentUserId={firestoreUser?.id}
             />
           )
         }
@@ -106,8 +107,8 @@ export default function RoomsScreen() {
                   title={section.emptyText}
                   description={
                     section.title === "Created by me"
-                      ? "Start a room around a topic people can join."
-                      : "Find active rooms from the Home tab."
+                      ? "Name a topic, set a duration, and invite people nearby."
+                      : "Browse nearby rooms from Home or enter an invite code."
                   }
                   actionLabel={section.emptyAction}
                   onAction={() => router.push(section.emptyRoute)}
