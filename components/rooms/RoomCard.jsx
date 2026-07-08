@@ -93,13 +93,18 @@ const RoomCard = memo(function RoomCard({
 
     if (diffMs <= 0) return { label: "Expired", tone: "expired" };
 
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const label =
-      diffHours >= 24
-        ? `${Math.floor(diffHours / 24)}d left`
-        : diffHours > 0
-          ? `${diffHours}h left`
-          : `${Math.max(1, Math.floor(diffMs / (1000 * 60)))}m left`;
+    const totalMinutes = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+
+    let label;
+    if (hours >= 24) {
+      label = `${Math.floor(hours / 24)}d left`;
+    } else if (hours > 0) {
+      label = mins > 0 ? `${hours}h ${mins}m left` : `${hours}h left`;
+    } else {
+      label = `${Math.max(1, mins)}m left`;
+    }
 
     return {
       label,
@@ -182,8 +187,6 @@ const RoomCard = memo(function RoomCard({
               </Text>
             </View>
           )}
-
-          {isActiveNow && <ActiveDot />}
         </View>
 
         {/* Title */}
@@ -343,7 +346,9 @@ const RoomCard = memo(function RoomCard({
             styles.card,
             {
               backgroundColor: isDark ? "#1C1C1E" : "#FFFFFF",
-              borderColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)",
+              borderColor: isDark
+                ? "rgba(255,255,255,0.06)"
+                : "rgba(0,0,0,0.06)",
             },
 
             Platform.OS === "ios" && styles.cardShadow,

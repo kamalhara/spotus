@@ -27,6 +27,7 @@ import CustomButton from "../../../components/ui/CustomButton";
 import CustomInput from "../../../components/ui/CustomInput";
 import GlassButton from "../../../components/ui/GlassButton";
 import GlassContainer from "../../../components/ui/GlassContainer";
+import RoomCard from "../../../components/rooms/RoomCard";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { createRoom } from "../../../lib/createRoom";
@@ -357,80 +358,23 @@ export default function CreateRooms() {
                 <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
                   List preview
                 </Text>
-                <GlassContainer
-                  borderRadius={16}
-                  fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
-                  style={{ padding: 16, overflow: "hidden" }}
-                >
-                  {/* Dynamic category-colored top accent */}
-                  <View
-                    className="absolute top-0 left-4 right-4 h-[2.5px] rounded-full"
-                    style={{
-                      backgroundColor: selectedCategoryMeta?.color || "#D1D5DB",
-                      opacity: selectedCategoryMeta ? 0.6 : 0.3,
+                <View pointerEvents="none" style={{ opacity: 0.9 }}>
+                  <RoomCard
+                    room={{
+                      id: "preview",
+                      title: title || "Your room title",
+                      category: selectedCategory || "General",
+                      visibility: showOnMap ? "public" : "ghost",
+                      createdAt: Date.now(),
+                      expiresAt: Date.now() + duration * 60 * 60 * 1000,
+                      participants: user?.id ? [user.id] : [],
+                      createdBy: user?.id,
+                      distance: showOnMap ? 0.0 : undefined,
                     }}
+                    currentUserId={user?.id}
+                    variant="discovery"
                   />
-                  <View className="flex-row items-center justify-between mb-3 mt-1">
-                    <View className="flex-row items-center gap-2">
-                      <View
-                        className="px-3 py-1.5 rounded-xl flex-row items-center"
-                        style={{
-                          backgroundColor: selectedCategoryMeta
-                            ? `${selectedCategoryMeta.color}12`
-                            : "#F1F5F9",
-                        }}
-                      >
-                        <Ionicons
-                          name={selectedCategoryMeta?.icon || "grid-outline"}
-                          size={13}
-                          color={selectedCategoryMeta?.color || "#94A3B8"}
-                        />
-                        <Text
-                          className="text-xs font-bold ml-1.5"
-                          style={{
-                            color: selectedCategoryMeta?.color || "#94A3B8",
-                          }}
-                        >
-                          {selectedCategory || "Choose category"}
-                        </Text>
-                      </View>
-                      <View className="px-3 py-1.5 rounded-xl flex-row items-center bg-gray-100 dark:bg-[#2C2C30]">
-                        <Ionicons
-                          name="time-outline"
-                          size={13}
-                          color="#6B7280"
-                        />
-                        <Text className="text-xs font-bold ml-1.5 text-gray-500 dark:text-gray-400">
-                          {duration}h
-                        </Text>
-                      </View>
-                    </View>
-                    {!showOnMap && (
-                      <View className="w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-500/10 items-center justify-center">
-                        <MaterialCommunityIcons
-                          name="ghost"
-                          size={16}
-                          color="#A855F7"
-                        />
-                      </View>
-                    )}
-                  </View>
-                  <Text
-                    className={`text-lg font-display font-extrabold tracking-tight ${
-                      title
-                        ? "text-secondary dark:text-gray-100"
-                        : "text-gray-300 dark:text-gray-600"
-                    }`}
-                    numberOfLines={2}
-                  >
-                    {title || "Your room title"}
-                  </Text>
-                  <Text className="text-gray-400 dark:text-gray-500 text-xs mt-2 leading-4">
-                    {showOnMap
-                      ? `Visible nearby for ${duration}h`
-                      : "Hidden from map; people join with the invite code"}
-                  </Text>
-                </GlassContainer>
+                </View>
               </View>
 
               {/* Visibility Toggle */}
