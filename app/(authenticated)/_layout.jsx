@@ -11,7 +11,9 @@ import { useEffect, useRef } from "react";
 import { AppState } from "react-native";
 import { db } from "../../config/firebase.config";
 import useFirestoreUser from "../../hook/useFireStoreUser";
+import { geohashForLocation } from "geofire-common";
 import { registerForPushNotifications } from "../../lib/notification";
+import { getSilentLocation } from "../../lib/location";
 
 export default function AuthenticatedLayout() {
   const { firestoreUser: user } = useFirestoreUser();
@@ -59,10 +61,21 @@ export default function AuthenticatedLayout() {
 
     const updatePresence = async (isOnline) => {
       try {
-        await updateDoc(doc(db, "users", user.id), {
+        const updateData = {
           isOnline,
           lastSeen: serverTimestamp(),
-        });
+        };
+
+        if (isOnline) {
+          const loc = await getSilentLocation();
+          if (loc) {
+            updateData.latitude = loc.latitude;
+            updateData.longitude = loc.longitude;
+            updateData.geohash = geohashForLocation([loc.latitude, loc.longitude]);
+          }
+        }
+
+        await updateDoc(doc(db, "users", user.id), updateData);
       } catch (error) {
         console.error("Error updating presence:", error);
       }

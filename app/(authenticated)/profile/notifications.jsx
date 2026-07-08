@@ -15,6 +15,7 @@ export default function Notifications() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [messageNotifications, setMessageNotifications] = useState(true);
   const [roomNotifications, setRoomNotifications] = useState(true);
+  const [nearbyRoomNotifications, setNearbyRoomNotifications] = useState(true);
   const { isDark } = useTheme();
 
   // Load saved settings on mount
@@ -28,6 +29,9 @@ export default function Notifications() {
       }
       if (firestoreUser.roomNotifications !== undefined) {
         setRoomNotifications(firestoreUser.roomNotifications);
+      }
+      if (firestoreUser.nearbyRoomNotifications !== undefined) {
+        setNearbyRoomNotifications(firestoreUser.nearbyRoomNotifications);
       }
     }
   }, [firestoreUser]);
@@ -99,6 +103,16 @@ export default function Notifications() {
               "roomNotifications",
               roomNotifications,
               setRoomNotifications,
+            )}
+          />
+          <SettingsRow
+            icon="location-outline"
+            title="Nearby Room Notifications"
+            description="Get notified when a new room is created near you."
+            rightComponent={renderSwitch(
+              "nearbyRoomNotifications",
+              nearbyRoomNotifications,
+              setNearbyRoomNotifications,
             )}
             isLast
           />
