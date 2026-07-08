@@ -194,7 +194,7 @@ export default function RoomInfo() {
           <>
             {/* Header section */}
             <View className="mb-6 mt-4">
-              <View className="flex-row items-center justify-between mb-3">
+              <View className="flex-row flex-wrap items-center gap-2 mb-3">
                 <GlassContainer
                   borderRadius={12}
                   style={{
@@ -230,6 +230,34 @@ export default function RoomInfo() {
                     <Ionicons name="location-sharp" size={12} color="#FF6B47" />
                     <Text className="text-primary font-display font-black text-[10px] ml-1">
                       {room?.location || "0.4km away"}
+                    </Text>
+                  </View>
+                </GlassContainer>
+
+                <GlassContainer
+                  borderRadius={12}
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(79, 70, 229, 0.15)"
+                      : "rgba(79, 70, 229, 0.08)",
+                  }}
+                  fallbackClassName="bg-indigo-50 dark:bg-[#242428]"
+                >
+                  <View className="flex-row items-center px-3.5 py-2">
+                    <Ionicons name="time-outline" size={12} color="#FF6B47" />
+                    <Text className="text-primary font-display font-black text-[10px] ml-1 uppercase tracking-[1px]">
+                      {(() => {
+                        if (!room?.expiresAt) return "Open now";
+                        const expiresMs = room.expiresAt.seconds ? room.expiresAt.seconds * 1000 : room.expiresAt instanceof Date ? room.expiresAt.getTime() : room.expiresAt;
+                        const diffMs = expiresMs - Date.now();
+                        if (diffMs <= 0) return "Expired";
+                        const totalMinutes = Math.floor(diffMs / (1000 * 60));
+                        const hours = Math.floor(totalMinutes / 60);
+                        const mins = totalMinutes % 60;
+                        if (hours >= 24) return `${Math.floor(hours / 24)}d left`;
+                        if (hours > 0) return mins > 0 ? `${hours}h ${mins}m left` : `${hours}h left`;
+                        return `${Math.max(1, mins)}m left`;
+                      })()}
                     </Text>
                   </View>
                 </GlassContainer>

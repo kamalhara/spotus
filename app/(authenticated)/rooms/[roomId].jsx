@@ -434,7 +434,19 @@ export default function RoomChat() {
                   <View className="flex-row items-center mt-0.5">
                     <Text className="text-gray-400 dark:text-gray-500 text-xs">
                       {room?.category || "Room"} ·{""}
-                      {room?.participants?.length || 0} members
+                      {room?.participants?.length || 0} members ·{""}
+                      {(() => {
+                        if (!room?.expiresAt) return " Open now";
+                        const expiresMs = room.expiresAt.seconds ? room.expiresAt.seconds * 1000 : room.expiresAt instanceof Date ? room.expiresAt.getTime() : room.expiresAt;
+                        const diffMs = expiresMs - Date.now();
+                        if (diffMs <= 0) return " Expired";
+                        const totalMinutes = Math.floor(diffMs / (1000 * 60));
+                        const hours = Math.floor(totalMinutes / 60);
+                        const mins = totalMinutes % 60;
+                        if (hours >= 24) return ` ${Math.floor(hours / 24)}d left`;
+                        if (hours > 0) return mins > 0 ? ` ${hours}h ${mins}m left` : ` ${hours}h left`;
+                        return ` ${Math.max(1, mins)}m left`;
+                      })()}
                     </Text>
                   </View>
                 </TouchableOpacity>

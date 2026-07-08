@@ -89,29 +89,62 @@ const RoomDetailsSheet = forwardRef(
           {/* Header section */}
           <View className="flex-row justify-between items-start mb-6">
             <View className="flex-1 mr-4">
-              <GlassContainer
-                borderRadius={12}
-                style={{
-                  backgroundColor: isDark
-                    ? "rgba(79, 70, 229, 0.15)"
-                    : "rgba(79, 70, 229, 0.08)",
-                  marginBottom: 16,
-                  alignSelf: "flex-start",
-                }}
-                fallbackClassName="bg-indigo-50 dark:bg-[#242428]"
-              >
-                <View className="px-3.5 py-2 flex-row items-center">
-                  <Ionicons
-                    name={categoryIcon}
-                    size={12}
-                    color="#FF6B47"
-                    style={{ marginRight: 6 }}
-                  />
-                  <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
-                    {room?.category || "Discovery Circle"}
-                  </Text>
-                </View>
-              </GlassContainer>
+              <View className="flex-row flex-wrap items-center gap-2 mb-4">
+                <GlassContainer
+                  borderRadius={12}
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(79, 70, 229, 0.15)"
+                      : "rgba(79, 70, 229, 0.08)",
+                  }}
+                  fallbackClassName="bg-indigo-50 dark:bg-[#242428]"
+                >
+                  <View className="px-3.5 py-2 flex-row items-center">
+                    <Ionicons
+                      name={categoryIcon}
+                      size={12}
+                      color="#FF6B47"
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
+                      {room?.category || "Discovery Circle"}
+                    </Text>
+                  </View>
+                </GlassContainer>
+
+                <GlassContainer
+                  borderRadius={12}
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(79, 70, 229, 0.15)"
+                      : "rgba(79, 70, 229, 0.08)",
+                  }}
+                  fallbackClassName="bg-indigo-50 dark:bg-[#242428]"
+                >
+                  <View className="px-3.5 py-2 flex-row items-center">
+                    <Ionicons
+                      name="time-outline"
+                      size={12}
+                      color="#FF6B47"
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
+                      {(() => {
+                        if (!room?.expiresAt) return "Open now";
+                        const expiresMs = room.expiresAt.seconds ? room.expiresAt.seconds * 1000 : room.expiresAt instanceof Date ? room.expiresAt.getTime() : room.expiresAt;
+                        const diffMs = expiresMs - Date.now();
+                        if (diffMs <= 0) return "Expired";
+                        const totalMinutes = Math.floor(diffMs / (1000 * 60));
+                        const hours = Math.floor(totalMinutes / 60);
+                        const mins = totalMinutes % 60;
+                        if (hours >= 24) return `${Math.floor(hours / 24)}d left`;
+                        if (hours > 0) return mins > 0 ? `${hours}h ${mins}m left` : `${hours}h left`;
+                        return `${Math.max(1, mins)}m left`;
+                      })()}
+                    </Text>
+                  </View>
+                </GlassContainer>
+              </View>
               <Text className="text-secondary dark:text-gray-100 text-3xl font-display font-black leading-tight tracking-tighter">
                 {room?.title}
               </Text>
