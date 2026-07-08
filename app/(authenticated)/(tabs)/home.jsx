@@ -271,7 +271,7 @@ export default function Home() {
 
   useFocusEffect(
     useCallback(() => {
-      setLoading(true);
+      // Fetch new rooms silently on tab focus without showing skeleton loading effect
       loadRooms().finally(() => setLoading(false));
     }, [loadRooms]),
   );

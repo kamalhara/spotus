@@ -1,7 +1,15 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { memo, useEffect, useRef } from "react";
-import { Animated, Platform, Text, TouchableOpacity, View } from "react-native";
+import {
+  Animated,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
+import { useTheme } from "../../context/ThemeContext";
 import ParticipantAvatar from "./ParticipantAvatar";
 
 function toMillis(value) {
@@ -14,19 +22,19 @@ function toMillis(value) {
 
 /** Breathing green dot for active rooms */
 function ActiveDot() {
-  const breathe = useRef(new Animated.Value(0.6)).current;
+  const breathe = useRef(new Animated.Value(0.5)).current;
 
   useEffect(() => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(breathe, {
           toValue: 1,
-          duration: 1200,
+          duration: 1400,
           useNativeDriver: true,
         }),
         Animated.timing(breathe, {
-          toValue: 0.6,
-          duration: 1200,
+          toValue: 0.5,
+          duration: 1400,
           useNativeDriver: true,
         }),
       ]),
@@ -34,15 +42,30 @@ function ActiveDot() {
   }, [breathe]);
 
   return (
-    <View className="flex-row items-center ml-auto">
+    <View className="flex-row items-center ml-auto bg-green-500/10 px-2.5 py-1 rounded-lg">
       <Animated.View
-        className="w-[7px] h-[7px] rounded-full bg-green-500 mr-1.5"
+        className="w-[6px] h-[6px] rounded-full bg-green-400 mr-1.5"
         style={{ opacity: breathe }}
       />
-      <Text className="text-green-600 dark:text-green-400 text-[10px] font-semibold">
-        Active
+      <Text className="text-green-500 dark:text-green-400 text-[10px] font-bold tracking-wide">
+        LIVE
       </Text>
     </View>
+  );
+}
+
+/** Expiry tone dot */
+function ToneDot({ tone }) {
+  const colors = {
+    expired: "#F87171",
+    ending: "#FBBF24",
+    active: "#34D399",
+  };
+  return (
+    <View
+      className="w-[5px] h-[5px] rounded-full mr-1.5"
+      style={{ backgroundColor: colors[tone] || colors.active }}
+    />
   );
 }
 
@@ -53,17 +76,14 @@ const RoomCard = memo(function RoomCard({
   currentUserId,
   isExploreMode = false,
 }) {
+  const { isDark } = useTheme();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const isOwner = room.createdBy === currentUserId;
   const isDiscovery = variant === "discovery";
   const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
   const categoryColor = CATEGORY_COLORS[room.category] || "#6B7280";
 
-  const buttonText = isExploreMode
-    ? "Preview"
-    : isDiscovery
-      ? "Join"
-      : "Enter";
+  const buttonText = isExploreMode ? "Preview" : isDiscovery ? "Join" : "Enter";
 
   const getExpiryInfo = () => {
     const expiresMs = toMillis(room.expiresAt);
@@ -92,20 +112,22 @@ const RoomCard = memo(function RoomCard({
 
   const getParticipantText = () => {
     if (participantCount <= 1) return "Just started";
-    if (participantCount === 2) return "2 here";
-    return `${participantCount} here`;
+    if (participantCount === 2) return "2 people";
+    return `${participantCount} people`;
   };
 
-  const lastActivityMs = toMillis(room.lastMessageAt) || toMillis(room.createdAt);
+  const lastActivityMs =
+    toMillis(room.lastMessageAt) || toMillis(room.createdAt);
 
   const isActiveNow =
     !!lastActivityMs && Date.now() - lastActivityMs < 5 * 60 * 1000;
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
-      toValue: 0.97,
+      toValue: 0.975,
       useNativeDriver: true,
       speed: 50,
+      bounciness: 4,
     }).start();
   };
 
@@ -114,45 +136,48 @@ const RoomCard = memo(function RoomCard({
       toValue: 1,
       useNativeDriver: true,
       speed: 50,
+      bounciness: 4,
     }).start();
   };
 
   const cardContent = (
-    <View>
-      {/* Category-colored top edge */}
+    <View className="overflow-hidden">
+      {/* Soft category-colored ambient glow — top-left corner */}
       <View
-        className="absolute top-0 left-4 right-4 h-[2.5px] rounded-full"
-        style={{
-          backgroundColor: categoryColor,
-          opacity: 0.5,
-        }}
+        style={[
+          styles.ambientGlow,
+          { backgroundColor: categoryColor, opacity: 0.06 },
+        ]}
       />
 
-      <View className="pt-1">
-        {/* Category + Ghost badge */}
-        <View className="flex-row items-center mb-2.5">
+      {/* Thin accent line at the very top */}
+      <View style={[styles.topAccent, { backgroundColor: categoryColor }]} />
+
+      <View className="px-4 pt-4 pb-3.5">
+        {/* Top row: Category badge + Active indicator */}
+        <View className="flex-row items-center mb-3">
           <View
-            className="w-6 h-6 rounded-lg items-center justify-center mr-2"
-            style={{ backgroundColor: `${categoryColor}18` }}
+            className="flex-row items-center px-2.5 py-1.5 rounded-lg mr-2"
+            style={{ backgroundColor: `${categoryColor}15` }}
           >
             <Ionicons name={categoryIcon} size={12} color={categoryColor} />
+            <Text
+              className="font-bold text-[10px] ml-1.5 uppercase tracking-wider"
+              style={{ color: categoryColor }}
+            >
+              {room.category || "General"}
+            </Text>
           </View>
-          <Text
-            className="font-semibold text-[11px]"
-            style={{ color: categoryColor }}
-          >
-            {room.category || "General"}
-          </Text>
 
           {room.visibility === "ghost" && (
-            <View className="flex-row items-center ml-2.5 px-2 py-0.5 rounded-md bg-purple-50 dark:bg-purple-500/10">
+            <View className="flex-row items-center px-2.5 py-1.5 rounded-lg bg-purple-500/10">
               <MaterialCommunityIcons
                 name="ghost"
-                size={10}
+                size={11}
                 color="#A855F7"
                 style={{ marginRight: 3 }}
               />
-              <Text className="font-semibold text-[9px] text-purple-600 dark:text-purple-400">
+              <Text className="font-bold text-[10px] text-purple-400 uppercase tracking-wider">
                 Ghost
               </Text>
             </View>
@@ -163,16 +188,16 @@ const RoomCard = memo(function RoomCard({
 
         {/* Title */}
         <Text
-          className="text-secondary dark:text-gray-100 font-heading tracking-tight text-[18px] leading-6 mb-1"
-          numberOfLines={1}
+          className="text-secondary dark:text-white font-display text-[19px] leading-6 mb-1.5 tracking-tight"
+          numberOfLines={2}
         >
-          {room.title}
+          {room.title || "Untitled room"}
         </Text>
 
-        {/* Last Message */}
+        {/* Last Message preview */}
         {room.lastMessage && (
           <Text
-            className="text-gray-400 dark:text-gray-500 text-[13px] font-body mb-2"
+            className="text-gray-400 dark:text-gray-500 text-[13px] font-body mb-1"
             numberOfLines={1}
           >
             {room.lastMessageSenderId === currentUserId ? "You: " : ""}
@@ -180,106 +205,128 @@ const RoomCard = memo(function RoomCard({
           </Text>
         )}
 
-        {/* Meta row */}
-        <View className="flex-row items-center mb-3">
-          {expiryInfo.tone === "expired" ? (
-            <View className="w-1.5 h-1.5 rounded-full bg-red-400 mr-1.5" />
-          ) : expiryInfo.tone === "ending" ? (
-            <View className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5" />
-          ) : (
-            <View className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1.5" />
-          )}
-          <Text className="text-gray-400 text-[11px] font-medium">
+        {/* Meta: expiry + distance */}
+        <View className="flex-row items-center mt-1 mb-3.5">
+          <ToneDot tone={expiryInfo.tone} />
+          <Text className="text-gray-500 dark:text-gray-500 text-[11px] font-medium">
             {expiryInfo.label}
           </Text>
           {room.distance !== undefined && !isExploreMode && (
             <>
-              <Text className="text-gray-300 dark:text-gray-600 mx-1.5">·</Text>
-              <Text className="text-gray-400 text-[11px] font-medium">
+              <Text className="text-gray-300 dark:text-gray-700 mx-1.5 text-[8px]">
+                ●
+              </Text>
+              <Text className="text-gray-500 dark:text-gray-500 text-[11px] font-medium">
                 {room.distance.toFixed(1)} km
               </Text>
             </>
           )}
           {isExploreMode && (
             <>
-              <Text className="text-gray-300 dark:text-gray-600 mx-1.5">·</Text>
-              <Text className="text-gray-400 text-[11px] font-medium">
+              <Text className="text-gray-300 dark:text-gray-700 mx-1.5 text-[8px]">
+                ●
+              </Text>
+              <Text className="text-gray-500 dark:text-gray-500 text-[11px] font-medium">
                 Nearby area
               </Text>
             </>
           )}
         </View>
 
-        {/* Footer */}
-        <View className="flex-row justify-between items-center pt-3 border-t border-gray-50 dark:border-[#2A2A2E]">
+        {/* Footer: participants + action button */}
+        <View
+          className="flex-row justify-between items-center pt-3"
+          style={{
+            borderTopWidth: StyleSheet.hairlineWidth,
+            borderTopColor: isDark
+              ? "rgba(255,255,255,0.06)"
+              : "rgba(0,0,0,0.06)",
+          }}
+        >
           <View className="flex-row items-center">
-            <View className="flex-row -space-x-2 mr-2.5">
+            <View className="flex-row mr-2.5" style={{ marginLeft: -2 }}>
               {(room.participants || []).slice(0, 3).map((participantId, i) => (
                 <ParticipantAvatar
                   key={participantId}
                   userId={participantId}
-                  size={28}
+                  size={26}
                   index={i}
                 />
               ))}
               {participantCount > 3 && (
-                <View className="w-7 h-7 rounded-lg border-2 border-white dark:border-[#1A1A1E] items-center justify-center bg-gray-100 dark:bg-[#252528]">
-                  <Text className="text-gray-500 dark:text-gray-400 font-bold text-[9px]">
+                <View
+                  className="w-[26px] h-[26px] rounded-full items-center justify-center"
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.08)"
+                      : "rgba(0,0,0,0.05)",
+                    marginLeft: -6,
+                    borderWidth: 2,
+                    borderColor: isDark ? "#1E1E23" : "#FFFFFF",
+                  }}
+                >
+                  <Text className="text-gray-400 font-bold text-[8px]">
                     +{participantCount - 3}
                   </Text>
                 </View>
               )}
               {participantCount === 0 && (
-                <View className="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-600 items-center justify-center bg-gray-50 dark:bg-[#252528]">
+                <View
+                  className="w-[26px] h-[26px] rounded-full items-center justify-center"
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(255,255,255,0.05)"
+                      : "rgba(0,0,0,0.04)",
+                  }}
+                >
                   <Ionicons
                     name="person-add-outline"
                     size={11}
-                    color="#9CA3AF"
+                    color="#6B7280"
                   />
                 </View>
               )}
             </View>
-            <Text className="text-muted dark:text-gray-500 text-[12px] font-medium">
+            <Text className="text-gray-500 dark:text-gray-500 text-[12px] font-medium">
               {getParticipantText()}
             </Text>
           </View>
 
-          {/* Proper pill button */}
-          <View
-            className="px-4 py-2 rounded-xl"
-            style={{
-              backgroundColor: isDiscovery
-                ? `${categoryColor}15`
-                : "rgba(255, 107, 71, 0.1)",
-            }}
+          {/* Action button */}
+          <TouchableOpacity
+            onPress={() => onPress?.(room)}
+            activeOpacity={0.8}
+            style={[
+              styles.actionButton,
+
+              {
+                backgroundColor: "transparent",
+                borderWidth: 1.5,
+                borderColor: `${categoryColor}50`,
+              },
+            ]}
           >
             <Text
-              className="font-semibold text-[12px]"
+              className="font-bold text-[11px] tracking-wide"
               style={{
-                color: isDiscovery ? categoryColor : "#FF6B47",
+                color: categoryColor,
               }}
             >
               {buttonText}
             </Text>
-          </View>
+            {isDiscovery && (
+              <Ionicons
+                name="arrow-forward"
+                size={12}
+                color={categoryColor}
+                style={{ marginLeft: 4 }}
+              />
+            )}
+          </TouchableOpacity>
         </View>
       </View>
     </View>
   );
-
-  const shadowStyle = isDiscovery
-    ? Platform.select({
-        ios: {
-          shadowColor: categoryColor,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.06,
-          shadowRadius: 8,
-        },
-        android: {
-          elevation: 2,
-        },
-      })
-    : {};
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
@@ -287,31 +334,53 @@ const RoomCard = memo(function RoomCard({
         onPress={() => onPress?.(room)}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
-        activeOpacity={0.95}
+        activeOpacity={1}
         className="mb-3"
       >
-        {isDiscovery ? (
-          <View
-            className="rounded-2xl p-4 bg-white dark:bg-[#1A1A1E] border border-border-light dark:border-[#2A2A2E]"
-            style={shadowStyle}
-          >
-            {cardContent}
-          </View>
-        ) : (
-          <View
-            className={`rounded-2xl p-4 border overflow-hidden ${
-              isOwner
-                ? "bg-primary-surface dark:bg-[#2C2320] border-primary/20"
-                : "bg-white dark:bg-[#1A1A1E] border-border-light dark:border-[#2A2A2E]"
-            }`}
-          >
-            {cardContent}
-          </View>
-        )}
+        <View
+          className="overflow-hidden"
+          style={[
+            styles.card,
+            {
+              backgroundColor: isDark ? "#1C1C1E" : "#FFFFFF",
+              borderColor: isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)",
+            },
+
+            Platform.OS === "ios" && styles.cardShadow,
+          ]}
+        >
+          {cardContent}
+        </View>
       </TouchableOpacity>
     </Animated.View>
   );
 });
 
-export default RoomCard;
+const styles = StyleSheet.create({
+  card: {
+    borderWidth: 1,
+    borderRadius: 20,
+  },
+  cardShadow: {
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+  },
 
+  topAccent: {
+    height: 2,
+    marginHorizontal: 20,
+    borderRadius: 1,
+    opacity: 0.35,
+  },
+  actionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+});
+
+export default RoomCard;
