@@ -48,6 +48,7 @@ export default function MessageSender({
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [showMediaMenu, setShowMediaMenu] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
@@ -60,6 +61,7 @@ export default function MessageSender({
   const insets = useSafeAreaInsets();
 
   const sendScale = useRef(new Animated.Value(1)).current;
+  const mediaMenuAnim = useRef(new Animated.Value(0)).current;
 
   // Auto-focus input when replying or editing
   useEffect(() => {
@@ -76,7 +78,27 @@ export default function MessageSender({
 
   const toggleMediaMenu = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    setShowMediaMenu((prev) => !prev);
+    if (showMediaMenu) {
+      closeMediaMenu();
+    } else {
+      setShowMediaMenu(true);
+      Animated.spring(mediaMenuAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 65,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
+  const closeMediaMenu = () => {
+    if (showMediaMenu) {
+      Animated.timing(mediaMenuAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => setShowMediaMenu(false));
+    }
   };
 
   const handleTyping = () => {
@@ -163,7 +185,7 @@ export default function MessageSender({
 
       if (!result.canceled) {
         const uri = result.assets[0].uri;
-        setShowMediaMenu(false);
+        closeMediaMenu();
         handleSendImage(uri);
       }
     };
@@ -186,7 +208,7 @@ export default function MessageSender({
 
       if (!result.canceled) {
         const uri = result.assets[0].uri;
-        setShowMediaMenu(false);
+        closeMediaMenu();
         handleSendImage(uri);
       }
     };
@@ -204,14 +226,33 @@ export default function MessageSender({
       {/* Backdrop overlay to dismiss the menu */}
       {showMediaMenu && (
         <Pressable
-          onPress={() => setShowMediaMenu(false)}
-          className="absolute -top-[1000px] -left-5 -right-5 bottom-0 z-[1]"
+          onPress={closeMediaMenu}
+          className="absolute -top-[2000px] -left-5 -right-5 -bottom-[200px] z-[1]"
         />
       )}
 
       {/* Media Menu Popup */}
       {showMediaMenu && (
-        <View className="absolute bottom-[82px] left-0 right-0 z-10">
+        <Animated.View
+          className="absolute bottom-[82px] left-0 right-0 z-10"
+          style={{
+            opacity: mediaMenuAnim,
+            transform: [
+              {
+                translateY: mediaMenuAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [20, 0],
+                }),
+              },
+              {
+                scale: mediaMenuAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.95, 1],
+                }),
+              },
+            ],
+          }}
+        >
           <GlassContainer
             borderRadius={16}
             fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] "
@@ -250,7 +291,7 @@ export default function MessageSender({
               ))}
             </View>
           </GlassContainer>
-        </View>
+        </Animated.View>
       )}
 
       {/* Edit Preview Banner */}
@@ -333,36 +374,52 @@ export default function MessageSender({
 
       {/* Input Bar */}
       <GlassContainer
-        borderRadius={30}
+        borderRadius={24}
         fallbackClassName="bg-white dark:bg-[#1C1C20] border border-border dark:border-[#2C2C30]"
         style={{
           padding: 6,
           flexDirection: "row",
-          alignItems: "center",
+          alignItems: "flex-end",
           width: "100%",
         }}
       >
         <TouchableOpacity
-          className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-alt dark:bg-[#242428] ml-0.5"
+          className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-alt dark:bg-[#242428] ml-0.5 mb-[1px]"
           onPress={toggleMediaMenu}
         >
-          <Ionicons
-            name={showMediaMenu ? "close" : "add"}
-            size={22}
-            color="#94A3B8"
-          />
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  rotate: mediaMenuAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ["0deg", "45deg"],
+                  }),
+                },
+              ],
+            }}
+          >
+            <Ionicons
+              name="add"
+              size={24}
+              color={showMediaMenu ? "#FF6B47" : "#94A3B8"}
+            />
+          </Animated.View>
         </TouchableOpacity>
 
         <TextInput
           ref={inputRef}
           value={message}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
           onChangeText={(text) => {
             setMessage(text);
             handleTyping();
           }}
           placeholder="Type a message..."
           placeholderTextColor="#CBD5E1"
-          className="flex-1 px-3.5 text-[15px] text-secondary dark:text-gray-100 tracking-tight min-h-[42px] max-h-[120px] py-2.5"
+          className="flex-1 bg-transparent px-3.5 text-[15px] text-secondary dark:text-gray-100 tracking-tight min-h-[42px] max-h-[120px] py-2.5"
+          style={{ backgroundColor: "transparent" }}
           multiline={true}
           underlineColorAndroid="transparent"
         />
