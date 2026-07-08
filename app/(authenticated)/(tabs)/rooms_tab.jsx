@@ -17,7 +17,7 @@ export default function RoomsScreen() {
   useFocusEffect(
     useCallback(() => {
       const loadRooms = async () => {
-        setLoading(true);
+        // Fetch new rooms silently on tab focus without showing skeleton loading effect
         const data = await getRooms(firestoreUser?.id);
         setRooms(data);
         setLoading(false);

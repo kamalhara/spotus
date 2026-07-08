@@ -1,12 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 
 import { useRouter } from "expo-router";
-import {
-  collection,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import {
   Animated,
@@ -62,7 +57,8 @@ export default function Chat() {
   // Fetch rooms user is in
   useEffect(() => {
     if (!currentUserId) return;
-    setRoomsLoading(true);
+    // Initialized to true via useState(true) for the first load.
+    // Fetch silently if dependencies change on tab switches.
     const q = query(
       collection(db, "rooms"),
       where("participants", "array-contains", currentUserId),
@@ -101,7 +97,9 @@ export default function Chat() {
   });
 
   const filteredRooms = rooms.filter((room) => {
-    return search === "" || room.title?.toLowerCase().includes(search.toLowerCase());
+    return (
+      search === "" || room.title?.toLowerCase().includes(search.toLowerCase())
+    );
   });
 
   return (
@@ -191,7 +189,7 @@ export default function Chat() {
               )}
             </View>
             {!roomsLoading && filteredRooms.length === 0 ? (
-              <EmptyState 
+              <EmptyState
                 variant="inline"
                 icon={search ? "search-outline" : "people-outline"}
                 title={search ? "No rooms found" : "No active rooms"}
