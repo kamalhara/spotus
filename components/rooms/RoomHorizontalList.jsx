@@ -1,6 +1,8 @@
+import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { useRef } from "react";
 import { Animated, FlatList, Text, TouchableOpacity, View } from "react-native";
+import { CATEGORY_ICONS } from "../../constants/categories";
 import useFirestoreUser from "../../hook/useFireStoreUser";
 import { isRoomUnseen } from "../../lib/chatSeen";
 import Skeleton from "../ui/Skeleton";
@@ -50,6 +52,7 @@ export function RoomHorizontalItem({ room, onPress }) {
 
   // Correctly pass the room document object to check for unread state
   const roomUnseen = isRoomUnseen(room, currentUserId);
+  const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
 
   return (
     <Animated.View
@@ -63,23 +66,13 @@ export function RoomHorizontalItem({ room, onPress }) {
         activeOpacity={0.9}
         className="items-center"
       >
-        <View
-          className="w-[74px] h-[74px] rounded-[26px] items-center justify-center border border-white"
-          style={{ backgroundColor: `${categoryColor}15` }}
-        >
-          <View
-            className="w-[60px] h-[60px] rounded-[21px] items-center justify-center"
-            style={{
-              backgroundColor: categoryColor,
-            }}
-          >
-            <Text className="text-white text-xl font-display font-extrabold">
-              {room?.title?.charAt(0).toUpperCase()}
-            </Text>
+        <View className="relative w-[74px] h-[74px]">
+          <View className="w-full h-full rounded-[26px] items-center justify-center bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]">
+            <Ionicons name={categoryIcon} size={30} color={categoryColor} />
           </View>
 
           {roomUnseen && (
-            <View className="absolute -top-1 -right-1 w-5 h-5 bg-primary rounded-full border-2 border-white items-center justify-center" />
+            <View className="absolute -top-1 -right-1 w-[18px] h-[18px] bg-primary rounded-full border-2 border-white dark:border-[#111113]" />
           )}
         </View>
 
