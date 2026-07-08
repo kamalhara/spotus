@@ -5,7 +5,7 @@ import { Image } from "expo-image";
 
 import { Redirect, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Skeleton from "../../../components/ui/Skeleton";
 
@@ -115,9 +115,22 @@ export default function Profile() {
   }
 
   const handleSignOut = async () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    await signOut();
-    router.replace("/login");
+    Alert.alert(
+      "Sign out",
+      "Are you sure you want to sign out of SpotUs?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Sign Out",
+          style: "destructive",
+          onPress: async () => {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            await signOut();
+            router.replace("/login");
+          },
+        },
+      ],
+    );
   };
 
   const createdRooms = rooms.filter(
@@ -139,16 +152,30 @@ export default function Profile() {
         <View className="items-center px-6 pt-6 pb-4">
           {/* Avatar and Edit Button */}
           <View className="relative">
-            <View className="w-[100px] h-[100px] rounded-[36px] overflow-hidden bg-gray-100 dark:bg-gray-800">
-              <Image
-                source={
-                  firestoreUser?.profilePic || "https://picsum.photos/200"
-                }
-                contentFit="cover"
-                transition={500}
-                style={{ width: "100%", height: "100%" }}
-              />
-            </View>
+            {/* Trust-colored ring */}
+            {(() => {
+              const badge = getTrustBadge(firestoreUser?.globalReputation ?? 0);
+              return (
+                <View
+                  className="w-[108px] h-[108px] rounded-[40px] items-center justify-center"
+                  style={{
+                    borderWidth: 2.5,
+                    borderColor: `${badge.color}40`,
+                  }}
+                >
+                  <View className="w-[100px] h-[100px] rounded-[36px] overflow-hidden bg-gray-100 dark:bg-gray-800">
+                    <Image
+                      source={
+                        firestoreUser?.profilePic || "https://picsum.photos/200"
+                      }
+                      contentFit="cover"
+                      transition={500}
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                  </View>
+                </View>
+              );
+            })()}
             <TouchableOpacity
               onPress={() => router.push("/profile/edit")}
               activeOpacity={0.8}
@@ -170,15 +197,18 @@ export default function Profile() {
             {firestoreUser?.bio || "No bio yet — say something about yourself!"}
           </Text>
 
-          {/* Inline stats */}
-          <View className="flex-row items-center mt-4 gap-4">
+          {/* Pill stat badges */}
+          <View className="flex-row items-center mt-4 gap-2">
             {(() => {
               const badge = getTrustBadge(firestoreUser?.globalReputation ?? 0);
               return (
-                <View className="flex-row items-center">
-                  <Ionicons name={badge.icon} size={13} color={badge.color} />
+                <View
+                  className="flex-row items-center px-3 py-1.5 rounded-lg"
+                  style={{ backgroundColor: `${badge.color}12` }}
+                >
+                  <Ionicons name={badge.icon} size={12} color={badge.color} />
                   <Text
-                    className="text-[12px] font-medium ml-1"
+                    className="text-[11px] font-semibold ml-1.5"
                     style={{ color: badge.color }}
                   >
                     {badge.label}
@@ -186,14 +216,18 @@ export default function Profile() {
                 </View>
               );
             })()}
-            <Text className="text-gray-300 dark:text-gray-600">·</Text>
-            <Text className="text-muted text-[12px] font-medium">
-              {createdRooms} created
-            </Text>
-            <Text className="text-gray-300 dark:text-gray-600">·</Text>
-            <Text className="text-muted text-[12px] font-medium">
-              {joinedRooms} joined
-            </Text>
+            <View className="flex-row items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-[#222226]">
+              <Ionicons name="add-circle-outline" size={12} color="#6B7280" />
+              <Text className="text-gray-500 dark:text-gray-400 text-[11px] font-semibold ml-1.5">
+                {createdRooms} created
+              </Text>
+            </View>
+            <View className="flex-row items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-[#222226]">
+              <Ionicons name="enter-outline" size={12} color="#6B7280" />
+              <Text className="text-gray-500 dark:text-gray-400 text-[11px] font-semibold ml-1.5">
+                {joinedRooms} joined
+              </Text>
+            </View>
           </View>
 
           {/* User Tags */}

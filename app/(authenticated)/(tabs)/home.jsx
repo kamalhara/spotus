@@ -35,11 +35,12 @@ import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
 import { sendPushNotification } from "../../../lib/notification";
 
-function getGreeting() {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Good morning";
-  if (hour < 17) return "Good afternoon";
-  return "Good evening";
+function getHeadline(roomCount, isLoading) {
+  if (isLoading) return "Looking nearby...";
+  if (roomCount === 0) return "Quiet for now";
+  if (roomCount === 1) return "1 room nearby";
+  if (roomCount <= 3) return `${roomCount} rooms nearby`;
+  return `${roomCount} rooms buzzing`;
 }
 
 function EmptyRooms({ activeCategory, isGhostBrowsing }) {
@@ -47,11 +48,14 @@ function EmptyRooms({ activeCategory, isGhostBrowsing }) {
 
   return (
     <View className="items-center justify-center py-16 px-6">
-      <View className="w-14 h-14 border border-dashed border-gray-200 dark:border-gray-700 rounded-2xl items-center justify-center mb-4">
-        <Ionicons name="radio-outline" size={24} color="#C0BDB8" />
+      <View
+        className="w-14 h-14 rounded-2xl items-center justify-center mb-4"
+        style={{ backgroundColor: "rgba(255, 107, 71, 0.08)" }}
+      >
+        <Ionicons name="radio-outline" size={22} color="#FF6B47" style={{ opacity: 0.6 }} />
       </View>
       <Text className="text-secondary dark:text-gray-100 text-lg font-heading tracking-tight text-center mb-2">
-        {isFiltered ? `No ${activeCategory} rooms` : "No open rooms nearby"}
+        {isFiltered ? `No ${activeCategory} rooms` : "Nothing open nearby"}
       </Text>
       <Text className="text-muted text-[14px] font-body text-center leading-5 px-4">
         {isGhostBrowsing
@@ -228,12 +232,12 @@ export default function Home() {
     joinSheetRef.current?.present();
   };
 
-  // Debounce: when displayDistance changes, wait 300ms then commit to searchDistance
+  // Debounce: when displayDistance changes, wait 500ms then commit to searchDistance
   useEffect(() => {
     if (debounceTimer.current) clearTimeout(debounceTimer.current);
     debounceTimer.current = setTimeout(() => {
       setSearchDistance(displayDistance);
-    }, 300);
+    }, 500);
     return () => clearTimeout(debounceTimer.current);
   }, [displayDistance]);
 
@@ -272,8 +276,9 @@ export default function Home() {
     }, [loadRooms]),
   );
 
-  // Pull-to-refresh handler
+  // Pull-to-refresh handler (guarded against double-refresh)
   const onRefresh = useCallback(async () => {
+    if (refreshing) return;
     setRefreshing(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     await loadRooms();
@@ -384,11 +389,7 @@ export default function Home() {
         }}
       >
         <Text className="text-secondary dark:text-gray-100 text-[26px] font-display tracking-tight">
-          {loading
-            ? "Looking nearby..."
-            : filteredRooms.length > 0
-              ? `${getGreeting()}`
-              : "Quiet for now"}
+          {getHeadline(filteredRooms.length, loading)}
         </Text>
         {!loading && filteredRooms.length > 0 && (
           <Text className="text-muted text-[14px] font-body mt-1">
@@ -703,16 +704,30 @@ export default function Home() {
         ) : (
           <Animated.FlatList
             data={listData}
-            renderItem={({ item }) =>
+            renderItem={({ item, index }) =>
               item._skeleton ? (
                 <RoomCardSkeleton />
               ) : (
-                <RoomCard
-                  room={item}
-                  onPress={() => handlePresentModalPress(item)}
-                  currentUserId={firestoreUser?.id}
-                  isExploreMode={isGhostBrowsing}
-                />
+                <Animated.View
+                  style={{
+                    opacity: fadeInContent,
+                    transform: [
+                      {
+                        translateY: fadeInContent.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [12 + index * 4, 0],
+                        }),
+                      },
+                    ],
+                  }}
+                >
+                  <RoomCard
+                    room={item}
+                    onPress={() => handlePresentModalPress(item)}
+                    currentUserId={firestoreUser?.id}
+                    isExploreMode={isGhostBrowsing}
+                  />
+                </Animated.View>
               )
             }
             keyExtractor={(item, index) =>

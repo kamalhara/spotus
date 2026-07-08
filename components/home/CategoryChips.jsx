@@ -1,7 +1,67 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import * as Haptics from "expo-haptics";
+import React, { useRef } from "react";
+import { Animated, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
+
+function ChipButton({ label, icon, color, isActive, onPress }) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.92,
+      useNativeDriver: true,
+      speed: 50,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+    }).start();
+  };
+
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress();
+  };
+
+  return (
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        activeOpacity={0.85}
+        className="flex-row items-center px-3.5 py-2 rounded-xl"
+        style={
+          isActive
+            ? { backgroundColor: color }
+            : {}
+        }
+      >
+        {icon && (
+          <Ionicons
+            name={icon}
+            size={13}
+            color={isActive ? "#FFFFFF" : "#9CA3AF"}
+            style={{ marginRight: 5 }}
+          />
+        )}
+        <Text
+          className={`font-semibold text-[13px] ${
+            isActive ? "" : "text-gray-400 dark:text-gray-500"
+          }`}
+          style={isActive ? { color: "#FFFFFF" } : {}}
+        >
+          {label}
+        </Text>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
 
 export default function CategoryChips({
   categories = [],
@@ -17,26 +77,12 @@ export default function CategoryChips({
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 20, gap: 6 }}
       >
-        <TouchableOpacity
+        <ChipButton
+          label="All"
+          isActive={activeCategory === "all"}
+          color="#FF6B47"
           onPress={() => onSelectCategory("all")}
-          activeOpacity={0.7}
-          className="px-3.5 py-2 rounded-xl"
-          style={
-            activeCategory === "all"
-              ? { backgroundColor: "rgba(255, 107, 71, 0.1)" }
-              : {}
-          }
-        >
-          <Text
-            className={`font-semibold text-[13px] ${
-              activeCategory === "all"
-                ? "text-primary"
-                : "text-gray-400 dark:text-gray-500"
-            }`}
-          >
-            All
-          </Text>
-        </TouchableOpacity>
+        />
 
         {categories.map((cat) => {
           const isActive = activeCategory === cat;
@@ -44,32 +90,14 @@ export default function CategoryChips({
           const icon = CATEGORY_ICONS[cat] || "grid";
 
           return (
-            <TouchableOpacity
+            <ChipButton
               key={cat}
+              label={cat}
+              icon={icon}
+              color={color}
+              isActive={isActive}
               onPress={() => onSelectCategory(cat)}
-              activeOpacity={0.7}
-              className="flex-row items-center px-3.5 py-2 rounded-xl"
-              style={
-                isActive
-                  ? { backgroundColor: `${color}12` }
-                  : {}
-              }
-            >
-              <Ionicons
-                name={icon}
-                size={13}
-                color={isActive ? color : "#9CA3AF"}
-                style={{ marginRight: 5 }}
-              />
-              <Text
-                className={`font-semibold text-[13px] ${
-                  isActive ? "" : "text-gray-400 dark:text-gray-500"
-                }`}
-                style={isActive ? { color } : {}}
-              >
-                {cat}
-              </Text>
-            </TouchableOpacity>
+            />
           );
         })}
       </ScrollView>

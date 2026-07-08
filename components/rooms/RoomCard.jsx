@@ -1,6 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { memo, useRef } from "react";
-import { Animated, Text, TouchableOpacity, View } from "react-native";
+import { memo, useEffect, useRef } from "react";
+import { Animated, Platform, Text, TouchableOpacity, View } from "react-native";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
 import ParticipantAvatar from "./ParticipantAvatar";
 
@@ -10,6 +10,40 @@ function toMillis(value) {
   if (value instanceof Date) return value.getTime();
   if (typeof value === "number") return value;
   return null;
+}
+
+/** Breathing green dot for active rooms */
+function ActiveDot() {
+  const breathe = useRef(new Animated.Value(0.6)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(breathe, {
+          toValue: 1,
+          duration: 1200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(breathe, {
+          toValue: 0.6,
+          duration: 1200,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+  }, [breathe]);
+
+  return (
+    <View className="flex-row items-center ml-auto">
+      <Animated.View
+        className="w-[7px] h-[7px] rounded-full bg-green-500 mr-1.5"
+        style={{ opacity: breathe }}
+      />
+      <Text className="text-green-600 dark:text-green-400 text-[10px] font-semibold">
+        Active
+      </Text>
+    </View>
+  );
 }
 
 const RoomCard = memo(function RoomCard({
@@ -84,23 +118,27 @@ const RoomCard = memo(function RoomCard({
   };
 
   const cardContent = (
-    <View className="flex-row">
-      {/* Left accent bar */}
+    <View>
+      {/* Category-colored top edge */}
       <View
-        className="w-[3px] rounded-full mr-4 self-stretch"
-        style={{ backgroundColor: categoryColor, opacity: 0.7 }}
+        className="absolute top-0 left-4 right-4 h-[2.5px] rounded-full"
+        style={{
+          backgroundColor: categoryColor,
+          opacity: 0.5,
+        }}
       />
-      <View className="flex-1">
+
+      <View className="pt-1">
         {/* Category + Ghost badge */}
-        <View className="flex-row items-center mb-2">
-          <Ionicons
-            name={categoryIcon}
-            size={11}
-            color={categoryColor}
-            style={{ marginRight: 5 }}
-          />
+        <View className="flex-row items-center mb-2.5">
+          <View
+            className="w-6 h-6 rounded-lg items-center justify-center mr-2"
+            style={{ backgroundColor: `${categoryColor}18` }}
+          >
+            <Ionicons name={categoryIcon} size={12} color={categoryColor} />
+          </View>
           <Text
-            className="font-medium text-[11px]"
+            className="font-semibold text-[11px]"
             style={{ color: categoryColor }}
           >
             {room.category || "General"}
@@ -120,14 +158,7 @@ const RoomCard = memo(function RoomCard({
             </View>
           )}
 
-          {isActiveNow && (
-            <View className="flex-row items-center ml-auto">
-              <View className="w-1.5 h-1.5 rounded-full bg-green-500 mr-1" />
-              <Text className="text-green-600 dark:text-green-400 text-[10px] font-medium">
-                Active
-              </Text>
-            </View>
-          )}
+          {isActiveNow && <ActiveDot />}
         </View>
 
         {/* Title */}
@@ -187,22 +218,22 @@ const RoomCard = memo(function RoomCard({
                 <ParticipantAvatar
                   key={participantId}
                   userId={participantId}
-                  size={24}
+                  size={28}
                   index={i}
                 />
               ))}
               {participantCount > 3 && (
-                <View className="w-6 h-6 rounded-lg border-2 border-white dark:border-[#1A1A1E] items-center justify-center bg-gray-100 dark:bg-[#252528]">
+                <View className="w-7 h-7 rounded-lg border-2 border-white dark:border-[#1A1A1E] items-center justify-center bg-gray-100 dark:bg-[#252528]">
                   <Text className="text-gray-500 dark:text-gray-400 font-bold text-[9px]">
                     +{participantCount - 3}
                   </Text>
                 </View>
               )}
               {participantCount === 0 && (
-                <View className="w-6 h-6 rounded-lg border border-dashed border-gray-200 dark:border-gray-600 items-center justify-center bg-gray-50 dark:bg-[#252528]">
+                <View className="w-7 h-7 rounded-lg border border-gray-200 dark:border-gray-600 items-center justify-center bg-gray-50 dark:bg-[#252528]">
                   <Ionicons
                     name="person-add-outline"
-                    size={10}
+                    size={11}
                     color="#9CA3AF"
                   />
                 </View>
@@ -212,8 +243,22 @@ const RoomCard = memo(function RoomCard({
               {getParticipantText()}
             </Text>
           </View>
-          <View className=" px-4 py-2 rounded-xl">
-            <Text className="text-primary font-semibold text-[12px]">
+
+          {/* Proper pill button */}
+          <View
+            className="px-4 py-2 rounded-xl"
+            style={{
+              backgroundColor: isDiscovery
+                ? `${categoryColor}15`
+                : "rgba(255, 107, 71, 0.1)",
+            }}
+          >
+            <Text
+              className="font-semibold text-[12px]"
+              style={{
+                color: isDiscovery ? categoryColor : "#FF6B47",
+              }}
+            >
               {buttonText}
             </Text>
           </View>
@@ -221,6 +266,20 @@ const RoomCard = memo(function RoomCard({
       </View>
     </View>
   );
+
+  const shadowStyle = isDiscovery
+    ? Platform.select({
+        ios: {
+          shadowColor: categoryColor,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.06,
+          shadowRadius: 8,
+        },
+        android: {
+          elevation: 2,
+        },
+      })
+    : {};
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
@@ -232,7 +291,10 @@ const RoomCard = memo(function RoomCard({
         className="mb-3"
       >
         {isDiscovery ? (
-          <View className="rounded-2xl p-4 bg-white dark:bg-[#1A1A1E] border border-border-light dark:border-[#2A2A2E]">
+          <View
+            className="rounded-2xl p-4 bg-white dark:bg-[#1A1A1E] border border-border-light dark:border-[#2A2A2E]"
+            style={shadowStyle}
+          >
             {cardContent}
           </View>
         ) : (
@@ -252,3 +314,4 @@ const RoomCard = memo(function RoomCard({
 });
 
 export default RoomCard;
+

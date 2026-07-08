@@ -360,9 +360,17 @@ export default function CreateRooms() {
                 <GlassContainer
                   borderRadius={16}
                   fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
-                  style={{ padding: 16 }}
+                  style={{ padding: 16, overflow: "hidden" }}
                 >
-                  <View className="flex-row items-center justify-between mb-3">
+                  {/* Dynamic category-colored top accent */}
+                  <View
+                    className="absolute top-0 left-4 right-4 h-[2.5px] rounded-full"
+                    style={{
+                      backgroundColor: selectedCategoryMeta?.color || "#D1D5DB",
+                      opacity: selectedCategoryMeta ? 0.6 : 0.3,
+                    }}
+                  />
+                  <View className="flex-row items-center justify-between mb-3 mt-1">
                     <View className="flex-row items-center gap-2">
                       <View
                         className="px-3 py-1.5 rounded-xl flex-row items-center"

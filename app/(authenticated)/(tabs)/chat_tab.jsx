@@ -209,9 +209,19 @@ export default function Chat() {
           <View className="flex-1 mt-1">
             {pendingReceivedChats.length > 0 && (
               <View className="mb-5">
-                <Text className="text-secondary dark:text-gray-100 text-[16px] font-heading tracking-tight mb-3">
-                  Message Requests
-                </Text>
+                <View className="flex-row items-center mb-3">
+                  <Text className="text-secondary dark:text-gray-100 text-[16px] font-heading tracking-tight">
+                    Message Requests
+                  </Text>
+                  <View
+                    className="ml-2 px-2 py-0.5 rounded-full"
+                    style={{ backgroundColor: "rgba(239, 68, 68, 0.1)" }}
+                  >
+                    <Text className="text-red-500 text-[11px] font-bold">
+                      {pendingReceivedChats.length}
+                    </Text>
+                  </View>
+                </View>
                 {pendingReceivedChats.map((item) => (
                   <ChatRow
                     key={item.id}
@@ -282,8 +292,8 @@ export default function Chat() {
                 ListEmptyComponent={
                   <EmptyState
                     icon="search-outline"
-                    title="No messages found"
-                    description="Try a different name or clear the search field."
+                    title="No matches"
+                    description="Try a different name or clear the search."
                   />
                 }
               />
@@ -291,8 +301,8 @@ export default function Chat() {
               <View className="flex-1 items-center justify-center pt-6">
                 <EmptyState
                   icon="chatbubble-outline"
-                  title="It's quiet in here..."
-                  description="Join a room and say hi to someone"
+                  title="No conversations yet"
+                  description="Join a room, find someone interesting, and start a conversation"
                 />
               </View>
             )}

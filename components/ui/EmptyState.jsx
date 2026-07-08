@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useRef } from "react";
+import { Animated, Text, TouchableOpacity, View } from "react-native";
 
 export default function EmptyState({
   icon = "information-circle-outline",
@@ -9,22 +10,55 @@ export default function EmptyState({
   actionIcon = "arrow-forward",
   onAction,
   variant = "default",
+  accentColor = "#FF6B47",
 }) {
+  const floatAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (variant !== "default") return;
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, {
+          toValue: 1,
+          duration: 2400,
+          useNativeDriver: true,
+        }),
+        Animated.timing(floatAnim, {
+          toValue: 0,
+          duration: 2400,
+          useNativeDriver: true,
+        }),
+      ]),
+    ).start();
+  }, [floatAnim, variant]);
+
+  const translateY = floatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -6],
+  });
+
   if (variant === "inline") {
     return (
-      <View className="bg-surface-alt dark:bg-[#222226] rounded-xl px-4 py-3 flex-row items-center">
-        <Ionicons
-          name={icon}
-          size={17}
-          color="#9CA3AF"
-          style={{ marginRight: 10 }}
+      <View
+        className="rounded-xl px-4 py-3.5 flex-row items-center overflow-hidden"
+        style={{ backgroundColor: `${accentColor}08` }}
+      >
+        <View
+          className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full"
+          style={{ backgroundColor: accentColor, opacity: 0.4 }}
         />
+        <View
+          className="w-8 h-8 rounded-xl items-center justify-center mr-3"
+          style={{ backgroundColor: `${accentColor}15` }}
+        >
+          <Ionicons name={icon} size={16} color={accentColor} />
+        </View>
         <View className="flex-1">
-          <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium">
+          <Text className="text-gray-600 dark:text-gray-300 text-sm font-semibold">
             {title}
           </Text>
           {description && (
-            <Text className="text-gray-400 dark:text-gray-500 text-[11px] mt-0.5">
+            <Text className="text-gray-400 dark:text-gray-500 text-[11px] mt-0.5 font-body">
               {description}
             </Text>
           )}
@@ -42,9 +76,18 @@ export default function EmptyState({
 
   return (
     <View className="items-center justify-center px-8 py-14">
-      <View className="w-16 h-16 rounded-2xl items-center justify-center mb-5 border border-dashed border-gray-200 dark:border-gray-700">
-        <Ionicons name={icon} size={26} color="#C0BDB8" />
-      </View>
+      <Animated.View
+        style={{ transform: [{ translateY }] }}
+      >
+        <View
+          className="w-16 h-16 rounded-2xl items-center justify-center mb-5"
+          style={{
+            backgroundColor: `${accentColor}12`,
+          }}
+        >
+          <Ionicons name={icon} size={26} color={accentColor} style={{ opacity: 0.7 }} />
+        </View>
+      </Animated.View>
       <Text className="text-secondary dark:text-gray-100 text-lg font-heading tracking-tight text-center">
         {title}
       </Text>

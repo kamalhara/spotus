@@ -144,7 +144,7 @@ export default function RoomChat() {
     };
 
     checkExpiry();
-    const interval = setInterval(checkExpiry, 1000);
+    const interval = setInterval(checkExpiry, 10000);
     return () => clearInterval(interval);
   }, [room?.expiresAt, roomExpired, expiredFade]);
 
@@ -217,18 +217,22 @@ export default function RoomChat() {
         lastMessageSeenBy: [currentUserId],
       });
 
-      // Notify all other room participants
+      // Notify all other room participants (batched)
       const otherParticipants = (room?.participants || []).filter(
         (uid) => uid !== currentUserId,
       );
-      otherParticipants.forEach((uid) => {
-        sendPushNotification(
-          uid,
-          currentUserId,
-          `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
-          trimmedText,
-          { type: "room", screen: "room", roomId },
-        );
+      Promise.allSettled(
+        otherParticipants.map((uid) =>
+          sendPushNotification(
+            uid,
+            currentUserId,
+            `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
+            trimmedText,
+            { type: "room", screen: "room", roomId },
+          ),
+        ),
+      ).catch((err) => {
+        if (__DEV__) console.error("Notification batch error:", err);
       });
     } catch (err) {
       console.error("Error sending message:", err);
