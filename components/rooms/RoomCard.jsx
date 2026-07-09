@@ -250,7 +250,7 @@ const RoomCard = memo(function RoomCard({
             <View className="flex-row mr-2.5" style={{ marginLeft: -2 }}>
               {(room.participants || []).slice(0, 3).map((participantId, i) => (
                 <ParticipantAvatar
-                  key={participantId}
+                  key={`${participantId}-${i}`}
                   userId={participantId}
                   size={26}
                   index={i}
