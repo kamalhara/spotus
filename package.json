@@ -4,6 +4,8 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "trigger-dev": "npx trigger.dev@latest dev",
+    "dev": "concurrently \"npm start\" \"npx trigger.dev@latest dev\"",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",
     "ios": "expo run:ios",
@@ -25,6 +27,7 @@
     "@react-navigation/native": "^7.1.8",
     "@trigger.dev/sdk": "^4.5.3",
     "autoprefixer": "^10.4.27",
+    "cloudinary": "^2.10.0",
     "expo": "~54.0.33",
     "expo-apple-authentication": "~8.0.8",
     "expo-asset": "~12.0.13",
@@ -57,6 +60,7 @@
     "expo-system-ui": "~6.0.9",
     "expo-web-browser": "~15.0.11",
     "firebase": "^12.12.0",
+    "firebase-admin": "^14.1.0",
     "geofire-common": "^6.0.0",
     "nativewind": "^4.2.3",
     "postcss": "^8.5.9",
@@ -81,6 +85,7 @@
     "@trigger.dev/build": "^4.5.3",
     "@types/node": "^25.9.1",
     "@types/react": "~19.1.0",
+    "concurrently": "^10.0.3",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "typescript": "~5.9.2"
