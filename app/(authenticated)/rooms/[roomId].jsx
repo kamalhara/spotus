@@ -244,15 +244,16 @@ export default function RoomChat() {
     setUploadingImageUri(uri);
 
     try {
-      const imageUrl = await uploadToCloudinary(uri);
-      if (!imageUrl) {
+      const uploadResult = await uploadToCloudinary(uri);
+      if (!uploadResult?.imageUrl) {
         setUploadingImageUri(null);
         return;
       }
 
       await addDoc(collection(db, "rooms", roomId, "messages"), {
         type: "image",
-        imageUrl,
+        imageUrl: uploadResult.imageUrl,
+        cloudinaryPublicId: uploadResult.cloudinaryPublicId,
         senderId: currentUserId,
         user: user?.userName || "Unknown",
         profilePic: user?.profilePic || null,

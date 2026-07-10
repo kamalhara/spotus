@@ -84,3 +84,4 @@ yarn-error.*
 *.tsbuildinfo
 
 # @end expo-cli
+.trigger

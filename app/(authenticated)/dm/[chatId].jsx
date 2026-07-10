@@ -219,15 +219,16 @@ export default function ChatId() {
     setUploadingImageUri(uri);
 
     try {
-      const imageUrl = await uploadToCloudinary(uri);
-      if (!imageUrl) {
+      const uploadResult = await uploadToCloudinary(uri);
+      if (!uploadResult?.imageUrl) {
         setUploadingImageUri(null);
         return;
       }
 
       await addDoc(collection(db, "chats", chatDocId, "messages"), {
         type: "image",
-        imageUrl,
+        imageUrl: uploadResult.imageUrl,
+        cloudinaryPublicId: uploadResult.cloudinaryPublicId,
         senderId: currentUserId,
         user: firestoreUser?.userName || "Unknown",
         createdAt: serverTimestamp(),

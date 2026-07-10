@@ -82,9 +82,9 @@ export default function Edit() {
     try {
       let finalImageUrl = user.profilePic;
       if (newImageUri) {
-        const uploadedUrl = await uploadToCloudinary(newImageUri);
-        if (uploadedUrl) {
-          finalImageUrl = uploadedUrl;
+        const uploadResult = await uploadToCloudinary(newImageUri);
+        if (uploadResult?.imageUrl) {
+          finalImageUrl = uploadResult.imageUrl;
         }
       }
 

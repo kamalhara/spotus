@@ -108,9 +108,9 @@ export default function OnboardingScreen() {
       let finalImageUrl = imageUri;
 
       if (imageUri && !imageUri.startsWith("http")) {
-        const uploadedUrl = await uploadToCloudinary(imageUri);
-        if (uploadedUrl) {
-          finalImageUrl = uploadedUrl;
+        const uploadResult = await uploadToCloudinary(imageUri);
+        if (uploadResult?.imageUrl) {
+          finalImageUrl = uploadResult.imageUrl;
         }
       }
 
