@@ -1,7 +1,7 @@
 import { logger, schedules } from "@trigger.dev/sdk/v3";
-import { Timestamp, FieldValue } from "firebase-admin/firestore";
-import { getDb } from "./firebaseAdmin";
 import { v2 as cloudinary } from "cloudinary";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
+import { getDb } from "./firebaseAdmin";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,7 +9,10 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-async function deleteImageWithRetries(publicId: string, retries = 3): Promise<boolean> {
+async function deleteImageWithRetries(
+  publicId: string,
+  retries = 3,
+): Promise<boolean> {
   if (!publicId) return true;
   for (let i = 0; i < retries; i++) {
     try {
@@ -17,9 +20,14 @@ async function deleteImageWithRetries(publicId: string, retries = 3): Promise<bo
       if (result.result === "ok" || result.result === "not found") {
         return true;
       }
-      logger.warn(`Cloudinary deletion returned non-ok result for ${publicId}`, { result });
+      logger.warn(
+        `Cloudinary deletion returned non-ok result for ${publicId}`,
+        { result },
+      );
     } catch (error) {
-      logger.warn(`Attempt ${i + 1} failed to delete image ${publicId}`, { error });
+      logger.warn(`Attempt ${i + 1} failed to delete image ${publicId}`, {
+        error,
+      });
     }
   }
   return false;
@@ -168,7 +176,9 @@ export const cleanupExpiredRooms = schedules.task({
           stats.imagesDeleted += deletedImagesCount;
         } catch (roomError) {
           stats.failedRooms++;
-          logger.error(`Failed to process room ${roomId}`, { error: roomError });
+          logger.error(`Failed to process room ${roomId}`, {
+            error: roomError,
+          });
         }
       }
 
@@ -176,19 +186,24 @@ export const cleanupExpiredRooms = schedules.task({
 
       // Soft-delete metrics to Firestore
       try {
-        await db.collection("stats").doc("cleanup").set(
-          {
-            lastRun: FieldValue.serverTimestamp(),
-            roomsDeleted: FieldValue.increment(stats.roomsDeleted),
-            messagesDeleted: FieldValue.increment(stats.messagesDeleted),
-            imagesDeleted: FieldValue.increment(stats.imagesDeleted),
-            failedRooms: FieldValue.increment(stats.failedRooms),
-            lastDurationMs: durationMs,
-          },
-          { merge: true }
-        );
+        await db
+          .collection("stats")
+          .doc("cleanup")
+          .set(
+            {
+              lastRun: FieldValue.serverTimestamp(),
+              roomsDeleted: FieldValue.increment(stats.roomsDeleted),
+              messagesDeleted: FieldValue.increment(stats.messagesDeleted),
+              imagesDeleted: FieldValue.increment(stats.imagesDeleted),
+              failedRooms: FieldValue.increment(stats.failedRooms),
+              lastDurationMs: durationMs,
+            },
+            { merge: true },
+          );
       } catch (statsError) {
-        logger.error("Failed to write stats to Firestore", { error: statsError });
+        logger.error("Failed to write stats to Firestore", {
+          error: statsError,
+        });
       }
 
       logger.info("Cleanup Summary", {
