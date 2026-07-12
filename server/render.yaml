@@ -3,10 +3,7 @@ services:
     name: spotus-notifications
     runtime: node
     rootDir: server
+    plan: free
     buildCommand: npm install
     startCommand: npm start
-    envVars:
-      - key: NODE_VERSION
-        value: ~20.0.0
-      - key: PORT
-        value: 8080
+    autoDeploy: true
