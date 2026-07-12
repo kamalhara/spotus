@@ -17,6 +17,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomOptionsModal from "../../../components/rooms/roomOptionsModal";
@@ -25,6 +26,7 @@ import GlassContainer from "../../../components/ui/GlassContainer";
 import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { deleteRoomWithMessages } from "../../../lib/deleteRoom";
 
 import GhostModeBanner from "../../../components/shared/GhostModeBanner";
 import { CATEGORY_ICONS } from "../../../constants/categories";
@@ -131,6 +133,34 @@ export default function RoomInfo() {
     } catch (err) {
       console.error("Leave room error:", err);
     }
+  };
+
+  const handleDeleteRoom = () => {
+    if (!roomId) return;
+
+    Alert.alert(
+      "Delete Room",
+      "Are you sure you want to delete this room? This action cannot be undone and will remove all messages for everyone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteRoomWithMessages(roomId);
+              setShowOptions(false);
+              router.replace("/(authenticated)/(tabs)/home");
+            } catch (err) {
+              console.error("Delete room error:", err);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleShare = async () => {
@@ -466,16 +496,29 @@ export default function RoomInfo() {
           }}
           fallbackClassName="bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30"
         >
-          <TouchableOpacity
-            onPress={handleLeaveRoom}
-            activeOpacity={0.7}
-            className="py-4 flex-row items-center justify-center gap-2"
-          >
-            <Ionicons name="log-out-outline" size={18} color="#EF4444" />
-            <Text className="text-red-500 font-semibold text-[15px]">
-              Leave Room
-            </Text>
-          </TouchableOpacity>
+          {currentUserId === room?.createdBy ? (
+            <TouchableOpacity
+              onPress={handleDeleteRoom}
+              activeOpacity={0.7}
+              className="py-4 flex-row items-center justify-center gap-2"
+            >
+              <Ionicons name="trash-outline" size={18} color="#EF4444" />
+              <Text className="text-red-500 font-semibold text-[15px]">
+                Delete Room
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={handleLeaveRoom}
+              activeOpacity={0.7}
+              className="py-4 flex-row items-center justify-center gap-2"
+            >
+              <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+              <Text className="text-red-500 font-semibold text-[15px]">
+                Leave Room
+              </Text>
+            </TouchableOpacity>
+          )}
         </GlassContainer>
       </ScrollView>
       {showOptions && (
