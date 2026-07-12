@@ -6,7 +6,7 @@ const sendNotification = async (req, res) => {
     const { recipientUserId, title, body, data = {} } = req.body;
     
     // Always trust the authenticated user's ID as the sender, ignoring client-provided senderUserId
-    const senderUserId = req.user.uid;
+    const senderUserId = req.auth.userId;
 
     if (!recipientUserId || !title || !body) {
       return res.status(400).json({ error: 'Missing required fields' });
