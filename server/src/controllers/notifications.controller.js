@@ -3,16 +3,13 @@ const { sendPushNotification } = require('../services/expo.service');
 
 const sendNotification = async (req, res) => {
   try {
-    const { recipientUserId, senderUserId, title, body, data = {} } = req.body;
+    const { recipientUserId, title, body, data = {} } = req.body;
+    
+    // Always trust the authenticated user's ID as the sender, ignoring client-provided senderUserId
+    const senderUserId = req.user.uid;
 
-    if (!recipientUserId || !senderUserId || !title || !body) {
+    if (!recipientUserId || !title || !body) {
       return res.status(400).json({ error: 'Missing required fields' });
-    }
-
-    // Prevent spoofing by verifying that the authenticated user matches the senderUserId
-    if (req.user.uid !== senderUserId) {
-      console.warn(`Spoofing attempt: ${req.user.uid} tried to send as ${senderUserId}`);
-      return res.status(403).json({ error: 'Forbidden: senderUserId does not match authenticated user' });
     }
 
     // Prevent self-notifications
