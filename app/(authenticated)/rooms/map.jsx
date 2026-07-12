@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
@@ -324,6 +325,7 @@ export default function MapViewScreen() {
   const router = useRouter();
   const { distance } = useLocalSearchParams();
   const { isDark } = useTheme();
+  const { getToken } = useAuth();
   const { firestoreUser } = useFirestoreUser();
   const insets = useSafeAreaInsets();
 
@@ -498,6 +500,7 @@ export default function MapViewScreen() {
         const otherParticipants = selectedRoomToJoin.participants.filter(
           (uid) => uid !== firestoreUser?.id,
         );
+        const token = await getToken();
         otherParticipants.forEach((uid) => {
           sendPushNotification(
             uid,
@@ -505,6 +508,7 @@ export default function MapViewScreen() {
             selectedRoomToJoin.title || "Room",
             `${firestoreUser?.userName || "Someone"} joined the room!`,
             { type: "room", screen: "room", roomId: selectedRoomToJoin.id },
+            token
           );
         });
       }

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { sendNotification } = require('../controllers/notifications.controller');
-const { verifyFirebaseToken } = require('../middleware/auth.middleware');
+const { verifyClerkToken } = require('../middleware/auth.middleware');
 
 // Apply auth middleware to all notification routes
-router.use(verifyFirebaseToken);
+router.use(verifyClerkToken);
 
 // POST /api/notifications
 router.post('/', sendNotification);

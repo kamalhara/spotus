@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -45,6 +46,7 @@ import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 export default function RoomChat() {
   const { isDark } = useTheme();
   const router = useRouter();
+  const { getToken } = useAuth();
 
   const [room, setRoom] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -221,6 +223,8 @@ export default function RoomChat() {
       const otherParticipants = (room?.participants || []).filter(
         (uid) => uid !== currentUserId,
       );
+      
+      const token = await getToken();
       Promise.allSettled(
         otherParticipants.map((uid) =>
           sendPushNotification(
@@ -229,6 +233,7 @@ export default function RoomChat() {
             `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
             trimmedText,
             { type: "room", screen: "room", roomId },
+            token
           ),
         ),
       ).catch((err) => {
@@ -271,6 +276,7 @@ export default function RoomChat() {
       const otherParticipants = (room?.participants || []).filter(
         (uid) => uid !== currentUserId,
       );
+      const token = await getToken();
       otherParticipants.forEach((uid) => {
         sendPushNotification(
           uid,
@@ -278,6 +284,7 @@ export default function RoomChat() {
           `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
           "📷 Sent a photo",
           { type: "room", screen: "room", roomId },
+          token
         );
       });
     } catch (err) {

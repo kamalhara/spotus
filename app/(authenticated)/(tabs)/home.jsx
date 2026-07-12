@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Slider from "@react-native-community/slider";
@@ -83,6 +84,7 @@ export default function Home() {
   const scrollOffsetY = useRef(0);
   const router = useRouter();
   const { isDark } = useTheme();
+  const { getToken } = useAuth();
   const { firestoreUser } = useFirestoreUser();
   const { setFloatingButtonOverride, clearFloatingButtonOverride } =
     useFloatingButton();
@@ -198,6 +200,7 @@ export default function Home() {
         const otherParticipants = roomToJoin.participants.filter(
           (uid) => uid !== firestoreUser.id,
         );
+        const token = await getToken();
         void Promise.all(
           otherParticipants.map((uid) =>
             Promise.resolve().then(() =>
@@ -207,6 +210,7 @@ export default function Home() {
                 roomToJoin.title || "Room",
                 `${firestoreUser?.userName || "Someone"} joined the room`,
                 { type: "room", screen: "room", roomId: roomToJoin.id },
+                token
               ),
             ),
           ),

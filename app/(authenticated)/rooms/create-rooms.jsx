@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
@@ -59,6 +60,7 @@ const TITLE_SCROLL_THRESHOLD = 70;
 
 export default function CreateRooms() {
   const router = useRouter();
+  const { getToken } = useAuth();
   const { firestoreUser: user } = useFirestoreUser();
   const { isDark } = useTheme();
 
@@ -140,6 +142,7 @@ export default function CreateRooms() {
   const proceedWithCreation = async () => {
     setIsCreating(true);
     try {
+      const token = await getToken();
       const { roomId } = await createRoom(
         trimmedTitle,
         description,
@@ -147,6 +150,7 @@ export default function CreateRooms() {
         user.id,
         showOnMap,
         duration,
+        token
       );
 
       trackEvent("room_created", {

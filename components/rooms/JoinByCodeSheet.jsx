@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import {
   BottomSheetBackdrop,
@@ -26,6 +27,7 @@ import GlassContainer from "../ui/GlassContainer";
 
 const JoinByCodeSheet = forwardRef(({ currentUserId, onJoinSuccess }, ref) => {
   const bottomSheetModalRef = useRef(null);
+  const { getToken } = useAuth();
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -81,7 +83,8 @@ const JoinByCodeSheet = forwardRef(({ currentUserId, onJoinSuccess }, ref) => {
     setError(null);
 
     try {
-      const roomId = await joinRoomByCode(code, currentUserId);
+      const token = await getToken();
+      const roomId = await joinRoomByCode(code, currentUserId, token);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onJoinSuccess?.(roomId);
       bottomSheetModalRef.current?.dismiss();

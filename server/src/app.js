@@ -1,11 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const { clerkMiddleware } = require('@clerk/express');
 const notificationsRouter = require('./routes/notifications');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(clerkMiddleware());
 
 // Keep-alive ping route for Render
 app.get('/ping', (req, res) => {

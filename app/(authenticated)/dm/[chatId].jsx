@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -40,6 +41,7 @@ export default function ChatId() {
   const { isDark } = useTheme();
   const { chatId, userName, profilePic } = useLocalSearchParams();
   const router = useRouter();
+  const { getToken } = useAuth();
   const { firestoreUser } = useFirestoreUser();
   const currentUserId = firestoreUser?.id;
   const [messages, setMessages] = useState([]);
@@ -202,12 +204,14 @@ export default function ChatId() {
       // Send push notification only if the other user hasn't muted the chat
       const isMutedByRecipient = chatDoc?.mutedBy?.includes(chatId);
       if (!isMutedByRecipient) {
+        const token = await getToken();
         sendPushNotification(
           chatId,
           currentUserId,
           firestoreUser?.userName || "New message",
           text.trim(),
           { type: "message", screen: "dm", chatId, chatDocId },
+          token
         );
       }
     } catch (err) {
@@ -248,12 +252,14 @@ export default function ChatId() {
       // Send push notification only if the other user hasn't muted the chat
       const isMutedByRecipient = chatDoc?.mutedBy?.includes(chatId);
       if (!isMutedByRecipient) {
+        const token = await getToken();
         sendPushNotification(
           chatId,
           currentUserId,
           firestoreUser?.userName || "New message",
           "📷 Sent a photo",
           { type: "message", screen: "dm", chatId, chatDocId },
+          token
         );
       }
     } catch (err) {

@@ -1,3 +1,4 @@
+import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ import SpotUsLoader from "../../../components/ui/SpotUsLoader";
 export default function JoinRoomScreen() {
   const router = useRouter();
   const { inviteCode } = useLocalSearchParams();
+  const { getToken } = useAuth();
   const { firestoreUser: user, loading: userLoading } = useFirestoreUser();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,7 +34,8 @@ export default function JoinRoomScreen() {
 
     const joinRoom = async () => {
       try {
-        const roomId = await joinRoomByCode(inviteCode, user.id);
+        const token = await getToken();
+        const roomId = await joinRoomByCode(inviteCode, user.id, token);
         router.replace(`/(authenticated)/rooms/${roomId}`);
       } catch (err) {
         setError(err.message || "Failed to join event.");
