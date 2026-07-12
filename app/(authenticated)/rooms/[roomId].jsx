@@ -37,7 +37,7 @@ import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { RoomSeen } from "../../../lib/chatSeen";
-import { sendPushNotification } from "../../../lib/notification";
+import { sendBatchNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 import { fetchUserBatch } from "../../../lib/userCache";
 
@@ -223,22 +223,16 @@ export default function RoomChat() {
       const otherParticipants = (room?.participants || []).filter(
         (uid) => uid !== currentUserId,
       );
-      
+
       const token = await getToken();
-      Promise.allSettled(
-        otherParticipants.map((uid) =>
-          sendPushNotification(
-            uid,
-            currentUserId,
-            `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
-            trimmedText,
-            { type: "room", screen: "room", roomId },
-            token
-          ),
-        ),
-      ).catch((err) => {
-        if (__DEV__) console.error("Notification batch error:", err);
-      });
+      sendBatchNotification(
+        otherParticipants,
+        currentUserId,
+        `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
+        trimmedText,
+        { type: "room", screen: "room", roomId },
+        token
+      );
     } catch (err) {
       console.error("Error sending message:", err);
     }
@@ -277,16 +271,14 @@ export default function RoomChat() {
         (uid) => uid !== currentUserId,
       );
       const token = await getToken();
-      otherParticipants.forEach((uid) => {
-        sendPushNotification(
-          uid,
-          currentUserId,
-          `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
-          "📷 Sent a photo",
-          { type: "room", screen: "room", roomId },
-          token
-        );
-      });
+      sendBatchNotification(
+        otherParticipants,
+        currentUserId,
+        `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
+        "📷 Sent a photo",
+        { type: "room", screen: "room", roomId },
+        token
+      );
     } catch (err) {
       console.error("Room image send error:", err);
     } finally {

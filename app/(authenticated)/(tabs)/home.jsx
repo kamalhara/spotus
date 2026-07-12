@@ -34,7 +34,7 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { trackEvent } from "../../../lib/analytics";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
-import { sendPushNotification } from "../../../lib/notification";
+import { sendBatchNotification } from "../../../lib/notification";
 
 function getHeadline(roomCount, isLoading) {
   if (isLoading) return "Looking nearby...";
@@ -201,22 +201,14 @@ export default function Home() {
           (uid) => uid !== firestoreUser.id,
         );
         const token = await getToken();
-        void Promise.all(
-          otherParticipants.map((uid) =>
-            Promise.resolve().then(() =>
-              sendPushNotification(
-                uid,
-                firestoreUser.id,
-                roomToJoin.title || "Room",
-                `${firestoreUser?.userName || "Someone"} joined the room`,
-                { type: "room", screen: "room", roomId: roomToJoin.id },
-                token
-              ),
-            ),
-          ),
-        ).catch((error) => {
-          console.error("Error notifying room participants:", error);
-        });
+        sendBatchNotification(
+          otherParticipants,
+          firestoreUser.id,
+          roomToJoin.title || "Room",
+          `${firestoreUser?.userName || "Someone"} joined the room`,
+          { type: "room", screen: "room", roomId: roomToJoin.id },
+          token
+        );
       }
 
       bottomSheetModalRef.current?.dismiss();

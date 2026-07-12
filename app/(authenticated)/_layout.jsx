@@ -14,6 +14,7 @@ import useFirestoreUser from "../../hook/useFireStoreUser";
 import { geohashForLocation } from "geofire-common";
 import { registerForPushNotifications } from "../../lib/notification";
 import { getSilentLocation } from "../../lib/location";
+import { API_BASE_URL } from "../../constants/api";
 
 export default function AuthenticatedLayout() {
   const { firestoreUser: user } = useFirestoreUser();
@@ -114,6 +115,32 @@ export default function AuthenticatedLayout() {
     if (!user?.id) return;
     registerForPushNotifications(user.id);
   }, [user?.id]);
+
+  // Pre-warm the notification server to reduce cold-start latency
+  useEffect(() => {
+    const pingServer = () => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      fetch(`${API_BASE_URL}/ping`, {
+        mode: "no-cors",
+        signal: controller.signal,
+      })
+        .catch(() => {}) // Fire-and-forget
+        .finally(() => clearTimeout(timeoutId));
+    };
+
+    // Ping on mount
+    pingServer();
+
+    // Ping when app comes back to foreground
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        pingServer();
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
 
   return (
     <Stack>

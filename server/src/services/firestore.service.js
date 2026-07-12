@@ -13,14 +13,26 @@ const removePushToken = async (userId) => {
   }, { merge: true });
 };
 
-const incrementNotificationsSent = async () => {
+const getUsersBatch = async (userIds) => {
+  if (!userIds || userIds.length === 0) return {};
+  const refs = userIds.map((id) => db.collection('users').doc(id));
+  const docs = await db.getAll(...refs);
+  const result = {};
+  docs.forEach((doc) => {
+    result[doc.id] = doc.exists ? doc.data() : null;
+  });
+  return result;
+};
+
+const incrementNotificationsSent = async (count = 1) => {
   await db.collection('stats').doc('notifications').set({
-    notificationsSent: admin.firestore.FieldValue.increment(1)
+    notificationsSent: admin.firestore.FieldValue.increment(count)
   }, { merge: true });
 };
 
 module.exports = {
   getUser,
+  getUsersBatch,
   removePushToken,
   incrementNotificationsSent
 };
