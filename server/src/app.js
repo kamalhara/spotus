@@ -7,6 +7,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Keep-alive ping route for Render
+app.get('/ping', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Routes
 app.use('/api/notifications', notificationsRouter);
 
