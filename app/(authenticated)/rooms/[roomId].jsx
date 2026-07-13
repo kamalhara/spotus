@@ -1,5 +1,4 @@
 import { useAuth } from "@clerk/expo";
-import { Ionicons } from "@expo/vector-icons";
 import * as Linking from "expo-linking";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -19,20 +18,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Share,
-  Text,
-  TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import ChatMessages from "../../../components/chat/ChatMessages";
 import MessageSender from "../../../components/chat/MessageSender";
+import ExpiredRoomModal from "../../../components/rooms/chat/ExpiredRoomModal";
+import PinnedMessageBanner from "../../../components/rooms/chat/PinnedMessageBanner";
+import RoomChatHeader from "../../../components/rooms/chat/RoomChatHeader";
 import RoomDetailsSheet from "../../../components/rooms/RoomDetailsSheet";
 import GhostModeBanner from "../../../components/shared/GhostModeBanner";
-import GlassButton from "../../../components/ui/GlassButton";
-import GlassContainer from "../../../components/ui/GlassContainer";
 import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
@@ -42,7 +38,6 @@ import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
 import { sendRoomMessage } from "../../../lib/roomMessages";
 import { fetchUserBatch } from "../../../lib/userCache";
 
-import CustomButton from "../../../components/ui/CustomButton";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../../constants/categories";
 export default function RoomChat() {
   const { isDark } = useTheme();
@@ -317,131 +312,27 @@ export default function RoomChat() {
 
   return (
     <>
-      <Modal
+      <ExpiredRoomModal
         visible={roomExpired}
-        transparent
-        animationType="none"
-        statusBarTranslucent
-      >
-        <Animated.View
-          style={{ flex: 1, opacity: expiredFade }}
-          className="bg-black/60 items-center justify-center px-6"
-        >
-          <View className="w-full max-w-[340px] rounded-[32px] overflow-hidden">
-            <GlassContainer
-              intensity={isDark ? 30 : 60}
-              tint={isDark ? "dark" : "light"}
-              borderRadius={32}
-              style={{
-                padding: 32,
-                alignItems: "center",
-              }}
-              fallbackClassName="bg-white/90 dark:bg-[#1C1C20]/90"
-            >
-              <View className="w-20 h-20 bg-primary/10 rounded-full items-center justify-center mb-6 border border-primary/20">
-                <Ionicons name="time" size={40} color="#FF6B47" />
-              </View>
-
-              <Text className="text-secondary dark:text-white text-2xl font-display font-extrabold text-center mb-3">
-                Room Expired
-              </Text>
-
-              <Text className="text-gray-500 dark:text-gray-300 text-sm text-center leading-6 mb-8 font-medium">
-                This room&apos;s time is up! All messages and content will be
-                securely cleaned up.
-              </Text>
-
-              <CustomButton
-                title="Return to Home"
-                onPress={handleExpiredDismiss}
-              />
-            </GlassContainer>
-          </View>
-        </Animated.View>
-      </Modal>
+        opacity={expiredFade}
+        isDark={isDark}
+        onDismiss={handleExpiredDismiss}
+      />
 
       <KeyboardAvoidingView
         className="flex-1 bg-bg dark:bg-[#111113]"
         behavior={Platform.OS === "ios" ? "padding" : undefined}
       >
-        {/* Header */}
-        <View className="bg-white dark:bg-[#1C1C20] z-10 border-b border-gray-100 dark:border-[#2C2C30]">
-          <SafeAreaView edges={["top"]}>
-            <View className="flex-row items-center justify-between px-5 py-3">
-              <View className="flex-row items-center flex-1">
-                <GlassButton
-                  onPress={() => router.back()}
-                  size={40}
-                  shape="circle"
-                  style={{ marginRight: 12 }}
-                >
-                  <Ionicons
-                    name="chevron-back"
-                    size={20}
-                    color={isDark ? "white" : "#18181B"}
-                  />
-                </GlassButton>
-
-                <View className="w-11 h-11 rounded-2xl bg-primary/10 items-center justify-center mr-3">
-                  <Ionicons
-                    name={categoryIcon}
-                    size={18}
-                    color={categoryColor}
-                  />
-                </View>
-
-                <TouchableOpacity
-                  className="flex-1"
-                  onPress={() => detailsSheetRef.current?.present()}
-                  activeOpacity={0.7}
-                >
-                  <Text
-                    className="text-secondary dark:text-gray-100 text-base font-display font-extrabold"
-                    numberOfLines={1}
-                  >
-                    {room?.title || "Loading..."}
-                  </Text>
-                  <View className="flex-row items-center mt-0.5">
-                    <Text className="text-gray-400 dark:text-gray-500 text-xs">
-                      {room?.category || "Room"} ·{""}
-                      {room?.participants?.length || 0} members ·{""}
-                      {(() => {
-                        if (!room?.expiresAt) return " Open now";
-                        const expiresMs = room.expiresAt.seconds ? room.expiresAt.seconds * 1000 : room.expiresAt instanceof Date ? room.expiresAt.getTime() : room.expiresAt;
-                        const diffMs = expiresMs - Date.now();
-                        if (diffMs <= 0) return " Expired";
-                        const totalMinutes = Math.floor(diffMs / (1000 * 60));
-                        const hours = Math.floor(totalMinutes / 60);
-                        const mins = totalMinutes % 60;
-                        if (hours >= 24) return ` ${Math.floor(hours / 24)}d left`;
-                        if (hours > 0) return mins > 0 ? ` ${hours}h ${mins}m left` : ` ${hours}h left`;
-                        return ` ${Math.max(1, mins)}m left`;
-                      })()}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-
-              <View className="flex-row items-center">
-                <GlassButton
-                  onPress={handleShare}
-                  size={40}
-                  shape="circle"
-                  style={{ marginRight: 8 }}
-                >
-                  <Ionicons name="share-outline" size={18} color="#9CA3AF" />
-                </GlassButton>
-                <GlassButton onPress={handleInfoPress} size={40} shape="circle">
-                  <Ionicons
-                    name="ellipsis-horizontal"
-                    size={18}
-                    color="#9CA3AF"
-                  />
-                </GlassButton>
-              </View>
-            </View>
-          </SafeAreaView>
-        </View>
+        <RoomChatHeader
+          room={room}
+          categoryIcon={categoryIcon}
+          categoryColor={categoryColor}
+          isDark={isDark}
+          onBack={() => router.back()}
+          onDetails={() => detailsSheetRef.current?.present()}
+          onShare={handleShare}
+          onInfo={handleInfoPress}
+        />
 
         {/* Ghost Mode Banner */}
         <GhostModeBanner
@@ -451,51 +342,12 @@ export default function RoomChat() {
           onShare={handleShare}
         />
 
-        {/* Pinned Message Banner */}
-        {room?.pinnedMessage && (
-          <View className="px-5 pt-2 pb-1 z-10">
-            <GlassContainer
-              borderRadius={16}
-              fallbackClassName="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/30"
-              style={{
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                backgroundColor: isDark
-                  ? "rgba(59,130,246,0.1)"
-                  : "rgba(239,246,255,0.8)",
-              }}
-            >
-              <View className="flex-row items-start justify-between">
-                <View className="flex-1 pr-4">
-                  <View className="flex-row items-center mb-1">
-                    <Ionicons name="pin" size={14} color="#3B82F6" />
-                    <Text className="text-blue-600 dark:text-blue-400 text-xs font-bold ml-1.5 uppercase tracking-widest">
-                      Pinned Announcement
-                    </Text>
-                  </View>
-                  <Text
-                    className="text-secondary dark:text-gray-200 text-sm font-semibold"
-                    numberOfLines={2}
-                  >
-                    <Text className="font-bold text-primary dark:text-primary-light">
-                      {room.pinnedMessage.senderName}:{" "}
-                    </Text>
-                    {room.pinnedMessage.text}
-                  </Text>
-                </View>
-                {isHost && (
-                  <TouchableOpacity
-                    onPress={handleUnpinMessage}
-                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                    className="bg-white/50 dark:bg-black/20 p-1.5 rounded-full"
-                  >
-                    <Ionicons name="close" size={16} color="#3B82F6" />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </GlassContainer>
-          </View>
-        )}
+        <PinnedMessageBanner
+          pinnedMessage={room?.pinnedMessage}
+          isHost={isHost}
+          isDark={isDark}
+          onUnpin={handleUnpinMessage}
+        />
 
         <View className="flex-1">
           <ChatMessages

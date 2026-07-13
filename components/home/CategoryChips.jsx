@@ -1,11 +1,21 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Animated, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
 
 function ChipButton({ label, icon, color, isActive, onPress }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
+  const activeAnim = useRef(new Animated.Value(isActive ? 1 : 0)).current;
+
+  useEffect(() => {
+    Animated.spring(activeAnim, {
+      toValue: isActive ? 1 : 0,
+      useNativeDriver: true,
+      speed: 24,
+      bounciness: 5,
+    }).start();
+  }, [activeAnim, isActive]);
 
   const handlePressIn = () => {
     Animated.spring(scaleAnim, {
@@ -29,17 +39,32 @@ function ChipButton({ label, icon, color, isActive, onPress }) {
   };
 
   return (
-    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+    <Animated.View
+      style={{
+        transform: [
+          { scale: scaleAnim },
+          {
+            translateY: activeAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, -1],
+            }),
+          },
+        ],
+      }}
+    >
       <TouchableOpacity
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.85}
-        className="flex-row items-center px-3.5 py-2 rounded-xl"
+        className="flex-row items-center px-3.5 py-2 rounded-xl border"
         style={
           isActive
-            ? { backgroundColor: color }
-            : {}
+            ? { backgroundColor: color, borderColor: color }
+            : {
+                backgroundColor: "rgba(148, 163, 184, 0.06)",
+                borderColor: "rgba(148, 163, 184, 0.12)",
+              }
         }
       >
         {icon && (

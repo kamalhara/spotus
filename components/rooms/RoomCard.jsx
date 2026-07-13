@@ -1,4 +1,5 @@
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { memo, useEffect, useRef } from "react";
 import {
   Animated,
@@ -78,7 +79,6 @@ const RoomCard = memo(function RoomCard({
 }) {
   const { isDark } = useTheme();
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const isOwner = room.createdBy === currentUserId;
   const isDiscovery = variant === "discovery";
   const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
   const categoryColor = CATEGORY_COLORS[room.category] || "#6B7280";
@@ -145,6 +145,11 @@ const RoomCard = memo(function RoomCard({
     }).start();
   };
 
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    onPress?.(room);
+  };
+
   const cardContent = (
     <View className="overflow-hidden">
       {/* Soft category-colored ambient glow — top-left corner */}
@@ -187,6 +192,7 @@ const RoomCard = memo(function RoomCard({
               </Text>
             </View>
           )}
+          {isActiveNow && <ActiveDot />}
         </View>
 
         {/* Title */}
@@ -297,7 +303,7 @@ const RoomCard = memo(function RoomCard({
 
           {/* Action button */}
           <TouchableOpacity
-            onPress={() => onPress?.(room)}
+            onPress={handlePress}
             activeOpacity={0.8}
             style={[
               styles.actionButton,
@@ -334,7 +340,7 @@ const RoomCard = memo(function RoomCard({
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
-        onPress={() => onPress?.(room)}
+        onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={1}
@@ -365,6 +371,7 @@ const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
     borderRadius: 20,
+    elevation: 2,
   },
   cardShadow: {
     shadowColor: "#000",
@@ -379,6 +386,7 @@ const styles = StyleSheet.create({
     borderRadius: 1,
     opacity: 0.35,
   },
+
   actionButton: {
     flexDirection: "row",
     alignItems: "center",

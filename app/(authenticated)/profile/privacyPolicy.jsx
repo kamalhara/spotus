@@ -1,4 +1,3 @@
-import { Ionicons } from "@expo/vector-icons";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ui/ScreenHeader";

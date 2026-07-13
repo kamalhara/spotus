@@ -1,5 +1,5 @@
 import { useAuth } from "@clerk/expo";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 import {
@@ -7,9 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
-  Switch,
   Text,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
@@ -18,6 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
 import Animated, {
   Extrapolation,
+  FadeInDown,
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
@@ -27,33 +26,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../../../components/ui/CustomButton";
 import CustomInput from "../../../components/ui/CustomInput";
 import GlassButton from "../../../components/ui/GlassButton";
-import GlassContainer from "../../../components/ui/GlassContainer";
-import RoomCard from "../../../components/rooms/RoomCard";
+import CreateRoomOptions from "../../../components/rooms/create/CreateRoomOptions";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { createRoom } from "../../../lib/createRoom";
 import { trackEvent } from "../../../lib/analytics";
 
-const CATEGORIES = [
-  { label: "Music", icon: "musical-notes", color: "#8B5CF6" },
-  { label: "Coffee", icon: "cafe", color: "#D97706" },
-  { label: "Art", icon: "color-palette", color: "#EC4899" },
-  { label: "Books", icon: "book", color: "#FF8566" },
-  { label: "Tech", icon: "code-slash", color: "#3B82F6" },
-  { label: "Food", icon: "restaurant", color: "#EF4444" },
-  { label: "Fashion", icon: "shirt", color: "#F59E0B" },
-  { label: "Sports", icon: "football", color: "#10B981" },
-  { label: "Local Events", icon: "calendar", color: "#14B8A6" },
-];
-
 const MAX_TITLE = 60;
-
-const DURATIONS = [
-  { label: "1 Hour", value: 1 },
-  { label: "3 Hours", value: 3 },
-  { label: "12 Hours", value: 12 },
-  { label: "24 Hours", value: 24 },
-];
 
 // Threshold at which the inline title scrolls out of view
 const TITLE_SCROLL_THRESHOLD = 70;
@@ -71,9 +50,6 @@ export default function CreateRooms() {
   const [duration, setDuration] = useState(3); // Default 3 hours
   const [isCreating, setIsCreating] = useState(false);
   const [showOnMap, setShowOnMap] = useState(true); // Default to Public
-  const selectedCategoryMeta = CATEGORIES.find(
-    (item) => item.label === selectedCategory,
-  );
   const trimmedTitle = title.trim();
   const canCreateRoom =
     trimmedTitle.length > 0 && !!selectedCategory && !!user?.id && !isCreating;
@@ -246,7 +222,10 @@ export default function CreateRooms() {
           keyboardShouldPersistTaps="handled"
         >
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-            <View className="flex-1">
+            <Animated.View
+              entering={FadeInDown.duration(380).delay(60)}
+              className="flex-1"
+            >
               {/* Inline Title — fades out on scroll */}
               <Animated.View className="mt-4 mb-8" style={inlineTitleStyle}>
                 <Text className="text-secondary dark:text-gray-100 text-[28px] font-display font-extrabold tracking-tight leading-[34px]">
@@ -281,153 +260,17 @@ export default function CreateRooms() {
                 />
               </View>
 
-              {/* Duration Picker */}
-              <View className="mt-5">
-                <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
-                  Room closes after
-                </Text>
-                <View className="flex-row flex-wrap gap-2.5">
-                  {DURATIONS.map(({ label, value }) => {
-                    const selected = duration === value;
-                    return (
-                      <TouchableOpacity
-                        key={value}
-                        onPress={() => setDuration(value)}
-                        className={`px-4 py-2.5 rounded-xl border ${
-                          selected
-                            ? "bg-primary border-primary"
-                            : "bg-white dark:bg-[#1C1C20] border-gray-100 dark:border-[#2C2C30]"
-                        }`}
-                      >
-                        <Text
-                          className={`text-sm font-medium ${
-                            selected
-                              ? "text-white"
-                              : "text-secondary dark:text-gray-100"
-                          }`}
-                        >
-                          {label}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-
-              {/* Categories — each with its own color */}
-              <View className="mt-5">
-                <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
-                  Category
-                </Text>
-
-                <View className="flex-row flex-wrap gap-2.5">
-                  {CATEGORIES.map(({ label, icon, color }) => {
-                    const selected = selectedCategory === label;
-                    return (
-                      <TouchableOpacity
-                        key={label}
-                        onPress={() => setSelectedCategory(label)}
-                        className={`px-3.5 py-2.5 rounded-xl flex-row items-center gap-2 border ${
-                          selected
-                            ? "border-transparent"
-                            : "bg-white dark:bg-[#1C1C20] border-gray-100 dark:border-[#2C2C30]"
-                        }`}
-                        style={
-                          selected
-                            ? {
-                                backgroundColor: `${color}15`,
-                                borderColor: `${color}30`,
-                              }
-                            : {}
-                        }
-                      >
-                        <Ionicons
-                          name={selected ? "checkmark" : icon}
-                          size={14}
-                          color={selected ? color : "#9CA3AF"}
-                        />
-                        <Text
-                          className={`text-sm font-medium ${!selected ? "text-secondary dark:text-gray-100" : ""}`}
-                          style={selected ? { color } : {}}
-                        >
-                          {label}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              </View>
-
-              {/* Preview */}
-              <View className="mt-8">
-                <Text className="text-gray-500 dark:text-gray-400 text-sm font-medium mb-3 ml-1">
-                  List preview
-                </Text>
-                <View pointerEvents="none" style={{ opacity: 0.9 }}>
-                  <RoomCard
-                    room={{
-                      id: "preview",
-                      title: title || "Your room title",
-                      category: selectedCategory || "General",
-                      visibility: showOnMap ? "public" : "ghost",
-                      createdAt: Date.now(),
-                      expiresAt: Date.now() + duration * 60 * 60 * 1000,
-                      participants: user?.id ? [user.id] : [],
-                      createdBy: user?.id,
-                      distance: showOnMap ? 0.0 : undefined,
-                    }}
-                    currentUserId={user?.id}
-                    variant="discovery"
-                  />
-                </View>
-              </View>
-
-              {/* Visibility Toggle */}
-              <View className="mt-8">
-                <GlassContainer
-                  borderRadius={16}
-                  fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
-                  style={{
-                    padding: 16,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View className="flex-1 pr-4">
-                    <View className="flex-row items-center mb-1">
-                      <MaterialCommunityIcons
-                        name="ghost-outline"
-                        size={18}
-                        color="#A855F7"
-                        style={{ marginRight: 6 }}
-                      />
-                      <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
-                        Hide from map
-                      </Text>
-                    </View>
-                    <Text className="text-gray-400 dark:text-gray-500 text-xs leading-4 pr-2">
-                      People can still join with the invite code. Nearby
-                      discovery will not show this room.
-                    </Text>
-                  </View>
-                  <Switch
-                    value={!showOnMap}
-                    onValueChange={(val) => {
-                      import("expo-haptics").then((Haptics) => {
-                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-                      });
-                      setShowOnMap(!val);
-                    }}
-                    trackColor={{
-                      false: isDark ? "#2C2C30" : "#E2E8F0",
-                      true: "#A855F7",
-                    }}
-                    thumbColor={"#FFFFFF"}
-                  />
-                </GlassContainer>
-              </View>
-
+              <CreateRoomOptions
+                duration={duration}
+                onDurationChange={setDuration}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
+                title={title}
+                showOnMap={showOnMap}
+                onShowOnMapChange={setShowOnMap}
+                user={user}
+                isDark={isDark}
+              />
               {/* Create Button */}
               <View className="flex-1 justify-end mt-10">
                 <CustomButton
@@ -437,7 +280,7 @@ export default function CreateRooms() {
                   loading={isCreating}
                 />
               </View>
-            </View>
+            </Animated.View>
           </TouchableWithoutFeedback>
         </Animated.ScrollView>
       </KeyboardAvoidingView>
