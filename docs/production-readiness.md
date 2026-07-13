@@ -19,6 +19,16 @@ Set `EXPO_PUBLIC_API_URL` in every EAS environment to the deployed API origin.
 Do not put Cloudinary API secrets or service-account credentials in any
 `EXPO_PUBLIC_` variable.
 
+### Render free-tier availability
+
+The Render blueprint enables a 10-minute self-ping to stay below Render's
+15-minute idle window. Confirm that the deployed service has both
+`ENABLE_SELF_PING=true` and the automatically provided `RENDER_EXTERNAL_URL`.
+The service log should contain `Keep-alive enabled` after startup and
+`Keep-alive ping successful` every ten minutes. A free service can still be
+restarted by Render and shares the workspace's monthly free-instance allowance,
+so the mobile client also warms the API on launch and tolerates a cold start.
+
 ## Firestore TTL and room deletion
 
 The committed TTL policy applies only to internal server rate-limit documents.

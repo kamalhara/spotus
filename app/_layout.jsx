@@ -23,6 +23,7 @@ import { ThemeProvider } from "../context/ThemeContext";
 import { ModalProvider } from "../context/ModalContext";
 import "../global.css";
 import { trackScreen } from "../lib/analytics";
+import { warmApi } from "../lib/api";
 import syncUserToFirebase from "../lib/syncUser";
 import { tokenCache } from "../utils/cache";
 
@@ -94,6 +95,10 @@ export default function RootLayout() {
     PlusJakartaSans_700Bold,
     PlusJakartaSans_800ExtraBold,
   });
+
+  useEffect(() => {
+    warmApi();
+  }, []);
 
   useEffect(() => {
     if (fontsLoaded) {

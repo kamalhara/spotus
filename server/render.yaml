@@ -6,4 +6,8 @@ services:
     plan: free
     buildCommand: npm install
     startCommand: npm start
+    healthCheckPath: /health
     autoDeploy: true
+    envVars:
+      - key: ENABLE_SELF_PING
+        value: "true"

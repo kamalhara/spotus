@@ -1,22 +1,13 @@
-/**
- * TEMPORARY DEVELOPMENT-ONLY FEATURE
- * 
- * This module is intended to prevent Render free-tier instances from spinning down
- * due to inactivity by periodically pinging the application's own /ping endpoint.
- * 
- * TODO: Remove this module and its initialization once SpotUs is deployed on a 
- * paid, always-on production server.
- */
-
-const BASE_INTERVAL_MS = 14 * 60 * 1000; // 14 minutes
-const MAX_INTERVAL_MS = 28 * 60 * 1000;  // 28 minutes (max backoff)
-const MAX_JITTER_MS = 60 * 1000;          // 60 seconds random jitter
+const PING_INTERVAL_MS = 10 * 60 * 1000;
+const RETRY_INTERVAL_MS = 60 * 1000;
+const REQUEST_TIMEOUT_MS = 10000;
 
 const startKeepAlive = () => {
   const enableSelfPing = process.env.ENABLE_SELF_PING;
   const renderExternalUrl = process.env.RENDER_EXTERNAL_URL;
 
-  if (enableSelfPing !== 'true') {
+  // Explicit opt-in outside Render. Render deployments default to enabled.
+  if (enableSelfPing === 'false' || (!renderExternalUrl && enableSelfPing !== 'true')) {
     return;
   }
 
@@ -25,55 +16,36 @@ const startKeepAlive = () => {
     return;
   }
 
-  let consecutiveFailures = 0;
-
-  /**
-   * Calculate the next ping interval with exponential backoff and random jitter.
-   * On success: base interval + jitter.
-   * On failure: doubles the interval per consecutive failure (capped at MAX_INTERVAL_MS) + jitter.
-   */
-  const getNextInterval = () => {
-    const backoff = Math.min(
-      BASE_INTERVAL_MS * Math.pow(2, consecutiveFailures),
-      MAX_INTERVAL_MS
-    );
-    const jitter = Math.floor(Math.random() * MAX_JITTER_MS);
-    return backoff + jitter;
-  };
-
   const ping = async () => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    let nextInterval = PING_INTERVAL_MS;
     try {
-      const response = await fetch(`${renderExternalUrl}/ping`);
+      const response = await fetch(`${renderExternalUrl}/ping`, {
+        signal: controller.signal,
+        headers: { 'user-agent': 'spotus-render-keepalive/1.0' },
+      });
       if (response.ok) {
-        console.log('Keep-alive ping successful');
-        consecutiveFailures = 0;
+        console.log('Keep-alive ping successful', {
+          nextPingMinutes: PING_INTERVAL_MS / 60000,
+        });
       } else {
-        consecutiveFailures++;
         console.error(`Keep-alive ping failed with status: ${response.status}`);
-        if (consecutiveFailures >= 3) {
-          console.warn(
-            `Keep-alive: ${consecutiveFailures} consecutive ping failures. Server may be unreachable.`
-          );
-        }
+        nextInterval = RETRY_INTERVAL_MS;
       }
     } catch (error) {
-      consecutiveFailures++;
       console.error(`Keep-alive ping failed: ${error.message}`);
-      if (consecutiveFailures >= 3) {
-        console.warn(
-          `Keep-alive: ${consecutiveFailures} consecutive ping failures. Server may be unreachable.`
-        );
-      }
+      nextInterval = RETRY_INTERVAL_MS;
+    } finally {
+      clearTimeout(timeoutId);
     }
 
-    // Schedule next ping with dynamic interval
-    const nextInterval = getNextInterval();
     setTimeout(ping, nextInterval);
   };
 
-  const initialInterval = getNextInterval();
-  console.log(`Keep-alive ping scheduled for ${renderExternalUrl} (base interval: 14 minutes with jitter).`);
-  setTimeout(ping, initialInterval);
+  console.log(`Keep-alive enabled for ${renderExternalUrl} (10-minute interval).`);
+  // Confirm the public route shortly after startup, then begin the regular cadence.
+  setTimeout(ping, 30000);
 };
 
 module.exports = { startKeepAlive };
