@@ -223,7 +223,8 @@ export default function ChatId() {
     setUploadingImageUri(uri);
 
     try {
-      const uploadResult = await uploadToCloudinary(uri);
+      const uploadToken = await getToken();
+      const uploadResult = await uploadToCloudinary(uri, uploadToken);
       if (!uploadResult?.imageUrl) {
         setUploadingImageUri(null);
         return;

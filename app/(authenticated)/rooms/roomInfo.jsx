@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@clerk/expo";
 import * as Linking from "expo-linking";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -27,6 +28,7 @@ import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { deleteRoomWithMessages } from "../../../lib/deleteRoom";
+import { fetchUserBatch } from "../../../lib/userCache";
 
 import GhostModeBanner from "../../../components/shared/GhostModeBanner";
 import { CATEGORY_ICONS } from "../../../constants/categories";
@@ -50,6 +52,7 @@ const roomRules = [
   },
 ];
 export default function RoomInfo() {
+  const { getToken } = useAuth();
   const router = useRouter();
   const { roomId } = useLocalSearchParams();
   const { firestoreUser: user } = useFirestoreUser();
@@ -79,13 +82,14 @@ export default function RoomInfo() {
           setRoom(roomData);
 
           if (roomData.participants?.length) {
-            const profiles = [];
-            for (const uid of roomData.participants) {
-              const userDoc = await getDoc(doc(db, "users", uid));
-              if (userDoc.exists()) {
-                profiles.push({ id: userDoc.id, ...userDoc.data() });
-              }
-            }
+            const profiles = (
+              await Promise.all(
+                roomData.participants.map(async (uid) => {
+                  const profile = await fetchUserBatch(uid);
+                  return profile ? { id: uid, ...profile } : null;
+                }),
+              )
+            ).filter(Boolean);
             const trustSnap = await getDocs(
               collection(db, "rooms", roomId, "trust"),
             );
@@ -147,7 +151,8 @@ export default function RoomInfo() {
       icon: "trash-outline",
       onConfirm: async () => {
         try {
-          await deleteRoomWithMessages(roomId);
+          const token = await getToken();
+          await deleteRoomWithMessages(roomId, token);
           setShowOptions(false);
           router.replace("/(authenticated)/(tabs)/home");
         } catch (err) {

@@ -1,7 +1,14 @@
-const { requireAuth } = require('@clerk/express');
+const { getAuth } = require('@clerk/express');
 
-// Export Clerk's requireAuth middleware. 
-// It automatically returns 401 Unauthorized if the token is invalid or missing.
-const verifyClerkToken = requireAuth();
+const verifyClerkToken = (req, res, next) => {
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return res.status(401).json({
+      error: { code: 'UNAUTHENTICATED', message: 'Authentication is required.' },
+    });
+  }
+  req.userId = userId;
+  return next();
+};
 
 module.exports = { verifyClerkToken };

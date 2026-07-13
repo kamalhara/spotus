@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@clerk/expo";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { doc, updateDoc } from "firebase/firestore";
@@ -36,6 +37,7 @@ const INTERESTS = [
   { label: "Local Events", icon: "calendar", color: "#14B8A6" },
 ];
 export default function Edit() {
+  const { getToken } = useAuth();
   const router = useRouter();
   const { firestoreUser: user } = useFirestoreUser();
 
@@ -82,7 +84,8 @@ export default function Edit() {
     try {
       let finalImageUrl = user.profilePic;
       if (newImageUri) {
-        const uploadResult = await uploadToCloudinary(newImageUri);
+        const token = await getToken();
+        const uploadResult = await uploadToCloudinary(newImageUri, token);
         if (uploadResult?.imageUrl) {
           finalImageUrl = uploadResult.imageUrl;
         }

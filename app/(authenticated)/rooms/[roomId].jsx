@@ -39,6 +39,7 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { RoomSeen } from "../../../lib/chatSeen";
 import { sendBatchNotification } from "../../../lib/notification";
 import { uploadToCloudinary } from "../../../lib/uploadCloudinary";
+import { sendRoomMessage } from "../../../lib/roomMessages";
 import { fetchUserBatch } from "../../../lib/userCache";
 
 import CustomButton from "../../../components/ui/CustomButton";
@@ -190,45 +191,13 @@ export default function RoomChat() {
     if (!text.trim()) return;
     const trimmedText = text.trim();
     try {
-      await addDoc(collection(db, "rooms", roomId, "messages"), {
-        text: trimmedText,
-        senderId: currentUserId || "unknown-id",
-        user: user?.userName || "Unknown",
-        profilePic: user?.profilePic || null,
-        createdAt: serverTimestamp(),
-        seenBy: [currentUserId],
-        reactions: {},
-        ...(replyTo
-          ? {
-              replyTo: {
-                id: replyTo.id,
-                text: replyTo.text || "",
-                user: replyTo.user || "Unknown",
-                imageUrl: replyTo.imageUrl || null,
-              },
-            }
-          : {}),
-      });
-      setReplyTo(null);
-
-      // Sync the parent room document with last message metadata
-      await updateDoc(doc(db, "rooms", roomId), {
-        lastMessage: trimmedText,
-        lastMessageAt: serverTimestamp(),
-        lastMessageSenderId: currentUserId,
-        lastMessageSeenBy: [currentUserId],
-      });
-
-      // Notify all other room participants (batched)
-      const otherParticipants = (room?.participants || []).filter(
-        (uid) => uid !== currentUserId,
-      );
-
       const token = await getToken();
+      const result = await sendRoomMessage(roomId, trimmedText, replyTo, token);
+      setReplyTo(null);
       sendBatchNotification(
-        otherParticipants,
+        result.participantIds,
         currentUserId,
-        `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
+        `${result.senderName} in ${result.roomTitle}`,
         trimmedText,
         { type: "room", screen: "room", roomId },
         token
@@ -243,7 +212,8 @@ export default function RoomChat() {
     setUploadingImageUri(uri);
 
     try {
-      const uploadResult = await uploadToCloudinary(uri);
+      const uploadToken = await getToken();
+      const uploadResult = await uploadToCloudinary(uri, uploadToken);
       if (!uploadResult?.imageUrl) {
         setUploadingImageUri(null);
         return;

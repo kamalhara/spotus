@@ -4,7 +4,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Slider from "@react-native-community/slider";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, useRouter } from "expo-router";
-import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
@@ -25,7 +24,6 @@ import ExploreInterceptModal from "../../../components/shared/ExploreInterceptMo
 import LocationPermissionDenied from "../../../components/shared/LocationPermissionDenied";
 import GlassButton from "../../../components/ui/GlassButton";
 import SpotUsLoader from "../../../components/ui/SpotUsLoader";
-import { db } from "../../../config/firebase.config";
 import { CATEGORY_ICONS } from "../../../constants/categories";
 import { useFloatingButton } from "../../../context/FloatingButtonContext";
 import { useTheme } from "../../../context/ThemeContext";
@@ -34,7 +32,7 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { trackEvent } from "../../../lib/analytics";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { getNearbyRooms } from "../../../lib/getNearbyRoom";
-import { sendBatchNotification } from "../../../lib/notification";
+import { joinRoomById } from "../../../lib/joinRoom";
 
 function getHeadline(roomCount, isLoading) {
   if (isLoading) return "Looking nearby...";
@@ -187,30 +185,14 @@ export default function Home() {
       return;
     }
 
-    const roomRef = doc(db, "rooms", roomToJoin.id);
-    const wasAlreadyInRoom = roomToJoin.participants?.includes(
-      firestoreUser.id,
-    );
-
     try {
-      await updateDoc(roomRef, {
-        participants: arrayUnion(firestoreUser.id),
-      });
-
-      if (!wasAlreadyInRoom && roomToJoin.participants) {
-        const otherParticipants = roomToJoin.participants.filter(
-          (uid) => uid !== firestoreUser.id,
-        );
-        const token = await getToken();
-        sendBatchNotification(
-          otherParticipants,
-          firestoreUser.id,
-          roomToJoin.title || "Room",
-          `${firestoreUser?.userName || "Someone"} joined the room`,
-          { type: "room", screen: "room", roomId: roomToJoin.id },
-          token
-        );
-      }
+      const token = await getToken();
+      await joinRoomById(
+        roomToJoin.id,
+        firestoreUser.id,
+        firestoreUser.userName,
+        token,
+      );
 
       bottomSheetModalRef.current?.dismiss();
       router.push(`/rooms/${roomToJoin.id}`);
@@ -280,7 +262,7 @@ export default function Home() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     await loadRooms();
     setRefreshing(false);
-  }, [loadRooms]);
+  }, [loadRooms, refreshing]);
 
   const nearbyRooms = useMemo(
     () => rooms.filter((r) => !r.participants?.includes(firestoreUser?.id)),

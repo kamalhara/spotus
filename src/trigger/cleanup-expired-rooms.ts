@@ -3,6 +3,8 @@ import { v2 as cloudinary } from "cloudinary";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { getDb } from "./firebaseAdmin";
 
+const MAX_ROOMS_PER_RUN = 100;
+
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -65,10 +67,17 @@ export const cleanupExpiredRooms = schedules.task({
       const roomsSnapshot = await db
         .collection("rooms")
         .where("expiresAt", "<=", now)
+        .orderBy("expiresAt", "asc")
+        .limit(MAX_ROOMS_PER_RUN)
         .get();
 
       const roomsCount = roomsSnapshot.size;
       logger.log(`Found ${roomsCount} expired rooms`);
+      if (roomsCount === MAX_ROOMS_PER_RUN) {
+        logger.warn("Cleanup reached the per-run safety limit; remaining rooms will be processed next run", {
+          limit: MAX_ROOMS_PER_RUN,
+        });
+      }
 
       let stats = {
         roomsDeleted: 0,

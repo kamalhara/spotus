@@ -44,7 +44,7 @@ export default function JoinRoomScreen() {
     };
 
     joinRoom();
-  }, [userLoading, user?.id, inviteCode, router]);
+  }, [userLoading, user?.id, inviteCode, router, getToken]);
 
   return (
     <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113] justify-center items-center px-6">

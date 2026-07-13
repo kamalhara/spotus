@@ -1,4 +1,4 @@
-import { useUser } from "@clerk/expo";
+import { useAuth, useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
@@ -36,6 +36,7 @@ const RADIUS_OPTIONS = [1, 5, 10, 25, 50];
 
 export default function OnboardingScreen() {
   const { user } = useUser();
+  const { getToken } = useAuth();
   const { isDark } = useTheme();
 
   const [step, setStep] = useState(1);
@@ -108,7 +109,8 @@ export default function OnboardingScreen() {
       let finalImageUrl = imageUri;
 
       if (imageUri && !imageUri.startsWith("http")) {
-        const uploadResult = await uploadToCloudinary(imageUri);
+        const token = await getToken();
+        const uploadResult = await uploadToCloudinary(imageUri, token);
         if (uploadResult?.imageUrl) {
           finalImageUrl = uploadResult.imageUrl;
         }

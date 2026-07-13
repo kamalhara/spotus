@@ -1,16 +1,21 @@
-const { getUser, getUsersBatch, removePushToken, incrementNotificationsSent } = require('../services/firestore.service');
+const {
+  authorizeNotification,
+  getUser,
+  getUsersBatch,
+  removePushToken,
+  incrementNotificationsSent,
+} = require('../services/firestore.service');
 const { sendPushNotification, sendBatchPushNotifications } = require('../services/expo.service');
+const { consumeRateLimit } = require('../services/rate-limit.service');
+const { notificationPayload } = require('../utils/validation');
 
-const sendNotification = async (req, res) => {
+const sendNotification = async (req, res, next) => {
   try {
-    const { recipientUserId, title, body, data = {} } = req.body;
+    await consumeRateLimit(req.userId, 'send-notification', { limit: 60, windowMs: 10 * 60 * 1000 });
+    const { recipientUserId, title, body, data } = notificationPayload(req.body);
     
     // Always trust the authenticated user's ID as the sender, ignoring client-provided senderUserId
-    const senderUserId = req.auth.userId;
-
-    if (!recipientUserId || !title || !body) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
+    const senderUserId = req.userId;
 
     // Prevent self-notifications
     if (recipientUserId === senderUserId) {
@@ -21,6 +26,9 @@ const sendNotification = async (req, res) => {
     const recipientData = await getUser(recipientUserId);
     if (!recipientData) {
       return res.status(404).json({ error: 'Recipient not found' });
+    }
+    if (!await authorizeNotification(senderUserId, [recipientUserId], data, recipientData)) {
+      return res.status(403).json({ error: 'Notification is not authorized' });
     }
 
     const pushToken = recipientData.expoPushToken || recipientData.pushToken;
@@ -68,7 +76,7 @@ const sendNotification = async (req, res) => {
     return res.status(200).json({ message: 'Notification sent successfully', ticket: result.ticket });
   } catch (error) {
     console.error('Error in sendNotification controller:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return next(error);
   }
 };
 
@@ -76,26 +84,19 @@ const sendNotification = async (req, res) => {
  * Batch notification controller.
  * Accepts multiple recipient user IDs and sends notifications in a single Expo batch.
  */
-const sendBatchNotification = async (req, res) => {
+const sendBatchNotification = async (req, res, next) => {
   try {
-    const { recipientUserIds, title, body, data = {} } = req.body;
+    await consumeRateLimit(req.userId, 'send-batch-notification', { limit: 20, windowMs: 10 * 60 * 1000 });
+    const { recipientUserIds, title, body, data } = notificationPayload(req.body, { batch: true });
 
     // Always trust the authenticated user's ID as the sender
-    const senderUserId = req.auth.userId;
-
-    // Validate input
-    if (!recipientUserIds || !Array.isArray(recipientUserIds) || recipientUserIds.length === 0) {
-      return res.status(400).json({ error: 'recipientUserIds must be a non-empty array' });
-    }
-    if (recipientUserIds.length > 100) {
-      return res.status(400).json({ error: 'recipientUserIds must not exceed 100 entries' });
-    }
-    if (!title || !body) {
-      return res.status(400).json({ error: 'Missing required fields: title, body' });
-    }
+    const senderUserId = req.userId;
 
     // Fetch all recipient users in a single batch Firestore read
     const usersMap = await getUsersBatch(recipientUserIds);
+    if (!await authorizeNotification(senderUserId, recipientUserIds, data)) {
+      return res.status(403).json({ error: 'Notification is not authorized' });
+    }
 
     const messagesToSend = [];
     const tokenToUserIdMap = {};
@@ -193,7 +194,7 @@ const sendBatchNotification = async (req, res) => {
     return res.status(200).json({ sent, skipped, failed });
   } catch (error) {
     console.error('Error in sendBatchNotification controller:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    return next(error);
   }
 };
 
