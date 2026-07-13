@@ -7,7 +7,6 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  Alert,
   Animated,
   Image,
   Text,
@@ -30,6 +29,7 @@ import { db } from "../../../config/firebase.config";
 import { CATEGORY_ICONS } from "../../../constants/categories";
 import { useFloatingButton } from "../../../context/FloatingButtonContext";
 import { useTheme } from "../../../context/ThemeContext";
+import { useModal } from "../../../context/ModalContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { trackEvent } from "../../../lib/analytics";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
@@ -88,6 +88,7 @@ export default function Home() {
   const { firestoreUser } = useFirestoreUser();
   const { setFloatingButtonOverride, clearFloatingButtonOverride } =
     useFloatingButton();
+  const { showAlert } = useModal();
 
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -179,7 +180,7 @@ export default function Home() {
     }
 
     if (!roomToJoin?.id || !firestoreUser?.id) {
-      Alert.alert(
+      showAlert(
         "Unable to join",
         "Your profile or the selected room is still loading. Please try again.",
       );
@@ -215,7 +216,7 @@ export default function Home() {
       router.push(`/rooms/${roomToJoin.id}`);
     } catch (error) {
       console.error("Error joining room:", error);
-      Alert.alert("Could not join room", "Please try again in a moment.");
+      showAlert("Could not join room", "Please try again in a moment.");
     }
   };
 

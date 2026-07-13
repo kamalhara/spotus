@@ -20,6 +20,7 @@ import {
   ReanimatedLogLevel,
 } from "react-native-reanimated";
 import { ThemeProvider } from "../context/ThemeContext";
+import { ModalProvider } from "../context/ModalContext";
 import "../global.css";
 import { trackScreen } from "../lib/analytics";
 import syncUserToFirebase from "../lib/syncUser";
@@ -113,7 +114,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <ThemedApp />
+      <ModalProvider>
+        <ThemedApp />
+      </ModalProvider>
     </ThemeProvider>
   );
 }

@@ -14,13 +14,13 @@ import {
 } from "firebase/firestore";
 import { useEffect, useMemo, useState, useRef } from "react";
 import {
-  Alert,
   ScrollView,
   Share,
   Text,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useModal } from "../../../context/ModalContext";
 import ReportSheet from "../../../components/modals/ReportSheet";
 
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -49,6 +49,7 @@ export default function UserProfile() {
   const [loading, setLoading] = useState(true);
   const [chatDoc, setChatDoc] = useState(null);
   const reportSheetRef = useRef(null);
+  const { showConfirm, showAlert } = useModal();
 
   const [rooms, setRooms] = useState([]);
 
@@ -171,11 +172,17 @@ export default function UserProfile() {
 
   const handleOptions = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Alert.alert("", "", [
-      { text: "Report", style: "destructive", onPress: handleReport },
-      { text: "Block", style: "destructive", onPress: handleBlock },
-      { text: "Cancel", style: "cancel" },
-    ]);
+    showConfirm({
+      title: "Options",
+      message: "Choose an action",
+      options: [
+        { text: "Report", style: "destructive", onPress: handleReport },
+        { text: "Block", style: "destructive", onPress: handleBlock },
+        { text: "Cancel", style: "cancel" },
+      ],
+      icon: "ellipsis-horizontal",
+      iconColor: "#9CA3AF"
+    });
   };
 
   const handleShare = async () => {
@@ -192,32 +199,28 @@ export default function UserProfile() {
 
   const handleBlock = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    Alert.alert(
-      `Block ${user?.userName}?`,
-      "You won't see each other anymore.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Block",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const viewerRef = doc(db, "users", viewer.id);
-              await updateDoc(viewerRef, {
-                blockedUsers: arrayUnion(userId),
-              });
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success,
-              );
-              router.back();
-            } catch (err) {
-              console.error("Error blocking user:", err);
-              Alert.alert("Error", "Could not block user. Please try again.");
-            }
-          },
-        },
-      ],
-    );
+    showConfirm({
+      title: `Block ${user?.userName}?`,
+      message: "You won't see each other anymore.",
+      confirmText: "Block",
+      confirmButtonStyle: "bg-red-500",
+      icon: "ban-outline",
+      onConfirm: async () => {
+        try {
+          const viewerRef = doc(db, "users", viewer.id);
+          await updateDoc(viewerRef, {
+            blockedUsers: arrayUnion(userId),
+          });
+          Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Success,
+          );
+          router.back();
+        } catch (err) {
+          console.error("Error blocking user:", err);
+          showAlert("Error", "Could not block user. Please try again.");
+        }
+      },
+    });
   };
 
   if (loading) {

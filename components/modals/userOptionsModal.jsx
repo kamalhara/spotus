@@ -11,7 +11,6 @@ import {
 } from "firebase/firestore";
 import { useState } from "react";
 import {
-  Alert,
   Modal,
   Pressable,
   Text,
@@ -20,6 +19,7 @@ import {
 } from "react-native";
 import { db } from "../../config/firebase.config";
 import { useTheme } from "../../context/ThemeContext";
+import { useModal } from "../../context/ModalContext";
 import GlassContainer from "../ui/GlassContainer";
 import SpotUsLoader from "../../components/ui/SpotUsLoader";
 
@@ -32,6 +32,7 @@ export default function UserOptionsModal({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const { showConfirm, showAlert } = useModal();
 
   const isMuted = chatDoc?.mutedBy?.includes(currentUserId) || false;
 
@@ -51,55 +52,51 @@ export default function UserOptionsModal({
       setShowOptions(false);
     } catch (error) {
       console.error("Error toggling mute:", error);
-      Alert.alert("Error", "Could not update mute setting.");
+      showAlert("Error", "Could not update mute setting.");
     }
   };
 
   const handleDeleteChat = async () => {
     setShowOptions(false);
-    Alert.alert(
-      "Delete Chat for Everyone",
-      "This will permanently delete the entire conversation for both participants. This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            setLoading(true);
-            try {
-              // 1. Delete all messages in the subcollection (batch delete)
-              const messagesRef = collection(db, "chats", chatId, "messages");
-              const messagesSnap = await getDocs(messagesRef);
+    showConfirm({
+      title: "Delete Chat for Everyone",
+      message: "This will permanently delete the entire conversation for both participants. This action cannot be undone.",
+      confirmText: "Delete",
+      icon: "trash-outline",
+      confirmButtonStyle: "bg-red-500",
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          // 1. Delete all messages in the subcollection (batch delete)
+          const messagesRef = collection(db, "chats", chatId, "messages");
+          const messagesSnap = await getDocs(messagesRef);
 
-              // Firestore batch supports max 500 operations
-              const batchSize = 500;
-              const docs = messagesSnap.docs;
+          // Firestore batch supports max 500 operations
+          const batchSize = 500;
+          const docs = messagesSnap.docs;
 
-              for (let i = 0; i < docs.length; i += batchSize) {
-                const batch = writeBatch(db);
-                const chunk = docs.slice(i, i + batchSize);
-                chunk.forEach((d) => batch.delete(d.ref));
-                await batch.commit();
-              }
+          for (let i = 0; i < docs.length; i += batchSize) {
+            const batch = writeBatch(db);
+            const chunk = docs.slice(i, i + batchSize);
+            chunk.forEach((d) => batch.delete(d.ref));
+            await batch.commit();
+          }
 
-              // 2. Delete the chat document itself
-              await deleteDoc(doc(db, "chats", chatId));
+          // 2. Delete the chat document itself
+          await deleteDoc(doc(db, "chats", chatId));
 
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success,
-              );
-              router.replace("/(authenticated)/(tabs)/chat_tab");
-            } catch (error) {
-              console.error("Error deleting chat:", error);
-              Alert.alert("Error", "Could not delete the chat.");
-            } finally {
-              setLoading(false);
-            }
-          },
-        },
-      ],
-    );
+          Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Success,
+          );
+          router.replace("/(authenticated)/(tabs)/chat_tab");
+        } catch (error) {
+          console.error("Error deleting chat:", error);
+          showAlert("Error", "Could not delete the chat.");
+        } finally {
+          setLoading(false);
+        }
+      },
+    });
   };
   const { isDark } = useTheme();
   const handleReportUser = async () => {

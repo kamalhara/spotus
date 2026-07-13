@@ -1,8 +1,9 @@
-import { Alert, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useUser } from "@clerk/expo";
 import { doc, deleteDoc } from "firebase/firestore";
 import { db } from "../../../config/firebase.config";
 import { useState } from "react";
+import { useModal } from "../../../context/ModalContext";
 import CustomButton from "../../../components/ui/CustomButton";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ui/ScreenHeader";
@@ -14,37 +15,34 @@ const ACCENT = "#EF4444";
 export default function DeleteAccount() {
   const { user } = useUser();
   const [isDeleting, setIsDeleting] = useState(false);
+  const { showConfirm, showAlert } = useModal();
 
   const handleDelete = () => {
-    Alert.alert(
-      "Delete Account",
-      "Are you absolutely sure? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            if (!user) return;
-            try {
-              setIsDeleting(true);
-              // Delete from Firebase first
-              await deleteDoc(doc(db, "users", user.id));
-              // Delete from Clerk
-              await user.delete();
-              // The Clerk provider should automatically handle the redirect out of (authenticated)
-            } catch (error) {
-              setIsDeleting(false);
-              console.error("Error deleting account:", error);
-              Alert.alert(
-                "Error",
-                "There was an error deleting your account. Please try again."
-              );
-            }
-          },
-        },
-      ]
-    );
+    showConfirm({
+      title: "Delete Account",
+      message: "Are you absolutely sure? This action cannot be undone.",
+      confirmText: "Delete",
+      confirmButtonStyle: "bg-red-500",
+      icon: "trash-outline",
+      onConfirm: async () => {
+        if (!user) return;
+        try {
+          setIsDeleting(true);
+          // Delete from Firebase first
+          await deleteDoc(doc(db, "users", user.id));
+          // Delete from Clerk
+          await user.delete();
+          // The Clerk provider should automatically handle the redirect out of (authenticated)
+        } catch (error) {
+          setIsDeleting(false);
+          console.error("Error deleting account:", error);
+          showAlert(
+            "Error",
+            "There was an error deleting your account. Please try again."
+          );
+        }
+      },
+    });
   };
 
   return (

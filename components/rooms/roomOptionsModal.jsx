@@ -7,7 +7,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import {
-  Alert,
   Modal,
   Pressable,
   Text,
@@ -16,6 +15,7 @@ import {
 } from "react-native";
 import { db } from "../../config/firebase.config";
 import { useTheme } from "../../context/ThemeContext";
+import { useModal } from "../../context/ModalContext";
 import GlassContainer from "../ui/GlassContainer";
 import ReportSheet from "./../modals/ReportSheet";
 import { useRef } from "react";
@@ -28,6 +28,7 @@ export default function RoomOptionsModal({
   roomDoc,
 }) {
   const { isDark } = useTheme();
+  const { showAlert } = useModal();
   const isMuted = roomDoc?.mutedBy?.includes(currentUserId) || false;
 
   const reportSheetRef = useRef(null);
@@ -56,7 +57,7 @@ export default function RoomOptionsModal({
       }
     } catch (err) {
       console.error("Error toggling room mute:", err);
-      Alert.alert("Error", "Could not update mute setting.");
+      showAlert("Error", "Could not update mute setting.");
     }
   };
 

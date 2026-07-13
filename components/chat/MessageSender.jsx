@@ -4,7 +4,6 @@ import * as Haptics from "expo-haptics";
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useRef, useState } from "react";
 import {
-  Alert,
   Animated,
   Pressable,
   Text,
@@ -12,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useModal } from "../../context/ModalContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GlassContainer from "../../components/ui/GlassContainer";
 import SpotUsLoader from "../../components/ui/SpotUsLoader";
@@ -59,6 +59,7 @@ export default function MessageSender({
   const isTypingLocal = useRef(false);
   const inputRef = useRef(null);
   const insets = useSafeAreaInsets();
+  const { showAlert } = useModal();
 
   const sendScale = useRef(new Animated.Value(1)).current;
   const mediaMenuAnim = useRef(new Animated.Value(0)).current;
@@ -171,7 +172,7 @@ export default function MessageSender({
         await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (!permission.granted) {
-        Alert.alert(
+        showAlert(
           "Permission Required",
           "Please grant permission to access the media library.",
         );
@@ -194,7 +195,7 @@ export default function MessageSender({
       if (!cameraPermission?.granted) {
         const permission = await requestCameraPermission();
         if (!permission?.granted) {
-          Alert.alert(
+          showAlert(
             "Permission Required",
             "Please grant permission to access the camera.",
           );

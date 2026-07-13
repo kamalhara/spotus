@@ -4,7 +4,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -13,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useModal } from "../../context/ModalContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import GlassButton from "../../components/ui/GlassButton";
 import { db } from "../../config/firebase.config";
@@ -36,10 +36,11 @@ export default function FeedbackScreen() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const { showAlert, showConfirm } = useModal();
 
   const handleSubmit = async () => {
     if (!selectedCategory) {
-      Alert.alert(
+      showAlert(
         "Select a category",
         "Please choose a reason for your report.",
       );
@@ -62,14 +63,19 @@ export default function FeedbackScreen() {
       });
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      Alert.alert(
-        "Report submitted",
-        "Thanks for helping keep SpotUs safe. We'll review your report shortly.",
-        [{ text: "OK", onPress: () => router.back() }],
-      );
+      showConfirm({
+        title: "Report submitted",
+        message: "Thanks for helping keep SpotUs safe. We'll review your report shortly.",
+        confirmText: "OK",
+        cancelText: null,
+        icon: "checkmark-circle-outline",
+        iconColor: "#10B981",
+        confirmButtonStyle: "bg-green-500",
+        onConfirm: () => router.back()
+      });
     } catch (err) {
       console.error("Error submitting report:", err);
-      Alert.alert("Error", "Could not submit report. Please try again.");
+      showAlert("Error", "Could not submit report. Please try again.");
     } finally {
       setSubmitting(false);
     }

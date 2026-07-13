@@ -5,10 +5,11 @@ import { Image } from "expo-image";
 
 import { Redirect, useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Skeleton from "../../../components/ui/Skeleton";
 
+import ConfirmModal from "../../../components/ui/ConfirmModal";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 import { getTrustBadge } from "../../../lib/trust";
@@ -59,6 +60,7 @@ export default function Profile() {
   const { firestoreUser, loading } = useFirestoreUser();
   const router = useRouter();
 
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [rooms, setRooms] = useState([]);
   useFocusEffect(
     useCallback(() => {
@@ -115,22 +117,7 @@ export default function Profile() {
   }
 
   const handleSignOut = async () => {
-    Alert.alert(
-      "Sign out",
-      "Are you sure you want to sign out of SpotUs?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Sign Out",
-          style: "destructive",
-          onPress: async () => {
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            await signOut();
-            router.replace("/login");
-          },
-        },
-      ],
-    );
+    setShowSignOutConfirm(true);
   };
 
   const createdRooms = rooms.filter(
@@ -146,7 +133,7 @@ export default function Profile() {
     <SafeAreaView className="bg-bg dark:bg-[#111112] flex-1" edges={["top"]}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40 }}
+        contentContainerStyle={{ paddingBottom: 140 }}
       >
         {/* Profile Header — clean, no gradient */}
         <View className="items-center px-6 pt-6 pb-4">
@@ -365,6 +352,21 @@ export default function Profile() {
           SpotUs v1.0.0
         </Text>
       </ScrollView>
+      <ConfirmModal
+        isVisible={showSignOutConfirm}
+        onClose={() => {
+          setShowSignOutConfirm(false);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Failure);
+        }}
+        title="Sign out"
+        message="Are you sure you want to sign out of SpotUs?"
+        onConfirm={async () => {
+          setShowSignOutConfirm(false);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          await signOut();
+          router.replace("/login");
+        }}
+      />
     </SafeAreaView>
   );
 }

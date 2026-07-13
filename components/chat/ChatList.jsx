@@ -4,7 +4,6 @@ import { doc, setDoc } from "firebase/firestore";
 import React, { memo, useRef, useState } from "react";
 import { deleteChatWithMessages } from "../../lib/deleteRoom";
 import {
-  Alert,
   Animated,
   Image,
   Modal,
@@ -14,6 +13,7 @@ import {
   View,
 } from "react-native";
 import { db } from "../../config/firebase.config";
+import { useModal } from "../../context/ModalContext";
 import { useTheme } from "../../context/ThemeContext";
 import useFirestoreUser from "../../hook/useFireStoreUser";
 import usePresenceStatus from "../../hook/usePresenceStatus";
@@ -85,6 +85,7 @@ const ChatRow = memo(function ChatRow({ chat, onPress }) {
   const [isMuted, setIsMuted] = useState(
     chat?.mutedBy?.includes(currentUserId) || false,
   );
+  const { showConfirm } = useModal();
 
   const handleLongPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -93,20 +94,20 @@ const ChatRow = memo(function ChatRow({ chat, onPress }) {
 
   const handleDeleteChat = () => {
     setShowOptions(false);
-    Alert.alert("Delete Chat", "Are you sure you want to delete this chat?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: async () => {
-          try {
-            await deleteChatWithMessages(chat.id);
-          } catch (err) {
-            console.error("Error deleting chat:", err);
-          }
-        },
+    showConfirm({
+      title: "Delete Chat",
+      message: "Are you sure you want to delete this chat?",
+      confirmText: "Delete",
+      confirmButtonStyle: "bg-red-500",
+      icon: "trash-outline",
+      onConfirm: async () => {
+        try {
+          await deleteChatWithMessages(chat.id);
+        } catch (err) {
+          console.error("Error deleting chat:", err);
+        }
       },
-    ]);
+    });
   };
 
   const handleMuteChat = async () => {
@@ -130,36 +131,32 @@ const ChatRow = memo(function ChatRow({ chat, onPress }) {
 
   const handleBlockUser = () => {
     setShowOptions(false);
-    Alert.alert(
-      "Block User",
-      `Are you sure you want to block ${otherUser?.userName || "this user"}?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Block",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const userRef = doc(db, "users", currentUserId);
-              const blockedUsers = firestoreUser?.blockedUsers || [];
-              await setDoc(
-                userRef,
-                {
-                  blockedUsers: [
-                    ...blockedUsers,
-                    otherUser?.id ||
-                      chat?.participants?.find((p) => p !== currentUserId),
-                  ],
-                },
-                { merge: true },
-              );
-            } catch (err) {
-              console.error("Error blocking user:", err);
-            }
-          },
-        },
-      ],
-    );
+    showConfirm({
+      title: "Block User",
+      message: `Are you sure you want to block ${otherUser?.userName || "this user"}?`,
+      confirmText: "Block",
+      confirmButtonStyle: "bg-red-500",
+      icon: "ban-outline",
+      onConfirm: async () => {
+        try {
+          const userRef = doc(db, "users", currentUserId);
+          const blockedUsers = firestoreUser?.blockedUsers || [];
+          await setDoc(
+            userRef,
+            {
+              blockedUsers: [
+                ...blockedUsers,
+                otherUser?.id ||
+                  chat?.participants?.find((p) => p !== currentUserId),
+              ],
+            },
+            { merge: true },
+          );
+        } catch (err) {
+          console.error("Error blocking user:", err);
+        }
+      },
+    });
   };
 
   const OPTIONS = [

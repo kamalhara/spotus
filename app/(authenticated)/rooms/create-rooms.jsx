@@ -3,7 +3,6 @@ import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState, useEffect } from "react";
 import {
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -14,6 +13,7 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { useModal } from "../../../context/ModalContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import ExploreInterceptModal from "../../../components/shared/ExploreInterceptModal";
 import Animated, {
@@ -63,6 +63,7 @@ export default function CreateRooms() {
   const { getToken } = useAuth();
   const { firestoreUser: user } = useFirestoreUser();
   const { isDark } = useTheme();
+  const { showAlert } = useModal();
 
   const [title, setTitle] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -161,7 +162,7 @@ export default function CreateRooms() {
       router.replace(`/rooms/${roomId}`);
     } catch (err) {
       console.error("Error creating room:", err);
-      Alert.alert("Could not create room", err?.message || "Please try again.");
+      showAlert("Could not create room", err?.message || "Please try again.");
     } finally {
       setIsCreating(false);
     }
@@ -169,7 +170,7 @@ export default function CreateRooms() {
 
   const handleCreateRoom = async () => {
     if (!trimmedTitle || !selectedCategory) {
-      Alert.alert(
+      showAlert(
         "Room details needed",
         "Add a room name and choose a category before creating it.",
       );
@@ -177,7 +178,7 @@ export default function CreateRooms() {
     }
 
     if (!user?.id) {
-      Alert.alert("Profile still loading", "Please try again in a moment.");
+      showAlert("Profile still loading", "Please try again in a moment.");
       return;
     }
 

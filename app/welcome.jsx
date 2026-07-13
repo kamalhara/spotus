@@ -1,5 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@clerk/expo";
+import { Ionicons } from "@expo/vector-icons";
 import { Redirect, useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
 import { useEffect, useRef } from "react";
@@ -127,8 +127,7 @@ export default function Welcome() {
         >
           <View className="bg-surface-alt dark:bg-[#1A1A1E] px-8 pt-10 pb-14 rounded-t-[28px]">
             <Text className="text-secondary dark:text-gray-100 text-[34px] font-display leading-[40px] tracking-tight">
-              Local rooms,{"\n"}while they are{" "}
-              <Text className="text-primary">active</Text>
+              Where locals {"\n"} <Text className="text-primary">Connect</Text>
             </Text>
             <Text className="text-muted text-[15px] mt-4 leading-6 mb-8 font-body">
               Browse by radius and category, then join with location or an

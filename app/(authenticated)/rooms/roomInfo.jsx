@@ -17,8 +17,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Alert,
 } from "react-native";
+import { useModal } from "../../../context/ModalContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RoomOptionsModal from "../../../components/rooms/roomOptionsModal";
 import GlassButton from "../../../components/ui/GlassButton";
@@ -61,6 +61,7 @@ export default function RoomInfo() {
   const [isMembersExpanded, setIsMembersExpanded] = useState(false);
   const [showRoomTitle, setShowRoomTitle] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const { showConfirm } = useModal();
 
   const maxVisibleMembers = 3;
   const visibleMembers = isMembersExpanded
@@ -138,29 +139,22 @@ export default function RoomInfo() {
   const handleDeleteRoom = () => {
     if (!roomId) return;
 
-    Alert.alert(
-      "Delete Room",
-      "Are you sure you want to delete this room? This action cannot be undone and will remove all messages for everyone.",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await deleteRoomWithMessages(roomId);
-              setShowOptions(false);
-              router.replace("/(authenticated)/(tabs)/home");
-            } catch (err) {
-              console.error("Delete room error:", err);
-            }
-          },
-        },
-      ]
-    );
+    showConfirm({
+      title: "Delete Room",
+      message: "Are you sure you want to delete this room? This action cannot be undone and will remove all messages for everyone.",
+      confirmText: "Delete",
+      confirmButtonStyle: "bg-red-500",
+      icon: "trash-outline",
+      onConfirm: async () => {
+        try {
+          await deleteRoomWithMessages(roomId);
+          setShowOptions(false);
+          router.replace("/(authenticated)/(tabs)/home");
+        } catch (err) {
+          console.error("Delete room error:", err);
+        }
+      },
+    });
   };
 
   const handleShare = async () => {

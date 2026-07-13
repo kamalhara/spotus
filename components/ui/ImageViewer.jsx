@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useRef, useState } from "react";
 import {
-  Alert,
   Animated,
   Dimensions,
   Image,
@@ -12,6 +11,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useModal } from "../../context/ModalContext";
 import * as FileSystem from "expo-file-system/legacy";
 import * as Sharing from "expo-sharing";
 import GlassButton from "./GlassButton";
@@ -40,6 +40,7 @@ export default function ImageViewer({
 
   const [isZoomed, setIsZoomed] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const { showAlert } = useModal();
 
   const handleShare = async () => {
     if (!imageUrl) return;
@@ -53,11 +54,11 @@ export default function ImageViewer({
       if (isAvailable) {
         await Sharing.shareAsync(downloadRes.uri);
       } else {
-        Alert.alert("Error", "Sharing is not available on your device");
+        showAlert("Error", "Sharing is not available on your device");
       }
     } catch (error) {
       console.error("Error sharing image:", error);
-      Alert.alert("Error", "Failed to share the image.");
+      showAlert("Error", "Failed to share the image.");
     } finally {
       setIsSharing(false);
     }

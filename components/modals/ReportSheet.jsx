@@ -17,10 +17,11 @@ import {
   useRef,
   useState,
 } from "react";
-import { Alert, Platform, Text, TouchableOpacity, View } from "react-native";
+import { Platform, Text, TouchableOpacity, View } from "react-native";
 import { db } from "../../config/firebase.config";
 import { useTheme } from "../../context/ThemeContext";
 import { trackEvent } from "../../lib/analytics";
+import { useModal } from "../../context/ModalContext";
 import GlassContainer from "../ui/GlassContainer";
 
 const REPORT_CATEGORIES = [
@@ -74,6 +75,7 @@ const REPORT_CATEGORIES = [
 const ReportSheet = forwardRef(({ currentUserId, targetId, type }, ref) => {
   const bottomSheetModalRef = useRef(null);
   const { isDark } = useTheme();
+  const { showAlert } = useModal();
 
   const [step, setStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -117,7 +119,7 @@ const ReportSheet = forwardRef(({ currentUserId, targetId, type }, ref) => {
       cat === "Violence or Threats"
     ) {
       if (description.trim().length < 5) {
-        Alert.alert(
+        showAlert(
           "More Details Needed",
           "Please provide at least 5 characters describing the issue so we can investigate properly.",
         );
@@ -168,7 +170,7 @@ const ReportSheet = forwardRef(({ currentUserId, targetId, type }, ref) => {
       setStep(3);
     } catch (err) {
       console.error("Error submitting report:", err);
-      Alert.alert("Error", "Could not submit report. Please try again.");
+      showAlert("Error", "Could not submit report. Please try again.");
     } finally {
       setLoading(false);
     }

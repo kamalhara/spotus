@@ -12,8 +12,9 @@ import {
   useMemo,
   useRef,
 } from "react";
-import { Alert, Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { useTheme } from "../../context/ThemeContext";
+import { useModal } from "../../context/ModalContext";
 import GlassContainer from "../ui/GlassContainer";
 
 import { CATEGORY_ICONS } from "../../constants/categories";
@@ -23,6 +24,7 @@ const RoomDetailsSheet = forwardRef(
     const bottomSheetModalRef = useRef(null);
     const router = useRouter();
     const { isDark } = useTheme();
+    const { showConfirm } = useModal();
     useImperativeHandle(ref, () => ({
       dismiss: () => bottomSheetModalRef.current?.dismiss(),
       present: () => bottomSheetModalRef.current?.present(),
@@ -255,18 +257,13 @@ const RoomDetailsSheet = forwardRef(
                     ) : isHost ? (
                       <TouchableOpacity
                         onPress={() => {
-                          Alert.alert(
-                            "Kick User?",
-                            `Are you sure you want to kick ${member.userName} from the event? They will not be able to rejoin.`,
-                            [
-                              { text: "Cancel", style: "cancel" },
-                              {
-                                text: "Kick",
-                                style: "destructive",
-                                onPress: () => onKickUser(member.id),
-                              },
-                            ],
-                          );
+                          showConfirm({
+                            title: "Kick User?",
+                            message: `Are you sure you want to kick ${member.userName} from the event? They will not be able to rejoin.`,
+                            confirmText: "Kick",
+                            onConfirm: () => onKickUser(member.id),
+                            icon: "person-remove-outline",
+                          });
                         }}
                         className="bg-red-50 dark:bg-red-500/10 px-3 py-1.5 rounded-full"
                       >

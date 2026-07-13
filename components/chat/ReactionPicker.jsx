@@ -1,6 +1,7 @@
 import { Ionicons } from"@expo/vector-icons";
-import { Modal, Pressable, Text, TouchableOpacity, View } from"react-native";
-import Animated, { ZoomIn } from"react-native-reanimated";
+import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
+import Animated, { ZoomIn } from "react-native-reanimated";
+import { useModal } from "../../context/ModalContext";
 
 const REACTIONS = ["👍","❤️","😂","😲","😢","🙏"];
 
@@ -19,6 +20,8 @@ export default function ReactionPicker({
  onKick,
  onPin,
 }) {
+ const { showConfirm } = useModal();
+
  if (!isVisible) return null;
 
  const isSentByMe = message?.isSentByMe;
@@ -155,17 +158,15 @@ export default function ReactionPicker({
  <TouchableOpacity
  onPress={() => {
  onClose();
- import("react-native").then(({ Alert }) => {
- Alert.alert(
- "Kick User?",
- `Are you sure you want to kick ${message.user || "this user"} from the event?`,
- [
- { text: "Cancel", style: "cancel" },
- { text: "Kick", style: "destructive", onPress: () => onKick?.(message.senderId) }
- ]
- );
- });
- }}
+                showConfirm({
+                  title: "Kick User?",
+                  message: `Are you sure you want to kick ${message.user || "this user"} from the event?`,
+                  confirmText: "Kick",
+                  icon: "person-remove-outline",
+                  confirmButtonStyle: "bg-red-500",
+                  onConfirm: () => onKick?.(message.senderId),
+                });
+              }}
  activeOpacity={0.7}
  className="flex-row items-center px-4 py-3 border-t border-gray-50 dark:border-[#2C2C30]"
  >

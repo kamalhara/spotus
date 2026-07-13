@@ -3,7 +3,6 @@ import * as Haptics from "expo-haptics";
 import { arrayRemove, doc, getDoc, updateDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import {
-  Alert,
   Image,
   Modal,
   ScrollView,
@@ -12,6 +11,7 @@ import {
   View,
 } from "react-native";
 import { db } from "../../config/firebase.config";
+import { useModal } from "../../context/ModalContext";
 import { useTheme } from "../../context/ThemeContext";
 import useFirestoreUser from "../../hook/useFireStoreUser";
 import GlassButton from "../ui/GlassButton";
@@ -23,6 +23,7 @@ function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
   const { isDark } = useTheme();
   const [blockedProfiles, setBlockedProfiles] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { showConfirm, showAlert } = useModal();
   const [unblocking, setUnblocking] = useState(null);
 
   // Fetch profiles for blocked user IDs
@@ -60,36 +61,33 @@ function BlockedUserModal({ showBlockedModal, setShowBlockedModal }) {
   }, [showBlockedModal, firestoreUser?.blockedUsers]);
 
   const handleUnblock = (blockedUser) => {
-    Alert.alert(
-      `Unblock ${blockedUser.userName}?`,
-      "They will be able to see your profile and send you messages again.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Unblock",
-          onPress: async () => {
-            setUnblocking(blockedUser.id);
-            try {
-              const viewerRef = doc(db, "users", firestoreUser.id);
-              await updateDoc(viewerRef, {
-                blockedUsers: arrayRemove(blockedUser.id),
-              });
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success,
-              );
-              setBlockedProfiles((prev) =>
-                prev.filter((p) => p.id !== blockedUser.id),
-              );
-            } catch (err) {
-              console.error("Error unblocking user:", err);
-              Alert.alert("Error", "Could not unblock user. Please try again.");
-            } finally {
-              setUnblocking(null);
-            }
-          },
-        },
-      ],
-    );
+    showConfirm({
+      title: `Unblock ${blockedUser.userName}?`,
+      message: "They will be able to see your profile and send you messages again.",
+      confirmText: "Unblock",
+      icon: "person-add-outline",
+      confirmButtonStyle: "bg-blue-500",
+      onConfirm: async () => {
+        setUnblocking(blockedUser.id);
+        try {
+          const viewerRef = doc(db, "users", firestoreUser.id);
+          await updateDoc(viewerRef, {
+            blockedUsers: arrayRemove(blockedUser.id),
+          });
+          Haptics.notificationAsync(
+            Haptics.NotificationFeedbackType.Success,
+          );
+          setBlockedProfiles((prev) =>
+            prev.filter((p) => p.id !== blockedUser.id),
+          );
+        } catch (err) {
+          console.error("Error unblocking user:", err);
+          showAlert("Error", "Could not unblock user. Please try again.");
+        } finally {
+          setUnblocking(null);
+        }
+      },
+    });
   };
 
   return (
