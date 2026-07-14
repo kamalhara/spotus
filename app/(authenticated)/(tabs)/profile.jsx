@@ -12,7 +12,6 @@ import Skeleton from "../../../components/ui/Skeleton";
 import ConfirmModal from "../../../components/ui/ConfirmModal";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
-import { getTrustBadge } from "../../../lib/trust";
 
 const MenuItem = ({
   icon,
@@ -139,30 +138,16 @@ export default function Profile() {
         <View className="items-center px-6 pt-6 pb-4">
           {/* Avatar and Edit Button */}
           <View className="relative">
-            {/* Trust-colored ring */}
-            {(() => {
-              const badge = getTrustBadge(firestoreUser?.globalReputation ?? 0);
-              return (
-                <View
-                  className="w-[108px] h-[108px] rounded-[40px] items-center justify-center"
-                  style={{
-                    borderWidth: 2.5,
-                    borderColor: `${badge.color}40`,
-                  }}
-                >
-                  <View className="w-[100px] h-[100px] rounded-[36px] overflow-hidden bg-gray-100 dark:bg-gray-800">
-                    <Image
-                      source={
-                        firestoreUser?.profilePic || "https://picsum.photos/200"
-                      }
-                      contentFit="cover"
-                      transition={500}
-                      style={{ width: "100%", height: "100%" }}
-                    />
-                  </View>
-                </View>
-              );
-            })()}
+            <View className="w-[100px] h-[100px] rounded-[36px] overflow-hidden bg-gray-100 dark:bg-gray-800">
+              <Image
+                source={
+                  firestoreUser?.profilePic || "https://picsum.photos/200"
+                }
+                contentFit="cover"
+                transition={500}
+                style={{ width: "100%", height: "100%" }}
+              />
+            </View>
             <TouchableOpacity
               onPress={() => router.push("/profile/edit")}
               activeOpacity={0.8}
@@ -186,23 +171,6 @@ export default function Profile() {
 
           {/* Pill stat badges */}
           <View className="flex-row items-center mt-4 gap-2">
-            {(() => {
-              const badge = getTrustBadge(firestoreUser?.globalReputation ?? 0);
-              return (
-                <View
-                  className="flex-row items-center px-3 py-1.5 rounded-lg"
-                  style={{ backgroundColor: `${badge.color}12` }}
-                >
-                  <Ionicons name={badge.icon} size={12} color={badge.color} />
-                  <Text
-                    className="text-[11px] font-semibold ml-1.5"
-                    style={{ color: badge.color }}
-                  >
-                    {badge.label}
-                  </Text>
-                </View>
-              );
-            })()}
             <View className="flex-row items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-[#222226]">
               <Ionicons name="add-circle-outline" size={12} color="#6B7280" />
               <Text className="text-gray-500 dark:text-gray-400 text-[11px] font-semibold ml-1.5">

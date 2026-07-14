@@ -4,10 +4,8 @@ import * as Linking from "expo-linking";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   arrayRemove,
-  collection,
   doc,
   getDoc,
-  getDocs,
   updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
@@ -90,16 +88,8 @@ export default function RoomInfo() {
                 }),
               )
             ).filter(Boolean);
-            const trustSnap = await getDocs(
-              collection(db, "rooms", roomId, "trust"),
-            );
-            const trustMap = {};
-            trustSnap.forEach((d) => {
-              trustMap[d.id] = d.data().messagesCount || 0;
-            });
             setMembers(
               profiles
-                .map((p) => ({ ...p, trustScore: trustMap[p.id] || 0 }))
                 .filter((p) => !user?.blockedUsers?.includes(p.id)),
             );
           }
@@ -365,19 +355,6 @@ export default function RoomInfo() {
                               {member.userName || "Unknown Member"}
                             </Text>
                             <View className="flex-row items-center mt-2 gap-2">
-                              {member.trustScore > 0 && (
-                                <View className="bg-success/10 px-2.5 py-1 rounded-lg flex-row items-center">
-                                  <Ionicons
-                                    name="checkmark-circle"
-                                    size={10}
-                                    color="#10B981"
-                                  />
-                                  <Text className="text-success font-display font-black text-[8px] uppercase tracking-widest ml-1">
-                                    Trust{""}
-                                    {Math.min(member.trustScore * 10, 100)}%
-                                  </Text>
-                                </View>
-                              )}
                               {member.id === room?.createdBy && (
                                 <View className="bg-warning/10 px-2.5 py-1 rounded-lg flex-row items-center">
                                   <Ionicons

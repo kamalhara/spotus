@@ -173,7 +173,6 @@ async function sendMessage(userId, roomId, payload) {
   const roomRef = db.collection('rooms').doc(roomId);
   const userRef = db.collection('users').doc(userId);
   const messageRef = roomRef.collection('messages').doc();
-  const trustRef = roomRef.collection('trust').doc(userId);
 
   return db.runTransaction(async (transaction) => {
     const [roomSnapshot, userSnapshot] = await Promise.all([
@@ -219,11 +218,6 @@ async function sendMessage(userId, roomId, payload) {
       messageCount: admin.firestore.FieldValue.increment(1),
       updatedAt: now,
     });
-    transaction.set(trustRef, {
-      messagesCount: admin.firestore.FieldValue.increment(1),
-      updatedAt: now,
-    }, { merge: true });
-
     return {
       messageId: messageRef.id,
       roomTitle: room.title || 'Room',

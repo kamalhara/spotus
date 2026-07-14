@@ -19,10 +19,10 @@ import { trackEvent } from "../../../lib/analytics";
 
 const FAQS = [
   {
-    title: "Unlocking Direct Messages",
+    title: "Starting Direct Messages",
     description:
-      "Send 10 quality messages inside a shared room to build trust and unlock DMs.",
-    icon: "shield-checkmark-outline",
+      "Open a member profile and send a message request. Once accepted, you can chat privately.",
+    icon: "chatbubble-ellipses-outline",
   },
   {
     title: "What are Rooms?",

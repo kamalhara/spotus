@@ -57,9 +57,9 @@ export default function About() {
             description="Meet through shared interest spaces before direct messages."
           />
           <SettingsRow
-            icon="shield-checkmark-outline"
-            title="Trust based"
-            description="Conversation access is designed around room activity."
+            icon="chatbubbles-outline"
+            title="Request based"
+            description="Direct conversations begin with an accepted message request."
           />
           <SettingsRow
             icon="location-outline"

@@ -233,18 +233,6 @@ const RoomDetailsSheet = forwardRef(
                               </Text>
                             </View>
                           )}
-                          {member.trustScore > 0 && (
-                            <View className="bg-success-surface dark:bg-success-surface px-2.5 py-1 rounded-full flex-row items-center">
-                              <Ionicons
-                                name="checkmark-circle"
-                                size={10}
-                                color="#10B981"
-                              />
-                              <Text className="text-success font-display font-black text-[9px] uppercase tracking-widest ml-1">
-                                Trust {Math.min(member.trustScore * 10, 100)}%
-                              </Text>
-                            </View>
-                          )}
                         </View>
                       </View>
                     </View>

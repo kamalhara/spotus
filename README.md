@@ -7,13 +7,13 @@
 
 ## 📋 Project Summary
 
-SpotUs is an internal, location-based social discovery and real-time messaging application. Built on React Native and Expo, SpotUs bridges local community discovery with high-integrity social interaction. By leveraging real-time geographic queries, interest-based rooms, and an innovative reputation trust system, SpotUs ensures that local chats remain engaging, safe, and spam-free.
+SpotUs is an internal, location-based social discovery and real-time messaging application. Built on React Native and Expo, SpotUs connects nearby communities through real-time geographic queries, interest-based rooms, moderated conversations, and request-based direct messages.
 
 ---
 
 ## 📖 Table of Contents
 
-- [Core Philosophy & Trust System](#-core-philosophy--trust-system)
+- [Core Philosophy](#-core-philosophy)
 - [Key Features](#-key-features)
 - [Tech Stack](#%EF%B8%8F-tech-stack)
 - [Directory Architecture](#-directory-architecture)
@@ -30,27 +30,25 @@ SpotUs is an internal, location-based social discovery and real-time messaging a
 
 ---
 
-## 🛡️ Core Philosophy & Trust System
+## 🛡️ Core Philosophy
 
-Unlike conventional location-based chat apps that are plagued by cold-reach spam and bots, SpotUs enforces a **Dual Trust System** designed to encourage authentic organic interactions.
+SpotUs encourages people to meet through shared nearby rooms before moving into private conversations. Direct messages begin with a request that the recipient can accept.
 
-### The DM Unlock Flow
+### The Direct Message Flow
 
 To message someone directly:
 
 1. A user joins a local room within their radius.
-2. The user participates in the public room chat. Every message sent increments their **Room Trust Score**.
-3. Once the user reaches a **Trust Score of 10** or more within that room, the system unlocks the ability to start a Direct Message (DM) thread with other members of that room.
+2. The user opens another member's profile and sends a message request.
+3. The recipient accepts the request to begin a private conversation.
 
 ```mermaid
 flowchart TD
-    A([User Joins Nearby Room]) --> B[Participate in Public Room Chat]
-    B --> C{Send Message}
-    C -->|Increments Trust| D[Firestore room trust counter updated]
-    D --> E{Trust Score >= 10?}
-    E -->|No| B
-    E -->|Yes| F[Unlock Direct Messaging with room members]
-    F --> G([Send DM / Private chat])
+    A([User Joins Nearby Room]) --> B[Open Member Profile]
+    B --> C[Send Message Request]
+    C --> D{Recipient Accepts?}
+    D -->|No| E[Request Remains Pending]
+    D -->|Yes| F([Start Private Chat])
 ```
 
 ---
@@ -104,7 +102,6 @@ spotus/
 ├── context/                  # Global contexts (ThemeContext, etc.)
 ├── hook/                     # Custom React Hooks
 ├── lib/                      # Core business logic helpers
-│   ├── trust.js              # Room Trust & DM verification logic
 │   ├── location.js           # Core Location fetchers (Expo Location)
 │   ├── getNearbyRoom.js      # Geohash queries for Room collection
 │   ├── notification.js       # Push Notification register/send

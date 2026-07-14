@@ -30,7 +30,6 @@ import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
-import { getTrustBadge } from "../../../lib/trust";
 
 const dateFormater = (timestamp) => {
   const date = new Date(timestamp * 1000);
@@ -74,7 +73,7 @@ export default function UserProfile() {
     (r) => r.createdBy === userId && r.visibility !== "ghost"
   );
 
-  // Fetch the viewed user's profile and check trust context for DM access
+  // Fetch the viewed user's profile.
   useEffect(() => {
     if (!userId) return;
 
@@ -368,17 +367,6 @@ export default function UserProfile() {
             </Text>
           ) : null}
 
-          {(() => {
-            const badge = getTrustBadge(user?.globalReputation ?? 0);
-            return (
-              <View className="mt-3 flex-row items-center px-3.5 py-1.5 rounded-full" style={{ backgroundColor: `${badge.color}15` }}>
-                <Ionicons name={badge.icon} size={12} color={badge.color} />
-                <Text className="text-xs font-semibold ml-1.5" style={{ color: badge.color }}>
-                  {badge.label} • {user?.globalReputation ?? 0} rep
-                </Text>
-              </View>
-            );
-          })()}
         </View>
 
         {/* Action Buttons */}
@@ -453,18 +441,6 @@ export default function UserProfile() {
               </Text>
               <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider mt-0.5">
                 Events Joined
-              </Text>
-            </View>
-            <View className="w-px bg-gray-100 dark:bg-[#2C2C30] my-4" />
-            <View className="flex-1 items-center py-5">
-              <View className="w-9 h-9 bg-green-50 dark:bg-green-900/20 rounded-xl items-center justify-center mb-2">
-                <Ionicons name="star-outline" size={16} color="#10B981" />
-              </View>
-              <Text className="text-[20px] font-display font-extrabold text-green-500">
-                {user?.globalReputation ?? 0}
-              </Text>
-              <Text className="text-gray-400 dark:text-gray-500 text-[10px] font-bold uppercase tracking-wider mt-0.5">
-                Rep
               </Text>
             </View>
           </View>
