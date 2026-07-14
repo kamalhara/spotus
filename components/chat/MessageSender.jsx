@@ -44,6 +44,7 @@ export default function MessageSender({
   editingMessage,
   setEditingMessage,
   handleEditMessage,
+  typingCollection = "chats",
 }) {
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
@@ -106,7 +107,7 @@ export default function MessageSender({
 
     if (!isTypingLocal.current) {
       isTypingLocal.current = true;
-      setTyping(chatId, currentUserId, true);
+      setTyping(chatId, currentUserId, true, typingCollection);
     }
 
     if (typingTimeout.current) {
@@ -115,11 +116,11 @@ export default function MessageSender({
 
     typingTimeout.current = setTimeout(() => {
       isTypingLocal.current = false;
-      setTyping(chatId, currentUserId, false);
+      setTyping(chatId, currentUserId, false, typingCollection);
     }, 1500);
   };
 
-  const onSend = () => {
+  const onSend = async () => {
     if (!canSend) return;
 
     // Trigger elastic bounce and heavy haptic on send
@@ -144,18 +145,26 @@ export default function MessageSender({
       clearTimeout(typingTimeout.current);
     }
     isTypingLocal.current = false;
-    setTyping(chatId, currentUserId, false);
+    setTyping(chatId, currentUserId, false, typingCollection);
 
-    if (editingMessage && handleEditMessage) {
-      handleEditMessage(editingMessage.id, message);
-      setEditingMessage(null);
-    } else if (handleSend) {
-      handleSend(message);
+    try {
+      if (editingMessage && handleEditMessage) {
+        await handleEditMessage(editingMessage.id, message);
+        setEditingMessage(null);
+      } else if (handleSend) {
+        await handleSend(message);
+      }
+
+      setMessage("");
+      onCancelReply?.();
+    } catch (error) {
+      showAlert(
+        "Message Not Sent",
+        error?.message || "Please check your connection and try again.",
+      );
+    } finally {
+      setIsSending(false);
     }
-
-    setMessage("");
-    onCancelReply?.();
-    setIsSending(false);
   };
 
   const handleCancelEdit = () => {
@@ -186,7 +195,14 @@ export default function MessageSender({
       if (!result.canceled) {
         const uri = result.assets[0].uri;
         closeMediaMenu();
-        handleSendImage(uri);
+        try {
+          await handleSendImage(uri);
+        } catch (error) {
+          showAlert(
+            "Photo Not Sent",
+            error?.message || "Please check your connection and try again.",
+          );
+        }
       }
     };
 
@@ -209,7 +225,14 @@ export default function MessageSender({
       if (!result.canceled) {
         const uri = result.assets[0].uri;
         closeMediaMenu();
-        handleSendImage(uri);
+        try {
+          await handleSendImage(uri);
+        } catch (error) {
+          showAlert(
+            "Photo Not Sent",
+            error?.message || "Please check your connection and try again.",
+          );
+        }
       }
     };
 

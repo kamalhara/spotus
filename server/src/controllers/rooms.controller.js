@@ -44,7 +44,7 @@ async function deleteRoom(req, res, next) {
 
 async function sendMessage(req, res, next) {
   try {
-    await consumeRateLimit(req.userId, 'send-room-message', { limit: 30, windowMs: 60 * 1000 });
+    await consumeRateLimit(req.userId, 'send-room-message', { limit: 120, windowMs: 60 * 1000 });
     const result = await roomsService.sendMessage(
       req.userId,
       documentId(req.params.roomId),

@@ -94,6 +94,7 @@ service cloud.firestore {
             && callerOnlyListChange("lastMessageSeenBy")
             && request.resource.data.lastMessageSeenBy.hasAny([request.auth.uid]))
           || (changesOnly(["mutedBy"]) && callerOnlyListChange("mutedBy"))
+          || (changesOnly(["typing"]) && callerOnlyMapChange("typing"))
         );
 
       match /messages/{messageId} {

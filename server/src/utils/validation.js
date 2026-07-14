@@ -109,7 +109,16 @@ function documentId(value, field = 'Room') {
 }
 
 function messagePayload(body = {}) {
-  const text = requiredString(body.text, 'Message', 1000);
+  const isImage = body.type === 'image';
+  const text = isImage ? '' : requiredString(body.text, 'Message', 1000);
+  const imageUrl = isImage ? requiredString(body.imageUrl, 'Image URL', 500) : null;
+  const cloudinaryPublicId = isImage
+    ? requiredString(body.cloudinaryPublicId, 'Cloudinary public ID', 300)
+    : null;
+
+  if (isImage && !/^https:\/\/.+\.cloudinary\.com\//i.test(imageUrl)) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'Image URL is invalid');
+  }
   const normalized = text.toLowerCase();
   const blockedTerms = (process.env.BLOCKED_MESSAGE_TERMS || '')
     .split(',')
@@ -131,7 +140,13 @@ function messagePayload(body = {}) {
       imageUrl: optionalString(body.replyTo.imageUrl, 'Reply image', 500) || null,
     };
   }
-  return { text, replyTo };
+  return {
+    type: isImage ? 'image' : 'text',
+    text,
+    imageUrl,
+    cloudinaryPublicId,
+    replyTo,
+  };
 }
 
 function notificationPayload(body = {}, { batch = false } = {}) {

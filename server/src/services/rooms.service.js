@@ -193,19 +193,26 @@ async function sendMessage(userId, roomId, payload) {
 
     const user = userSnapshot.data() || {};
     const now = admin.firestore.FieldValue.serverTimestamp();
+    const isImage = payload.type === 'image';
     const message = {
-      text: payload.text,
+      ...(isImage
+        ? {
+            type: 'image',
+            imageUrl: payload.imageUrl,
+            cloudinaryPublicId: payload.cloudinaryPublicId,
+          }
+        : { text: payload.text }),
       senderId: userId,
       user: user.userName || 'SpotUs member',
       profilePic: user.profilePic || null,
       createdAt: now,
       seenBy: [userId],
       reactions: {},
-      ...(payload.replyTo ? { replyTo: payload.replyTo } : {}),
+      ...(!isImage && payload.replyTo ? { replyTo: payload.replyTo } : {}),
     };
     transaction.create(messageRef, message);
     transaction.update(roomRef, {
-      lastMessage: payload.text,
+      lastMessage: isImage ? '📷 Photo' : payload.text,
       lastMessageAt: now,
       lastMessageSenderId: userId,
       lastMessageSeenBy: [userId],

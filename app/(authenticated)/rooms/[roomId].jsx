@@ -2,7 +2,6 @@ import { useAuth } from "@clerk/expo";
 import * as Linking from "expo-linking";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  addDoc,
   arrayRemove,
   arrayUnion,
   collection,
@@ -11,7 +10,6 @@ import {
   onSnapshot,
   orderBy,
   query,
-  serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -187,7 +185,11 @@ export default function RoomChat() {
     const trimmedText = text.trim();
     try {
       const token = await getToken();
-      const result = await sendRoomMessage(roomId, trimmedText, replyTo, token);
+      const result = await sendRoomMessage(
+        roomId,
+        { text: trimmedText, replyTo },
+        token,
+      );
       setReplyTo(null);
       sendBatchNotification(
         result.participantIds,
@@ -197,8 +199,10 @@ export default function RoomChat() {
         { type: "room", screen: "room", roomId },
         token
       );
+      return result;
     } catch (err) {
       console.error("Error sending message:", err);
+      throw err;
     }
   };
 
@@ -214,38 +218,23 @@ export default function RoomChat() {
         return;
       }
 
-      await addDoc(collection(db, "rooms", roomId, "messages"), {
+      const result = await sendRoomMessage(roomId, {
         type: "image",
         imageUrl: uploadResult.imageUrl,
         cloudinaryPublicId: uploadResult.cloudinaryPublicId,
-        senderId: currentUserId,
-        user: user?.userName || "Unknown",
-        profilePic: user?.profilePic || null,
-        createdAt: serverTimestamp(),
-        seenBy: [currentUserId],
-      });
-
-      await updateDoc(doc(db, "rooms", roomId), {
-        lastMessage: "📷 Photo",
-        lastMessageAt: serverTimestamp(),
-        lastMessageSenderId: currentUserId,
-        lastMessageSeenBy: [currentUserId],
-      });
+      }, uploadToken);
       // Notify all other room participants about the image
-      const otherParticipants = (room?.participants || []).filter(
-        (uid) => uid !== currentUserId,
-      );
-      const token = await getToken();
       sendBatchNotification(
-        otherParticipants,
+        result.participantIds,
         currentUserId,
-        `${user?.userName || "Someone"} in ${room?.title || "Room"}`,
+        `${result.senderName} in ${result.roomTitle}`,
         "📷 Sent a photo",
         { type: "room", screen: "room", roomId },
-        token
+        uploadToken
       );
     } catch (err) {
       console.error("Room image send error:", err);
+      throw err;
     } finally {
       setUploadingImageUri(null);
     }
@@ -378,6 +367,7 @@ export default function RoomChat() {
             editingMessage={editingMessage}
             setEditingMessage={setEditingMessage}
             handleEditMessage={handleEditMessage}
+            typingCollection="rooms"
           />
         </View>
 

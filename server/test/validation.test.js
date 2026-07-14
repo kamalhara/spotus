@@ -85,7 +85,10 @@ describe('messagePayload', () => {
         },
       }),
     ).toEqual({
+      type: 'text',
       text: 'Hello there',
+      imageUrl: null,
+      cloudinaryPublicId: null,
       replyTo: {
         id: 'message_1',
         text: 'Previous message',
@@ -93,6 +96,34 @@ describe('messagePayload', () => {
         imageUrl: null,
       },
     });
+  });
+
+  test('accepts a signed Cloudinary image message', () => {
+    expect(
+      messagePayload({
+        type: 'image',
+        imageUrl: 'https://res.cloudinary.com/demo/image/upload/spotus/photo.jpg',
+        cloudinaryPublicId: 'spotus/photo',
+      }),
+    ).toEqual({
+      type: 'image',
+      text: '',
+      imageUrl: 'https://res.cloudinary.com/demo/image/upload/spotus/photo.jpg',
+      cloudinaryPublicId: 'spotus/photo',
+      replyTo: null,
+    });
+  });
+
+  test('rejects image messages hosted outside Cloudinary', () => {
+    expect(() =>
+      messagePayload({
+        type: 'image',
+        imageUrl: 'https://example.com/photo.jpg',
+        cloudinaryPublicId: 'spotus/photo',
+      }),
+    ).toThrow(
+      expect.objectContaining({ code: 'VALIDATION_ERROR', status: 400 }),
+    );
   });
 });
 
