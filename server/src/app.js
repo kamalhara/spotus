@@ -1,3 +1,14 @@
+const Sentry = require('@sentry/node');
+
+const sentryDsn = process.env.SENTRY_DSN;
+Sentry.init({
+  // Placeholder: set SENTRY_DSN on Render to enable backend crash reporting.
+  dsn: sentryDsn || 'https://examplePublicKey@o0.ingest.sentry.io/0',
+  enabled: Boolean(sentryDsn),
+  environment: process.env.NODE_ENV || 'development',
+  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0,
+});
+
 const express = require('express');
 const cors = require('cors');
 const { clerkMiddleware } = require('@clerk/express');
@@ -89,7 +100,7 @@ app.get('/ready', async (req, res) => {
       new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000)),
     ]);
     res.status(200).json({ status: 'ready', timestamp: new Date().toISOString() });
-  } catch (error) {
+  } catch (_error) {
     res.status(503).json({ status: 'not_ready', timestamp: new Date().toISOString() });
   }
 });
@@ -106,6 +117,8 @@ app.use('/api', (req, res) => {
     requestId: req.requestId,
   });
 });
+
+Sentry.setupExpressErrorHandler(app);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -130,9 +130,11 @@ export default function CreateRooms() {
         token
       );
 
-      trackEvent("room_created", {
+      trackEvent("Room Created", {
+        roomId,
         category: selectedCategory,
         duration,
+        visibility: showOnMap ? "public" : "ghost",
       });
 
       router.replace(`/rooms/${roomId}`);

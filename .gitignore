@@ -85,3 +85,4 @@ yarn-error.*
 
 # @end expo-cli
 .trigger
+server/coverage/

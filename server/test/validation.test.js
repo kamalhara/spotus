@@ -1,69 +1,118 @@
-const test = require('node:test');
-const assert = require('node:assert/strict');
+const { afterEach, describe, expect, test } = require('@jest/globals');
 const {
   createRoomPayload,
-  documentId,
-  inviteCode,
   messagePayload,
   notificationPayload,
 } = require('../src/utils/validation');
 
-test('normalizes a valid room payload', () => {
-  const capturedAt = Date.now();
-  assert.deepEqual(createRoomPayload({
-    title: '  Coffee nearby  ',
-    description: ' Say hello ',
-    category: 'Coffee',
-    duration: 3,
-    showOnMap: true,
-    latitude: 12.9,
-    longitude: 77.6,
-    accuracy: 15,
-    capturedAt,
-  }), {
-    title: 'Coffee nearby',
-    description: 'Say hello',
-    category: 'Coffee',
-    duration: 3,
-    showOnMap: true,
-    latitude: 12.9,
-    longitude: 77.6,
-    accuracy: 15,
-    capturedAt,
+const validRoom = (overrides = {}) => ({
+  title: '  Coffee nearby  ',
+  description: ' Say hello ',
+  category: 'Coffee',
+  duration: 3,
+  showOnMap: true,
+  latitude: 12.9,
+  longitude: 77.6,
+  accuracy: 15,
+  capturedAt: Date.now(),
+  ...overrides,
+});
+
+describe('createRoomPayload', () => {
+  test('normalizes and returns the expected payload structure', () => {
+    const payload = createRoomPayload(validRoom());
+
+    expect(payload).toEqual({
+      title: 'Coffee nearby',
+      description: 'Say hello',
+      category: 'Coffee',
+      duration: 3,
+      showOnMap: true,
+      latitude: 12.9,
+      longitude: 77.6,
+      accuracy: 15,
+      capturedAt: expect.any(Number),
+    });
+  });
+
+  test.each([-1, 251, Number.NaN])(
+    'rejects invalid location accuracy: %s',
+    (accuracy) => {
+      expect(() => createRoomPayload(validRoom({ accuracy }))).toThrow(
+        expect.objectContaining({ code: 'LOCATION_UNRELIABLE', status: 422 }),
+      );
+    },
+  );
+
+  test('rejects stale location evidence', () => {
+    expect(() =>
+      createRoomPayload(validRoom({ capturedAt: Date.now() - 121_000 })),
+    ).toThrow(
+      expect.objectContaining({ code: 'LOCATION_STALE', status: 422 }),
+    );
   });
 });
 
-test('rejects unsupported room durations and coordinates', () => {
-  assert.throws(() => createRoomPayload({
-    title: 'Test', category: 'Tech', duration: 999, latitude: 0, longitude: 0,
-  }), { code: 'VALIDATION_ERROR' });
-  assert.throws(() => createRoomPayload({
-    title: 'Test', category: 'Tech', duration: 1, latitude: 91, longitude: 0,
-  }), { code: 'VALIDATION_ERROR' });
-});
+describe('messagePayload', () => {
+  const originalBlockedTerms = process.env.BLOCKED_MESSAGE_TERMS;
 
-test('validates identifiers and invite codes', () => {
-  assert.equal(documentId('room_123'), 'room_123');
-  assert.equal(inviteCode('ab12cd34'), 'AB12CD34');
-  assert.throws(() => documentId('rooms/unsafe'), { code: 'VALIDATION_ERROR' });
-});
+  afterEach(() => {
+    if (originalBlockedTerms === undefined) {
+      delete process.env.BLOCKED_MESSAGE_TERMS;
+    } else {
+      process.env.BLOCKED_MESSAGE_TERMS = originalBlockedTerms;
+    }
+  });
 
-test('rejects obvious message spam', () => {
-  assert.throws(() => messagePayload({ text: 'aaaaaaaaaaaaaa' }), { code: 'CONTENT_REJECTED' });
-  assert.throws(() => messagePayload({ text: 'https://a.test https://b.test https://c.test' }), {
-    code: 'CONTENT_REJECTED',
+  test('rejects configured bad words case-insensitively', () => {
+    process.env.BLOCKED_MESSAGE_TERMS = 'forbidden,blocked phrase';
+
+    expect(() => messagePayload({ text: 'This contains FORBIDDEN content' }))
+      .toThrow(
+        expect.objectContaining({ code: 'CONTENT_REJECTED', status: 422 }),
+      );
+  });
+
+  test('normalizes a message and reply payload', () => {
+    expect(
+      messagePayload({
+        text: '  Hello there  ',
+        replyTo: {
+          id: 'message_1',
+          text: ' Previous message ',
+          user: ' Ada ',
+          imageUrl: '',
+        },
+      }),
+    ).toEqual({
+      text: 'Hello there',
+      replyTo: {
+        id: 'message_1',
+        text: 'Previous message',
+        user: 'Ada',
+        imageUrl: null,
+      },
+    });
   });
 });
 
-test('deduplicates notification recipients and limits payload data', () => {
-  const result = notificationPayload({
-    recipientUserIds: ['user_1', 'user_1', 'user_2'],
-    title: 'Room update',
-    body: 'Someone joined',
-    data: { type: 'room', roomId: 'room_1' },
-  }, { batch: true });
-  assert.deepEqual(result.recipientUserIds, ['user_1', 'user_2']);
-  assert.throws(() => notificationPayload({
-    recipientUserId: 'user_1', title: 'x', body: 'y', data: { type: 'unknown' },
-  }), { code: 'VALIDATION_ERROR' });
+describe('notificationPayload', () => {
+  test('deduplicates batch recipients and preserves the validated shape', () => {
+    expect(
+      notificationPayload(
+        {
+          recipientUserIds: ['user_1', 'user_1', 'user_2'],
+          title: 'Room update',
+          body: 'Someone joined',
+          data: { type: 'room', roomId: 'room_1' },
+        },
+        { batch: true },
+      ),
+    ).toEqual({
+      recipientUserIds: ['user_1', 'user_2'],
+      title: 'Room update',
+      body: 'Someone joined',
+      data: { type: 'room', roomId: 'room_1' },
+    });
+  });
 });

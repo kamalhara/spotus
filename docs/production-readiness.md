@@ -15,10 +15,16 @@ Set these as secret environment variables on the backend:
 - `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET`
 - `ALLOWED_ORIGINS` as a comma-separated allowlist for the web build
 - `BLOCKED_MESSAGE_TERMS` for the initial moderation denylist
+- `SENTRY_DSN` for backend crash reporting
 
 Set `EXPO_PUBLIC_API_URL` in every EAS environment to the deployed API origin.
+Set `EXPO_PUBLIC_SENTRY_DSN`, `EXPO_PUBLIC_POSTHOG_API_KEY`, and optionally
+`EXPO_PUBLIC_POSTHOG_HOST` in every EAS environment.
 Do not put Cloudinary API secrets or service-account credentials in any
 `EXPO_PUBLIC_` variable.
+
+GitHub Actions requires `EXPO_TOKEN` for OTA updates and an optional
+`RENDER_DEPLOY_HOOK_URL` if Render auto-deploy is disabled.
 
 ### Render free-tier availability
 
@@ -38,11 +44,11 @@ release. The default database should report `freeTier: true`, with PITR,
 backups, clones, and TTL policies disabled. Do not enable TTL: TTL deletes
 require billing and deleting a room document would orphan its subcollections.
 
-The room cleanup task therefore remains responsible for recursive data and media
-cleanup. It is capped at 100 expired rooms per execution to prevent one run from
-causing unbounded reads, memory use, or timeouts. Monitor for repeated
-"per-run safety limit" warnings; if they occur, increase task frequency before
-raising the cap.
+The Trigger.dev room cleanup task therefore remains responsible for recursive
+data and media cleanup. It is capped at 100 expired rooms per execution to
+prevent one run from causing unbounded reads, memory use, or timeouts. Monitor
+for repeated "per-run safety limit" warnings; if they occur, increase task
+frequency before raising the cap.
 
 Deploy the backend before closing the Firestore rules; older backend deployments
 do not expose the custom-token endpoint and signed-in clients would be locked

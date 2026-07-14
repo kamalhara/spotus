@@ -10,7 +10,7 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint app components config constants context hook lib utils"
   },
   "dependencies": {
     "@clerk/expo": "^3.1.9",
@@ -26,6 +26,7 @@
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
     "@trigger.dev/sdk": "4.5.4",
+    "@sentry/react-native": "~7.2.0",
     "autoprefixer": "^10.4.27",
     "cloudinary": "^2.10.0",
     "expo": "~54.0.33",
@@ -58,12 +59,14 @@
     "expo-status-bar": "~3.0.9",
     "expo-symbols": "~1.0.8",
     "expo-system-ui": "~6.0.9",
+    "expo-updates": "~29.0.18",
     "expo-web-browser": "~15.0.11",
     "firebase": "^12.12.0",
     "firebase-admin": "^14.1.0",
     "geofire-common": "^6.0.0",
     "nativewind": "^4.2.3",
     "postcss": "^8.5.9",
+    "posthog-react-native": "^4.56.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.5",
@@ -76,7 +79,7 @@
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
     "react-native-svg": "15.12.1",
-    "react-native-view-shot": "^5.1.0",
+    "react-native-view-shot": "4.0.3",
     "react-native-web": "~0.21.0",
     "react-native-worklets": "0.5.1",
     "tailwindcss": "3"

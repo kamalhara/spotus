@@ -81,7 +81,8 @@
       "expo-audio",
       "expo-web-browser",
       "expo-asset",
-      "expo-font"
+      "expo-font",
+      "@sentry/react-native"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -92,6 +93,12 @@
       "eas": {
         "projectId": "e6dbbfe0-c4b3-448c-ad16-96fcc01d1937"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e6dbbfe0-c4b3-448c-ad16-96fcc01d1937"
     }
   }
 }

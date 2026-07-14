@@ -48,7 +48,6 @@ export default function MessageSender({
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [showMediaMenu, setShowMediaMenu] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
 
@@ -411,8 +410,6 @@ export default function MessageSender({
         <TextInput
           ref={inputRef}
           value={message}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
           onChangeText={(text) => {
             setMessage(text);
             handleTyping();

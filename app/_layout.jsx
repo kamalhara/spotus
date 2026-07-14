@@ -1,4 +1,5 @@
 import { ClerkLoaded, ClerkProvider, useUser } from "@clerk/expo";
+import * as Sentry from "@sentry/react-native";
 import {
   PlusJakartaSans_400Regular,
   PlusJakartaSans_500Medium,
@@ -27,6 +28,16 @@ import { warmApi } from "../lib/api";
 import syncUserToFirebase from "../lib/syncUser";
 import { tokenCache } from "../utils/cache";
 import FirebaseAuthGate from "../components/auth/FirebaseAuthGate";
+
+const sentryDsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
+
+Sentry.init({
+  // Placeholder: set EXPO_PUBLIC_SENTRY_DSN in EAS for production reporting.
+  dsn: sentryDsn || "https://examplePublicKey@o0.ingest.sentry.io/0",
+  enabled: Boolean(sentryDsn),
+  environment: __DEV__ ? "development" : "production",
+  tracesSampleRate: __DEV__ ? 0 : 0.1,
+});
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -90,7 +101,7 @@ function ThemedApp() {
   );
 }
 
-export default function RootLayout() {
+function RootLayout() {
   const [fontsLoaded] = useFonts({
     PlusJakartaSans_400Regular,
     PlusJakartaSans_500Medium,
@@ -128,3 +139,5 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+
+export default Sentry.wrap(RootLayout);
