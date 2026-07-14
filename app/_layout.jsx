@@ -26,6 +26,7 @@ import { trackScreen } from "../lib/analytics";
 import { warmApi } from "../lib/api";
 import syncUserToFirebase from "../lib/syncUser";
 import { tokenCache } from "../utils/cache";
+import FirebaseAuthGate from "../components/auth/FirebaseAuthGate";
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -67,18 +68,20 @@ function ThemedApp() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
           <ClerkLoaded>
-            <BottomSheetModalProvider>
-              <Stack>
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="welcome" options={{ headerShown: false }} />
-                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="(authenticated)"
-                  options={{ headerShown: false }}
-                />
-              </Stack>
-              <UserSync />
-            </BottomSheetModalProvider>
+            <FirebaseAuthGate>
+              <BottomSheetModalProvider>
+                <Stack>
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen name="welcome" options={{ headerShown: false }} />
+                  <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(authenticated)"
+                    options={{ headerShown: false }}
+                  />
+                </Stack>
+                <UserSync />
+              </BottomSheetModalProvider>
+            </FirebaseAuthGate>
           </ClerkLoaded>
         </ClerkProvider>
       </GestureHandlerRootView>

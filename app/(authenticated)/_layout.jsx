@@ -2,9 +2,7 @@ import * as Notifications from "expo-notifications";
 import { Stack, useRouter } from "expo-router";
 import {
   doc,
-  increment,
   serverTimestamp,
-  setDoc,
   updateDoc,
 } from "firebase/firestore";
 import { useEffect, useRef } from "react";
@@ -24,19 +22,6 @@ export default function AuthenticatedLayout() {
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener(
       async (response) => {
-        // Track analytics
-        try {
-          await setDoc(
-            doc(db, "stats", "notifications"),
-            {
-              notificationsOpened: increment(1),
-            },
-            { merge: true },
-          );
-        } catch (e) {
-          console.error("Error tracking notification open:", e);
-        }
-
         // Handle deep linking
         const data = response.notification.request.content.data;
         if (!data) return;

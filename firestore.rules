@@ -2,77 +2,245 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
 
-    // NOTE: This app uses Clerk for authentication, NOT Firebase Auth.
-    // Because request.auth is always null, we cannot use it to gate access.
-    // For production, consider using Clerk's Firebase custom token integration
-    // or a backend (Cloud Functions) to mediate writes.
+    function isSelf(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
 
-    // USERS
+    function roomData(roomId) {
+      return get(/databases/$(database)/documents/rooms/$(roomId)).data;
+    }
+
+    function isRoomMember(roomId) {
+      return signedIn() && request.auth.uid in roomData(roomId).participants;
+    }
+
+    function isRoomHost(roomId) {
+      return signedIn() && roomData(roomId).createdBy == request.auth.uid;
+    }
+
+    function chatData(chatId) {
+      return get(/databases/$(database)/documents/chats/$(chatId)).data;
+    }
+
+    function isChatMember(chatId) {
+      return signedIn() && request.auth.uid in chatData(chatId).participants;
+    }
+
+    function changesOnly(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+
+    function callerOnlyListChange(field) {
+      return request.resource.data.get(field, []) is list
+        && request.resource.data.get(field, []).removeAll([request.auth.uid])
+          == resource.data.get(field, []).removeAll([request.auth.uid]);
+    }
+
+    function callerOnlyMapChange(field) {
+      return request.resource.data.get(field, {}) is map
+        && request.resource.data.get(field, {}).diff(resource.data.get(field, {}))
+          .affectedKeys().hasOnly([request.auth.uid]);
+    }
+
     match /users/{userId} {
-      allow read, write: if true;
-
+      // Profiles are visible only inside the authenticated community. A user may
+      // create, edit, or delete only the document matching their Firebase UID.
+      allow read: if signedIn();
+      allow create: if isSelf(userId);
+      allow update, delete: if isSelf(userId);
     }
 
-    // ROOMS
     match /rooms/{roomId} {
-      allow read, write: if true;
+      // Public-room queries must include visibility == "public". Private/ghost
+      // rooms are readable only after the trusted server adds the user.
+      allow read: if signedIn()
+        && (resource.data.visibility == "public"
+          || request.auth.uid in resource.data.participants);
 
-      // MESSAGES SUBCOLLECTION
+      // Creation and deletion go through the Clerk-authenticated server.
+      allow create, delete: if false;
+
+      allow update: if isRoomMember(roomId)
+        && request.resource.data.createdBy == resource.data.createdBy
+        && request.resource.data.inviteCode == resource.data.inviteCode
+        && request.resource.data.visibility == resource.data.visibility
+        && request.resource.data.geohash == resource.data.geohash
+        && request.resource.data.latitude == resource.data.latitude
+        && request.resource.data.longitude == resource.data.longitude
+        && (
+          // Hosts can moderate membership and pin content.
+          (isRoomHost(roomId) && changesOnly([
+            "participants", "bannedUsers", "pinnedMessage",
+            "title", "description", "category"
+          ]))
+          // A participant may leave, but cannot add or remove anyone else.
+          || (changesOnly(["participants"])
+            && resource.data.participants.hasAll([request.auth.uid])
+            && !request.resource.data.participants.hasAny([request.auth.uid])
+            && request.resource.data.participants
+              == resource.data.participants.removeAll([request.auth.uid]))
+          // A direct image message may update its parent preview.
+          || (changesOnly([
+            "lastMessage", "lastMessageAt", "lastMessageSenderId",
+            "lastMessageSeenBy", "updatedAt"
+          ])
+            && request.resource.data.lastMessageSenderId == request.auth.uid
+            && request.resource.data.lastMessageSeenBy == [request.auth.uid])
+          || (changesOnly(["lastMessageSeenBy"])
+            && callerOnlyListChange("lastMessageSeenBy")
+            && request.resource.data.lastMessageSeenBy.hasAny([request.auth.uid]))
+          || (changesOnly(["mutedBy"]) && callerOnlyListChange("mutedBy"))
+        );
+
       match /messages/{messageId} {
-        allow read, write: if true;
+        allow read: if isRoomMember(roomId);
+        allow create: if isRoomMember(roomId)
+          && request.resource.data.senderId == request.auth.uid
+          && request.resource.data.keys().hasOnly([
+            "text", "type", "imageUrl", "cloudinaryPublicId", "senderId",
+            "user", "profilePic", "createdAt", "seenBy", "reactions",
+            "replyTo"
+          ])
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.seenBy == [request.auth.uid]
+          && (
+            (request.resource.data.keys().hasAll(["text"])
+              && request.resource.data.text is string
+              && request.resource.data.text.size() > 0
+              && request.resource.data.text.size() <= 1000)
+            || (request.resource.data.keys().hasAll(["imageUrl"])
+              && request.resource.data.imageUrl is string
+              && request.resource.data.imageUrl.size() <= 500)
+          );
+        allow update: if isRoomMember(roomId)
+          && (
+            (resource.data.senderId == request.auth.uid
+              && changesOnly(["text", "isEdited"]))
+            || (changesOnly(["seenBy"]) && callerOnlyListChange("seenBy"))
+            || (changesOnly(["deletedFor"]) && callerOnlyListChange("deletedFor"))
+            || (changesOnly(["reactions"]) && callerOnlyMapChange("reactions"))
+          );
+        allow delete: if isRoomMember(roomId)
+          && resource.data.senderId == request.auth.uid;
       }
 
-      // TRUST SUBCOLLECTION
       match /trust/{userId} {
-        allow read, write: if true;
+        allow read: if isRoomMember(roomId);
+        allow write: if false;
       }
     }
 
-    // CHATS (DMs)
     match /chats/{chatId} {
-      allow read, write: if true;
+      allow read: if signedIn() && request.auth.uid in resource.data.participants;
+      allow create: if signedIn()
+        && request.resource.data.participants is list
+        && request.resource.data.participants.size() == 2
+        && request.auth.uid in request.resource.data.participants
+        && request.resource.data.participants[0] != request.resource.data.participants[1]
+        && request.resource.data.keys().hasOnly([
+          "participants", "createdAt", "updatedAt", "lastMessage",
+          "lastMessageAt", "lastMessageSenderId", "lastMessageSeenBy",
+          "status", "senderId"
+        ]);
+      allow update: if isChatMember(chatId)
+        && request.resource.data.participants == resource.data.participants
+        && (
+          changesOnly(["updatedAt"])
+          || (changesOnly([
+            "updatedAt", "lastMessage", "lastMessageAt", "lastMessageSenderId",
+            "lastMessageSeenBy"
+          ])
+            && request.resource.data.lastMessageSenderId == request.auth.uid
+            && request.resource.data.lastMessageSeenBy == [request.auth.uid])
+          || (changesOnly(["lastMessageSeenBy"])
+            && callerOnlyListChange("lastMessageSeenBy")
+            && request.resource.data.lastMessageSeenBy.hasAny([request.auth.uid]))
+          || (changesOnly(["typing"]) && callerOnlyMapChange("typing"))
+          || (changesOnly(["mutedBy"]) && callerOnlyListChange("mutedBy"))
+          || (changesOnly(["status", "updatedAt"])
+            && resource.data.status == "pending"
+            && request.resource.data.status == "accepted"
+            && resource.data.senderId != request.auth.uid)
+        );
+      allow delete: if isChatMember(chatId);
 
       match /messages/{messageId} {
-        allow read, write: if true;
+        allow read: if isChatMember(chatId);
+        allow create: if isChatMember(chatId)
+          && request.resource.data.senderId == request.auth.uid
+          && request.resource.data.keys().hasOnly([
+            "text", "type", "imageUrl", "cloudinaryPublicId", "senderId",
+            "user", "createdAt", "seenBy", "reactions", "replyTo"
+          ])
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.seenBy == [request.auth.uid]
+          && (
+            (request.resource.data.keys().hasAll(["text"])
+              && request.resource.data.text is string
+              && request.resource.data.text.size() > 0
+              && request.resource.data.text.size() <= 1000)
+            || (request.resource.data.keys().hasAll(["imageUrl"])
+              && request.resource.data.imageUrl is string
+              && request.resource.data.imageUrl.size() <= 500)
+          );
+        allow update: if isChatMember(chatId)
+          && (
+            (resource.data.senderId == request.auth.uid
+              && changesOnly(["text", "isEdited"]))
+            || (changesOnly(["seenBy"]) && callerOnlyListChange("seenBy"))
+            || (changesOnly(["deletedFor"]) && callerOnlyListChange("deletedFor"))
+            || (changesOnly(["reactions"]) && callerOnlyMapChange("reactions"))
+          );
+        allow delete: if isChatMember(chatId);
       }
     }
 
-    // REPORTS — anyone can create/update, no one can read/delete from client
     match /reports/{reportId} {
-      allow create, update: if true;
+      allow create: if signedIn()
+        && (request.resource.data.get("reportedBy", null) == request.auth.uid
+          || request.resource.data.get("reporterId", null) == request.auth.uid);
+      allow update: if signedIn()
+        && (resource.data.get("reportedBy", null) == request.auth.uid
+          || resource.data.get("reporterId", null) == request.auth.uid)
+        && changesOnly([
+          "category", "description", "attachments", "createdAt", "platform",
+          "appVersion", "priority", "status"
+        ]);
       allow read, delete: if false;
     }
 
-    // SUPPORT TICKETS — bug reports, feature requests, app issues
     match /supportTickets/{ticketId} {
-      allow create: if true;
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
       allow read, update, delete: if false;
     }
 
-    // EXPLORE ROOMS
     match /exploreRooms/{roomId} {
-      allow read: if true;
-      allow write: if false; // Only backend/functions should write this
+      allow read: if signedIn();
+      allow write: if false;
     }
 
-    // GLOBAL ROOMS
     match /globalRooms/{roomId} {
-      allow read: if true;
-      allow write: if false; // Only backend/functions should write this
+      allow read: if signedIn();
+      allow write: if false;
     }
 
-    // NOTIFICATIONS
+    // These collections are server-owned. Firebase Admin bypasses client rules.
     match /notifications/{notificationId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
-    // STATS
     match /stats/{statId} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
 
-    // Fallback — deny everything else
+    match /_serverRateLimits/{limitId} {
+      allow read, write: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
