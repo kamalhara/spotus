@@ -15,12 +15,7 @@ import {
   useRef,
   useState,
 } from "react";
-import {
-  Keyboard,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Keyboard, Text, TouchableOpacity, View } from "react-native";
 import { joinRoomByCode } from "../../lib/joinRoom";
 import CustomButton from "../ui/CustomButton";
 import GlassContainer from "../ui/GlassContainer";
@@ -148,7 +143,7 @@ const JoinByCodeSheet = forwardRef(({ currentUserId, onJoinSuccess }, ref) => {
                   setCode(text.toUpperCase());
                   setError(null);
                 }}
-                placeholder="Enter 6-character code"
+                placeholder="Enter 8-character code"
                 placeholderTextColor="#94A3B8"
                 className="flex-1 text-secondary dark:text-gray-100 text-lg font-bold uppercase tracking-widest"
                 autoCapitalize="characters"
