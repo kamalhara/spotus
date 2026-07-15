@@ -25,17 +25,17 @@ export default function HomeEmptyRooms({
       </View>
       <Text className="text-secondary dark:text-gray-100 text-[22px] leading-7 font-display tracking-tight text-center px-5">
         {isGhostBrowsing
-          ? "Nothing public to preview right now"
+          ? "No rooms to preview"
           : isFiltered
             ? `No ${activeCategory} rooms within ${displayDistance} km`
             : `No rooms open within ${displayDistance} km`}
       </Text>
       <Text className="text-muted dark:text-gray-400 text-[14px] font-body text-center leading-5 px-7 mt-2">
         {isGhostBrowsing
-          ? "Preview mode only shows a small public sample. Share your location to check what’s actually around you."
+          ? "Turn on location to see rooms near you."
           : isFiltered
-            ? `Try All, choose another topic, or move the distance slider past ${displayDistance} km.`
-            : "Move the distance slider to look farther out, or host the first conversation nearby."}
+            ? "Choose another category or try a larger distance."
+            : "Try a larger distance or create a room."}
       </Text>
     </View>
   );

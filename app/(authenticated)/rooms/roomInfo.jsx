@@ -416,7 +416,7 @@ export default function RoomInfo() {
                       />
                     </View>
                     <Text className="text-muted font-bold text-sm">
-                      No members found
+                      No one has joined yet
                     </Text>
                   </View>
                 )}

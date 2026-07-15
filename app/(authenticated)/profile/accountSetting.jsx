@@ -624,7 +624,7 @@ export default function Profile() {
             <View className="flex-1 items-center justify-center py-10">
               <Ionicons name="search-outline" size={48} color="#E5E7EB" />
               <Text className="text-gray-400 mt-4 font-medium">
-                {`No results found for"${searchQuery}"`}
+                {`No settings found for “${searchQuery}”`}
               </Text>
             </View>
           )}

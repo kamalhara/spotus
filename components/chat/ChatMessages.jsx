@@ -262,10 +262,10 @@ export default function ChatMessages({
           <Ionicons name="chatbubble-outline" size={28} color="#FF6B47" />
         </View>
         <Text className="text-secondary dark:text-gray-100 text-base font-bold mt-1">
-          You’re at the start
+          No messages yet
         </Text>
         <Text className="text-gray-400 dark:text-gray-500 text-sm text-center mt-1.5 leading-5">
-          Say what brought you here—the first message doesn’t need to be clever.
+          Send the first message.
         </Text>
       </View>
     );

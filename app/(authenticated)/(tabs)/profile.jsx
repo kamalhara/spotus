@@ -166,7 +166,7 @@ export default function Profile() {
             className="text-muted dark:text-gray-400 text-[14px] mt-1.5 text-center px-8 font-body leading-5"
             numberOfLines={2}
           >
-            {firestoreUser?.bio || "No bio yet — say something about yourself!"}
+            {firestoreUser?.bio || "Add a short bio"}
           </Text>
 
           {/* Pill stat badges */}

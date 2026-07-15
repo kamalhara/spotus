@@ -67,15 +67,15 @@ function EmptyRooms({
             </Text>
           </View>
           <Text className="text-secondary dark:text-gray-100 text-xl font-display tracking-tight">
-            {isGhostBrowsing ? "No preview rooms right now" : "It’s quiet around here"}
+            {isGhostBrowsing ? "No rooms to preview" : "No rooms nearby"}
           </Text>
         </View>
       </View>
 
       <Text className="text-muted dark:text-gray-400 text-[14px] font-body leading-5 mt-4 mb-5">
         {isGhostBrowsing
-          ? "Turn on location to discover live conversations happening around you."
-          : `No public rooms are open within ${radiusKm} km. Widen your search or start the first one nearby.`}
+          ? "Turn on location to see rooms near you."
+          : `No public rooms within ${radiusKm} km. Try a larger distance or create a room.`}
       </Text>
 
       <TouchableOpacity

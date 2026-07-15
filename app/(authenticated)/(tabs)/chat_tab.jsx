@@ -193,14 +193,14 @@ export default function Chat() {
                 variant="inline"
                 icon={search ? "search-outline" : "people-outline"}
                 title={
-                  search ? `No joined room matches “${search}”` : "Your joined rooms will appear here"
+                  search ? `No joined rooms for “${search}”` : "No joined rooms"
                 }
                 description={
                   search
-                    ? "This search only checks rooms you’ve already joined."
-                    : "Join a nearby room and it’ll stay within reach from Messages."
+                    ? "Only rooms you’ve joined are included here."
+                    : "Rooms you join will show up here."
                 }
-                actionLabel={search ? "Clear" : "Explore"}
+                actionLabel={search ? "Clear" : "Browse"}
                 actionIcon={search ? "close" : "compass-outline"}
                 onAction={() => (search ? setSearch("") : router.push("/home"))}
               />
@@ -300,9 +300,9 @@ export default function Chat() {
                 ListEmptyComponent={
                   <EmptyState
                     icon="search-outline"
-                    eyebrow="Search complete"
-                    title={`No conversation matches “${search}”`}
-                    description="Search checks the people and conversations already in your inbox."
+                    eyebrow="Messages"
+                    title={`No conversations for “${search}”`}
+                    description="Try another name or clear the search."
                     actionLabel="Clear search"
                     actionIcon="close"
                     onAction={() => setSearch("")}
@@ -313,10 +313,10 @@ export default function Chat() {
               <View className="flex-1 items-center justify-center pt-6">
                 <EmptyState
                   icon="chatbubble-outline"
-                  eyebrow="Your messages"
-                  title="Meet in a room. Keep talking here."
-                  description="When a room conversation turns into a direct message, you’ll find it here."
-                  actionLabel="Explore nearby rooms"
+                  eyebrow="Messages"
+                  title="No messages yet"
+                  description="Message someone you meet in a room."
+                  actionLabel="Browse rooms"
                   actionIcon="compass-outline"
                   onAction={() => router.push("/home")}
                 />
