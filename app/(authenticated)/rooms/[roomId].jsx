@@ -44,6 +44,7 @@ export default function RoomChat() {
 
   const [room, setRoom] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [isMessagesLoading, setIsMessagesLoading] = useState(true);
   const [members, setMembers] = useState([]);
   const [uploadingImageUri, setUploadingImageUri] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
@@ -68,29 +69,47 @@ export default function RoomChat() {
   // Load last 50 messages for performance. Older messages are
   // rarely needed and can be loaded on demand in the future.
   useEffect(() => {
+    setMessages([]);
+    setPendingMessages([]);
+    receivedMessageIds.current = new Set();
+    setIsMessagesLoading(true);
+  }, [roomId]);
+
+  useEffect(() => {
     if (!roomId) return;
     const q = query(
       collection(db, "rooms", roomId, "messages"),
       orderBy("createdAt", "asc"),
       limitToLast(messageLimit),
     );
-    const unsub = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs
-        .map((doc) => ({ id: doc.id, ...doc.data() }))
-        .filter(
-          (msg) =>
-            !msg.deletedFor?.includes(currentUserId) &&
-            !user?.blockedUsers?.includes(msg.senderId),
+    const unsub = onSnapshot(
+      q,
+      (snapshot) => {
+        const msgs = snapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter(
+            (msg) =>
+              !msg.deletedFor?.includes(currentUserId) &&
+              !user?.blockedUsers?.includes(msg.senderId),
+          );
+        receivedMessageIds.current = new Set(
+          msgs.map((message) => message.id),
         );
-      receivedMessageIds.current = new Set(msgs.map((message) => message.id));
-      setMessages(msgs);
-      setPendingMessages((pending) =>
-        pending.filter(
-          (message) => !receivedMessageIds.current.has(message.id),
-        ),
-      );
-      setIsLoadingMore(false);
-    });
+        setMessages(msgs);
+        setPendingMessages((pending) =>
+          pending.filter(
+            (message) => !receivedMessageIds.current.has(message.id),
+          ),
+        );
+        setIsLoadingMore(false);
+        setIsMessagesLoading(false);
+      },
+      (error) => {
+        console.error("Error loading room messages:", error);
+        setIsLoadingMore(false);
+        setIsMessagesLoading(false);
+      },
+    );
     return unsub;
   }, [currentUserId, roomId, user?.blockedUsers, messageLimit]);
 
@@ -426,6 +445,7 @@ export default function RoomChat() {
             onPinMessage={handlePinMessage}
             onLoadMore={handleLoadMore}
             isLoadingMore={isLoadingMore}
+            isMessagesLoading={isMessagesLoading}
           />
         </View>
 

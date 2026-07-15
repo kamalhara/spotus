@@ -78,6 +78,22 @@ function formatTime(timestamp) {
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
+function MessagesLoadingState({ overlay = false }) {
+  return (
+    <View
+      pointerEvents="none"
+      className={`${overlay ? "absolute inset-0 z-20" : "flex-1"} items-center justify-center bg-bg dark:bg-[#111113]`}
+    >
+      <View className="items-center rounded-3xl px-6 py-5">
+        <SpotUsLoader size={36} />
+        <Text className="mt-3 text-xs font-semibold tracking-wide text-gray-400 dark:text-gray-500">
+          Loading messages...
+        </Text>
+      </View>
+    </View>
+  );
+}
+
 export default function ChatMessages({
   messages,
   currentUserId,
@@ -92,12 +108,15 @@ export default function ChatMessages({
   isTyping = false,
   onLoadMore,
   isLoadingMore = false,
+  isMessagesLoading = false,
 }) {
   const flatListRef = useRef(null);
   const router = useRouter();
   const isNearBottomRef = useRef(true);
   const previousLastMessageIdRef = useRef(null);
-  const initialScrollPendingRef = useRef(true);
+  const initialRevealScheduledRef = useRef(false);
+  const initialRevealFrameRef = useRef(null);
+  const [isInitialPositionReady, setIsInitialPositionReady] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [reactionPicker, setReactionPicker] = useState(null);
   const [viewerImage, setViewerImage] = useState(null);
@@ -154,10 +173,18 @@ export default function ChatMessages({
   );
 
   useEffect(() => {
-    initialScrollPendingRef.current = true;
+    initialRevealScheduledRef.current = false;
     previousLastMessageIdRef.current = null;
     isNearBottomRef.current = true;
+    setIsInitialPositionReady(false);
     setShowScrollButton(false);
+
+    return () => {
+      if (initialRevealFrameRef.current !== null) {
+        cancelAnimationFrame(initialRevealFrameRef.current);
+        initialRevealFrameRef.current = null;
+      }
+    };
   }, [chatDocId]);
 
   // Keep new messages visible only when the user is already at the bottom.
@@ -169,7 +196,7 @@ export default function ChatMessages({
       lastMessage?.id &&
       lastMessage.id !== previousLastMessageIdRef.current;
 
-    if (lastMessageChanged && !initialScrollPendingRef.current) {
+    if (lastMessageChanged && isInitialPositionReady) {
       if (lastMessage?.senderId === currentUserId) {
         scrollToLatest(true);
       } else {
@@ -178,7 +205,13 @@ export default function ChatMessages({
     }
 
     previousLastMessageIdRef.current = lastMessage?.id || null;
-  }, [messages, currentUserId, scrollToEndIfNearBottom, scrollToLatest]);
+  }, [
+    messages,
+    currentUserId,
+    isInitialPositionReady,
+    scrollToEndIfNearBottom,
+    scrollToLatest,
+  ]);
 
   const renderLeftActions = useCallback((progress, dragX) => {
     const scale = dragX.interpolate({
@@ -217,6 +250,10 @@ export default function ChatMessages({
       </Animated.View>
     );
   }, []);
+
+  if (isMessagesLoading) {
+    return <MessagesLoadingState />;
+  }
 
   if (!messages || messages.length === 0) {
     return (
@@ -551,6 +588,7 @@ export default function ChatMessages({
     <View style={{ flex: 1 }}>
       <FlatList
         ref={flatListRef}
+        style={{ opacity: isInitialPositionReady ? 1 : 0 }}
         data={messages}
         renderItem={renderMessage}
         keyExtractor={(item, index) => item.id?.toString() || index.toString()}
@@ -572,6 +610,7 @@ export default function ChatMessages({
         }}
         contentContainerClassName="py-4 px-1"
         onScroll={(e) => {
+          if (!isInitialPositionReady) return;
           const { contentOffset, contentSize, layoutMeasurement } =
             e.nativeEvent;
           const distanceFromBottom =
@@ -585,9 +624,19 @@ export default function ChatMessages({
         }}
         scrollEventThrottle={16}
         onContentSizeChange={() => {
-          if (initialScrollPendingRef.current && messages.length > 0) {
-            initialScrollPendingRef.current = false;
-            scrollToLatest(false);
+          if (!isInitialPositionReady && messages.length > 0) {
+            flatListRef.current?.scrollToEnd({ animated: false });
+
+            if (!initialRevealScheduledRef.current) {
+              initialRevealScheduledRef.current = true;
+              initialRevealFrameRef.current = requestAnimationFrame(() => {
+                flatListRef.current?.scrollToEnd({ animated: false });
+                initialRevealFrameRef.current = requestAnimationFrame(() => {
+                  initialRevealFrameRef.current = null;
+                  setIsInitialPositionReady(true);
+                });
+              });
+            }
             return;
           }
           scrollToEndIfNearBottom(true);
@@ -624,7 +673,8 @@ export default function ChatMessages({
           </View>
         }
       />
-      {showScrollButton && (
+      {!isInitialPositionReady && <MessagesLoadingState overlay />}
+      {isInitialPositionReady && showScrollButton && (
         <TouchableOpacity
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

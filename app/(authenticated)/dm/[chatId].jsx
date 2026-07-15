@@ -45,6 +45,7 @@ export default function ChatId() {
   const { firestoreUser } = useFirestoreUser();
   const currentUserId = firestoreUser?.id;
   const [messages, setMessages] = useState([]);
+  const [isMessagesLoading, setIsMessagesLoading] = useState(true);
   const [otherUser, setOtherUser] = useState(null);
   const [uploadingImageUri, setUploadingImageUri] = useState(null);
   const [replyTo, setReplyTo] = useState(null);
@@ -116,29 +117,44 @@ export default function ChatId() {
 
   // Listen to last 50 messages for performance
   useEffect(() => {
+    setMessages([]);
+    setIsMessagesLoading(true);
+  }, [chatDocId]);
+
+  useEffect(() => {
     if (!chatDocId) return;
     const q = query(
       collection(db, "chats", chatDocId, "messages"),
       orderBy("createdAt", "asc"),
       limitToLast(messageLimit),
     );
-    const unsub = onSnapshot(q, { includeMetadataChanges: true }, (snapshot) => {
-      const msgs = snapshot.docs
-        .map((d) => {
-          const data = d.data();
-          return {
-            id: d.id,
-            ...data,
-            isSending: d.metadata.hasPendingWrites,
-            createdAt:
-              data.createdAt ||
-              (d.metadata.hasPendingWrites ? new Date() : null),
-          };
-        })
-        .filter((msg) => !msg.deletedFor?.includes(currentUserId));
-      setMessages(msgs);
-      setIsLoadingMore(false);
-    });
+    const unsub = onSnapshot(
+      q,
+      { includeMetadataChanges: true },
+      (snapshot) => {
+        const msgs = snapshot.docs
+          .map((d) => {
+            const data = d.data();
+            return {
+              id: d.id,
+              ...data,
+              isSending: d.metadata.hasPendingWrites,
+              createdAt:
+                data.createdAt ||
+                (d.metadata.hasPendingWrites ? new Date() : null),
+            };
+          })
+          .filter((msg) => !msg.deletedFor?.includes(currentUserId));
+        setMessages(msgs);
+        setIsMessagesLoading(false);
+        setIsLoadingMore(false);
+      },
+      (error) => {
+        console.error("Error loading DM messages:", error);
+        setIsMessagesLoading(false);
+        setIsLoadingMore(false);
+      },
+    );
     return unsub;
   }, [chatDocId, currentUserId, messageLimit]);
 
@@ -392,6 +408,7 @@ export default function ChatId() {
             isTyping={isTyping}
             onLoadMore={handleLoadMore}
             isLoadingMore={isLoadingMore}
+            isMessagesLoading={isMessagesLoading}
           />
         </View>
 
