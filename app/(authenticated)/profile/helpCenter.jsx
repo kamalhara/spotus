@@ -37,15 +37,15 @@ const FAQS = [
     icon: "log-out-outline",
   },
   {
-    title: "Ghost Mode",
+    title: "Preview mode",
     description:
-      "Browse rooms without sharing your location. You can see activity but cannot join or post.",
+      "View sample public rooms without location. You cannot join, post, or create a room.",
     icon: "eye-off-outline",
   },
   {
     title: "Why did my room disappear?",
     description:
-      "All rooms expire automatically. SpotUs is built for the moment — rooms are temporary by design.",
+      "Rooms close automatically when their host-selected duration ends.",
     icon: "time-outline",
   },
 ];

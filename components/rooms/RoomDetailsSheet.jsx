@@ -109,7 +109,7 @@ const RoomDetailsSheet = forwardRef(
                       style={{ marginRight: 6 }}
                     />
                     <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
-                      {room?.category || "Discovery Circle"}
+                      {room?.category || "General"}
                     </Text>
                   </View>
                 </GlassContainer>

@@ -385,7 +385,7 @@ export default function RoomChat() {
     try {
       const inviteLink = Linking.createURL("join/" + room?.inviteCode);
       await Share.share({
-        message: `Join my event: ${room?.title} on SpotUs! Use invite code ${room?.inviteCode} or tap here: ${inviteLink}`,
+        message: `Join “${room?.title}” on SpotUs. Room code: ${room?.inviteCode}\n${inviteLink}`,
       });
     } catch (error) {
       console.error("Error sharing room:", error);
@@ -419,6 +419,7 @@ export default function RoomChat() {
         {/* Ghost Mode Banner */}
         <GhostModeBanner
           room={room}
+          variant="compact"
           showGhostBanner={showGhostBanner}
           setShowGhostBanner={setShowGhostBanner}
           onShare={handleShare}

@@ -148,7 +148,7 @@ export default function SignUp() {
                 </Text>
 
                 <Text className="text-secondary dark:text-gray-100 text-[32px] font-display tracking-tight mb-2">
-                  {pendingVerification ? "Verify Email" : "Create\nAccount"}
+                  {pendingVerification ? "Check your email" : "Create account"}
                 </Text>
                 <Text className="text-gray-400 dark:text-gray-500 text-[15px] leading-6 font-body">
                   {pendingVerification
@@ -266,7 +266,7 @@ export default function SignUp() {
 
                   <View className="mt-2">
                     <CustomButton
-                      title="Sign Up"
+                      title="Create account"
                       onPress={onSignUpPress}
                       loading={loading}
                       disabled={!agreedToTerms}

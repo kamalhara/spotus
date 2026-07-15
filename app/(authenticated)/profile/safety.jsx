@@ -34,8 +34,8 @@ export default function Safety() {
         <SettingsSection title="Your toolkit">
           <SettingsRow
             icon="eye-off-outline"
-            title="Ghost Mode"
-            description="Browse rooms invisibly. Your location is not shared."
+            title="Preview mode"
+            description="View sample rooms without sharing location. You cannot join or post."
             color={ACCENT}
           />
           <SettingsRow
@@ -47,13 +47,13 @@ export default function Safety() {
           <SettingsRow
             icon="ban"
             title="Block users"
-            description="Cut off all contact instantly. They cannot see your activity."
+            description="Stop direct contact and hide the user from your room activity."
             color={ACCENT}
           />
           <SettingsRow
             icon="flag-outline"
             title="Report abuse"
-            description="Flag harassment, threats, or illegal behavior. We act within 24 hours."
+            description="Send harassment, threat, or illegal-content reports for review."
             color={ACCENT}
             isLast
           />
@@ -84,8 +84,8 @@ export default function Safety() {
         <SettingsSection title="How Reporting Works" className="mt-3">
           <SettingsRow
             icon="shield-checkmark"
-            title="Reports are reviewed"
-            description="Our team reviews every report manually. False reports may result in account restrictions."
+            title="Report review"
+            description="Reports include relevant account and room details for review."
             color="#FF6B47"
           />
           <SettingsRow

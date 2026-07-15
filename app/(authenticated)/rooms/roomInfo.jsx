@@ -156,7 +156,7 @@ export default function RoomInfo() {
     try {
       const inviteLink = Linking.createURL("join/" + room?.inviteCode);
       await Share.share({
-        message: `Join my event: ${room?.title} on SpotUs! Use invite code ${room?.inviteCode} or tap here: ${inviteLink}`,
+        message: `Join “${room?.title}” on SpotUs. Room code: ${room?.inviteCode}\n${inviteLink}`,
       });
     } catch (error) {
       console.error("Error sharing room:", error);
@@ -231,7 +231,7 @@ export default function RoomInfo() {
                       style={{ marginRight: 6 }}
                     />
                     <Text className="text-primary font-display font-black text-[10px] uppercase tracking-[1.5px]">
-                      {room?.category || "Discovery Circle"}
+                      {room?.category || "General"}
                     </Text>
                   </View>
                 </GlassContainer>

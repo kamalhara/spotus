@@ -11,7 +11,7 @@ export default function CommunityGuidelines() {
     <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
       <ScreenHeader
         title="Community Guidelines"
-        subtitle="How we roll around here"
+        subtitle="Rules for using SpotUs"
       />
 
       <ScrollView
@@ -59,8 +59,8 @@ export default function CommunityGuidelines() {
           />
           <SettingsRow
             icon="flag-outline"
-            title="See something? Report it"
-            description="Use the block and report buttons. We review reports within 24 hours."
+            title="Report a problem"
+            description="Use the block and report buttons when a person or message breaks these rules."
             color={ACCENT}
             isLast
           />

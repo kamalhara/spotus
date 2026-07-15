@@ -89,7 +89,7 @@ export default function NearbyPulse({
         </>
       ) : (
         <Text className="text-muted text-[13px] font-body">
-          All quiet within {radius}km
+          No rooms within {radius} km
         </Text>
       )}
     </View>

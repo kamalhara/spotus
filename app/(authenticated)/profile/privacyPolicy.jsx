@@ -25,7 +25,7 @@ export default function PrivacyPolicy() {
           <SettingsRow
             icon="location-outline"
             title="Location"
-            description="Precise or approximate — your choice. Ghost Mode hides you entirely."
+            description="Used to calculate room distance and find rooms near you."
             color={ACCENT}
           />
           <SettingsRow
@@ -62,8 +62,8 @@ export default function PrivacyPolicy() {
         <SettingsSection title="Your control" className="mt-3">
           <SettingsRow
             icon="eye-off-outline"
-            title="Ghost Mode"
-            description="Browse rooms without sharing your location."
+            title="Preview mode"
+            description="View sample public rooms without sharing location."
             color={ACCENT}
           />
           <SettingsRow

@@ -15,10 +15,10 @@ import NearbyPulse from "./NearbyPulse";
 
 function getHeadline(roomCount, isLoading) {
   if (isLoading) return "Looking nearby...";
-  if (roomCount === 0) return "Quiet for now";
+  if (roomCount === 0) return "No rooms nearby";
   if (roomCount === 1) return "1 room nearby";
   if (roomCount <= 3) return `${roomCount} rooms nearby`;
-  return `${roomCount} rooms buzzing`;
+  return `${roomCount} rooms nearby`;
 }
 
 export default function HomeDiscoveryHeader({
@@ -72,7 +72,7 @@ export default function HomeDiscoveryHeader({
         <View className="bg-white dark:bg-[#1A1A1E] rounded-2xl px-5 py-4 border border-border-light dark:border-[#2A2A2E]">
           <View className="flex-row items-center justify-between mb-2">
             <Text className="text-secondary dark:text-gray-100 text-[13px] font-semibold">
-              Discovery radius
+              Search distance
             </Text>
             <Text className="text-primary text-[13px] font-heading">
               {displayDistance} km
@@ -194,10 +194,10 @@ export default function HomeDiscoveryHeader({
           </View>
           <View className="flex-1">
             <Text className="text-white font-heading text-[15px] tracking-tight">
-              Host a nearby room
+              Create a room
             </Text>
             <Text className="text-white/60 text-[12px] font-body mt-0.5">
-              Pick a topic, set a timer, share the invite code
+              Choose a topic and how long it stays open
             </Text>
           </View>
           <Ionicons

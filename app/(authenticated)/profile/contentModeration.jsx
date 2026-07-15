@@ -11,7 +11,7 @@ export default function ContentModeration() {
     <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
       <ScreenHeader
         title="Content Moderation"
-        subtitle="How we keep things clean"
+        subtitle="Filtering, reports, and account action"
       />
 
       <ScrollView
@@ -22,7 +22,7 @@ export default function ContentModeration() {
           <SettingsRow
             icon="funnel-outline"
             title="Automated filters"
-            description="Hate speech, explicit terms, and spam are caught before they are sent."
+            description="Automated checks can flag explicit terms, hate speech, and spam."
             color={ACCENT}
           />
           <SettingsRow
@@ -33,8 +33,8 @@ export default function ContentModeration() {
           />
           <SettingsRow
             icon="eye-outline"
-            title="Human review"
-            description="Our team reviews flagged content and makes final decisions within 24 hours."
+            title="Report review"
+            description="Flagged content can be reviewed with relevant account and room details."
             color={ACCENT}
             isLast
           />
@@ -43,8 +43,8 @@ export default function ContentModeration() {
         <SettingsSection title="What happens" className="mt-3">
           <SettingsRow
             icon="trash-outline"
-            title="Content removed"
-            description="Offending messages, images, or rooms are deleted immediately."
+            title="Content removal"
+            description="Messages, images, or rooms may be removed when they break the rules."
             color={ACCENT}
           />
           <SettingsRow
@@ -55,8 +55,8 @@ export default function ContentModeration() {
           />
           <SettingsRow
             icon="close-circle-outline"
-            title="Permanent ban"
-            description="Severe violations result in an instant, permanent ban."
+            title="Account ban"
+            description="Severe or repeated violations may result in an account ban."
             color={ACCENT}
             isLast
           />
@@ -67,7 +67,7 @@ export default function ContentModeration() {
             Appeals
           </Text>
           <Text className="text-gray-400 dark:text-gray-500 text-sm leading-5">
-            Think we got it wrong? Email support to appeal. We review within 7 business days.
+            Email support with your account details and the action you want reviewed.
           </Text>
         </View>
       </ScrollView>

@@ -127,10 +127,10 @@ export default function Login() {
         >
           <View className="mt-10 mb-10">
             <Text className="text-secondary dark:text-gray-100 text-[32px] font-display tracking-tight mb-2">
-              Welcome{"\n"}Back
+              Sign in
             </Text>
             <Text className="text-gray-400 dark:text-gray-500 text-[15px] leading-6 font-body">
-              Sign in to continue where you left off.
+              See your rooms and messages.
             </Text>
           </View>
 
@@ -187,7 +187,7 @@ export default function Login() {
           </View>
 
           <CustomButton
-            title="Login"
+            title="Sign in"
             onPress={onSignInPress}
             loading={loading}
           />
@@ -208,7 +208,7 @@ export default function Login() {
             </Text>
             <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
               <Text className="text-primary dark:text-primary-light font-semibold text-[14px]">
-                Sign Up
+                Create account
               </Text>
             </TouchableOpacity>
           </View>

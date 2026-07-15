@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { useEffect, useRef } from "react";
-import { Animated, Linking, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useEffect } from "react";
+import { Linking, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ui/ScreenHeader";
 import { useTheme } from "../../../context/ThemeContext";
@@ -41,15 +41,9 @@ const CONTACT_OPTIONS = [
 export default function ContactSupport() {
   const { isDark } = useTheme();
 
-  const fadeIn = useRef(new Animated.Value(0)).current;
   useEffect(() => {
     trackEvent("contact_support_opened");
-    Animated.timing(fadeIn, {
-      toValue: 1,
-      duration: 400,
-      useNativeDriver: true,
-    }).start();
-  }, [fadeIn]);
+  }, []);
 
   const handleEmailPress = (email, title) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -61,7 +55,7 @@ export default function ContactSupport() {
     <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
       <ScreenHeader title="Contact Support" subtitle="Get in touch with us" />
 
-      <Animated.View style={{ flex: 1, opacity: fadeIn }}>
+      <View className="flex-1">
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{
@@ -76,7 +70,7 @@ export default function ContactSupport() {
             </View>
             <View className="flex-1">
               <Text className="text-secondary dark:text-gray-100 text-sm font-bold mb-1">
-                We typically respond within 24 hours
+                Contact the right team
               </Text>
               <Text className="text-gray-500 dark:text-gray-400 text-xs leading-4">
                 Include your username and a description of the issue for the
@@ -138,7 +132,7 @@ export default function ContactSupport() {
             </Text>
           </View>
         </ScrollView>
-      </Animated.View>
+      </View>
     </SafeAreaView>
   );
 }

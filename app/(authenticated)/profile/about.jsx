@@ -23,11 +23,11 @@ export default function About() {
           </View>
           <View className="flex-row items-center">
             <Text className="text-secondary dark:text-gray-100 text-2xl font-display font-extrabold tracking-tight">
-              Spot Us
+              SpotUs
             </Text>
           </View>
           <Text className="text-gray-400 dark:text-gray-500 text-sm leading-5 text-center mt-3">
-            Rooms and direct messages for people nearby.
+            Where locals connect.
           </Text>
         </View>
 

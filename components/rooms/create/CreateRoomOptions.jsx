@@ -1,7 +1,6 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Switch, Text, TouchableOpacity, View } from "react-native";
 import RoomCard from "../RoomCard";
-import GlassContainer from "../../ui/GlassContainer";
 
 export const ROOM_CATEGORIES = [
   { label: "Music", icon: "musical-notes", color: "#8B5CF6" },
@@ -136,22 +135,13 @@ export default function CreateRoomOptions({
       </View>
 
       <View className="mt-8">
-        <GlassContainer
-          borderRadius={16}
-          fallbackClassName="bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30]"
-          style={{
-            padding: 16,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <View className="bg-white dark:bg-[#1C1C20] border border-border dark:border-[#2C2C30] rounded-2xl p-4 flex-row items-center justify-between">
           <View className="flex-1 pr-4">
             <View className="flex-row items-center mb-1">
-              <MaterialCommunityIcons
-                name="ghost-outline"
+              <Ionicons
+                name="eye-off-outline"
                 size={18}
-                color="#A855F7"
+                color="#FF6B47"
                 style={{ marginRight: 6 }}
               />
               <Text className="text-secondary dark:text-gray-100 text-[15px] font-bold">
@@ -173,11 +163,11 @@ export default function CreateRoomOptions({
             }}
             trackColor={{
               false: isDark ? "#2C2C30" : "#E2E8F0",
-              true: "#A855F7",
+              true: "#FF6B47",
             }}
             thumbColor="#FFFFFF"
           />
-        </GlassContainer>
+        </View>
       </View>
     </>
   );

@@ -63,7 +63,7 @@ function EmptyRooms({
         <View className="flex-1">
           <View className="self-start rounded-full bg-surface-alt dark:bg-[#28282C] px-2.5 py-1 mb-1.5">
             <Text className="text-text-tertiary dark:text-gray-400 text-[11px] font-semibold">
-              {isGhostBrowsing ? "EXPLORING PRIVATELY" : `${radiusKm} KM CHECKED`}
+              {isGhostBrowsing ? "PREVIEW MODE" : `${radiusKm} KM CHECKED`}
             </Text>
           </View>
           <Text className="text-secondary dark:text-gray-100 text-xl font-display tracking-tight">

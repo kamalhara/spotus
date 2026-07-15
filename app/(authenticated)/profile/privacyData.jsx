@@ -70,9 +70,9 @@ export default function PrivacyData() {
             rightComponent={renderSwitch(preciseLocation, setPreciseLocation)}
           />
           <SettingsRow
-            icon="ghost-outline"
-            title="Private Explore Mode"
-            description="Browse SpotUs without sharing your exact location. Participation requires location access."
+            icon="eye-outline"
+            title="Preview mode"
+            description="View sample public rooms without location. Location is required to join or create."
             rightComponent={renderSwitch(isGhostBrowsing, handleGhostToggle)}
             isLast
           />

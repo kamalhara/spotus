@@ -348,7 +348,7 @@ export default function Home() {
           </TouchableOpacity>
           <View className="flex-row items-center">
             <Text className="text-secondary dark:text-gray-100 tracking-tighter text-[20px] font-heading">
-              Spot Us
+              SpotUs
             </Text>
           </View>
           {/* Spacer to preserve layout — button is now the shared FloatingGlassButton */}

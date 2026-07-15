@@ -40,7 +40,14 @@ export function ModalProvider({ children }) {
       icon: options.icon || "alert-circle-outline",
       iconColor: options.iconColor || "#EF4444",
       confirmButtonStyle: options.confirmButtonStyle || "bg-red-500",
-      options: options.options || null,
+      options:
+        options.options?.map((option) => ({
+          ...option,
+          onPress: () => {
+            if (option.onPress) option.onPress();
+            hideModal();
+          },
+        })) || null,
     });
   }, [hideModal]);
 

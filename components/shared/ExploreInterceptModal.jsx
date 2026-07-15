@@ -1,7 +1,6 @@
 import React from "react";
 import { Modal, Text, TouchableOpacity, View } from "react-native";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import GlassButton from "../ui/GlassButton";
+import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function ExploreInterceptModal({ visible, onClose, onEnableLocation, actionName = "participate" }) {
@@ -27,44 +26,41 @@ export default function ExploreInterceptModal({ visible, onClose, onEnableLocati
             elevation: 10,
           }}
         >
-          <View className="w-16 h-16 bg-purple-50 dark:bg-purple-900/20 rounded-full items-center justify-center mb-5 border border-purple-100 dark:border-purple-800/30">
-            <Ionicons name="location" size={28} color="#A855F7" />
+          <View className="w-12 h-12 bg-primary-surface rounded-xl items-center justify-center mb-5">
+            <Ionicons name="location" size={22} color="#FF6B47" />
           </View>
           
           <Text className="text-secondary dark:text-gray-100 text-[22px] font-display font-black tracking-tight mb-2.5">
-            Enable Location
+            Location needed
           </Text>
           
           <Text className="text-muted text-[15px] font-medium leading-6 mb-8">
-            SpotUs requires location sharing to {actionName}. This helps keep the community authentic and prevents anonymous abuse.
+            Turn on location to {actionName}. SpotUs uses it to find rooms near you.
           </Text>
           
           <View className="gap-3">
-            <GlassButton
+            <TouchableOpacity
               onPress={onEnableLocation}
-              shape="pill"
-              size="regular"
+              activeOpacity={0.8}
+              className="h-12 rounded-xl bg-primary items-center justify-center"
             >
-              <View className="flex-row items-center justify-center gap-2 py-3.5 w-full">
-                <Ionicons name="location-outline" size={18} color="#FF6B47" />
-                <Text className="text-primary dark:text-primary-light font-bold text-[15px]">
-                  Share Precise Location
+              <View className="flex-row items-center justify-center gap-2">
+                <Ionicons name="location-outline" size={18} color="white" />
+                <Text className="text-white font-bold text-[15px]">
+                  Use my location
                 </Text>
               </View>
-            </GlassButton>
+            </TouchableOpacity>
             
-            <GlassButton
+            <TouchableOpacity
               onPress={onClose}
-              shape="pill"
-              size="regular"
+              activeOpacity={0.75}
+              className="h-11 items-center justify-center"
             >
-              <View className="flex-row items-center justify-center gap-2 py-3.5 w-full">
-                <MaterialCommunityIcons name="ghost" size={18} color="#A855F7" />
-                <Text className="text-purple-600 dark:text-purple-400 font-bold text-[15px]">
-                  Keep Exploring
-                </Text>
-              </View>
-            </GlassButton>
+              <Text className="text-muted dark:text-gray-400 font-semibold text-[14px]">
+                Not now
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

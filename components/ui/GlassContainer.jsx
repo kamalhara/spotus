@@ -28,6 +28,7 @@ const hasGlass = Platform.OS === "ios" && GlassView && isLiquidGlassAvailable();
  *   - glassEffectStyle   "regular" | "prominent" (default: "regular")
  *   - isInteractive      Enable liquid-glass drag effect (default: false)
  *   - borderRadius       Border radius applied to both glass and fallback (default: 16)
+ *   - tintColor          Optional native glass tint on supported iOS versions
  */
 export default function GlassContainer({
   children,
@@ -37,6 +38,7 @@ export default function GlassContainer({
   glassEffectStyle = "regular",
   isInteractive = false,
   borderRadius = 16,
+  tintColor,
 }) {
   const containerStyle = {
     borderRadius,
@@ -50,6 +52,7 @@ export default function GlassContainer({
         style={containerStyle}
         glassEffectStyle={glassEffectStyle}
         isInteractive={isInteractive}
+        tintColor={tintColor}
       >
         {children}
       </GlassView>

@@ -24,12 +24,12 @@ import { trackEvent } from "../../lib/analytics";
 import { CATEGORY_ICONS, CATEGORY_COLORS } from "../../constants/categories";
 
 const MOTIVATIONS = [
-  "Meeting new people",
-  "Finding local events",
-  "Networking",
-  "Just looking around",
-  "Dating",
-  "Discovering hidden gems",
+  "Join local conversations",
+  "Find nearby events",
+  "Meet people with shared interests",
+  "Make plans nearby",
+  "Share local recommendations",
+  "Browse for now",
 ];
 
 const RADIUS_OPTIONS = [1, 5, 10, 25, 50];
@@ -153,10 +153,10 @@ export default function OnboardingScreen() {
     <>
       <View className="mt-8 mb-10">
         <Text className="text-[28px] font-display text-secondary dark:text-white mb-2 tracking-tight">
-          Before you dive in...
+          Set up your profile
         </Text>
         <Text className="text-[15px] text-muted font-body leading-6">
-          Pick a name and pic so people know it&apos;s you.
+          Add a name and photo that people in rooms will recognize.
         </Text>
       </View>
 
@@ -220,10 +220,10 @@ export default function OnboardingScreen() {
     <>
       <View className="mt-8 mb-8">
         <Text className="text-[28px] font-display text-secondary dark:text-white mb-2 tracking-tight">
-          What are you into?
+          Choose your interests
         </Text>
         <Text className="text-[15px] text-muted font-body leading-6">
-          Select at least 3 interests to help us find relevant rooms.
+          Pick at least 3 topics to filter nearby rooms.
         </Text>
       </View>
 
@@ -286,10 +286,10 @@ export default function OnboardingScreen() {
     <>
       <View className="mt-8 mb-10">
         <Text className="text-[28px] font-display text-secondary dark:text-white mb-2 tracking-tight">
-          How far will you go?
+          Set your search distance
         </Text>
         <Text className="text-[15px] text-muted font-body leading-6">
-          Set your preferred discovery radius. You can change this anytime.
+          Choose how far away rooms can be. You can change this later.
         </Text>
       </View>
 
@@ -332,7 +332,7 @@ export default function OnboardingScreen() {
         </TouchableOpacity>
         <View className="flex-1">
           <CustomButton
-            title="Looks good"
+            title="Continue"
             onPress={handleNextStep3}
           />
         </View>
@@ -344,10 +344,10 @@ export default function OnboardingScreen() {
     <>
       <View className="mt-8 mb-10">
         <Text className="text-[28px] font-display text-secondary dark:text-white mb-2 tracking-tight">
-          What brings you to SpotUs?
+          How will you use SpotUs?
         </Text>
         <Text className="text-[15px] text-muted font-body leading-6">
-          Pick your primary motivation.
+          Choose the closest option. You can change it later.
         </Text>
       </View>
 
@@ -393,7 +393,7 @@ export default function OnboardingScreen() {
         </TouchableOpacity>
         <View className="flex-1">
           <CustomButton
-            title="Let's Go!"
+            title="Finish setup"
             onPress={handleComplete}
             loading={isLoading}
           />

@@ -1,8 +1,7 @@
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { memo, useEffect, useRef } from "react";
+import { memo } from "react";
 import {
-  Animated,
   Platform,
   StyleSheet,
   Text,
@@ -21,35 +20,12 @@ function toMillis(value) {
   return null;
 }
 
-/** Breathing green dot for active rooms */
 function ActiveDot() {
-  const breathe = useRef(new Animated.Value(0.5)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(breathe, {
-          toValue: 1,
-          duration: 1400,
-          useNativeDriver: true,
-        }),
-        Animated.timing(breathe, {
-          toValue: 0.5,
-          duration: 1400,
-          useNativeDriver: true,
-        }),
-      ]),
-    ).start();
-  }, [breathe]);
-
   return (
-    <View className="flex-row items-center ml-auto bg-green-500/10 px-2.5 py-1 rounded-lg">
-      <Animated.View
-        className="w-[6px] h-[6px] rounded-full bg-green-400 mr-1.5"
-        style={{ opacity: breathe }}
-      />
-      <Text className="text-green-500 dark:text-green-400 text-[10px] font-bold tracking-wide">
-        LIVE
+    <View className="flex-row items-center ml-auto">
+      <View className="w-[6px] h-[6px] rounded-full bg-green-400 mr-1.5" />
+      <Text className="text-green-600 dark:text-green-400 text-[10px] font-semibold">
+        Active
       </Text>
     </View>
   );
@@ -78,12 +54,11 @@ const RoomCard = memo(function RoomCard({
   isExploreMode = false,
 }) {
   const { isDark } = useTheme();
-  const scaleAnim = useRef(new Animated.Value(1)).current;
   const isDiscovery = variant === "discovery";
   const categoryIcon = CATEGORY_ICONS[room.category] || "grid";
   const categoryColor = CATEGORY_COLORS[room.category] || "#6B7280";
 
-  const buttonText = isExploreMode ? "Preview" : isDiscovery ? "Join" : "Enter";
+  const buttonText = isExploreMode ? "View" : isDiscovery ? "Join" : "Open";
 
   const getExpiryInfo = () => {
     const expiresMs = toMillis(room.expiresAt);
@@ -127,24 +102,6 @@ const RoomCard = memo(function RoomCard({
   const isActiveNow =
     !!lastActivityMs && Date.now() - lastActivityMs < 5 * 60 * 1000;
 
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.975,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 4,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 4,
-    }).start();
-  };
-
   const handlePress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress?.(room);
@@ -152,27 +109,13 @@ const RoomCard = memo(function RoomCard({
 
   const cardContent = (
     <View className="overflow-hidden">
-      {/* Soft category-colored ambient glow — top-left corner */}
-      <View
-        style={[
-          styles.ambientGlow,
-          { backgroundColor: categoryColor, opacity: 0.06 },
-        ]}
-      />
-
-      {/* Thin accent line at the very top */}
-      <View style={[styles.topAccent, { backgroundColor: categoryColor }]} />
-
       <View className="px-4 pt-4 pb-3.5">
         {/* Top row: Category badge + Active indicator */}
         <View className="flex-row items-center mb-3">
-          <View
-            className="flex-row items-center px-2.5 py-1.5 rounded-lg mr-2"
-            style={{ backgroundColor: `${categoryColor}15` }}
-          >
+          <View className="flex-row items-center mr-2">
             <Ionicons name={categoryIcon} size={12} color={categoryColor} />
             <Text
-              className="font-bold text-[10px] ml-1.5 uppercase tracking-wider"
+              className="font-semibold text-[11px] ml-1.5"
               style={{ color: categoryColor }}
             >
               {room.category || "General"}
@@ -180,15 +123,15 @@ const RoomCard = memo(function RoomCard({
           </View>
 
           {room.visibility === "ghost" && (
-            <View className="flex-row items-center px-2.5 py-1.5 rounded-lg bg-purple-500/10">
-              <MaterialCommunityIcons
-                name="ghost"
+            <View className="flex-row items-center ml-2">
+              <Ionicons
+                name="key-outline"
                 size={11}
-                color="#A855F7"
+                color="#8A8A8A"
                 style={{ marginRight: 3 }}
               />
-              <Text className="font-bold text-[10px] text-purple-400 uppercase tracking-wider">
-                Ghost
+              <Text className="font-semibold text-[10px] text-muted dark:text-gray-400">
+                Invite-only
               </Text>
             </View>
           )}
@@ -338,12 +281,9 @@ const RoomCard = memo(function RoomCard({
   );
 
   return (
-    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <TouchableOpacity
         onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        activeOpacity={1}
+        activeOpacity={0.85}
         className="mb-3"
       >
         <View
@@ -363,7 +303,6 @@ const RoomCard = memo(function RoomCard({
           {cardContent}
         </View>
       </TouchableOpacity>
-    </Animated.View>
   );
 });
 
@@ -378,13 +317,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
-  },
-
-  topAccent: {
-    height: 2,
-    marginHorizontal: 20,
-    borderRadius: 1,
-    opacity: 0.35,
   },
 
   actionButton: {

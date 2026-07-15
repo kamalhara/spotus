@@ -2,8 +2,7 @@ import { useAuth } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
 import { Redirect, useRouter } from "expo-router";
 import { useColorScheme } from "nativewind";
-import { useEffect, useRef } from "react";
-import { Animated, Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomButton from "../components/ui/CustomButton";
 
@@ -12,42 +11,6 @@ export default function Welcome() {
   const { isSignedIn, isLoaded } = useAuth();
   const { colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
-
-  // Animations
-  const fadeInContent = useRef(new Animated.Value(0)).current;
-  const slideUpContent = useRef(new Animated.Value(30)).current;
-  const fadeInHero = useRef(new Animated.Value(0)).current;
-  const scaleHero = useRef(new Animated.Value(0.9)).current;
-
-  useEffect(() => {
-    Animated.sequence([
-      Animated.parallel([
-        Animated.timing(fadeInHero, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.spring(scaleHero, {
-          toValue: 1,
-          useNativeDriver: true,
-          speed: 8,
-          bounciness: 6,
-        }),
-      ]),
-      Animated.parallel([
-        Animated.timing(fadeInContent, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideUpContent, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start();
-  }, [fadeInContent, fadeInHero, scaleHero, slideUpContent]);
 
   if (isLoaded && isSignedIn) {
     return <Redirect href="/(authenticated)/(tabs)/home" />;
@@ -59,21 +22,15 @@ export default function Welcome() {
         {/* Brand */}
         <View className="mt-6 px-8">
           <Text className="text-secondary dark:text-gray-100 text-2xl font-heading tracking-tight">
-            Spot Us
+            SpotUs
           </Text>
           <Text className="text-muted text-[13px] mt-1 font-body">
-            Nearby rooms with a timer
+            Where locals connect
           </Text>
         </View>
 
         {/* Hero */}
-        <Animated.View
-          className="items-center justify-center flex-1 my-2 px-8"
-          style={{
-            opacity: fadeInHero,
-            transform: [{ scale: scaleHero }],
-          }}
-        >
+        <View className="items-center justify-center flex-1 my-2 px-8">
           <View className="w-44 h-44 items-center justify-center mb-5">
             <Image
               source={
@@ -116,21 +73,16 @@ export default function Welcome() {
               </View>
             </View>
           </View>
-        </Animated.View>
+        </View>
 
         {/* Bottom */}
-        <Animated.View
-          style={{
-            opacity: fadeInContent,
-            transform: [{ translateY: slideUpContent }],
-          }}
-        >
+        <View>
           <View className="bg-surface-alt dark:bg-[#1A1A1E] px-8 pt-10 pb-14 rounded-t-[28px]">
             <Text className="text-secondary dark:text-gray-100 text-[34px] font-display leading-[40px] tracking-tight">
-              Where locals {"\n"} <Text className="text-primary">Connect</Text>
+              Find a room nearby
             </Text>
             <Text className="text-muted text-[15px] mt-4 leading-6 mb-8 font-body">
-              Browse by radius and category, then join with location or an
+              Browse by distance and topic, or join a private room with an
               invite code.
             </Text>
 
@@ -155,7 +107,7 @@ export default function Welcome() {
               </TouchableOpacity>
             </View>
           </View>
-        </Animated.View>
+        </View>
       </SafeAreaView>
     </View>
   );
