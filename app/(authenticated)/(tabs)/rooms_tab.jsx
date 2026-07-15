@@ -43,8 +43,9 @@ export default function RoomsScreen() {
       data: loading ? [1, 2] : myCreatedRooms,
       isEmpty: !loading && myCreatedRooms.length === 0,
       emptyIcon: "add-circle-outline",
-      emptyText: "No rooms created yet",
-      emptyAction: "Create room",
+      emptyText: "You haven’t hosted a room yet",
+      emptyDescription: "Pick a topic, set how long it stays open, then share the invite code.",
+      emptyAction: "Host one",
       emptyRoute: "/rooms/create-rooms",
     },
     {
@@ -53,8 +54,9 @@ export default function RoomsScreen() {
       data: loading ? [1, 2, 3] : myJoinedRooms,
       isEmpty: !loading && myJoinedRooms.length === 0,
       emptyIcon: "compass-outline",
-      emptyText: "No joined rooms yet",
-      emptyAction: "Explore rooms",
+      emptyText: "You haven’t joined a room yet",
+      emptyDescription: "Rooms you join nearby—or by invite code—will stay collected here.",
+      emptyAction: "Find one",
       emptyRoute: "/home",
     },
   ];
@@ -105,11 +107,7 @@ export default function RoomsScreen() {
                   variant="inline"
                   icon={section.emptyIcon}
                   title={section.emptyText}
-                  description={
-                    section.title === "Created by me"
-                      ? "Name a topic, set a duration, and invite people nearby."
-                      : "Browse nearby rooms from Home or enter an invite code."
-                  }
+                  description={section.emptyDescription}
                   actionLabel={section.emptyAction}
                   onAction={() => router.push(section.emptyRoute)}
                 />

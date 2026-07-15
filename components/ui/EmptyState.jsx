@@ -1,73 +1,46 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useRef } from "react";
-import { Animated, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 
 export default function EmptyState({
   icon = "information-circle-outline",
   title,
   description,
+  eyebrow,
   actionLabel,
   actionIcon = "arrow-forward",
   onAction,
   variant = "default",
   accentColor = "#FF6B47",
 }) {
-  const floatAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (variant !== "default") return;
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(floatAnim, {
-          toValue: 1,
-          duration: 2400,
-          useNativeDriver: true,
-        }),
-        Animated.timing(floatAnim, {
-          toValue: 0,
-          duration: 2400,
-          useNativeDriver: true,
-        }),
-      ]),
-    ).start();
-  }, [floatAnim, variant]);
-
-  const translateY = floatAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -6],
-  });
-
   if (variant === "inline") {
     return (
-      <View
-        className="rounded-xl px-4 py-3.5 flex-row items-center overflow-hidden"
-        style={{ backgroundColor: `${accentColor}08` }}
-      >
+      <View className="border-t border-border dark:border-[#2A2A2E] py-4 flex-row items-start">
         <View
-          className="absolute left-0 top-0 bottom-0 w-[3px] rounded-full"
-          style={{ backgroundColor: accentColor, opacity: 0.4 }}
-        />
-        <View
-          className="w-8 h-8 rounded-xl items-center justify-center mr-3"
-          style={{ backgroundColor: `${accentColor}15` }}
+          className="w-7 h-7 rounded-full items-center justify-center mr-3 mt-0.5"
+          style={{ backgroundColor: `${accentColor}12` }}
         >
-          <Ionicons name={icon} size={16} color={accentColor} />
+          <Ionicons name={icon} size={14} color={accentColor} />
         </View>
         <View className="flex-1">
-          <Text className="text-gray-600 dark:text-gray-300 text-sm font-semibold">
+          <Text className="text-secondary dark:text-gray-100 text-[14px] font-semibold">
             {title}
           </Text>
           {description && (
-            <Text className="text-gray-400 dark:text-gray-500 text-[11px] mt-0.5 font-body">
+            <Text className="text-muted dark:text-gray-400 text-[12px] leading-[18px] mt-1 font-body pr-2">
               {description}
             </Text>
           )}
         </View>
         {actionLabel && onAction && (
-          <TouchableOpacity onPress={onAction} activeOpacity={0.8}>
-            <Text className="text-primary text-[13px] font-semibold">
+          <TouchableOpacity
+            onPress={onAction}
+            activeOpacity={0.75}
+            className="flex-row items-center ml-2 pt-1"
+          >
+            <Text className="text-primary text-[12px] font-semibold mr-1">
               {actionLabel}
             </Text>
+            <Ionicons name={actionIcon} size={12} color={accentColor} />
           </TouchableOpacity>
         )}
       </View>
@@ -75,24 +48,23 @@ export default function EmptyState({
   }
 
   return (
-    <View className="items-center justify-center px-8 py-14">
-      <Animated.View
-        style={{ transform: [{ translateY }] }}
-      >
+    <View className="items-start justify-center px-2 py-12">
+      <View className="flex-row items-center mb-4">
         <View
-          className="w-16 h-16 rounded-2xl items-center justify-center mb-5"
-          style={{
-            backgroundColor: `${accentColor}12`,
-          }}
+          className="w-7 h-7 rounded-full items-center justify-center mr-2.5"
+          style={{ backgroundColor: `${accentColor}12` }}
         >
-          <Ionicons name={icon} size={26} color={accentColor} style={{ opacity: 0.7 }} />
+          <Ionicons name={icon} size={14} color={accentColor} />
         </View>
-      </Animated.View>
-      <Text className="text-secondary dark:text-gray-100 text-lg font-heading tracking-tight text-center">
+        <Text className="text-muted dark:text-gray-400 text-[11px] font-semibold tracking-[1.4px] uppercase">
+          {eyebrow || "Nothing here yet"}
+        </Text>
+      </View>
+      <Text className="text-secondary dark:text-gray-100 text-[23px] leading-7 font-display tracking-tight max-w-[320px]">
         {title}
       </Text>
       {description ? (
-        <Text className="text-muted dark:text-gray-400 text-[14px] font-body leading-6 text-center mt-2 px-4">
+        <Text className="text-muted dark:text-gray-400 text-[14px] font-body leading-6 mt-2 max-w-[330px]">
           {description}
         </Text>
       ) : null}
@@ -100,13 +72,13 @@ export default function EmptyState({
         <TouchableOpacity
           onPress={onAction}
           activeOpacity={0.8}
-          className="mt-5"
+          className="mt-6 bg-primary h-11 px-4 rounded-full flex-row items-center justify-center"
         >
           <View className="flex-row items-center">
-            <Text className="text-primary text-[14px] font-semibold mr-1">
+            <Text className="text-white text-[14px] font-semibold mr-2">
               {actionLabel}
             </Text>
-            <Ionicons name={actionIcon} size={14} color="#FF6B47" />
+            <Ionicons name={actionIcon} size={14} color="white" />
           </View>
         </TouchableOpacity>
       ) : null}

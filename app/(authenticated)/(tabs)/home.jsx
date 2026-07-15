@@ -453,6 +453,7 @@ export default function Home() {
               loading ? null : (
                 <HomeEmptyRooms
                   activeCategory={activeCategory}
+                  displayDistance={displayDistance}
                   isGhostBrowsing={isGhostBrowsing}
                 />
               )

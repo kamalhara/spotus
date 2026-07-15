@@ -19,9 +19,9 @@ import RoomHorizontalList from "../../../components/rooms/RoomHorizontalList";
 import EmptyState from "../../../components/ui/EmptyState";
 import GlassContainer from "../../../components/ui/GlassContainer";
 import { db } from "../../../config/firebase.config";
+import { useChats } from "../../../context/ChatContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { isChatUnseen } from "../../../lib/chatSeen";
-import { useChats } from "../../../context/ChatContext";
 
 export default function Chat() {
   const { firestoreUser } = useFirestoreUser();
@@ -192,7 +192,17 @@ export default function Chat() {
               <EmptyState
                 variant="inline"
                 icon={search ? "search-outline" : "people-outline"}
-                title={search ? "No rooms found" : "No active rooms"}
+                title={
+                  search ? `No joined room matches “${search}”` : "Your joined rooms will appear here"
+                }
+                description={
+                  search
+                    ? "This search only checks rooms you’ve already joined."
+                    : "Join a nearby room and it’ll stay within reach from Messages."
+                }
+                actionLabel={search ? "Clear" : "Explore"}
+                actionIcon={search ? "close" : "compass-outline"}
+                onAction={() => (search ? setSearch("") : router.push("/home"))}
               />
             ) : (
               <RoomHorizontalList
@@ -290,8 +300,12 @@ export default function Chat() {
                 ListEmptyComponent={
                   <EmptyState
                     icon="search-outline"
-                    title="No matches"
-                    description="Try a different name or clear the search."
+                    eyebrow="Search complete"
+                    title={`No conversation matches “${search}”`}
+                    description="Search checks the people and conversations already in your inbox."
+                    actionLabel="Clear search"
+                    actionIcon="close"
+                    onAction={() => setSearch("")}
                   />
                 }
               />
@@ -299,8 +313,12 @@ export default function Chat() {
               <View className="flex-1 items-center justify-center pt-6">
                 <EmptyState
                   icon="chatbubble-outline"
-                  title="No conversations yet"
-                  description="Join a room, find someone interesting, and start a conversation"
+                  eyebrow="Your messages"
+                  title="Meet in a room. Keep talking here."
+                  description="When a room conversation turns into a direct message, you’ll find it here."
+                  actionLabel="Explore nearby rooms"
+                  actionIcon="compass-outline"
+                  onAction={() => router.push("/home")}
                 />
               </View>
             )}

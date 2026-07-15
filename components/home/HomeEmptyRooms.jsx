@@ -1,31 +1,41 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
 
-export default function HomeEmptyRooms({ activeCategory, isGhostBrowsing }) {
+export default function HomeEmptyRooms({
+  activeCategory,
+  displayDistance,
+  isGhostBrowsing,
+}) {
   const isFiltered = activeCategory !== "all";
+  const categoryColor = CATEGORY_COLORS[activeCategory] || "#FF6B47";
+  const categoryIcon = CATEGORY_ICONS[activeCategory] || "location-outline";
 
   return (
-    <View className="items-center justify-center py-16 px-6">
-      <View
-        className="w-14 h-14 rounded-2xl items-center justify-center mb-4"
-        style={{ backgroundColor: "rgba(255, 107, 71, 0.08)" }}
-      >
-        <Ionicons
-          name="radio-outline"
-          size={22}
-          color="#FF6B47"
-          style={{ opacity: 0.6 }}
-        />
+    <View className="py-10 px-1">
+      <View className="flex-row items-center mb-4">
+        <View className="h-px flex-1 bg-border dark:bg-[#2A2A2E]" />
+        <View className="flex-row items-center px-3">
+          <Ionicons name={categoryIcon} size={13} color={categoryColor} />
+          <Text className="text-muted dark:text-gray-400 text-[10px] font-semibold tracking-[1.2px] ml-1.5">
+            {isGhostBrowsing ? "PREVIEW COMPLETE" : `${displayDistance} KM CHECKED`}
+          </Text>
+        </View>
+        <View className="h-px flex-1 bg-border dark:bg-[#2A2A2E]" />
       </View>
-      <Text className="text-secondary dark:text-gray-100 text-lg font-heading tracking-tight text-center mb-2">
-        {isFiltered ? `No ${activeCategory} rooms` : "Nothing open nearby"}
-      </Text>
-      <Text className="text-muted text-[14px] font-body text-center leading-5 px-4">
+      <Text className="text-secondary dark:text-gray-100 text-[22px] leading-7 font-display tracking-tight text-center px-5">
         {isGhostBrowsing
-          ? "Exploring mode only shows public samples. Turn on location to see rooms around you."
+          ? "Nothing public to preview right now"
           : isFiltered
-            ? "Try another category or widen the radius."
-            : "Start one for the people around you or widen the radius."}
+            ? `No ${activeCategory} rooms within ${displayDistance} km`
+            : `No rooms open within ${displayDistance} km`}
+      </Text>
+      <Text className="text-muted dark:text-gray-400 text-[14px] font-body text-center leading-5 px-7 mt-2">
+        {isGhostBrowsing
+          ? "Preview mode only shows a small public sample. Share your location to check what’s actually around you."
+          : isFiltered
+            ? `Try All, choose another topic, or move the distance slider past ${displayDistance} km.`
+            : "Move the distance slider to look farther out, or host the first conversation nearby."}
       </Text>
     </View>
   );
