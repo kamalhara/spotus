@@ -96,7 +96,9 @@ export default function ChatMessages({
   const flatListRef = useRef(null);
   const router = useRouter();
   const isNearBottomRef = useRef(true);
-  const prevMessageCountRef = useRef(messages?.length ?? 0);
+  const previousLastMessageIdRef = useRef(null);
+  const initialScrollPendingRef = useRef(true);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const [reactionPicker, setReactionPicker] = useState(null);
   const [viewerImage, setViewerImage] = useState(null);
   const swipeableRefs = useRef({});
@@ -135,27 +137,48 @@ export default function ChatMessages({
     }
   };
 
-  const scrollToEndIfNearBottom = useCallback((animated = true) => {
-    if (!isNearBottomRef.current) return;
-    flatListRef.current?.scrollToEnd({ animated });
+  const scrollToLatest = useCallback((animated = true) => {
+    isNearBottomRef.current = true;
+    setShowScrollButton(false);
+    requestAnimationFrame(() => {
+      flatListRef.current?.scrollToEnd({ animated });
+    });
   }, []);
 
-  // Auto-scroll when new messages arrive
+  const scrollToEndIfNearBottom = useCallback(
+    (animated = true) => {
+      if (!isNearBottomRef.current) return;
+      scrollToLatest(animated);
+    },
+    [scrollToLatest],
+  );
+
+  useEffect(() => {
+    initialScrollPendingRef.current = true;
+    previousLastMessageIdRef.current = null;
+    isNearBottomRef.current = true;
+    setShowScrollButton(false);
+  }, [chatDocId]);
+
+  // Keep new messages visible only when the user is already at the bottom.
+  // Sending your own message always returns to the latest message.
   useEffect(() => {
     const count = messages?.length ?? 0;
-    if (count > prevMessageCountRef.current) {
-      const lastMessage = messages[count - 1];
+    const lastMessage = count > 0 ? messages[count - 1] : null;
+    const lastMessageChanged =
+      lastMessage?.id &&
+      lastMessage.id !== previousLastMessageIdRef.current;
+
+    if (lastMessageChanged && !initialScrollPendingRef.current) {
       if (lastMessage?.senderId === currentUserId) {
-        isNearBottomRef.current = true;
-        setTimeout(() => {
-          flatListRef.current?.scrollToEnd({ animated: true });
-        }, 100);
+        scrollToLatest(true);
       } else {
         scrollToEndIfNearBottom(true);
       }
     }
-    prevMessageCountRef.current = count;
-  }, [messages, currentUserId, scrollToEndIfNearBottom]);
+
+    previousLastMessageIdRef.current = lastMessage?.id || null;
+  }, [messages, currentUserId, scrollToEndIfNearBottom, scrollToLatest]);
 
   const renderLeftActions = useCallback((progress, dragX) => {
     const scale = dragX.interpolate({
@@ -553,14 +576,21 @@ export default function ChatMessages({
             e.nativeEvent;
           const distanceFromBottom =
             contentSize.height - layoutMeasurement.height - contentOffset.y;
-          isNearBottomRef.current = distanceFromBottom < 120;
+          const isNearBottom = distanceFromBottom < 120;
+          const wasNearBottom = isNearBottomRef.current;
+          isNearBottomRef.current = isNearBottom;
+          if (wasNearBottom !== isNearBottom) {
+            setShowScrollButton(!isNearBottom);
+          }
         }}
         scrollEventThrottle={16}
         onContentSizeChange={() => {
+          if (initialScrollPendingRef.current && messages.length > 0) {
+            initialScrollPendingRef.current = false;
+            scrollToLatest(false);
+            return;
+          }
           scrollToEndIfNearBottom(true);
-        }}
-        onLayout={() => {
-          scrollToEndIfNearBottom(false);
         }}
         ListFooterComponent={
           <View>
@@ -594,6 +624,27 @@ export default function ChatMessages({
           </View>
         }
       />
+      {showScrollButton && (
+        <TouchableOpacity
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            scrollToLatest(true);
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Jump to latest message"
+          className="absolute bottom-4 right-4 w-10 h-10 bg-white dark:bg-[#1C1C20] border border-gray-100 dark:border-[#2C2C30] rounded-full items-center justify-center"
+          style={{
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.15,
+            shadowRadius: 4,
+            elevation: 4,
+            zIndex: 50,
+          }}
+        >
+          <Ionicons name="chevron-down" size={24} color="#FF6B47" />
+        </TouchableOpacity>
+      )}
       <ReactionPicker
         isVisible={!!reactionPicker}
         onClose={() => setReactionPicker(null)}
