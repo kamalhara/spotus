@@ -14,7 +14,6 @@ import {
 import { useModal } from "../../context/ModalContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import GlassContainer from "../../components/ui/GlassContainer";
-import SpotUsLoader from "../../components/ui/SpotUsLoader";
 import { setTyping } from "../../lib/chatTyping";
 
 const MEDIA_OPTIONS = [
@@ -47,7 +46,6 @@ export default function MessageSender({
   typingCollection = "chats",
 }) {
   const [message, setMessage] = useState("");
-  const [isSending, setIsSending] = useState(false);
   const [showMediaMenu, setShowMediaMenu] = useState(false);
 
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -57,6 +55,7 @@ export default function MessageSender({
 
   const typingTimeout = useRef(null);
   const isTypingLocal = useRef(false);
+  const sendPressLocked = useRef(false);
   const inputRef = useRef(null);
   const insets = useSafeAreaInsets();
   const { showAlert } = useModal();
@@ -76,6 +75,10 @@ export default function MessageSender({
       setMessage(editingMessage.text || "");
     }
   }, [editingMessage]);
+
+  useEffect(() => {
+    sendPressLocked.current = false;
+  }, [message]);
 
   const toggleMediaMenu = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -121,7 +124,8 @@ export default function MessageSender({
   };
 
   const onSend = async () => {
-    if (!canSend) return;
+    if (!canSend || sendPressLocked.current) return;
+    sendPressLocked.current = true;
 
     // Trigger elastic bounce and heavy haptic on send
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -139,7 +143,13 @@ export default function MessageSender({
       }),
     ]).start();
 
-    setIsSending(true);
+    const textToSend = message;
+    const currentEditingMessage = editingMessage;
+
+    setMessage("");
+    if (!currentEditingMessage) {
+      onCancelReply?.();
+    }
 
     if (typingTimeout.current) {
       clearTimeout(typingTimeout.current);
@@ -148,22 +158,18 @@ export default function MessageSender({
     setTyping(chatId, currentUserId, false, typingCollection);
 
     try {
-      if (editingMessage && handleEditMessage) {
-        await handleEditMessage(editingMessage.id, message);
+      if (currentEditingMessage && handleEditMessage) {
+        await handleEditMessage(currentEditingMessage.id, textToSend);
         setEditingMessage(null);
       } else if (handleSend) {
-        await handleSend(message);
+        await handleSend(textToSend);
       }
-
-      setMessage("");
-      onCancelReply?.();
     } catch (error) {
+      setMessage((currentMessage) => currentMessage || textToSend);
       showAlert(
         "Message Not Sent",
         error?.message || "Please check your connection and try again.",
       );
-    } finally {
-      setIsSending(false);
     }
   };
 
@@ -448,21 +454,17 @@ export default function MessageSender({
         {/* Send Button */}
         <Animated.View style={{ transform: [{ scale: sendScale }] }}>
           <TouchableOpacity
-            disabled={!canSend || isSending}
+            disabled={!canSend}
             onPress={onSend}
             activeOpacity={0.7}
             className={`w-[42px] h-[42px] rounded-full items-center justify-center mr-0.5 ${isActive ? "bg-primary" : "bg-surface-alt dark:bg-[#242428]"}`}
           >
-            {isSending ? (
-              <SpotUsLoader size="small" />
-            ) : (
-              <Ionicons
-                name="send"
-                size={18}
-                color={isActive ? "white" : "#94A3B8"}
-                style={{ marginLeft: 2 }}
-              />
-            )}
+            <Ionicons
+              name="send"
+              size={18}
+              color={isActive ? "white" : "#94A3B8"}
+              style={{ marginLeft: 2 }}
+            />
           </TouchableOpacity>
         </Animated.View>
       </GlassContainer>

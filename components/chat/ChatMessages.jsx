@@ -344,6 +344,7 @@ export default function ChatMessages({
               friction={2}
               leftThreshold={40}
               overshootLeft={false}
+              enabled={!item.isSending}
               onSwipeableOpen={(direction) => {
                 if (direction === "left") {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -355,7 +356,9 @@ export default function ChatMessages({
               <TouchableOpacity
                 activeOpacity={0.7}
                 onLongPress={(event) => {
-                  handleMessageLongPress(event, item);
+                  if (!item.isSending) {
+                    handleMessageLongPress(event, item);
+                  }
                 }}
                 className={`min-w-[76px] ${item.imageUrl ? "" : "px-3.5 pt-2.5 pb-5"} ${
                   isSentByMe
@@ -479,17 +482,21 @@ export default function ChatMessages({
                     <View className="ml-1">
                       <Ionicons
                         name={
-                          item.seenBy?.length > 1
-                            ? "checkmark-done"
-                            : "checkmark"
+                          item.isSending
+                            ? "time-outline"
+                            : item.seenBy?.length > 1
+                              ? "checkmark-done"
+                              : "checkmark"
                         }
                         size={13}
                         color={
-                          item.seenBy?.length > 1
-                            ? "#93C5FD"
-                            : item.imageUrl
-                              ? "rgba(255,255,255,0.8)"
-                              : "rgba(255,255,255,0.55)"
+                          item.isSending
+                            ? "rgba(255,255,255,0.55)"
+                            : item.seenBy?.length > 1
+                              ? "#93C5FD"
+                              : item.imageUrl
+                                ? "rgba(255,255,255,0.8)"
+                                : "rgba(255,255,255,0.55)"
                         }
                       />
                     </View>

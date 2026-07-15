@@ -49,6 +49,9 @@ export default function RoomChat() {
   const [replyTo, setReplyTo] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
   const [showGhostBanner, setShowGhostBanner] = useState(true);
+  const [pendingMessages, setPendingMessages] = useState([]);
+  const pendingMessageSequence = useRef(0);
+  const receivedMessageIds = useRef(new Set());
 
   const [roomExpired, setRoomExpired] = useState(false);
   const expiredFade = useRef(new Animated.Value(0)).current;
@@ -80,7 +83,13 @@ export default function RoomChat() {
             !msg.deletedFor?.includes(currentUserId) &&
             !user?.blockedUsers?.includes(msg.senderId),
         );
+      receivedMessageIds.current = new Set(msgs.map((message) => message.id));
       setMessages(msgs);
+      setPendingMessages((pending) =>
+        pending.filter(
+          (message) => !receivedMessageIds.current.has(message.id),
+        ),
+      );
       setIsLoadingMore(false);
     });
     return unsub;
@@ -177,20 +186,55 @@ export default function RoomChat() {
       setEditingMessage(null);
     } catch (err) {
       console.error("Error editing message:", err);
+      throw err;
     }
   };
 
   const handleSend = async (text) => {
     if (!text.trim()) return;
     const trimmedText = text.trim();
+    const activeReply = replyTo;
+    const tempId = `temp-${Date.now()}-${pendingMessageSequence.current++}`;
+    const optimisticMsg = {
+      id: tempId,
+      text: trimmedText,
+      senderId: currentUserId,
+      user: user?.userName || "Unknown",
+      createdAt: new Date(),
+      isSending: true,
+      seenBy: [currentUserId],
+      reactions: {},
+      ...(activeReply && {
+        replyTo: {
+          id: activeReply.id,
+          text: activeReply.text || "",
+          user: activeReply.user || "Unknown",
+          imageUrl: activeReply.imageUrl || null,
+        },
+      }),
+    };
+
+    setPendingMessages((prev) => [...prev, optimisticMsg]);
+    setReplyTo(null);
+
     try {
       const token = await getToken();
       const result = await sendRoomMessage(
         roomId,
-        { text: trimmedText, replyTo },
+        { text: trimmedText, replyTo: activeReply },
         token,
       );
-      setReplyTo(null);
+
+      setPendingMessages((prev) =>
+        receivedMessageIds.current.has(result.messageId)
+          ? prev.filter((message) => message.id !== tempId)
+          : prev.map((message) =>
+              message.id === tempId
+                ? { ...message, id: result.messageId, isSending: false }
+                : message,
+            ),
+      );
+
       sendBatchNotification(
         result.participantIds,
         currentUserId,
@@ -202,6 +246,8 @@ export default function RoomChat() {
       return result;
     } catch (err) {
       console.error("Error sending message:", err);
+      setPendingMessages((prev) => prev.filter((m) => m.id !== tempId));
+      setReplyTo((currentReply) => currentReply || activeReply);
       throw err;
     }
   };
@@ -283,6 +329,13 @@ export default function RoomChat() {
   const isHost = room?.createdBy === currentUserId;
   const categoryIcon = CATEGORY_ICONS[room?.category] || "grid";
   const categoryColor = CATEGORY_COLORS[room?.category] || "#111113";
+  const renderedMessageIds = new Set(messages.map((message) => message.id));
+  const visibleMessages = [
+    ...messages,
+    ...pendingMessages.filter(
+      (message) => !renderedMessageIds.has(message.id),
+    ),
+  ];
 
   const handleInfoPress = () => {
     router.push(`/rooms/roomInfo?roomId=${roomId}`);
@@ -340,7 +393,7 @@ export default function RoomChat() {
 
         <View className="flex-1">
           <ChatMessages
-            messages={messages}
+            messages={visibleMessages}
             currentUserId={currentUserId}
             chatDocId={roomId}
             collectionName="rooms"

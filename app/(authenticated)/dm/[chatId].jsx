@@ -122,9 +122,19 @@ export default function ChatId() {
       orderBy("createdAt", "asc"),
       limitToLast(messageLimit),
     );
-    const unsub = onSnapshot(q, (snapshot) => {
+    const unsub = onSnapshot(q, { includeMetadataChanges: true }, (snapshot) => {
       const msgs = snapshot.docs
-        .map((d) => ({ id: d.id, ...d.data() }))
+        .map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            ...data,
+            isSending: d.metadata.hasPendingWrites,
+            createdAt:
+              data.createdAt ||
+              (d.metadata.hasPendingWrites ? new Date() : null),
+          };
+        })
         .filter((msg) => !msg.deletedFor?.includes(currentUserId));
       setMessages(msgs);
       setIsLoadingMore(false);
@@ -163,12 +173,16 @@ export default function ChatId() {
       setEditingMessage(null);
     } catch (err) {
       console.error("Error editing message:", err);
+      throw err;
     }
   };
 
-  // Send a message
   const handleSend = async (text) => {
     if (!text.trim() || !chatDocId) return;
+
+    const activeReply = replyTo;
+    let messageCreated = false;
+
     try {
       await addDoc(collection(db, "chats", chatDocId, "messages"), {
         text: text.trim(),
@@ -177,18 +191,21 @@ export default function ChatId() {
         createdAt: serverTimestamp(),
         seenBy: [currentUserId],
         reactions: {},
-        ...(replyTo
+        ...(activeReply
           ? {
               replyTo: {
-                id: replyTo.id,
-                text: replyTo.text || "",
-                user: replyTo.user || "Unknown",
-                imageUrl: replyTo.imageUrl || null,
+                id: activeReply.id,
+                text: activeReply.text || "",
+                user: activeReply.user || "Unknown",
+                imageUrl: activeReply.imageUrl || null,
               },
             }
           : {}),
       });
+      messageCreated = true;
+
       setReplyTo(null);
+
       // Update the chat's last activity and message preview
       await setDoc(
         doc(db, "chats", chatDocId),
@@ -215,7 +232,12 @@ export default function ChatId() {
         );
       }
     } catch (err) {
-      console.error("Error sending DM:", err);
+      if (!messageCreated) {
+        console.error("Error sending DM:", err);
+        setReplyTo((currentReply) => currentReply || activeReply);
+        throw err;
+      }
+      console.error("Message sent, but chat metadata was not updated:", err);
     }
   };
   const handleSendImage = async (uri) => {
