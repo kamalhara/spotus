@@ -3,7 +3,14 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Dimensions, FlatList, SafeAreaView, Text, View } from "react-native";
+import {
+  Dimensions,
+  FlatList,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import MapView from "react-native-map-clustering";
 import { Marker } from "react-native-maps";
 import Animated, {
@@ -36,48 +43,76 @@ const ITEM_MARGIN = 8;
 const ITEM_WIDTH = CARD_WIDTH + ITEM_MARGIN * 2;
 const SNAP_INTERVAL = ITEM_WIDTH;
 
-function EmptyRooms() {
-  const router = useRouter();
-  const { isDark } = useTheme();
-  const insets = useSafeAreaInsets();
+function EmptyRooms({
+  radiusKm,
+  nextRadiusKm,
+  isGhostBrowsing,
+  isSearching,
+  onSearchWider,
+  onCreateRoom,
+  onEnableLocation,
+}) {
   return (
-    <View className="flex-1 items-center justify-center py-20 px-6">
-      <View className="w-24 h-24 bg-info-surface rounded-full items-center justify-center mb-6">
-        <Ionicons name="compass" size={40} color="#FF6B47" />
-      </View>
-      <Text className="text-secondary dark:text-gray-100 text-xl font-display font-black tracking-tight text-center mb-2.5">
-        No rooms nearby
-      </Text>
-      <Text className="text-muted text-[15px] font-medium text-center leading-6 px-4 mb-10">
-        Keep exploring or enable location to join conversations.
-      </Text>
-
-      <GlassButton
-        onPress={() => router.push("/rooms/create-rooms")}
-        shape="pill"
-        size="regular"
-      >
-        <View className="flex-row items-center justify-center gap-2 py-3.5 px-6">
-          <Ionicons
-            name="add-outline"
-            size={20}
-            color={isDark ? "#FFAB99" : "#FF6B47"}
-          />
-          <Text className="text-primary dark:text-primary-light font-bold text-lg">
-            Create Room
+    <View className="mx-4 rounded-4xl bg-white dark:bg-[#1C1C20] border border-border dark:border-[#303034] px-5 pt-5 pb-4 shadow-xl">
+      <View className="flex-row items-center">
+        <View className="w-14 h-14 rounded-2xl bg-primary-surface items-center justify-center mr-4">
+          <View className="absolute w-10 h-10 rounded-full border border-primary/20" />
+          <View className="absolute w-6 h-6 rounded-full border border-primary/30" />
+          <Ionicons name="location" size={18} color="#FF6B47" />
+        </View>
+        <View className="flex-1">
+          <View className="self-start rounded-full bg-surface-alt dark:bg-[#28282C] px-2.5 py-1 mb-1.5">
+            <Text className="text-text-tertiary dark:text-gray-400 text-[11px] font-semibold">
+              {isGhostBrowsing ? "EXPLORING PRIVATELY" : `${radiusKm} KM CHECKED`}
+            </Text>
+          </View>
+          <Text className="text-secondary dark:text-gray-100 text-xl font-display tracking-tight">
+            {isGhostBrowsing ? "No preview rooms right now" : "It’s quiet around here"}
           </Text>
         </View>
-      </GlassButton>
-
-      <View style={{ position: "absolute", top: insets.top + 16, left: 16 }}>
-        <GlassButton onPress={() => router.back()} size={44} shape="circle">
-          <Ionicons
-            name="chevron-back"
-            size={20}
-            color={isDark ? "#F3F4F6" : "#18181B"}
-          />
-        </GlassButton>
       </View>
+
+      <Text className="text-muted dark:text-gray-400 text-[14px] font-body leading-5 mt-4 mb-5">
+        {isGhostBrowsing
+          ? "Turn on location to discover live conversations happening around you."
+          : `No public rooms are open within ${radiusKm} km. Widen your search or start the first one nearby.`}
+      </Text>
+
+      <TouchableOpacity
+        onPress={isGhostBrowsing ? onEnableLocation : onSearchWider}
+        disabled={isSearching}
+        activeOpacity={0.82}
+        className="h-[52px] rounded-2xl bg-primary flex-row items-center justify-center"
+        style={{ opacity: isSearching ? 0.72 : 1 }}
+      >
+        <Ionicons
+          name={isGhostBrowsing ? "navigate" : "scan-outline"}
+          size={18}
+          color="white"
+        />
+        <Text className="text-white text-[15px] font-bold ml-2">
+          {isSearching
+            ? "Searching…"
+            : isGhostBrowsing
+              ? "Use my location"
+              : nextRadiusKm > radiusKm
+                ? `Search within ${nextRadiusKm} km`
+                : `Refresh ${radiusKm} km search`}
+        </Text>
+      </TouchableOpacity>
+
+      {!isGhostBrowsing && (
+        <TouchableOpacity
+          onPress={onCreateRoom}
+          activeOpacity={0.75}
+          className="h-12 flex-row items-center justify-center mt-1"
+        >
+          <Ionicons name="add-circle-outline" size={18} color="#FF6B47" />
+          <Text className="text-primary dark:text-primary-light text-[14px] font-bold ml-2">
+            Create a room here
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -347,6 +382,11 @@ export default function MapViewScreen() {
   });
 
   const hasInitialRender = useRef(false);
+  const rawDistance = Array.isArray(distance) ? distance[0] : distance;
+  const parsedDistance = Number.parseFloat(rawDistance);
+  const searchRadiusKm =
+    Number.isFinite(parsedDistance) && parsedDistance > 0 ? parsedDistance : 5;
+  const nextRadiusKm = Math.min(Math.max(searchRadiusKm * 2, 10), 50);
 
   useFocusEffect(
     useCallback(() => {
@@ -408,10 +448,8 @@ export default function MapViewScreen() {
             });
           }
 
-          const radiusKm = distance ? parseFloat(distance) : 5;
-
           unsubscribe = await subscribeNearbyRooms(
-            radiusKm,
+            searchRadiusKm,
             firestoreUser?.id,
             (allRooms) => {
               if (!isMounted) return;
@@ -451,7 +489,7 @@ export default function MapViewScreen() {
         if (unsubscribe) unsubscribe();
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [distance, firestoreUser?.id, retryTrigger]),
+    }, [distance, firestoreUser?.id, retryTrigger, searchRadiusKm]),
   );
 
   const animateToRoom = (room) => {
@@ -500,6 +538,42 @@ export default function MapViewScreen() {
     }
   };
 
+  const handleSearchWider = () => {
+    setLoading(true);
+
+    if (nextRadiusKm > searchRadiusKm) {
+      router.setParams({ distance: String(nextRadiusKm) });
+    } else {
+      setRetryTrigger((prev) => prev + 1);
+    }
+
+    if (userLocation) {
+      const delta = Math.min(Math.max(nextRadiusKm / 55, 0.08), 1);
+      mapRef.current?.animateToRegion(
+        {
+          ...userLocation,
+          latitudeDelta: delta,
+          longitudeDelta: delta,
+        },
+        500,
+      );
+    }
+  };
+
+  const handleEnableLocation = async () => {
+    await AsyncStorage.setItem("isGhostBrowsing", "false");
+    setIsGhostBrowsing(false);
+    setRetryTrigger((prev) => prev + 1);
+  };
+
+  const handleCreateRoom = () => {
+    if (isGhostBrowsing) {
+      setInterceptModal({ visible: true, action: "create a room" });
+      return;
+    }
+    router.push("/rooms/create-rooms");
+  };
+
   if (loading && !region && !locationError) {
     return (
       <View className="flex-1 bg-bg dark:bg-[#111113] items-center justify-center">
@@ -518,8 +592,6 @@ export default function MapViewScreen() {
             setRetryTrigger((prev) => prev + 1);
           }}
         />
-      ) : rooms.length === 0 && !loading ? (
-        <EmptyRooms />
       ) : (
         <>
           <GhostBrowsingBanner
@@ -598,55 +670,77 @@ export default function MapViewScreen() {
                       color: isDark ? "#F3F4F6" : "#18181B",
                     }}
                   >
-                    {rooms.length} {rooms.length === 1 ? "Room" : "Rooms"}
+                    {rooms.length === 0
+                      ? `${searchRadiusKm} km radius`
+                      : `${rooms.length} ${rooms.length === 1 ? "Room" : "Rooms"}`}
                   </Text>
                 </View>
               </GlassButton>
             </View>
           </SafeAreaView>
 
-          {/* Bottom Cards Carousel */}
-          <View
-            style={{
-              position: "absolute",
-              bottom: 20 + insets.bottom,
-              left: 0,
-              right: 0,
-            }}
-          >
-            <FlatList
-              ref={flatListRef}
-              data={rooms}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={SNAP_INTERVAL}
-              decelerationRate="fast"
-              contentContainerStyle={{
-                paddingHorizontal: (width - ITEM_WIDTH) / 2,
+          {rooms.length === 0 ? (
+            <View
+              style={{
+                position: "absolute",
+                bottom: 12 + insets.bottom,
+                left: 0,
+                right: 0,
               }}
-              onMomentumScrollEnd={(e) => {
-                const index = Math.round(
-                  e.nativeEvent.contentOffset.x / SNAP_INTERVAL,
-                );
-                if (rooms[index] && rooms[index].id !== selectedRoomId) {
-                  animateToRoom(rooms[index]);
-                }
+            >
+              <EmptyRooms
+                radiusKm={searchRadiusKm}
+                nextRadiusKm={nextRadiusKm}
+                isGhostBrowsing={isGhostBrowsing}
+                isSearching={loading}
+                onSearchWider={handleSearchWider}
+                onCreateRoom={handleCreateRoom}
+                onEnableLocation={handleEnableLocation}
+              />
+            </View>
+          ) : rooms.length > 0 ? (
+            <View
+              style={{
+                position: "absolute",
+                bottom: 20 + insets.bottom,
+                left: 0,
+                right: 0,
               }}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <View
-                  style={{ width: CARD_WIDTH, marginHorizontal: ITEM_MARGIN }}
-                >
-                  <RoomCard
-                    room={item}
-                    onPress={() => handleCardPress(item)}
-                    currentUserId={firestoreUser?.id}
-                    isExploreMode={isGhostBrowsing}
-                  />
-                </View>
-              )}
-            />
-          </View>
+            >
+              <FlatList
+                ref={flatListRef}
+                data={rooms}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                snapToInterval={SNAP_INTERVAL}
+                decelerationRate="fast"
+                contentContainerStyle={{
+                  paddingHorizontal: (width - ITEM_WIDTH) / 2,
+                }}
+                onMomentumScrollEnd={(e) => {
+                  const index = Math.round(
+                    e.nativeEvent.contentOffset.x / SNAP_INTERVAL,
+                  );
+                  if (rooms[index] && rooms[index].id !== selectedRoomId) {
+                    animateToRoom(rooms[index]);
+                  }
+                }}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <View
+                    style={{ width: CARD_WIDTH, marginHorizontal: ITEM_MARGIN }}
+                  >
+                    <RoomCard
+                      room={item}
+                      onPress={() => handleCardPress(item)}
+                      currentUserId={firestoreUser?.id}
+                      isExploreMode={isGhostBrowsing}
+                    />
+                  </View>
+                )}
+              />
+            </View>
+          ) : null}
         </>
       )}
 
