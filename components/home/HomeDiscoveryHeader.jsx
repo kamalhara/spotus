@@ -9,9 +9,9 @@ import {
   View,
 } from "react-native";
 import { CATEGORY_ICONS } from "../../constants/categories";
+import GlassButton from "../ui/GlassButton";
 import CategoryChips from "./CategoryChips";
 import NearbyPulse from "./NearbyPulse";
-import GlassButton from "../ui/GlassButton";
 
 function getHeadline(roomCount, isLoading) {
   if (isLoading) return "Looking nearby...";

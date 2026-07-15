@@ -1,7 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import React, { useEffect, useRef } from "react";
-import { Animated, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { CATEGORY_COLORS, CATEGORY_ICONS } from "../../constants/categories";
 
 function ChipButton({ label, icon, color, isActive, onPress }) {
@@ -57,7 +63,7 @@ function ChipButton({ label, icon, color, isActive, onPress }) {
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={0.85}
-        className="flex-row items-center px-3.5 py-2 rounded-xl border"
+        className="flex-row items-center px-3.5 py-2 rounded-xl border mt-1"
         style={
           isActive
             ? { backgroundColor: color, borderColor: color }
