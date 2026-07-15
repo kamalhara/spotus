@@ -50,7 +50,6 @@ export default function RoomChat() {
   const [editingMessage, setEditingMessage] = useState(null);
   const [showGhostBanner, setShowGhostBanner] = useState(true);
   const [pendingMessages, setPendingMessages] = useState([]);
-  const pendingMessageSequence = useRef(0);
   const receivedMessageIds = useRef(new Set());
 
   const [roomExpired, setRoomExpired] = useState(false);
@@ -194,9 +193,11 @@ export default function RoomChat() {
     if (!text.trim()) return;
     const trimmedText = text.trim();
     const activeReply = replyTo;
-    const tempId = `temp-${Date.now()}-${pendingMessageSequence.current++}`;
+    const messageId = doc(
+      collection(db, "rooms", roomId, "messages"),
+    ).id;
     const optimisticMsg = {
-      id: tempId,
+      id: messageId,
       text: trimmedText,
       senderId: currentUserId,
       user: user?.userName || "Unknown",
@@ -221,16 +222,25 @@ export default function RoomChat() {
       const token = await getToken();
       const result = await sendRoomMessage(
         roomId,
-        { text: trimmedText, replyTo: activeReply },
+        {
+          text: trimmedText,
+          replyTo: activeReply,
+          clientMessageId: messageId,
+        },
         token,
       );
+      const confirmedMessageId = result.messageId || messageId;
 
       setPendingMessages((prev) =>
-        receivedMessageIds.current.has(result.messageId)
-          ? prev.filter((message) => message.id !== tempId)
+        receivedMessageIds.current.has(confirmedMessageId)
+          ? prev.filter((message) => message.id !== messageId)
           : prev.map((message) =>
-              message.id === tempId
-                ? { ...message, id: result.messageId, isSending: false }
+              message.id === messageId
+                ? {
+                    ...message,
+                    id: confirmedMessageId,
+                    isSending: false,
+                  }
                 : message,
             ),
       );
@@ -245,8 +255,16 @@ export default function RoomChat() {
       );
       return result;
     } catch (err) {
+      if (receivedMessageIds.current.has(messageId)) {
+        setPendingMessages((prev) =>
+          prev.filter((message) => message.id !== messageId),
+        );
+        return;
+      }
       console.error("Error sending message:", err);
-      setPendingMessages((prev) => prev.filter((m) => m.id !== tempId));
+      setPendingMessages((prev) =>
+        prev.filter((message) => message.id !== messageId),
+      );
       setReplyTo((currentReply) => currentReply || activeReply);
       throw err;
     }
@@ -268,6 +286,9 @@ export default function RoomChat() {
         type: "image",
         imageUrl: uploadResult.imageUrl,
         cloudinaryPublicId: uploadResult.cloudinaryPublicId,
+        clientMessageId: doc(
+          collection(db, "rooms", roomId, "messages"),
+        ).id,
       }, uploadToken);
       // Notify all other room participants about the image
       sendBatchNotification(

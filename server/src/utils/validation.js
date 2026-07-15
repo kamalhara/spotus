@@ -140,12 +140,19 @@ function messagePayload(body = {}) {
       imageUrl: optionalString(body.replyTo.imageUrl, 'Reply image', 500) || null,
     };
   }
+  const clientMessageId = body.clientMessageId
+    ? documentId(body.clientMessageId, 'Client message')
+    : null;
+  if (clientMessageId && !/^[A-Za-z0-9]{20}$/.test(clientMessageId)) {
+    throw new ApiError(400, 'VALIDATION_ERROR', 'Client message is invalid');
+  }
   return {
     type: isImage ? 'image' : 'text',
     text,
     imageUrl,
     cloudinaryPublicId,
     replyTo,
+    clientMessageId,
   };
 }
 

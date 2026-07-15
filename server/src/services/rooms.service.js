@@ -172,17 +172,32 @@ async function deleteRoom(userId, roomId) {
 async function sendMessage(userId, roomId, payload) {
   const roomRef = db.collection('rooms').doc(roomId);
   const userRef = db.collection('users').doc(userId);
-  const messageRef = roomRef.collection('messages').doc();
+  const messageRef = payload.clientMessageId
+    ? roomRef.collection('messages').doc(payload.clientMessageId)
+    : roomRef.collection('messages').doc();
 
   return db.runTransaction(async (transaction) => {
-    const [roomSnapshot, userSnapshot] = await Promise.all([
+    const [roomSnapshot, userSnapshot, messageSnapshot] = await Promise.all([
       transaction.get(roomRef),
       transaction.get(userRef),
+      transaction.get(messageRef),
     ]);
     if (!roomSnapshot.exists) {
       throw new ApiError(404, 'ROOM_NOT_FOUND', 'This room no longer exists.');
     }
     const room = roomSnapshot.data();
+    if (messageSnapshot.exists) {
+      if (messageSnapshot.data().senderId !== userId) {
+        throw new ApiError(409, 'MESSAGE_ID_CONFLICT', 'Message could not be sent.');
+      }
+      return {
+        messageId: messageRef.id,
+        roomTitle: room.title || 'Room',
+        participantIds: room.participants.filter((id) => id !== userId).slice(0, 100),
+        senderName: userSnapshot.data()?.userName || 'SpotUs member',
+        alreadyCreated: true,
+      };
+    }
     if (room.isActive === false || room.expiresAt?.toMillis?.() <= Date.now()) {
       throw new ApiError(410, 'ROOM_EXPIRED', 'This room has expired.');
     }
@@ -223,6 +238,7 @@ async function sendMessage(userId, roomId, payload) {
       roomTitle: room.title || 'Room',
       participantIds: room.participants.filter((id) => id !== userId).slice(0, 100),
       senderName: message.user,
+      alreadyCreated: false,
     };
   });
 }

@@ -77,6 +77,7 @@ describe('messagePayload', () => {
     expect(
       messagePayload({
         text: '  Hello there  ',
+        clientMessageId: 'AbCdEfGhIjKlMnOpQrSt',
         replyTo: {
           id: 'message_1',
           text: ' Previous message ',
@@ -89,6 +90,7 @@ describe('messagePayload', () => {
       text: 'Hello there',
       imageUrl: null,
       cloudinaryPublicId: null,
+      clientMessageId: 'AbCdEfGhIjKlMnOpQrSt',
       replyTo: {
         id: 'message_1',
         text: 'Previous message',
@@ -111,7 +113,16 @@ describe('messagePayload', () => {
       imageUrl: 'https://res.cloudinary.com/demo/image/upload/spotus/photo.jpg',
       cloudinaryPublicId: 'spotus/photo',
       replyTo: null,
+      clientMessageId: null,
     });
+  });
+
+  test('rejects malformed client message IDs', () => {
+    expect(() =>
+      messagePayload({ text: 'Hello', clientMessageId: 'temp-123' }),
+    ).toThrow(
+      expect.objectContaining({ code: 'VALIDATION_ERROR', status: 400 }),
+    );
   });
 
   test('rejects image messages hosted outside Cloudinary', () => {
