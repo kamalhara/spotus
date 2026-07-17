@@ -7,6 +7,7 @@ import {
   Animated,
   FlatList,
   Image,
+  Keyboard,
   Text,
   TouchableOpacity,
   View,
@@ -171,6 +172,15 @@ export default function ChatMessages({
     },
     [scrollToLatest],
   );
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", () => {
+      scrollToLatest(true);
+    });
+    return () => {
+      showSubscription.remove();
+    };
+  }, [scrollToLatest]);
 
   useEffect(() => {
     initialRevealScheduledRef.current = false;
