@@ -257,4 +257,4 @@ This software, its design, structure, and database schemas are the intellectual 
 
 - Access is granted solely under employment or contracting agreements.
 - Do not share source code, database structures, security configurations, API secrets, or certificates with third parties.
-- Violations of these conditions will result in immediate termination of access and possible legal action
+- Violations of these conditions will result in immediate termination of access and possible legal action.
