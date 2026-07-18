@@ -35,8 +35,8 @@ import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { trackEvent } from "../../../lib/analytics";
 import { getExploreRooms } from "../../../lib/getExploreRooms";
 import { subscribeNearbyRooms } from "../../../lib/getNearbyRoom";
-import { getCurrentLocation } from "../../../lib/location";
 import { joinRoomById } from "../../../lib/joinRoom";
+import { getCurrentLocation } from "../../../lib/location";
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = width * 0.78; // Narrower to show adjacent cards
 const ITEM_MARGIN = 8;
@@ -56,9 +56,7 @@ function EmptyRooms({
     <View className="mx-4 rounded-4xl bg-white dark:bg-[#1C1C20] border border-border dark:border-[#303034] px-5 pt-5 pb-4 shadow-xl">
       <View className="flex-row items-center">
         <View className="w-14 h-14 rounded-2xl bg-primary-surface items-center justify-center mr-4">
-          <View className="absolute w-10 h-10 rounded-full border border-primary/20" />
-          <View className="absolute w-6 h-6 rounded-full border border-primary/30" />
-          <Ionicons name="location" size={18} color="#FF6B47" />
+          <Ionicons name="globe" size={28} color="#FF6B47" />
         </View>
         <View className="flex-1">
           <View className="self-start rounded-full bg-surface-alt dark:bg-[#28282C] px-2.5 py-1 mb-1.5">

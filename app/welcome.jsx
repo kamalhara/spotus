@@ -24,9 +24,6 @@ export default function Welcome() {
           <Text className="text-secondary dark:text-gray-100 text-2xl font-heading tracking-tight">
             SpotUs
           </Text>
-          <Text className="text-muted text-[13px] mt-1 font-body">
-            Where locals connect
-          </Text>
         </View>
 
         {/* Hero */}
@@ -79,7 +76,10 @@ export default function Welcome() {
         <View>
           <View className="bg-surface-alt dark:bg-[#1A1A1E] px-8 pt-10 pb-14 rounded-t-[28px]">
             <Text className="text-secondary dark:text-gray-100 text-[34px] font-display leading-[40px] tracking-tight">
-              Find a room nearby
+              Where locals{" "}
+              <Text className="text-primary dark:text-primary-light">
+                Connect
+              </Text>
             </Text>
             <Text className="text-muted text-[15px] mt-4 leading-6 mb-8 font-body">
               Browse by distance and topic, or join a private room with an
