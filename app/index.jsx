@@ -1,11 +1,14 @@
 import { useAuth, useUser } from "@clerk/expo";
 import { Redirect } from "expo-router";
+import AppLoadingScreen from "../components/ui/AppLoadingScreen";
 
 export default function Index() {
   const { isSignedIn, isLoaded: isAuthLoaded } = useAuth();
   const { user, isLoaded: isUserLoaded } = useUser();
 
-  if (!isAuthLoaded || (isSignedIn && !isUserLoaded)) return null;
+  if (!isAuthLoaded || (isSignedIn && !isUserLoaded)) {
+    return <AppLoadingScreen />;
+  }
 
   if (isSignedIn) {
     // If onboarding is explicitly completed, go home

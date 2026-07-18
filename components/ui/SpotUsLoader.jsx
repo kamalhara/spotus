@@ -1,51 +1,49 @@
-import React, { useEffect } from 'react';
-import { View } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import React, { useEffect } from "react";
+import { View } from "react-native";
+import Svg, { Circle, Path } from "react-native-svg";
 import Animated, {
-  useSharedValue,
+  Easing,
+  interpolate,
+  interpolateColor,
   useAnimatedProps,
+  useSharedValue,
   withRepeat,
   withTiming,
-  Easing,
-  interpolateColor,
-  interpolate,
-} from 'react-native-reanimated';
-import { useColorScheme } from 'nativewind';
+} from "react-native-reanimated";
+import { useColorScheme } from "nativewind";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
-export default function SpotUsLoader({ size = 'small', color }) {
+const SIZE_MAP = {
+  small: 24,
+  medium: 32,
+  large: 64,
+  hero: 96,
+};
+
+export default function SpotUsLoader({
+  size = "small",
+  color,
+  accessibilityLabel = "Loading",
+}) {
   const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const isDark = colorScheme === "dark";
+  const dimension =
+    typeof size === "number" ? size : SIZE_MAP[size] || SIZE_MAP.small;
 
-  // Determine dimensions based on size prop
-  let width = 24;
-  let height = 24;
-
-  if (typeof size === 'number') {
-    width = size;
-    height = size;
-  } else if (size === 'large') {
-    width = 48;
-    height = 48;
-  } else if (size === 'small') {
-    width = 24;
-    height = 24;
-  }
-
-  const defaultActiveColor = isDark ? '#F5F5F5' : '#111113';
+  const defaultActiveColor = isDark ? "#F5F5F5" : "#111113";
   // Use passed color for the main nodes, otherwise use theme color
   const ACTIVE_COLOR = color || defaultActiveColor;
-  const INACTIVE_COLOR = '#FF8566'; // CORAL
+  const INACTIVE_COLOR = "#FF8566";
 
   const progress = useSharedValue(0);
 
   useEffect(() => {
     progress.value = withRepeat(
       withTiming(1, { duration: 1800, easing: Easing.bezier(0.37, 0, 0.63, 1) }),
-      -1, // Infinite repeat
-      false
+      -1,
+      false,
     );
   }, [progress]);
 
@@ -124,12 +122,18 @@ export default function SpotUsLoader({ size = 'small', color }) {
   });
 
   return (
-    <View style={{ width, height }} className="items-center justify-center">
+    <View
+      accessible
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole="progressbar"
+      style={{ width: dimension, height: dimension }}
+      className="items-center justify-center"
+    >
       <Svg
         viewBox="0 0 708 652"
         width="100%"
         height="100%"
-        style={{ overflow: 'visible' }}
+        style={{ overflow: "visible" }}
       >
         <AnimatedPath
           animatedProps={lineRightDiagProps}

@@ -1,4 +1,9 @@
-import { ClerkLoaded, ClerkProvider, useUser } from "@clerk/expo";
+import {
+  ClerkLoaded,
+  ClerkLoading,
+  ClerkProvider,
+  useUser,
+} from "@clerk/expo";
 import * as Sentry from "@sentry/react-native";
 import {
   PlusJakartaSans_400Regular,
@@ -28,6 +33,7 @@ import { warmApi } from "../lib/api";
 import syncUserToFirebase from "../lib/syncUser";
 import { tokenCache } from "../utils/cache";
 import FirebaseAuthGate from "../components/auth/FirebaseAuthGate";
+import AppLoadingScreen from "../components/ui/AppLoadingScreen";
 
 const sentryDsn = process.env.EXPO_PUBLIC_SENTRY_DSN;
 
@@ -78,6 +84,9 @@ function ThemedApp() {
     <View style={{ flex: 1 }} className="bg-bg dark:bg-[#111113]">
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+          <ClerkLoading>
+            <AppLoadingScreen />
+          </ClerkLoading>
           <ClerkLoaded>
             <FirebaseAuthGate>
               <BottomSheetModalProvider>
@@ -115,12 +124,6 @@ function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded]);
-
-  useEffect(() => {
     if (Platform.OS === "android") {
       NavigationBar.setPositionAsync("absolute");
       NavigationBar.setBackgroundColorAsync("#ffffff00");
@@ -133,10 +136,20 @@ function RootLayout() {
 
   return (
     <ThemeProvider>
-      <ModalProvider>
-        <ThemedApp />
-      </ModalProvider>
+      <AppReady />
     </ThemeProvider>
+  );
+}
+
+function AppReady() {
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
+
+  return (
+    <ModalProvider>
+      <ThemedApp />
+    </ModalProvider>
   );
 }
 

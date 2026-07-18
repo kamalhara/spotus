@@ -131,7 +131,10 @@ export default function CustomButton({
           style={getShadowStyle()}
         >
           {loading ? (
-            <SpotUsLoader size="small" />
+            <SpotUsLoader
+              size="medium"
+              accessibilityLabel={`${title} in progress`}
+            />
           ) : (
             <View className="flex-row items-center justify-center">
               {icon && <View className="mr-2.5">{icon}</View>}

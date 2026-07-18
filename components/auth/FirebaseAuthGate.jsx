@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
 import { auth } from "../../config/firebase.config";
 import { apiRequest } from "../../lib/api";
-import SpotUsLoader from "../ui/SpotUsLoader";
+import AppLoadingScreen from "../ui/AppLoadingScreen";
 
 export default function FirebaseAuthGate({ children }) {
   const { getToken, isLoaded, isSignedIn, userId } = useAuth();
@@ -70,7 +70,14 @@ export default function FirebaseAuthGate({ children }) {
             </TouchableOpacity>
           </>
         ) : (
-          <SpotUsLoader />
+          <AppLoadingScreen
+            message={isSignedIn ? "Signing you in…" : "Opening SpotUs…"}
+            detail={
+              isSignedIn
+                ? "Securing your account and syncing your rooms"
+                : "Getting everything ready for you"
+            }
+          />
         )}
       </View>
     );

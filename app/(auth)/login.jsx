@@ -16,7 +16,7 @@ import Oauth from "../../components/auth/Oauth";
 import CustomButton from "../../components/ui/CustomButton";
 import CustomInput from "../../components/ui/CustomInput";
 import GlassButton from "../../components/ui/GlassButton";
-import SpotUsLoader from "../../components/ui/SpotUsLoader";
+import AppLoadingScreen from "../../components/ui/AppLoadingScreen";
 import { useTheme } from "../../context/ThemeContext";
 
 export default function Login() {
@@ -96,11 +96,7 @@ export default function Login() {
   };
 
   if (!isLoaded) {
-    return (
-      <SafeAreaView className="flex-1 justify-center items-center bg-bg dark:bg-[#111112]">
-        <SpotUsLoader size="large" />
-      </SafeAreaView>
-    );
+    return <AppLoadingScreen message="Preparing sign in…" />;
   }
 
   return (
