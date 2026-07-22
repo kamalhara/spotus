@@ -1,63 +1,46 @@
-import { doc, updateDoc } from "firebase/firestore";
-import { useEffect, useState } from "react";
-import { ScrollView, Switch } from "react-native";
+import * as ExpoNotifications from "expo-notifications";
+import { Linking, ScrollView, Switch } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ui/ScreenHeader";
 import SettingsRow from "../../../components/ui/SettingsRow";
 import SettingsSection from "../../../components/ui/SettingsSection";
-import { db } from "../../../config/firebase.config";
 import { useTheme } from "../../../context/ThemeContext";
-import useFirestoreUser from "../../../hook/useFireStoreUser";
+import { useModal } from "../../../context/ModalContext";
+import useUserSettings from "../../../hook/useUserSettings";
+import { registerForPushNotifications } from "../../../lib/notification";
 
 export default function Notifications() {
-  const { firestoreUser } = useFirestoreUser();
-
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [messageNotifications, setMessageNotifications] = useState(true);
-  const [roomNotifications, setRoomNotifications] = useState(true);
-  const [nearbyRoomNotifications, setNearbyRoomNotifications] = useState(true);
   const { isDark } = useTheme();
+  const { showConfirm } = useModal();
+  const { firestoreUser, settings, updateSetting } = useUserSettings({
+    notificationsEnabled: true,
+    messageNotifications: true,
+    roomNotifications: true,
+    nearbyRoomNotifications: true,
+  });
 
-  // Load saved settings on mount
-  useEffect(() => {
-    if (firestoreUser) {
-      if (firestoreUser.notificationsEnabled !== undefined) {
-        setNotificationsEnabled(firestoreUser.notificationsEnabled);
+  const toggle = async (key, value) => {
+    if (key === "notificationsEnabled" && value) {
+      const permission = await ExpoNotifications.getPermissionsAsync();
+      if (permission.status !== "granted" && !permission.canAskAgain) {
+        showConfirm({
+          title: "Notifications are blocked",
+          message: "Enable notifications for SpotUs in your device settings.",
+          confirmText: "Open Settings",
+          onConfirm: Linking.openSettings,
+        });
+        return;
       }
-      if (firestoreUser.messageNotifications !== undefined) {
-        setMessageNotifications(firestoreUser.messageNotifications);
-      }
-      if (firestoreUser.roomNotifications !== undefined) {
-        setRoomNotifications(firestoreUser.roomNotifications);
-      }
-      if (firestoreUser.nearbyRoomNotifications !== undefined) {
-        setNearbyRoomNotifications(firestoreUser.nearbyRoomNotifications);
-      }
+      await registerForPushNotifications(firestoreUser?.id);
     }
-  }, [firestoreUser]);
-
-  const persistSetting = async (key, value) => {
-    if (!firestoreUser?.id) return;
-    try {
-      const userRef = doc(db, "users", firestoreUser.id);
-      await updateDoc(userRef, {
-        [key]: value,
-      });
-    } catch (err) {
-      console.error("Error saving notification setting:", err);
-    }
+    await updateSetting(key, value);
   };
 
-  const toggle = (key, currentValue, setter) => {
-    const newValue = !currentValue;
-    setter(newValue);
-    persistSetting(key, newValue);
-  };
-
-  const renderSwitch = (key, value, setter) => (
+  const renderSwitch = (key, value) => (
     <Switch
       value={value}
-      onValueChange={() => toggle(key, value, setter)}
+      onValueChange={(nextValue) => toggle(key, nextValue)}
+      disabled={key !== "notificationsEnabled" && !settings.notificationsEnabled}
       trackColor={{ false: isDark ? "#242428" : "#E5E7EB", true: "#FF6B47" }}
       thumbColor="#FFFFFF"
     />
@@ -81,8 +64,7 @@ export default function Notifications() {
             description="Enable or disable all push notifications."
             rightComponent={renderSwitch(
               "notificationsEnabled",
-              notificationsEnabled,
-              setNotificationsEnabled,
+              settings.notificationsEnabled,
             )}
           />
           <SettingsRow
@@ -91,8 +73,7 @@ export default function Notifications() {
             description="Get notified when you receive a new direct message."
             rightComponent={renderSwitch(
               "messageNotifications",
-              messageNotifications,
-              setMessageNotifications,
+              settings.messageNotifications,
             )}
           />
           <SettingsRow
@@ -101,8 +82,7 @@ export default function Notifications() {
             description="Get notified about activity in your rooms."
             rightComponent={renderSwitch(
               "roomNotifications",
-              roomNotifications,
-              setRoomNotifications,
+              settings.roomNotifications,
             )}
           />
           <SettingsRow
@@ -111,8 +91,7 @@ export default function Notifications() {
             description="Get notified when a new room is created near you."
             rightComponent={renderSwitch(
               "nearbyRoomNotifications",
-              nearbyRoomNotifications,
-              setNearbyRoomNotifications,
+              settings.nearbyRoomNotifications,
             )}
             isLast
           />

@@ -8,7 +8,6 @@ import {
   Keyboard,
   Platform,
   ScrollView,
-  Switch,
   Text,
   TextInput,
   TouchableOpacity,
@@ -44,12 +43,10 @@ const MenuItem = ({
   onPress,
   color = "#FF6B47",
   isLast = false,
-  switchComponent = false,
   tag,
   goto = true,
   rightComponent,
 }) => {
-  const { isDark } = useTheme();
   return (
     <TouchableOpacity
       onPress={() => {
@@ -82,17 +79,6 @@ const MenuItem = ({
       </View>
       {rightComponent ? (
         rightComponent
-      ) : switchComponent ? (
-        <Switch
-          trackColor={{
-            false: isDark ? "#242428" : "#E5E7EB",
-            true: "#FF6B47",
-          }}
-          ios_backgroundColor="#E5E7EB"
-          onValueChange={() => {}}
-          value={true}
-          thumbColor={"#fff"}
-        />
       ) : tag ? (
         <View className="flex-row items-center justify-center bg-primary/10 px-2 py-1 rounded-lg">
           <Text className="text-primary text-xs font-semibold uppercase tracking-wide">
@@ -361,7 +347,7 @@ export default function Profile() {
           </View>
         )}
 
-        {(filterMatch("Notifications") || filterMatch("Email Alerts")) && (
+        {filterMatch("Notifications") && (
           <View className="bg-white dark:bg-[#1C1C20] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2C2C30] overflow-hidden">
             <Text className="text-gray-400 dark:text-gray-500 text-[11px] font-semibold uppercase tracking-wider px-5 pt-4 pb-2">
               Preferences
@@ -370,14 +356,6 @@ export default function Profile() {
               <MenuItem
                 icon="notifications-outline"
                 label="Notifications"
-                color="#8B5CF6"
-                onPress={() => router.push("/profile/notifications")}
-              />
-            )}
-            {filterMatch("Email Alerts") && (
-              <MenuItem
-                icon="at-outline"
-                label="Email Alerts"
                 color="#8B5CF6"
                 onPress={() => router.push("/profile/notifications")}
               />
@@ -607,7 +585,6 @@ export default function Profile() {
           !filterMatch("Sign-In Method") &&
           !filterMatch("Password") &&
           !filterMatch("Notifications") &&
-          !filterMatch("Email Alerts") &&
           !filterMatch("Profile Visibility") &&
           !filterMatch("Blocked Users") &&
           !filterMatch("Help Center") &&

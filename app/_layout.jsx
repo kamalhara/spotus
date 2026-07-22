@@ -27,6 +27,7 @@ import {
 } from "react-native-reanimated";
 import { ThemeProvider } from "../context/ThemeContext";
 import { ModalProvider } from "../context/ModalContext";
+import { LocalizationProvider } from "../context/LocalizationContext";
 import "../global.css";
 import { trackScreen } from "../lib/analytics";
 import { warmApi } from "../lib/api";
@@ -136,7 +137,9 @@ function RootLayout() {
 
   return (
     <ThemeProvider>
-      <AppReady />
+      <LocalizationProvider>
+        <AppReady />
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

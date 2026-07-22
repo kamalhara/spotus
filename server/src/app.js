@@ -16,6 +16,7 @@ const notificationsRouter = require('./routes/notifications');
 const roomsRouter = require('./routes/rooms');
 const uploadsRouter = require('./routes/uploads');
 const authRouter = require('./routes/auth');
+const accountRouter = require('./routes/account');
 const { db } = require('./config/firebase');
 
 const app = express();
@@ -107,6 +108,7 @@ app.get('/ready', async (req, res) => {
 
 // Routes
 app.use('/api/auth', authRouter);
+app.use('/api/account', accountRouter);
 app.use('/api/notifications', notificationsRouter);
 app.use('/api/rooms', roomsRouter);
 app.use('/api/uploads', uploadsRouter);

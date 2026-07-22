@@ -1,7 +1,5 @@
 import { ScrollView, Text, View } from "react-native";
-import { useUser } from "@clerk/expo";
-import { doc, deleteDoc } from "firebase/firestore";
-import { db } from "../../../config/firebase.config";
+import { useAuth } from "@clerk/expo";
 import { useState } from "react";
 import { useModal } from "../../../context/ModalContext";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -9,11 +7,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ui/ScreenHeader";
 import SettingsRow from "../../../components/ui/SettingsRow";
 import SettingsSection from "../../../components/ui/SettingsSection";
+import { apiRequest } from "../../../lib/api";
 
 const ACCENT = "#EF4444";
 
 export default function DeleteAccount() {
-  const { user } = useUser();
+  const { getToken, signOut } = useAuth();
   const [isDeleting, setIsDeleting] = useState(false);
   const { showConfirm, showAlert } = useModal();
 
@@ -25,14 +24,11 @@ export default function DeleteAccount() {
       confirmButtonStyle: "bg-red-500",
       icon: "trash-outline",
       onConfirm: async () => {
-        if (!user) return;
         try {
           setIsDeleting(true);
-          // Delete from Firebase first
-          await deleteDoc(doc(db, "users", user.id));
-          // Delete from Clerk
-          await user.delete();
-          // The Clerk provider should automatically handle the redirect out of (authenticated)
+          const token = await getToken();
+          await apiRequest("/api/account", { method: "DELETE", token, timeoutMs: 120000 });
+          await signOut();
         } catch (error) {
           setIsDeleting(false);
           console.error("Error deleting account:", error);

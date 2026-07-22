@@ -308,6 +308,28 @@ export default function UserProfile() {
     );
   }
 
+  if (user.publicProfile === false && viewer?.id !== user.id) {
+    return (
+      <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
+        <TouchableOpacity
+          onPress={handleBack}
+          className="mx-6 mt-4 w-10 h-10 rounded-full bg-white dark:bg-[#1C1C20] items-center justify-center border border-gray-100 dark:border-[#2C2C30]"
+        >
+          <Ionicons name="chevron-back" size={20} color={isDark ? "white" : "#18181B"} />
+        </TouchableOpacity>
+        <View className="flex-1 items-center justify-center px-10 -mt-10">
+          <Ionicons name="lock-closed-outline" size={48} color="#D1D5DB" />
+          <Text className="text-secondary dark:text-gray-100 text-lg font-bold mt-4">
+            Private profile
+          </Text>
+          <Text className="text-gray-400 dark:text-gray-500 text-sm mt-1 text-center">
+            This person has limited who can view their profile.
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView className="bg-bg dark:bg-[#111113] flex-1" edges={["top"]}>
       {/* Header */}

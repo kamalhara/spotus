@@ -1,9 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useUser } from "@clerk/expo";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
+  ActivityIndicator,
   Platform,
   ScrollView,
   Text,
@@ -14,14 +16,58 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import CustomInput from "../../../components/ui/CustomInput";
 import { useTheme } from "../../../context/ThemeContext";
+import { useModal } from "../../../context/ModalContext";
 
 export default function ChangePassword() {
   const router = useRouter();
+  const { user } = useUser();
+  const { showAlert } = useModal();
   const { isDark } = useTheme();
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [formError, setFormError] = useState("");
+
+  const handleUpdatePassword = async () => {
+    setFormError("");
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setFormError("Complete all password fields.");
+      return;
+    }
+    if (newPassword.length < 8 || !/[A-Za-z]/.test(newPassword) || !/\d/.test(newPassword)) {
+      setFormError("Use at least 8 characters with a letter and a number.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setFormError("New passwords do not match.");
+      return;
+    }
+    if (newPassword === currentPassword) {
+      setFormError("Choose a password different from your current password.");
+      return;
+    }
+
+    try {
+      setIsUpdating(true);
+      await user.updatePassword({
+        currentPassword,
+        newPassword,
+        signOutOfOtherSessions: true,
+      });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      router.back();
+      showAlert("Password updated", "Your password was changed and other sessions were signed out.");
+    } catch (error) {
+      const message = error?.errors?.[0]?.longMessage || error?.errors?.[0]?.message;
+      setFormError(message || "Could not update your password. Please try again.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   return (
     <SafeAreaView className="bg-bg flex-1" edges={["top"]}>
@@ -103,16 +149,20 @@ export default function ChangePassword() {
                 />
 
                 <TouchableOpacity
-                  className="bg-primary py-4 rounded-2xl mt-4 items-center"
+                  className={`bg-primary py-4 rounded-2xl mt-4 items-center ${isUpdating ? "opacity-60" : ""}`}
                   activeOpacity={0.8}
-                  onPress={() => {
-                    // Logic to update password will go here
-                  }}
+                  disabled={isUpdating}
+                  onPress={handleUpdatePassword}
                 >
-                  <Text className="text-white font-bold text-lg">
-                    Update Password
-                  </Text>
+                  {isUpdating ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text className="text-white font-bold text-lg">Update Password</Text>
+                  )}
                 </TouchableOpacity>
+                {formError ? (
+                  <Text className="text-red-500 text-sm text-center mt-1">{formError}</Text>
+                ) : null}
               </View>
 
               <Text className="text-gray-400 dark:text-gray-500 text-xs text-center mt-8 px-4">

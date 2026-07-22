@@ -22,6 +22,7 @@ import {
   useFloatingButton,
 } from "../../../context/FloatingButtonContext";
 import { useTheme } from "../../../context/ThemeContext";
+import { useLocalization } from "../../../context/LocalizationContext";
 
 import { ChatProvider, useChats } from "../../../context/ChatContext";
 
@@ -240,6 +241,7 @@ function getActiveTab(pathname) {
 // ── Inner layout that can access the floating button context ──────────────
 function TabsLayoutInner() {
   const { isDark } = useTheme();
+  const { t } = useLocalization();
   const { unreadCount } = useChats();
   const pathname = usePathname();
   const activeTab = getActiveTab(pathname);
@@ -256,29 +258,29 @@ function TabsLayoutInner() {
             <LiquidTabBar {...props} unreadCount={unreadCount} />
           )}
         >
-          <Tabs.Screen name="home" options={{ title: "Home" }} />
-          <Tabs.Screen name="rooms_tab" options={{ title: "Rooms" }} />
-          <Tabs.Screen name="chat_tab" options={{ title: "Chat" }} />
-          <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+          <Tabs.Screen name="home" options={{ title: t("tabs.home") }} />
+          <Tabs.Screen name="rooms_tab" options={{ title: t("tabs.rooms") }} />
+          <Tabs.Screen name="chat_tab" options={{ title: t("tabs.chats") }} />
+          <Tabs.Screen name="profile" options={{ title: t("tabs.profile") }} />
         </Tabs>
       ) : (
         <NativeTabs>
           <NativeTabs.Trigger name="home">
-            <Label>Home</Label>
+            <Label>{t("tabs.home")}</Label>
             <Icon
               selectedColor={isDark ? "#FFAB99" : "#FF6B47"}
               sf={{ default: "house", selected: "house.fill" }}
             />
           </NativeTabs.Trigger>
           <NativeTabs.Trigger name="rooms_tab">
-            <Label>Rooms</Label>
+            <Label>{t("tabs.rooms")}</Label>
             <Icon
               selectedColor={isDark ? "#FFAB99" : "#FF6B47"}
               sf={{ default: "person.2", selected: "person.2.fill" }}
             />
           </NativeTabs.Trigger>
           <NativeTabs.Trigger name="chat_tab">
-            <Label>Chat</Label>
+            <Label>{t("tabs.chats")}</Label>
             <Icon
               selectedColor={isDark ? "#FFAB99" : "#FF6B47"}
               sf={{ default: "message", selected: "message.fill" }}
@@ -286,7 +288,7 @@ function TabsLayoutInner() {
             {unreadCount > 0 && <Badge>{unreadCount}</Badge>}
           </NativeTabs.Trigger>
           <NativeTabs.Trigger name="profile">
-            <Label>Profile</Label>
+            <Label>{t("tabs.profile")}</Label>
             <Icon
               selectedColor={isDark ? "#FFAB99" : "#FF6B47"}
               sf={{

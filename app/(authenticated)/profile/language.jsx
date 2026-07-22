@@ -1,37 +1,47 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useState } from "react";
+import * as Haptics from "expo-haptics";
+import { doc, updateDoc } from "firebase/firestore";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ScreenHeader from "../../../components/ui/ScreenHeader";
-
-const LANGUAGES = [
-  { code: "en", label: "English", region: "United States" },
-  { code: "hi", label: "Hindi", region: "India" },
-  { code: "es", label: "Spanish", region: "International" },
-  { code: "fr", label: "French", region: "International" },
-];
+import { db } from "../../../config/firebase.config";
+import {
+  SUPPORTED_LANGUAGES,
+  useLocalization,
+} from "../../../context/LocalizationContext";
+import useFirestoreUser from "../../../hook/useFireStoreUser";
 
 export default function Language() {
-  const [selectedLanguage, setSelectedLanguage] = useState("en");
+  const { language: selectedLanguage, setLanguage, t } = useLocalization();
+  const { firestoreUser } = useFirestoreUser();
+
+  const selectLanguage = async (code) => {
+    if (code === selectedLanguage) return;
+    await setLanguage(code);
+    if (firestoreUser?.id) {
+      await updateDoc(doc(db, "users", firestoreUser.id), { language: code });
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-bg dark:bg-[#111113]" edges={["top"]}>
-      <ScreenHeader title="Language" subtitle="App language" />
+      <ScreenHeader title={t("language.title")} subtitle={t("language.subtitle")} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingHorizontal: 24, paddingBottom: 40 }}
       >
         <View className="bg-white dark:bg-[#1C1C20] rounded-2xl border border-gray-100 dark:border-[#2C2C30] overflow-hidden">
-          {LANGUAGES.map((language, index) => {
+          {SUPPORTED_LANGUAGES.map((language, index) => {
             const selected = selectedLanguage === language.code;
             return (
               <TouchableOpacity
                 key={language.code}
-                onPress={() => setSelectedLanguage(language.code)}
+                onPress={() => selectLanguage(language.code)}
                 activeOpacity={0.75}
                 className={`px-5 py-4 flex-row items-center ${
-                  index !== LANGUAGES.length - 1
+                  index !== SUPPORTED_LANGUAGES.length - 1
                     ? "border-b border-gray-50 dark:border-[#2C2C30]"
                     : ""
                 }`}
@@ -60,7 +70,7 @@ export default function Language() {
                 {selected ? (
                   <View className="bg-primary px-2.5 py-1 rounded-lg">
                     <Text className="text-white text-[10px] font-bold">
-                      Active
+                      {t("common.active")}
                     </Text>
                   </View>
                 ) : null}

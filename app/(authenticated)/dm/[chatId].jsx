@@ -175,8 +175,14 @@ export default function ChatId() {
   }, [chatDocId]);
   useEffect(() => {
     if (!chatDocId || !currentUserId) return;
-    ChatSeen(chatDocId, currentUserId, messages, chatDoc);
-  }, [chatDocId, currentUserId, messages, chatDoc]);
+    ChatSeen(
+      chatDocId,
+      currentUserId,
+      messages,
+      chatDoc,
+      firestoreUser?.readReceipts !== false,
+    );
+  }, [chatDocId, currentUserId, messages, chatDoc, firestoreUser?.readReceipts]);
 
   const handleEditMessage = async (messageId, newText) => {
     if (!newText.trim() || !chatDocId) return;

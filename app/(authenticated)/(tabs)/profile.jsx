@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Skeleton from "../../../components/ui/Skeleton";
 
 import ConfirmModal from "../../../components/ui/ConfirmModal";
+import { useLocalization } from "../../../context/LocalizationContext";
 import useFirestoreUser from "../../../hook/useFireStoreUser";
 import { getRooms } from "../../../lib/getRoom";
 
@@ -58,6 +59,7 @@ export default function Profile() {
   const { signOut } = useAuth();
   const { firestoreUser, loading } = useFirestoreUser();
   const router = useRouter();
+  const { t, languageInfo } = useLocalization();
 
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [rooms, setRooms] = useState([]);
@@ -166,7 +168,7 @@ export default function Profile() {
             className="text-muted dark:text-gray-400 text-[14px] mt-1.5 text-center px-8 font-body leading-5"
             numberOfLines={2}
           >
-            {firestoreUser?.bio || "Add a short bio"}
+            {firestoreUser?.bio || t("profile.addBio")}
           </Text>
 
           {/* Pill stat badges */}
@@ -174,13 +176,13 @@ export default function Profile() {
             <View className="flex-row items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-[#222226]">
               <Ionicons name="add-circle-outline" size={12} color="#6B7280" />
               <Text className="text-gray-500 dark:text-gray-400 text-[11px] font-semibold ml-1.5">
-                {createdRooms} created
+                {createdRooms} {t("profile.created")}
               </Text>
             </View>
             <View className="flex-row items-center px-3 py-1.5 rounded-lg bg-gray-100 dark:bg-[#222226]">
               <Ionicons name="enter-outline" size={12} color="#6B7280" />
               <Text className="text-gray-500 dark:text-gray-400 text-[11px] font-semibold ml-1.5">
-                {joinedRooms} joined
+                {joinedRooms} {t("profile.joined")}
               </Text>
             </View>
           </View>
@@ -223,17 +225,17 @@ export default function Profile() {
         {/* Menu Groups */}
         <View className="bg-white dark:bg-[#1A1A1E] mx-6 mt-4 rounded-2xl border border-gray-100 dark:border-[#2A2A2E] overflow-hidden">
           <Text className="text-gray-400 dark:text-gray-500 text-[12px] font-medium px-5 pt-4 pb-2">
-            Account
+            {t("profile.account")}
           </Text>
           <MenuItem
             icon="person-outline"
-            label="Account Details"
+            label={t("profile.accountDetails")}
             subtitle={firestoreUser?.email}
             onPress={() => router.push("/profile/accountSetting")}
           />
           <MenuItem
             icon="shield-checkmark-outline"
-            label="Security"
+            label={t("profile.security")}
             onPress={() => router.push("/profile/security")}
             isLast
           />
@@ -241,17 +243,17 @@ export default function Profile() {
 
         <View className="bg-white dark:bg-[#1A1A1E] mx-6 mt-3 rounded-2xl border border-gray-100 dark:border-[#2A2A2E] overflow-hidden">
           <Text className="text-gray-400 dark:text-gray-500 text-[12px] font-medium px-5 pt-4 pb-2">
-            App
+            {t("profile.app")}
           </Text>
           <MenuItem
             icon="notifications-outline"
-            label="Notifications"
+            label={t("profile.notifications")}
             onPress={() => router.push("/profile/notifications")}
           />
           <MenuItem
             icon="language-outline"
-            label="Language"
-            subtitle="English"
+            label={t("profile.language")}
+            subtitle={languageInfo?.label}
             onPress={() => router.push("/profile/language")}
             isLast
           />
@@ -259,21 +261,21 @@ export default function Profile() {
 
         <View className="bg-white dark:bg-[#1A1A1E] mx-6 mt-3 rounded-2xl border border-gray-100 dark:border-[#2A2A2E] overflow-hidden">
           <Text className="text-gray-400 dark:text-gray-500 text-[12px] font-medium px-5 pt-4 pb-2">
-            Safety & Privacy
+            {t("profile.safetyPrivacy")}
           </Text>
           <MenuItem
             icon="eye-outline"
-            label="Privacy & Data"
+            label={t("profile.privacyData")}
             onPress={() => router.push("/profile/privacyData")}
           />
           <MenuItem
             icon="shield-outline"
-            label="Safety Center"
+            label={t("profile.safetyCenter")}
             onPress={() => router.push("/profile/safety")}
           />
           <MenuItem
             icon="document-text-outline"
-            label="Community Guidelines"
+            label={t("profile.communityGuidelines")}
             onPress={() => router.push("/profile/communityGuidelines")}
             isLast
           />
@@ -281,26 +283,26 @@ export default function Profile() {
 
         <View className="bg-white dark:bg-[#1A1A1E] mx-6 mt-3 rounded-2xl border border-gray-100 dark:border-[#2A2A2E] overflow-hidden">
           <Text className="text-gray-400 dark:text-gray-500 text-[12px] font-medium px-5 pt-4 pb-2">
-            Support
+            {t("profile.support")}
           </Text>
           <MenuItem
             icon="help-circle-outline"
-            label="Help Center"
+            label={t("profile.helpCenter")}
             onPress={() => router.push("/profile/helpCenter")}
           />
           <MenuItem
             icon="bug-outline"
-            label="Report a Problem"
+            label={t("profile.reportProblem")}
             onPress={() => router.push("/profile/reportProblem")}
           />
           <MenuItem
             icon="mail-outline"
-            label="Contact Support"
+            label={t("profile.contactSupport")}
             onPress={() => router.push("/profile/contactSupport")}
           />
           <MenuItem
             icon="information-circle-outline"
-            label="About SpotUs"
+            label={t("profile.about")}
             onPress={() => router.push("/profile/about")}
             isLast
           />
@@ -313,7 +315,7 @@ export default function Profile() {
           className="mx-6 mt-6 py-3.5 rounded-2xl flex-row items-center justify-center gap-2"
         >
           <Ionicons name="log-out-outline" size={16} color="#EF4444" />
-          <Text className="text-red-500 font-medium text-[14px]">Sign Out</Text>
+          <Text className="text-red-500 font-medium text-[14px]">{t("profile.signOut")}</Text>
         </TouchableOpacity>
 
         <Text className="text-center text-gray-300 dark:text-gray-600 text-[10px] mt-5 tracking-wider font-body">
