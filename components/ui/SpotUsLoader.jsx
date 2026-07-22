@@ -1,6 +1,6 @@
+import { useColorScheme } from "nativewind";
 import React, { useEffect } from "react";
 import { View } from "react-native";
-import Svg, { Circle, Path } from "react-native-svg";
 import Animated, {
   Easing,
   interpolate,
@@ -10,7 +10,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from "react-native-reanimated";
-import { useColorScheme } from "nativewind";
+import Svg, { Circle, Path } from "react-native-svg";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -41,7 +41,10 @@ export default function SpotUsLoader({
 
   useEffect(() => {
     progress.value = withRepeat(
-      withTiming(1, { duration: 1800, easing: Easing.bezier(0.37, 0, 0.63, 1) }),
+      withTiming(1, {
+        duration: 1800,
+        easing: Easing.bezier(0.37, 0, 0.63, 1),
+      }),
       -1,
       false,
     );
@@ -52,11 +55,12 @@ export default function SpotUsLoader({
   // Node Left
   const nodeLeftProps = useAnimatedProps(() => {
     return {
-      stroke: interpolateColor(
-        progress.value,
-        inputRange,
-        [ACTIVE_COLOR, INACTIVE_COLOR, INACTIVE_COLOR, ACTIVE_COLOR]
-      ),
+      stroke: interpolateColor(progress.value, inputRange, [
+        ACTIVE_COLOR,
+        INACTIVE_COLOR,
+        INACTIVE_COLOR,
+        ACTIVE_COLOR,
+      ]),
       fillOpacity: interpolate(progress.value, inputRange, [1, 0, 0, 1]),
       r: interpolate(progress.value, [0, 0.08, 0.22, 1], [91, 95.55, 91, 91]),
     };
@@ -65,59 +69,72 @@ export default function SpotUsLoader({
   // Node Top
   const nodeTopProps = useAnimatedProps(() => {
     return {
-      stroke: interpolateColor(
-        progress.value,
-        inputRange,
-        [INACTIVE_COLOR, ACTIVE_COLOR, INACTIVE_COLOR, INACTIVE_COLOR]
-      ),
+      stroke: interpolateColor(progress.value, inputRange, [
+        INACTIVE_COLOR,
+        ACTIVE_COLOR,
+        INACTIVE_COLOR,
+        INACTIVE_COLOR,
+      ]),
       fillOpacity: interpolate(progress.value, inputRange, [0, 1, 0, 0]),
-      r: interpolate(progress.value, [0, 0.3333, 0.4133, 0.5533, 1], [91, 91, 95.55, 91, 91]),
+      r: interpolate(
+        progress.value,
+        [0, 0.3333, 0.4133, 0.5533, 1],
+        [91, 91, 95.55, 91, 91],
+      ),
     };
   });
 
   // Node Right
   const nodeRightProps = useAnimatedProps(() => {
     return {
-      stroke: interpolateColor(
-        progress.value,
-        inputRange,
-        [INACTIVE_COLOR, INACTIVE_COLOR, ACTIVE_COLOR, INACTIVE_COLOR]
-      ),
+      stroke: interpolateColor(progress.value, inputRange, [
+        INACTIVE_COLOR,
+        INACTIVE_COLOR,
+        ACTIVE_COLOR,
+        INACTIVE_COLOR,
+      ]),
       fillOpacity: interpolate(progress.value, inputRange, [0, 0, 1, 0]),
-      r: interpolate(progress.value, [0, 0.6666, 0.7466, 0.8866, 1], [91, 91, 95.55, 91, 91]),
+      r: interpolate(
+        progress.value,
+        [0, 0.6666, 0.7466, 0.8866, 1],
+        [91, 91, 95.55, 91, 91],
+      ),
     };
   });
 
   // Line Bottom (Left to Right)
   const lineBottomProps = useAnimatedProps(() => {
     return {
-      stroke: interpolateColor(
-        progress.value,
-        inputRange,
-        [ACTIVE_COLOR, INACTIVE_COLOR, INACTIVE_COLOR, ACTIVE_COLOR]
-      ),
+      stroke: interpolateColor(progress.value, inputRange, [
+        ACTIVE_COLOR,
+        INACTIVE_COLOR,
+        INACTIVE_COLOR,
+        ACTIVE_COLOR,
+      ]),
     };
   });
 
   // Line Left Diag (Top to Left)
   const lineLeftDiagProps = useAnimatedProps(() => {
     return {
-      stroke: interpolateColor(
-        progress.value,
-        inputRange,
-        [INACTIVE_COLOR, ACTIVE_COLOR, INACTIVE_COLOR, INACTIVE_COLOR]
-      ),
+      stroke: interpolateColor(progress.value, inputRange, [
+        INACTIVE_COLOR,
+        ACTIVE_COLOR,
+        INACTIVE_COLOR,
+        INACTIVE_COLOR,
+      ]),
     };
   });
 
   // Line Right Diag (Top to Right)
   const lineRightDiagProps = useAnimatedProps(() => {
     return {
-      stroke: interpolateColor(
-        progress.value,
-        inputRange,
-        [INACTIVE_COLOR, INACTIVE_COLOR, ACTIVE_COLOR, INACTIVE_COLOR]
-      ),
+      stroke: interpolateColor(progress.value, inputRange, [
+        INACTIVE_COLOR,
+        INACTIVE_COLOR,
+        ACTIVE_COLOR,
+        INACTIVE_COLOR,
+      ]),
     };
   });
 
