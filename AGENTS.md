@@ -71,4 +71,4 @@ This file serves as the core context for AI agents working on the `spot-us` code
 
 - Use **Conventional Commits** (e.g., `feat:`, `fix:`, `refactor:`, `chore:`).
 - Keep commit subjects short, imperative, and descriptive.
-- PRs must include a concise summary, linked issue numbers, screenshots/recordings for UI changes, and details on verification steps taken
+- PRs must include a concise summary, linked issue numbers, screenshots/recordings for UI changes, and details on verification steps taken.
