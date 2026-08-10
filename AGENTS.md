@@ -100,4 +100,4 @@ This file serves as the core context for AI agents working on the `spot-us` code
 
 - **Headers:** Use `bg-header-background text-header-foreground`.
 - **Back Buttons:** Use `Ionicons` and ensure they are styled with `text-primary` and `font-bold` when necessary.
-- **`ScreenWrapper` Component:** Always wrap screen content in `components/ui/ScreenWrapper` to ensure consistent safe area handling and background styling across the app.
+- **`ScreenWrapper` Component:** Always wrap screen content in `components/ui/ScreenWrapper` to ensure consistent safe area handling and background styling across the app
