@@ -23,6 +23,7 @@ SpotUs is an internal, location-based social discovery and real-time messaging a
   - [Environment Configuration](#environment-configuration)
   - [Dependencies Installation](#dependencies-installation)
   - [Local Development Server](#local-development-server)
+  - [Backend Development](#backend-development)
 - [Internal Git & Development Flow](#-internal-git--development-flow)
 - [Firebase & Security Configuration](#-firebase--security-configuration)
 - [EAS Build & Release Management](#-eas-build--release-management)
@@ -67,9 +68,9 @@ flowchart TD
 ## 🛠️ Tech Stack & Dependencies
 
 - **Core SDK**: Expo SDK v54 (React Native 0.81.x)
-- **Routing**: Expo Router (v6/v7 compatible)
+- **Routing**: Expo Router v6
 - **Styling**: NativeWind v4, Tailwind CSS, Reanimated v4
-- **State & Logic**: Context APIs, Lucide Icons, Haptics
+- **State & Logic**: React Context APIs, Expo Haptics
 - **Identity Provider**: Clerk SDK (`@clerk/expo`)
 - **Database Backend**: Firebase Firestore (Web SDK v12)
 - **Geo-indexing**: Geohashes via `geofire-common`
@@ -125,18 +126,18 @@ Ensure your workstation has the following installed:
 - **iOS Simulator** (via Xcode) and/or **Android Emulator** (via Android Studio)
 - **Expo Go** app installed on your physical test device
 
-### SSH Git Clone
+### Clone the Repository
 
-Request repository access from the administrator, then clone using SSH:
+Clone the repository using HTTPS or SSH:
 
 ```bash
-git clone git@github.com:spotus/spotus.git
+git clone https://github.com/kamalhara/spotus.git
 cd spotus
 ```
 
 ### Environment Configuration
 
-Copy the template below to create your local environment file. **Never commit `.env` or configuration secrets to the repository.**
+Create a local `.env` file. **Never commit `.env` or configuration secrets to the repository.**
 
 ```bash
 touch .env
@@ -156,11 +157,17 @@ EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 EXPO_PUBLIC_FIREBASE_APP_ID=...
 EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID=...
+
+# Optional API, monitoring, and analytics configuration
+EXPO_PUBLIC_API_URL=http://localhost:8080
+EXPO_PUBLIC_SENTRY_DSN=...
+EXPO_PUBLIC_POSTHOG_API_KEY=...
+EXPO_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 ```
 
 ### Dependencies Installation
 
-Install dependencies based on the locked package manifests:
+Install the mobile app dependencies from the lockfile:
 
 ```bash
 npm ci
@@ -177,6 +184,20 @@ npm start
 - Press `i` to launch on the local iOS Simulator.
 - Press `a` to launch on the local Android Emulator.
 - Scan the console QR code to run on a physical test device via Expo Go.
+
+### Backend Development
+
+The Express backend lives in [`server/`](server/) and has its own dependencies and environment variables:
+
+```bash
+cd server
+npm ci
+npm run dev
+```
+
+For local development, set `EXPO_PUBLIC_API_URL=http://localhost:8080` in the app environment. The backend requires server-side configuration such as `CLERK_SECRET_KEY`, `FIREBASE_SERVICE_ACCOUNT`, and the Cloudinary credentials used by the upload and room-cleanup services. Keep these values in the server's environment only; do not expose them through `EXPO_PUBLIC_` variables.
+
+The root `npm run dev` command starts Expo and the Trigger.dev development worker together. Use it when working on the scheduled jobs in [`src/trigger/`](src/trigger/).
 
 ---
 
@@ -201,7 +222,7 @@ To maintain codebase sanity, follow these team practices:
 
 SpotUs uses **Clerk** for user authentication instead of Firebase Auth. Because of this, Firebase's `request.auth` remains `null` for client-side API requests.
 
-The firestore security configuration is located in [firestore.rules](file:///Users/kamalahara/code/spotus/firestore.rules).
+The firestore security configuration is located in [`firestore.rules`](firestore.rules).
 
 - **Client Access**: Read/write rules are set up to support real-time messaging updates direct from the client.
 - **Moderation**: The `/reports/{reportId}` rules are write-only (`allow create: if true; allow read, update, delete: if false`) to secure reporting logs from external inspects.
@@ -210,23 +231,23 @@ The firestore security configuration is located in [firestore.rules](file:///Use
 
 ## 📦 EAS Build & Release Management
 
-We use **Expo Application Services (EAS)** to run builds and distribute internal testing versions.
+We use **Expo Application Services (EAS)** to run builds and distribute internal testing versions. Build profiles are defined in [`eas.json`](eas.json).
 
 ### Setting Up EAS locally
 
 1. Install EAS CLI: `npm install -g eas-cli`
-2. Log in using the team shared account credentials:
+2. Log in with an account that has access to the SpotUs EAS project:
    ```bash
    npx eas-cli login
    ```
-3. Link the app with the EAS project ID (from `app.json`):
+3. Link the app with the EAS project if needed:
    ```bash
    npx eas project:init
    ```
 
 ### Internal Release Builds
 
-Generate builds based on configurations defined in [eas.json](file:///Users/kamalahara/code/spotus/eas.json):
+Generate builds based on the configurations defined in [`eas.json`](eas.json):
 
 ```bash
 # Generate a local development client build (allows hot reloading on devices/simulators)
